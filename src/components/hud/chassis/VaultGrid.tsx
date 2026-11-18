@@ -50,7 +50,7 @@ function VaultCell({
       ref={setNodeRef}
       className={`
         relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border cursor-pointer
-        ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-[#2a3535] bg-[#050808]/80'}
+        ${isOver ? 'border-cyan-glow bg-cyan-glow/10' : 'border-line-subtle bg-abyss/80'}
       `}
       onClick={handleActivate}
       role="button"
@@ -75,7 +75,7 @@ function VaultCell({
           />
         </div>
       ) : (
-        <span className="absolute inset-0 flex items-center justify-center text-[8px] text-[#3a4a49] pointer-events-none">
+        <span className="absolute inset-0 flex items-center justify-center text-2xs text-[#3a4a49] pointer-events-none">
           {index + 1}
         </span>
       )}

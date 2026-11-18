@@ -48,10 +48,10 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('carcinus@moltology.org')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^settings$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^sign out$/i })).toBeInTheDocument()
-    expect(screen.getByText('SIGN OUT')).toBeInTheDocument()
-    expect(screen.getByText('SETTINGS')).toBeInTheDocument()
-    expect(screen.queryByText('MOLTOLOGY HOME')).not.toBeInTheDocument()
-    expect(screen.getByText('PROFILE')).toBeInTheDocument()
+    expect(screen.getByText('Sign out')).toBeInTheDocument()
+    expect(screen.getByText('Settings')).toBeInTheDocument()
+    expect(screen.queryByText('Moltology home')).not.toBeInTheDocument()
+    expect(screen.getByText('Profile')).toBeInTheDocument()
   })
 
   it('prefers a claimed designation over auth name or larva unit', () => {

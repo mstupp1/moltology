@@ -50,7 +50,7 @@ const VARIANT_MAP: Record<HUDSpinnerVariant, { primary: string; secondary: strin
  * // With a label below (stack vertically with a wrapper)
  * <div className="flex flex-col items-center gap-2">
  *   <HUDSpinner size="lg" />
- *   <span className="text-xs text-[#00c3ff]/60">Fetching doctrine...</span>
+ *   <span className="text-xs text-cyan-glow/60">Fetching doctrine...</span>
  * </div>
  */
 export function HUDSpinner({
@@ -121,7 +121,7 @@ export function HUDSpinner({
 
       {label && (
         <span
-          className="font-sans uppercase tracking-widest"
+          className="font-sans"
           style={{ fontSize: Math.max(9, px * 0.22), color: primary, opacity: 0.7 }}
         >
           {label}

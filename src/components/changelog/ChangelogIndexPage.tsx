@@ -36,7 +36,7 @@ export function ChangelogIndexPage() {
     const extraCats = Object.keys(counts).filter((c) => !standardOrder.includes(c))
 
     return [
-      { label: 'ALL', count: logs.length },
+      { label: 'All', count: logs.length },
       ...[...orderedCats, ...extraCats].map((cat) => ({
         label: cat,
         count: counts[cat] || 0,
@@ -124,11 +124,11 @@ export function ChangelogIndexPage() {
       <PublicHeader onOpenAuth={openAuth} />
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-8 pt-28 sm:pt-32 pb-12 space-y-5">
         <header className="space-y-3 pb-2">
-          <div className="flex items-center gap-2 text-sm font-bold text-cyan-glow">
+          <div className="flex items-center gap-2 text-sm font-semibold text-cyan-glow">
             <GitCommit className="w-4 h-4" aria-hidden="true" />
             <span>What’s new</span>
           </div>
-          <h1 className="font-grotesk font-bold text-3xl sm:text-4xl tracking-tight">Change log</h1>
+          <h1 className="font-grotesk font-semibold text-3xl sm:text-4xl tracking-tight">Change log</h1>
           <p className="text-sm sm:text-base text-ink-muted leading-relaxed max-w-2xl">
             New features, improvements, and fixes to make your day in Moltology easier.
           </p>
@@ -141,9 +141,9 @@ export function ChangelogIndexPage() {
           meta={<span className="text-xs text-ink-muted tabular-nums" role="status">{filteredLogs.length} updates</span>}>
           {filteredLogs.length === 0 ? (
             <div className="py-10 text-center space-y-3">
-              <h3 className="text-base font-bold">No updates found</h3>
+              <h3 className="text-base font-semibold">No updates found</h3>
               <p className="text-sm text-ink-muted">Try another search or clear your filters.</p>
-              <button onClick={handleResetFilters} className={`min-h-10 px-3 text-sm font-bold text-cyan-glow rounded-control hover:bg-surface-2 ${DASHBOARD_FOCUS}`}>Clear filters</button>
+              <button onClick={handleResetFilters} className={`min-h-10 px-3 text-sm font-semibold text-cyan-glow rounded-control hover:bg-surface-2 ${DASHBOARD_FOCUS}`}>Clear filters</button>
             </div>
           ) : (
             <ol className="divide-y divide-line-subtle">
@@ -155,13 +155,13 @@ export function ChangelogIndexPage() {
                       {log.releasedAt ? <LocalTime value={log.releasedAt} /> : 'Date unavailable'}
                     </span>
                     <span className="min-w-0 space-y-2 block">
-                      <span className="flex flex-wrap items-center gap-2 text-[11px]">
-                        <span className="rounded-chip bg-cyan-soft px-2 py-0.5 font-bold text-cyan-glow">{log.category}</span>
+                      <span className="flex flex-wrap items-center gap-2 text-2xs">
+                        <span className="rounded-chip bg-cyan-soft px-2 py-0.5 font-semibold text-cyan-glow">{log.category}</span>
                         {log.version && <span className="text-ink-muted">{log.version}</span>}
                       </span>
-                      <span className="block text-base sm:text-lg font-bold text-ink group-hover:text-cyan-glow leading-snug">{log.title}</span>
+                      <span className="block text-base sm:text-lg font-semibold text-ink group-hover:text-cyan-glow leading-snug">{log.title}</span>
                       <span className="block text-sm text-ink-muted leading-relaxed">{log.summary}</span>
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-cyan-glow pt-1">Read update <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" /></span>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow pt-1">Read update <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" /></span>
                     </span>
                     <ChevronRight className="hidden sm:block w-4 h-4 text-ink-muted mt-1 group-hover:text-cyan-glow" aria-hidden="true" />
                   </Link>

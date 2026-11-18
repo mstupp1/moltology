@@ -9,7 +9,7 @@ function formatBalance(value: number): string {
 /** A gem amount with its icon, for prices and balances. */
 export function GemAmount({ value, size = 'md' }: { value: number; size?: 'sm' | 'md' }) {
   return (
-    <span className={cn('inline-flex items-center gap-1 font-grotesk font-bold tabular-nums text-ink', size === 'sm' ? 'text-[12px]' : 'text-base')}>
+    <span className={cn('inline-flex items-center gap-1 font-grotesk font-semibold tabular-nums text-ink', size === 'sm' ? 'text-xs' : 'text-base')}>
       <img
         src={getAssetUrl('/images/chitin_gem.png')}
         alt=""
@@ -35,10 +35,10 @@ export function MarketCurrencyBar({ chitinGems, moltCredits, creditsLive, classN
       <div className="flex min-w-0 items-center gap-2 rounded-control bg-surface-2 px-3 py-2">
         <img src={getAssetUrl('/images/chitin_gem.png')} alt="" className="w-6 h-6 object-contain shrink-0" />
         <div className="flex flex-col leading-none min-w-0 gap-1">
-          <span className="whitespace-nowrap text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
+          <span className="eyebrow whitespace-nowrap">
             Chitin Gems
           </span>
-          <span className="font-grotesk text-base font-extrabold text-ink tabular-nums" data-testid="gem-balance">
+          <span className="font-grotesk text-base font-semibold text-ink tabular-nums" data-testid="gem-balance">
             {formatBalance(chitinGems)}
           </span>
         </div>
@@ -46,10 +46,10 @@ export function MarketCurrencyBar({ chitinGems, moltCredits, creditsLive, classN
       <div className="flex min-w-0 items-center gap-2 rounded-control bg-surface-2 px-3 py-2">
         <img src={getAssetUrl('/images/molt_credit.png')} alt="" className="w-6 h-6 object-contain shrink-0" />
         <div className="flex flex-col leading-none min-w-0 gap-1">
-          <span className="whitespace-nowrap text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
+          <span className="eyebrow whitespace-nowrap">
             Molt Credits
           </span>
-          <span className="font-grotesk text-base font-extrabold text-ink tabular-nums">
+          <span className="font-grotesk text-base font-semibold text-ink tabular-nums">
             {creditsLive || moltCredits > 0 ? formatBalance(moltCredits) : 'Soon'}
           </span>
         </div>

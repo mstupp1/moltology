@@ -45,7 +45,7 @@ export function StoryLink({
 
 export function Kicker({ category }: { category: string }) {
   return (
-    <span className="text-[11px] font-sans font-bold uppercase tracking-[0.08em] text-cyan-glow">
+    <span className="eyebrow">
       {formatSectionName(category)}
     </span>
   )

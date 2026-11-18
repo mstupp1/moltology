@@ -78,7 +78,7 @@ describe('UserAvatar Component', () => {
 
     const { container } = render(<UserAvatar user={user} size="xxs" />)
     const avatar = container.firstChild as HTMLElement
-    expect(avatar.className).toContain('w-4 h-4 text-[8px]')
+    expect(avatar.className).toContain('w-4 h-4 text-2xs')
     expect(screen.getByText('B')).toBeInTheDocument()
   })
 })

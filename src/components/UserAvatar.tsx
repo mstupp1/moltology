@@ -69,8 +69,8 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
 
     // Size preset mapping
     const sizeClasses = {
-      xxs: 'w-4 h-4 text-[8px]',
-      xs: 'w-5 h-5 text-[10px]',
+      xxs: 'w-4 h-4 text-2xs',
+      xs: 'w-5 h-5 text-2xs',
       sm: 'w-6 h-6 text-xs',
       row: 'w-8 h-8 text-xs',
       nav: 'w-9 h-9 text-sm',
@@ -122,7 +122,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     if (imageUrl && !imageError) {
       return (
         <div
-          className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
+          className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-abyss ${sizeClasses} ${className}`}
         >
           <BrandAwareImage
             src={imageUrl}
@@ -138,7 +138,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
     if (fallbackSrc && !user) {
       return (
         <div
-          className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
+          className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-abyss ${sizeClasses} ${className}`}
         >
           <BrandAwareImage
             src={fallbackSrc}
@@ -154,7 +154,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = React.memo(
 
     return (
       <div
-        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] ${borderless ? '' : 'border border-[#00c3ff]/60'} text-[#00c3ff] ${sizeClasses} ${className}`}
+        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-semibold bg-gradient-to-br from-surface-2 via-surface-1 to-abyss ${borderless ? '' : 'border border-cyan-glow/60'} text-cyan-glow ${sizeClasses} ${className}`}
         aria-label={displayAlt}
         title={displayName || 'User Avatar'}
       >

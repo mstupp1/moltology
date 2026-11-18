@@ -167,7 +167,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
     content: forumMarkdownToDoc(value) as JSONContent,
     editorProps: {
       attributes: {
-        class: `forum-editor-content ${SIZE_CLASS[size]} max-h-[420px] overflow-y-auto px-3 py-2.5 text-[16px] sm:text-sm text-ink leading-relaxed outline-hidden break-words`,
+        class: `forum-editor-content ${SIZE_CLASS[size]} max-h-[420px] overflow-y-auto px-3 py-2.5 text-base sm:text-sm text-ink leading-relaxed outline-hidden break-words`,
         role: 'textbox',
         'aria-multiline': 'true',
         ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
@@ -429,7 +429,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
             <button
               type="button"
               onClick={applyLink}
-              className="min-h-8 px-3 rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss text-[11px] font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="min-h-8 px-3 rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss text-2xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               data-testid="forum-link-apply"
             >
               Apply
@@ -438,7 +438,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
               <button
                 type="button"
                 onClick={removeLink}
-                className="min-h-8 px-2.5 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="min-h-8 px-2.5 rounded-control text-2xs font-semibold text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 data-testid="forum-link-remove"
               >
                 Remove
@@ -447,13 +447,13 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
             <button
               type="button"
               onClick={closeLink}
-              className="min-h-8 px-2.5 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="min-h-8 px-2.5 rounded-control text-2xs font-semibold text-ink-muted hover:text-ink hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Cancel
             </button>
           </div>
           {linkError && (
-            <p id={`${fieldId}-link-error`} className="text-[11px] text-crimson-text" role="alert">
+            <p id={`${fieldId}-link-error`} className="text-2xs text-crimson-text" role="alert">
               {linkError}
             </p>
           )}
@@ -470,7 +470,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
       )}
 
       <p
-        className={`border-t border-line-subtle px-3 py-2 text-[11px] ${value.trim().length > FORUM_BODY_MAX_CHARS ? 'text-crimson-text' : 'text-ink-muted'}`}
+        className={`border-t border-line-subtle px-3 py-2 text-2xs ${value.trim().length > FORUM_BODY_MAX_CHARS ? 'text-crimson-text' : 'text-ink-muted'}`}
         role={value.trim().length > FORUM_BODY_MAX_CHARS ? 'alert' : undefined}
       >
         {value.trim().length} / {FORUM_BODY_MAX_CHARS.toLocaleString('en-US')} characters · Includes formatting and links
@@ -485,12 +485,12 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
           style={{ left: mention?.left ?? 0, top: mention?.top ?? 0, width: MENTION_MENU_WIDTH }}
           className="absolute z-30 max-h-48 overflow-y-auto rounded-card border border-line bg-surface-2 shadow-menu p-1"
         >
-          {!searchEnabled && <p className="px-3 py-2 text-[11px] text-ink-muted">Type a handle to mention someone.</p>}
+          {!searchEnabled && <p className="px-3 py-2 text-2xs text-ink-muted">Type a handle to mention someone.</p>}
           {searchEnabled && searching && options.length === 0 && (
-            <p className="px-3 py-2 text-[11px] text-ink-muted">Searching members...</p>
+            <p className="px-3 py-2 text-2xs text-ink-muted">Searching members...</p>
           )}
           {searchEnabled && !searching && options.length === 0 && (
-            <p className="px-3 py-2 text-[11px] text-ink-muted">No member has that handle.</p>
+            <p className="px-3 py-2 text-2xs text-ink-muted">No member has that handle.</p>
           )}
           {options.map((member, index) => {
             const handle = member.handle!.trim()
@@ -509,7 +509,7 @@ export const ForumEditor = forwardRef<ForumEditorHandle, ForumEditorProps>(funct
                   applyMention(handle)
                 }}
               >
-                <span className="font-bold">@{handle}</span>
+                <span className="font-semibold">@{handle}</span>
                 {member.displayName && member.displayName !== handle && (
                   <span className="ml-2 text-ink-muted">{member.displayName}</span>
                 )}

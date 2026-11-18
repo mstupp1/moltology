@@ -42,7 +42,7 @@ export function ChangelogDetailPage() {
         />
         <div className="text-center rounded-card hud-sheen shadow-sheen-inset border border-line-subtle p-8 sm:p-12 rounded-control max-w-lg w-full my-auto">
           <Terminal className="w-12 h-12 text-red-500 mx-auto mb-4 animate-pulse" />
-          <h2 className="font-grotesk text-xl sm:text-2xl font-bold text-ink">
+          <h2 className="font-grotesk text-xl sm:text-2xl font-semibold text-ink">
             Update not found
           </h2>
           <p className="text-xs text-ink-muted mt-2 mb-6 font-sans">
@@ -50,7 +50,7 @@ export function ChangelogDetailPage() {
           </p>
           <Link
             to="/changelog"
-            className="px-6 py-2.5 bg-surface-2 border border-line text-cyan-glow font-grotesk font-bold text-xs rounded-control inline-flex items-center justify-center gap-2 hover:bg-surface-3 transition-colors"
+            className="px-6 py-2.5 bg-surface-2 border border-line text-cyan-glow font-grotesk font-semibold text-xs rounded-control inline-flex items-center justify-center gap-2 hover:bg-surface-3 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to change log</span>
@@ -110,7 +110,7 @@ export function ChangelogDetailPage() {
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 relative z-10">
             <Link
               to="/changelog"
-              className="inline-flex items-center gap-2 py-1 text-xs font-sans font-bold text-cyan-glow hover:text-cyan-glow transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="inline-flex items-center gap-2 py-1 text-xs font-sans font-semibold text-cyan-glow hover:text-cyan-hover transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to change log</span>
@@ -118,11 +118,11 @@ export function ChangelogDetailPage() {
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-sans">
               {entry.version && (
-                <span className="font-grotesk font-extrabold text-xs text-cyan-glow bg-surface-2 border border-line px-3 py-1 rounded-control ">
+                <span className="font-grotesk font-semibold text-xs text-cyan-glow bg-surface-2 border border-line px-3 py-1 rounded-control ">
                   {entry.version}
                 </span>
               )}
-              <span className={`text-[11px] font-bold px-2.5 py-1 border text-cyan-glow bg-cyan-soft border-line-subtle rounded-control`}>
+              <span className={`text-2xs font-semibold px-2.5 py-1 border text-cyan-glow bg-cyan-soft border-line-subtle rounded-control`}>
                 {entry.category}
               </span>
               <span className="flex items-center gap-1.5 text-ink-muted text-xs">
@@ -131,7 +131,7 @@ export function ChangelogDetailPage() {
               </span>
             </div>
 
-            <h1 className="font-grotesk font-black text-2xl sm:text-4xl md:text-5xl text-ink tracking-tight leading-tight break-words">
+            <h1 className="font-grotesk font-semibold text-2xl sm:text-4xl md:text-5xl text-ink tracking-tight leading-tight break-words">
               {entry.title}
             </h1>
 
@@ -167,13 +167,13 @@ export function ChangelogDetailPage() {
           {relatedEntries.length > 0 && (
             <div className="mt-12 pt-8 border-t border-line-subtle space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-grotesk font-bold text-sm text-ink tracking-wider flex items-center gap-2">
+                <h3 className="font-grotesk font-semibold text-sm text-ink flex items-center gap-2">
                   <Activity className="w-4 h-4 text-cyan-glow" />
                   <span>More updates</span>
                 </h3>
                 <Link
                   to="/changelog"
-                  className="text-xs font-sans text-cyan-glow hover:text-cyan-glow transition-colors flex items-center gap-1"
+                  className="text-xs font-sans text-cyan-glow hover:text-cyan-hover transition-colors flex items-center gap-1"
                 >
                   <span>All updates</span>
                   <ArrowRight className="w-3 h-3" />
@@ -189,18 +189,18 @@ export function ChangelogDetailPage() {
                     className="rounded-card hud-sheen shadow-sheen-inset p-4 border border-line-subtle hover:border-line-strong bg-surface-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow transition-all flex flex-col justify-between group space-y-2"
                   >
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[11px] font-sans">
-                        <span className="text-cyan-glow font-bold">{rel.version}</span>
+                      <div className="flex items-center justify-between text-2xs font-sans">
+                        <span className="text-cyan-glow font-semibold">{rel.version}</span>
                         <span className="text-ink-muted">{rel.category}</span>
                       </div>
-                      <h4 className="font-grotesk font-bold text-xs sm:text-sm text-ink group-hover:text-cyan-glow transition-colors line-clamp-2">
+                      <h4 className="font-grotesk font-semibold text-xs sm:text-sm text-ink group-hover:text-cyan-glow transition-colors line-clamp-2">
                         {rel.title}
                       </h4>
-                      <p className="text-[11px] text-ink-muted font-sans line-clamp-2">
+                      <p className="text-2xs text-ink-muted font-sans line-clamp-2">
                         {rel.summary}
                       </p>
                     </div>
-                    <div className="text-[11px] text-cyan-glow group-hover:text-cyan-glow flex items-center gap-1 font-bold pt-1">
+                    <div className="text-2xs text-cyan-glow group-hover:text-cyan-glow flex items-center gap-1 font-semibold pt-1">
                       <span>Read update</span>
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </div>

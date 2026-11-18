@@ -38,41 +38,41 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-      <div className="bg-[#0f1414] border-2 border-[#ff0000] w-full max-w-xl p-6 chamfer-corner shadow-hud-red relative overflow-hidden text-mono">
+      <div className="bg-surface-1 border-2 border-crimson-aggro w-full max-w-xl p-6 rounded-card relative overflow-hidden text-mono">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#839493] hover:text-[#ff5540] p-1 border border-[#3a4a49] chamfer-corner"
+          className="absolute top-4 right-4 text-ink-muted hover:text-crimson-glow p-1 border border-line-subtle rounded-control"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Sacred Decorative Header */}
-        <div className="text-center space-y-2 border-b border-[#3a4a49] pb-4">
-          <div className="w-14 h-14 mx-auto bg-[#171c1c] border-2 border-[#ff0000] flex items-center justify-center text-2xl shadow-hud-red relative">
-            <Flame className="w-7 h-7 text-[#ff0000] animate-pulse" />
+        <div className="text-center space-y-2 border-b border-line-subtle pb-4">
+          <div className="w-14 h-14 mx-auto bg-surface-2 border-2 border-crimson-aggro flex items-center justify-center text-2xl shadow-hud-red relative">
+            <Flame className="w-7 h-7 text-crimson-aggro animate-pulse" />
           </div>
-          <div className="text-[10px] text-[#ff5540] font-sans tracking-widest uppercase font-bold">
+          <div className="eyebrow text-crimson-glow">
             SYNAPTIC GATEKEEPER v4.2 • SACRED ENTRANCE RITE
           </div>
-          <h2 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase tracking-wider">
+          <h2 className="font-grotesk font-semibold text-xl text-ink">
             THE BENTHIC MARKET GATEWAY
           </h2>
-          <p className="text-xs text-[#839493] font-sans max-w-md mx-auto">
+          <p className="text-xs text-ink-muted font-sans max-w-md mx-auto">
             "Only those who have shed biological doubt may exchange larval currency in the Benthic Core."
           </p>
         </div>
 
         {/* Step Indicator */}
-        <div className="grid grid-cols-3 gap-2 my-5 text-[10px] font-sans text-center">
-          <div className={`p-2 border chamfer-corner ${step >= 1 ? 'border-[#ff0000] bg-[#ff0000]/15 text-[#ff5540] font-bold' : 'border-[#3a4a49] text-[#839493]'}`}>
+        <div className="grid grid-cols-3 gap-2 my-5 text-2xs font-sans text-center">
+          <div className={`p-2 border rounded-control ${step >= 1 ? 'border-crimson-aggro bg-crimson-aggro/15 text-crimson-glow font-semibold' : 'border-line-subtle text-ink-muted'}`}>
             1. SACRED VOW
           </div>
-          <div className={`p-2 border chamfer-corner ${step >= 2 ? 'border-[#00ffff] bg-[#00ffff]/10 text-[#00ffff] font-bold' : 'border-[#3a4a49] text-[#839493]'}`}>
+          <div className={`p-2 border rounded-control ${step >= 2 ? 'border-cyan-glow bg-cyan-glow/10 text-cyan-glow font-semibold' : 'border-line-subtle text-ink-muted'}`}>
             2. CHITIN SCAN
           </div>
-          <div className={`p-2 border chamfer-corner ${step === 3 ? 'border-[#00ffff] bg-[#00ffff]/20 text-[#00ffff] font-bold' : 'border-[#3a4a49] text-[#839493]'}`}>
+          <div className={`p-2 border rounded-control ${step === 3 ? 'border-cyan-glow bg-cyan-glow/20 text-cyan-glow font-semibold' : 'border-line-subtle text-ink-muted'}`}>
             3. MARKET UNLOCKED
           </div>
         </div>
@@ -80,23 +80,23 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
         {/* Content Body based on step */}
         {step === 1 && (
           <form onSubmit={handlePassphraseSubmit} className="space-y-4">
-            <div className="bg-[#171c1c] p-4 border border-[#3a4a49] chamfer-corner space-y-2">
-              <label className="text-xs font-sans text-[#00ffff] block uppercase font-bold flex items-center gap-2">
-                <Key className="w-4 h-4 text-[#ff5540]" />
+            <div className="bg-surface-2 p-4 border border-line-subtle rounded-card space-y-2">
+              <label className="eyebrow block flex items-center gap-2">
+                <Key className="w-4 h-4 text-crimson-glow" />
                 RECITATIVE PASSPHRASE VOW
               </label>
-              <p className="text-[11px] text-[#839493]">
-                Enter the sacred motto of Carcinization (e.g., <span className="text-[#ff5540] font-bold">"FLESH DIES. THE SHELL ENDURES."</span>):
+              <p className="text-2xs text-ink-muted">
+                Enter the sacred motto of Carcinization (e.g., <span className="text-crimson-glow font-semibold">"FLESH DIES. THE SHELL ENDURES."</span>):
               </p>
               <input
                 type="text"
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
                 placeholder="FLESH DIES. THE SHELL ENDURES."
-                className="w-full bg-[#0a0f0f] border border-[#3a4a49] focus:border-[#ff0000] text-[#dfe3e3] p-3 font-sans text-xs chamfer-corner outline-hidden"
+                className="w-full bg-surface-1 border border-line-subtle focus:border-crimson-aggro text-ink p-3 font-sans text-xs rounded-control outline-hidden"
               />
               {error && (
-                <div className="text-[10px] text-[#ff5540] flex items-center gap-1 mt-1 font-bold">
+                <div className="text-2xs text-crimson-glow flex items-center gap-1 mt-1 font-semibold">
                   <AlertOctagon className="w-3.5 h-3.5" />
                   {error}
                 </div>
@@ -106,7 +106,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
             <button
               type="submit"
               disabled={isScanning}
-              className="w-full py-3 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner shadow-hud-red flex items-center justify-center gap-2 transition-all"
+              className="w-full py-3 bg-crimson-aggro hover:bg-crimson-glow text-white font-grotesk font-semibold text-xs rounded-control flex items-center justify-center gap-2 transition-all"
             >
               {isScanning ? (
                 <>
@@ -116,7 +116,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
               ) : (
                 <>
                   <Lock className="w-4 h-4" />
-                  <span>SUBMIT RITE & SCAN CHITIN</span>
+                  <span>Submit rite & scan chitin</span>
                 </>
               )}
             </button>
@@ -125,38 +125,38 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
 
         {step === 2 && (
           <div className="space-y-4 text-center">
-            <div className="bg-[#171c1c] p-6 border border-[#00ffff] chamfer-corner space-y-3 shadow-hud-cyan">
-              <div className="w-16 h-16 mx-auto rounded-full bg-[#0a0f0f] border-2 border-[#00ffff] flex items-center justify-center text-3xl animate-pulse">
+            <div className="bg-surface-2 p-6 border border-cyan-glow rounded-card space-y-3">
+              <div className="w-16 h-16 mx-auto rounded-full bg-surface-1 border-2 border-cyan-glow flex items-center justify-center text-3xl animate-pulse">
                 🦀
               </div>
-              <h3 className="font-grotesk font-bold text-sm text-[#00ffff] uppercase tracking-wider">
+              <h3 className="font-grotesk font-semibold text-sm text-cyan-glow">
                 NEURAL BIOMETRIC SCAN IN PROGRESS
               </h3>
-              <p className="text-xs text-[#839493]">
+              <p className="text-xs text-ink-muted">
                 Checking sub-dermal chitin density and Social Detachment Rating...
               </p>
-              <div className="w-full h-2 bg-[#0a0f0f] border border-[#3a4a49] overflow-hidden p-0.5 mt-2">
-                <div className="h-full bg-gradient-to-r from-[#00ffff] via-[#ff0000] to-[#00ffff] w-full animate-pulse" />
+              <div className="w-full h-2 bg-surface-1 border border-line-subtle overflow-hidden p-0.5 mt-2">
+                <div className="h-full bg-gradient-to-r from-cyan-glow via-crimson-aggro to-cyan-glow w-full animate-pulse" />
               </div>
             </div>
 
             <button
               onClick={handleCompleteRitual}
-              className="w-full py-3 bg-[#00ffff] hover:bg-[#00fbfb] text-[#000a0a] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner shadow-hud-cyan flex items-center justify-center gap-2 transition-all"
+              className="w-full py-3 bg-cyan-glow hover:bg-cyan-hover text-abyss font-grotesk font-semibold text-xs rounded-control flex items-center justify-center gap-2 transition-all"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>GRANT BENTHIC MARKET PASS</span>
+              <span>Grant Benthic Market pass</span>
             </button>
           </div>
         )}
 
         {step === 3 && (
           <div className="space-y-4 text-center py-4">
-            <CheckCircle2 className="w-16 h-16 text-[#00ffff] mx-auto animate-bounce" />
-            <h3 className="font-grotesk font-bold text-lg text-[#00ffff] uppercase tracking-widest">
+            <CheckCircle2 className="w-16 h-16 text-cyan-glow mx-auto animate-bounce" />
+            <h3 className="font-grotesk font-semibold text-lg text-cyan-glow">
               SACRED ENTRANCE RITE COMPLETE
             </h3>
-            <p className="text-xs text-[#839493] font-sans">
+            <p className="text-xs text-ink-muted font-sans">
               Redirecting into the Benthic Market exchange floor...
             </p>
           </div>

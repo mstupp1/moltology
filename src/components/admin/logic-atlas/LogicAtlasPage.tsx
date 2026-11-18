@@ -56,11 +56,11 @@ function StatCard({
 }) {
   const body = (
     <>
-      <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">{label}</p>
-      <p className={`mt-1 font-grotesk text-xl font-bold ${tone === 'amber' ? 'text-amber-400' : 'text-cyan-glow'}`}>
+      <p className="eyebrow">{label}</p>
+      <p className={`mt-1 font-grotesk text-xl font-semibold ${tone === 'amber' ? 'text-amber-400' : 'text-cyan-glow'}`}>
         {value}
       </p>
-      {detail ? <p className="mt-0.5 truncate text-[11px] text-ink-muted">{detail}</p> : null}
+      {detail ? <p className="mt-0.5 truncate text-2xs text-ink-muted">{detail}</p> : null}
     </>
   )
   if (!onClick) return <div className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4">{body}</div>
@@ -236,7 +236,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
           <button
             type="button"
             onClick={onRetry}
-            className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-xs font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Try again
@@ -323,7 +323,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                   type="button"
                   aria-pressed={active}
                   onClick={() => toggleKind(kind)}
-                  className={`inline-flex min-h-[28px] items-center gap-1 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`inline-flex min-h-[28px] items-center gap-1 rounded-control text-2xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     active ? 'text-cyan-glow' : 'text-ink-muted hover:text-ink'
                   }`}
                 >
@@ -333,7 +333,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
               )
             })}
             <span className="hidden h-3 w-px bg-line-subtle sm:inline-block" aria-hidden />
-            <span className="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.08em] text-ink-muted">
+            <span className="inline-flex items-center gap-3 text-2xs text-ink-muted">
               <span className="inline-flex items-center gap-1">
                 <DriftDot drift="ok" /> Verified
               </span>
@@ -377,7 +377,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                 <button
                   type="button"
                   onClick={() => setFlowOpen(false)}
-                  className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className="hud-sheen inline-flex min-h-[36px] items-center gap-1.5 rounded-control border border-line bg-surface-1 px-3 text-2xs font-semibold text-ink transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <X className="h-3.5 w-3.5" />
                   Back to map

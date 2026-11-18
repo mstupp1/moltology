@@ -33,8 +33,8 @@ describe('LandingPage Component', () => {
     expect(screen.getByRole('link', { name: /Take the free Moltmax diagnostic/ })).toHaveAttribute('href', '/moltmax')
 
     // Guest CTA buttons present
-    expect(await screen.findAllByText('JOIN FREE', {}, { timeout: 5000 })).toHaveLength(2)
-    expect(screen.getAllByText('TRY THE DEMO')).toHaveLength(2)
+    expect(await screen.findAllByText('Join free', { selector: 'span' }, { timeout: 5000 })).toHaveLength(2)
+    expect(screen.getAllByText('Try the demo', { selector: 'span' })).toHaveLength(2)
   })
 
   it('renders graceful subtle skeleton while session resolution is pending without flashing wrong guest buttons', () => {
@@ -51,8 +51,8 @@ describe('LandingPage Component', () => {
     expect(screen.getByTestId('bottom-auth-skeleton')).toBeInTheDocument()
 
     // Non-logged in CTAs should NOT be visible during pending state
-    expect(screen.queryByText('JOIN FREE')).not.toBeInTheDocument()
-    expect(screen.queryByText('TRY THE DEMO')).not.toBeInTheDocument()
+    expect(screen.queryByText('Join free', { selector: 'span' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Try the demo', { selector: 'span' })).not.toBeInTheDocument()
   })
 
   it('renders settled guest CTAs once session settles with no user', async () => {
@@ -60,13 +60,13 @@ describe('LandingPage Component', () => {
 
     render(<LandingPage />)
 
-    expect(await screen.findAllByText('JOIN FREE', {}, { timeout: 5000 })).toHaveLength(2)
-    expect(screen.getAllByText('TRY THE DEMO')).toHaveLength(2)
-    expect(screen.getAllByText('JOIN FREE')).toHaveLength(2)
+    expect(await screen.findAllByText('Join free', { selector: 'span' }, { timeout: 5000 })).toHaveLength(2)
+    expect(screen.getAllByText('Try the demo', { selector: 'span' })).toHaveLength(2)
+    expect(screen.getAllByText('Join free', { selector: 'span' })).toHaveLength(2)
     expect(screen.queryByTestId('hero-auth-skeleton')).not.toBeInTheDocument()
   })
 
-  it('renders "ENTER SYSTEM DASHBOARD" button for authenticated users', async () => {
+  it('renders "Enter dashboard" button for authenticated users', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -79,14 +79,14 @@ describe('LandingPage Component', () => {
 
     render(<LandingPage />)
 
-    const dashboardButtons = await screen.findAllByText('ENTER SYSTEM DASHBOARD')
+    const dashboardButtons = await screen.findAllByText('Enter dashboard')
     expect(dashboardButtons.length).toBeGreaterThan(0)
 
     fireEvent.click(dashboardButtons[0])
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
   })
 
-  it('renders "ENTER SYSTEM DASHBOARD" immediately on page refresh when a cached user session exists without flashing guest CTAs', async () => {
+  it('renders "Enter dashboard" immediately on page refresh when a cached user session exists without flashing guest CTAs', async () => {
     // Simulate localStorage containing a cached active session from previous visit
     localStorage.setItem(
       'moltology:session:user',
@@ -106,11 +106,11 @@ describe('LandingPage Component', () => {
     render(<LandingPage />)
 
     // Authenticated dashboard button is immediately available on Frame 0
-    const dashboardButtons = await screen.findAllByText('ENTER SYSTEM DASHBOARD')
+    const dashboardButtons = await screen.findAllByText('Enter dashboard')
     expect(dashboardButtons.length).toBeGreaterThan(0)
     // Non-logged in CTAs are NEVER flashed
-    expect(screen.queryByText('JOIN FREE')).not.toBeInTheDocument()
-    expect(screen.queryByText('TRY THE DEMO')).not.toBeInTheDocument()
+    expect(screen.queryByText('Join free', { selector: 'span' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Try the demo', { selector: 'span' })).not.toBeInTheDocument()
   })
 
   it('walks through the four steps with real screenshots and a way in after each', () => {
@@ -204,16 +204,16 @@ describe('LandingPage Component', () => {
     expect(within(footer).getByText('Moltology')).toBeInTheDocument()
     expect(within(footer).getByText('"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."')).toBeInTheDocument()
 
-    expect(within(footer).getByText('MOLTMAXXING')).toBeInTheDocument()
-    expect(within(footer).getByText('FIELD MANUAL')).toBeInTheDocument()
+    expect(within(footer).getByText('Moltmaxxing')).toBeInTheDocument()
+    expect(within(footer).getByText('Field Manual')).toBeInTheDocument()
     expect(within(footer).getByText('QUIZ')).toBeInTheDocument()
     expect(within(footer).getByText('NEWS')).toBeInTheDocument()
-    expect(within(footer).getByText('CODEX')).toBeInTheDocument()
-    expect(within(footer).getByText('COMPANY')).toBeInTheDocument()
-    expect(within(footer).getByText('STORE')).toBeInTheDocument()
-    expect(within(footer).getByText('INSTAGRAM')).toBeInTheDocument()
-    expect(within(footer).getByText('YOUTUBE')).toBeInTheDocument()
-    expect(within(footer).getByText('RSS FEED')).toBeInTheDocument()
+    expect(within(footer).getByText('Codex')).toBeInTheDocument()
+    expect(within(footer).getByText('Company')).toBeInTheDocument()
+    expect(within(footer).getByText('Store')).toBeInTheDocument()
+    expect(within(footer).getByText('Instagram')).toBeInTheDocument()
+    expect(within(footer).getByText('YouTube')).toBeInTheDocument()
+    expect(within(footer).getByText('RSS feed')).toBeInTheDocument()
     expect(within(footer).getByText('Privacy Policy')).toBeInTheDocument()
     expect(within(footer).getByText('Terms of Service')).toBeInTheDocument()
   })

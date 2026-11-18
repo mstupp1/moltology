@@ -47,15 +47,15 @@ export function BandSectionNav<K extends string>({
                 aria-current={selected ? 'page' : undefined}
                 data-testid={`band-section-${section.id}`}
                 className={cn(
-                  'inline-flex min-h-9 items-center gap-1.5 justify-center whitespace-nowrap rounded-control px-2.5 text-[11px] uppercase tracking-[0.08em] transition-colors',
+                  'inline-flex min-h-9 items-center gap-1.5 justify-center whitespace-nowrap rounded-control px-2.5 text-ui font-medium transition-colors',
                   // Inset focus ring: the scroll row would clip an outer one.
                   'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
-                  selected ? 'font-bold text-ink' : 'font-semibold text-ink-muted hover:text-ink',
+                  selected ? 'text-ink' : 'text-ink-muted hover:text-ink',
                 )}
               >
                 {section.label}
                 {section.badge ? (
-                  <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-[11px] font-bold text-abyss tabular-nums">
+                  <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-cyan-glow text-2xs font-semibold text-abyss tabular-nums">
                     <span className="sr-only">, </span>
                     {section.badge > 99 ? '99+' : section.badge}
                     <span className="sr-only"> waiting</span>
@@ -84,10 +84,10 @@ export function BandStat({
 }) {
   return (
     <div className="min-w-0" title={title}>
-      <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted whitespace-nowrap">{label}</div>
+      <div className="eyebrow whitespace-nowrap">{label}</div>
       <div
         className={cn(
-          'font-grotesk text-lg font-bold leading-tight tabular-nums',
+          'font-grotesk text-lg font-semibold leading-tight tabular-nums',
           tone === 'cyan' ? 'text-cyan-glow' : tone === 'amber' ? 'text-amber-400' : 'text-ink',
         )}
       >

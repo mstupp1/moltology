@@ -103,7 +103,7 @@ export function PremiumOfferPanel({
             <p className="text-xs text-cyan-glow mb-2">
               Model access and usage
             </p>
-            <h2 className="text-xl sm:text-2xl font-grotesk font-bold text-ink">
+            <h2 className="text-xl sm:text-2xl font-grotesk font-semibold text-ink">
               Compare your options.
             </h2>
           </div>
@@ -117,7 +117,7 @@ export function PremiumOfferPanel({
             <p className="text-xs text-ink-muted mb-2">
               Included with your free account
             </p>
-            <h3 className="text-xl font-grotesk font-bold text-ink">
+            <h3 className="text-xl font-grotesk font-semibold text-ink">
               Oracle Lite
             </h3>
             <p className="mt-2 text-sm text-ink-body">
@@ -129,7 +129,7 @@ export function PremiumOfferPanel({
             <p className="text-xs text-cyan-glow mb-2">
               Included with Oracle MAX
             </p>
-            <h3 className="text-xl font-grotesk font-bold text-ink">
+            <h3 className="text-xl font-grotesk font-semibold text-ink">
               Oracle MAX
             </h3>
             <p className="mt-2 text-sm text-ink-body">
@@ -199,7 +199,7 @@ export function PremiumOfferPanel({
             )}
           </span>
           <div>
-            <h2 className="font-grotesk text-xl font-bold text-ink">
+            <h2 className="font-grotesk text-xl font-semibold text-ink">
               {preview
                 ? "Oracle MAX is in early access."
                 : "Your Oracle MAX membership"}

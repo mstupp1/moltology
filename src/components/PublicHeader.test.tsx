@@ -37,9 +37,9 @@ describe('PublicHeader Navigation Component', () => {
     expect(within(nav).getByText('About')).toBeInTheDocument()
     // The company page lives in the footer, not the header.
     expect(within(nav).queryByText('Organization')).not.toBeInTheDocument()
-    expect(within(nav).queryByRole('link', { name: /COMPANY/i })).not.toBeInTheDocument()
+    expect(within(nav).queryByRole('link', { name: /Company/i })).not.toBeInTheDocument()
 
-    const storeLink = within(nav).getByRole('link', { name: /STORE/i })
+    const storeLink = within(nav).getByRole('link', { name: /Store/i })
     expect(storeLink).toBeInTheDocument()
     expect(storeLink).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
     expect(storeLink).toHaveAttribute('target', '_blank')
@@ -56,7 +56,7 @@ describe('PublicHeader Navigation Component', () => {
     } as never)
     render(<PublicHeader activePage="home" />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
-    const storeLink = within(nav).getByRole('link', { name: /STORE/i })
+    const storeLink = within(nav).getByRole('link', { name: /Store/i })
     await vi.waitFor(() => expect(storeLink).toHaveAttribute('href', '/store'))
     expect(storeLink).not.toHaveAttribute('target')
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never)
@@ -69,7 +69,7 @@ describe('PublicHeader Navigation Component', () => {
     } as never)
     render(<PublicHeader activePage="home" />)
     await vi.waitFor(() => expect(getUserProfileFn).toHaveBeenCalled())
-    expect(within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /STORE/i })).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
+    expect(within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('link', { name: /Store/i })).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never)
   })
 

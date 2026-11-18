@@ -222,7 +222,7 @@ export const VectorCarapaceDiagram: React.FC = () => {
                 aria-hidden
                 onClick={() => select(index)}
                 {...hoverProps(index)}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer whitespace-nowrap rounded-control px-1.5 py-1 text-center text-[11px] font-semibold uppercase leading-tight tracking-[0.14em] transition-colors sm:text-xs ${
+                className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer whitespace-nowrap rounded-control px-1.5 py-1 text-center text-2xs font-semibold leading-tight transition-colors sm:text-xs ${
                   lit ? 'text-cyan-glow' : 'text-ink-muted hover:text-ink'
                 }`}
                 style={nodePosition(index)}
@@ -275,7 +275,7 @@ export const VectorCarapaceDiagram: React.FC = () => {
                     <Icon className="h-4 w-4" aria-hidden />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block font-grotesk text-sm font-bold uppercase tracking-wide text-ink sm:text-base">{v.label}</span>
+                    <span className="block font-grotesk text-sm font-semibold text-ink sm:text-base">{v.label}</span>
                     <span className="block text-xs text-ink-muted">{v.dimension}</span>
                   </span>
                   <ChevronDown
@@ -295,7 +295,7 @@ export const VectorCarapaceDiagram: React.FC = () => {
                 <div className="overflow-hidden">
                   <div className="px-4 pb-4 sm:pl-[4.25rem]">
                     <p className="text-sm leading-relaxed text-ink-body">{v.description}</p>
-                    <div className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-muted">The three questions behind it</div>
+                    <div className="eyebrow mt-4">The three questions behind it</div>
                     <ol className="mt-2 divide-y divide-line-subtle border-t border-line-subtle">
                       {questions.map((question) => (
                         <li key={question.id} className="flex gap-3 py-2.5">
@@ -304,7 +304,7 @@ export const VectorCarapaceDiagram: React.FC = () => {
                           </span>
                           <div className="min-w-0">
                             <p className="text-sm leading-snug text-ink-body">{question.prompt}</p>
-                            <span className="mt-1 block text-[11px] text-ink-muted">{FORMAT_LABEL[question.format]}</span>
+                            <span className="mt-1 block text-2xs text-ink-muted">{FORMAT_LABEL[question.format]}</span>
                           </div>
                         </li>
                       ))}

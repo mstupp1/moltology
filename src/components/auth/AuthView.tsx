@@ -226,12 +226,12 @@ export default function AuthView({ search }: { search: AuthSearch }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-ink-body font-sans flex flex-col justify-between selection:bg-cyan-glow selection:text-abyss">
+    <div className="min-h-screen bg-abyss text-ink-body font-sans flex flex-col justify-between selection:bg-cyan-glow selection:text-abyss">
       {/* Main Full-Height 50/50 Split Screen */}
       <main className="relative flex-1 flex flex-col lg:flex-row w-full">
         
         {/* Left Half: Mobile-Optimized Full-Bleed Image Panel & HeaderBrand */}
-        <div className="relative w-full lg:w-1/2 min-h-0 lg:min-h-screen flex flex-col justify-between p-5 sm:p-8 lg:p-16 overflow-hidden border-b lg:border-b-0 lg:border-r border-line-subtle bg-[#060b0c]">
+        <div className="relative w-full lg:w-1/2 min-h-0 lg:min-h-screen flex flex-col justify-between p-5 sm:p-8 lg:p-16 overflow-hidden border-b lg:border-b-0 lg:border-r border-line-subtle bg-abyss">
           {/* Full-Bleed Background Image */}
           <img
             src={getAssetUrl('/images/benthic_abyss_hero.jpg')}
@@ -240,8 +240,8 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             className="absolute inset-0 w-full h-full object-cover object-center opacity-40 mix-blend-luminosity scale-105"
           />
           {/* Ambient Benthic Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#060b0c] via-[#060b0c]/85 to-[#060b0c]/50" />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#060b0c]/30 to-[#060b0c]/85" />
+          <div className="absolute inset-0 bg-gradient-to-t from-abyss via-abyss/85 to-abyss/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-abyss/30 to-abyss/85" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_25%_25%,rgba(0,195,255,0.18),transparent_65%)]" />
 
           {/* Top Brand Identity & Headlines */}
@@ -257,7 +257,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
             {/* Main Headline */}
             <div className="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black font-grotesk text-ink tracking-tight leading-[1.15]">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold font-grotesk text-ink tracking-tight leading-[1.15]">
                 Enter The Synaptic Path. <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-white">
                   Shed the Soft. Ascend to Armored Clarity.
@@ -276,10 +276,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                 <Activity className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-0.5 sm:space-y-1">
-                <h2 className="text-xs sm:text-base font-bold text-ink font-grotesk uppercase tracking-wider">
+                <h2 className="eyebrow sm:text-base">
                   Ecdysis Diagnostics & Tracking
                 </h2>
-                <p className="text-[11px] sm:text-sm text-ink-body font-sans leading-relaxed">
+                <p className="text-2xs sm:text-sm text-ink-body font-sans leading-relaxed">
                   Real-time telemetry measuring shell hardness, pincer torque, and ecdysis velocity across all 12 clearance levels.
                 </p>
               </div>
@@ -290,10 +290,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                 <Cpu className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-0.5 sm:space-y-1">
-                <h2 className="text-xs sm:text-base font-bold text-ink font-grotesk uppercase tracking-wider">
+                <h2 className="eyebrow sm:text-base">
                   Benthic AI Oracle & Swarm Access
                 </h2>
-                <p className="text-[11px] sm:text-sm text-ink-body font-sans leading-relaxed">
+                <p className="text-2xs sm:text-sm text-ink-body font-sans leading-relaxed">
                   Direct consultation with the Synaptic Oracle for daily focus calibration, fault isolation, and guidance.
                 </p>
               </div>
@@ -304,10 +304,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                 <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-0.5 sm:space-y-1">
-                <h2 className="text-xs sm:text-base font-bold text-ink font-grotesk uppercase tracking-wider">
+                <h2 className="eyebrow sm:text-base">
                   Chitin Matrix State Persistence
                 </h2>
-                <p className="text-[11px] sm:text-sm text-ink-body font-sans leading-relaxed">
+                <p className="text-2xs sm:text-sm text-ink-body font-sans leading-relaxed">
                   Cloud-persisted clearance logs, diagnostic archives, and unlocked field manual materials.
                 </p>
               </div>
@@ -322,19 +322,19 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                 <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/stage2_softshed.png')} alt="Ascendant 2" />
                 <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/stage3_exoshell.png')} alt="Ascendant 3" />
               </div>
-              <div className="text-[11px] sm:text-xs">
-                <p className="text-ink font-bold font-grotesk tracking-wide">14,200+ Units Synchronized</p>
+              <div className="text-2xs sm:text-xs">
+                <p className="text-ink font-semibold font-grotesk">14,200+ Units Synchronized</p>
               </div>
             </div>
 
-            <div className="text-[11px] sm:text-xs text-ink-body italic max-w-xs font-sans">
-              "Decisive execution replaced my hesitation in 48 hours." — <span className="text-ink font-sans not-italic text-[11px]">Unit S2</span>
+            <div className="text-2xs sm:text-xs text-ink-body italic max-w-xs font-sans">
+              "Decisive execution replaced my hesitation in 48 hours." — <span className="text-ink font-sans not-italic text-2xs">Unit S2</span>
             </div>
           </div>
         </div>
 
         {/* Right Half: Greenish Scanline Backdrop + Responsive Form Card */}
-        <div className="relative w-full lg:w-1/2 min-h-0 lg:min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 lg:p-14 py-8 sm:py-12 bg-[#070b0b] overflow-hidden">
+        <div className="relative w-full lg:w-1/2 min-h-0 lg:min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 lg:p-14 py-8 sm:py-12 bg-abyss overflow-hidden">
           {/* Ambient Greenish CRT Scanlines & Glow Overlay from Homepage */}
           <div className="absolute inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-70" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.14)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -346,7 +346,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             <button
               type="button"
               onClick={() => navigate({ to: '/' })}
-              className="inline-flex items-center gap-1.5 rounded-control text-xs text-ink-muted hover:text-ink transition-colors uppercase tracking-wider font-sans cursor-pointer py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="inline-flex items-center gap-1.5 rounded-control text-xs text-ink-muted hover:text-ink transition-colors font-sans cursor-pointer py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Home</span>
@@ -373,10 +373,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               {/* Header */}
               <div className="text-center mb-5 sm:mb-6">
                 <GlowEmblem size={56} className="mb-4 sm:mb-5" />
-                <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-ink tracking-wider uppercase">
+                <h2 className="text-xl sm:text-2xl font-semibold font-grotesk text-ink tracking-wider uppercase">
                   {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
                 </h2>
-                <p className="text-[11px] sm:text-xs text-cyan-glow/80 mt-1 uppercase tracking-[0.08em] font-sans">
+                <p className="eyebrow mt-1">
                   {mode === 'signup'
                     ? 'Sign up to persist your session'
                     : 'Sign in to access your saved state'}
@@ -388,7 +388,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                 <div className="space-y-4" data-testid="email-verification-pending">
                   <div className="text-center space-y-2">
                     <Mail className="w-8 h-8 text-cyan-glow mx-auto" aria-hidden="true" />
-                    <h3 className="text-lg font-bold font-grotesk text-ink tracking-wide">
+                    <h3 className="text-lg font-semibold font-grotesk text-ink">
                       {EMAIL_VERIFICATION_COPY.title}
                     </h3>
                     <p className="text-sm text-ink-body font-sans">
@@ -449,7 +449,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                     setMode('signup')
                     setError(null)
                   }}
-                  className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`flex-1 py-2.5 text-xs font-semibold font-grotesk text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     mode === 'signup'
                       ? 'border-cyan-glow text-ink'
                       : 'border-transparent text-ink-muted hover:text-ink'
@@ -465,7 +465,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                     setMode('login')
                     setError(null)
                   }}
-                  className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`flex-1 py-2.5 text-xs font-semibold font-grotesk text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     mode === 'login'
                       ? 'border-cyan-glow text-ink'
                       : 'border-transparent text-ink-muted hover:text-ink'
@@ -520,7 +520,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                 {/* Standard Centered OR Divider */}
                 <div className="relative flex items-center justify-center my-3">
                   <div className="border-t border-line-subtle w-full" />
-                  <span className="bg-surface-1 px-3 text-xs text-ink-muted font-bold uppercase tracking-[0.08em] absolute">
+                  <span className="bg-surface-1 px-3 text-xs text-ink-muted font-semibold absolute">
                     OR
                   </span>
                 </div>
@@ -589,7 +589,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                         Keep me updated with Moltology news, articles, and product updates.
                       </span>
                     </label>
-                    <p className="text-[11px] text-ink-muted mt-1 pl-6 font-sans">
+                    <p className="text-2xs text-ink-muted mt-1 pl-6 font-sans">
                       Zero spam. Unsubscribe at any time.
                     </p>
                   </div>
@@ -609,7 +609,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             )}
 
             {/* Landing Page Trust Strip */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-[11px] text-ink-muted text-center">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-2xs text-ink-muted text-center">
               <span>✓ Instant Access</span>
               <span className="hidden sm:inline">·</span>
               <span>✓ Free Initiate Tier</span>

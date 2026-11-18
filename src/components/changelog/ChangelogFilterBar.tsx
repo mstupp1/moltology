@@ -84,8 +84,8 @@ export function ChangelogFilterBar({
         <div className="flex flex-wrap gap-1.5 flex-1" role="group" aria-label="Filter by category">
           {categories.map((cat) => (
             <button key={cat.label} type="button" aria-pressed={selectedCategory === cat.label} onClick={() => onCategoryChange(cat.label)}
-              className={`min-h-8 px-3 rounded-control text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${selectedCategory === cat.label ? 'bg-cyan-soft text-cyan-glow' : 'text-ink-muted hover:bg-surface-2 hover:text-ink'}`}>
-              {cat.label === 'ALL' ? 'All updates' : cat.label} <span className="ml-1 text-[11px] tabular-nums opacity-75">{cat.count}</span>
+              className={`min-h-8 px-3 rounded-control text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${selectedCategory === cat.label ? 'bg-cyan-soft text-cyan-glow' : 'text-ink-muted hover:bg-surface-2 hover:text-ink'}`}>
+              {cat.label === 'ALL' ? 'All updates' : cat.label} <span className="ml-1 text-2xs tabular-nums opacity-75">{cat.count}</span>
             </button>
           ))}
         </div>

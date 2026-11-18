@@ -149,7 +149,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
             role="tab"
             aria-selected={g.id === ideaGroup.id}
             onClick={() => setIdeaTab(i)}
-            className={`shrink-0 rounded-chip px-3 py-1 text-xs font-bold transition-colors cursor-pointer ${focus} ${
+            className={`shrink-0 rounded-chip px-3 py-1 text-xs font-semibold transition-colors cursor-pointer ${focus} ${
               g.id === ideaGroup.id ? 'bg-cyan-soft text-cyan-glow' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
             }`}
           >
@@ -217,7 +217,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   const recents = showRecents && (
     <section aria-labelledby="oracle-recent-chats" className="-mx-2 flex flex-col gap-1 text-left">
       <div className="flex items-center justify-between pl-2 pr-1">
-        <h3 id="oracle-recent-chats" className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+        <h3 id="oracle-recent-chats" className="eyebrow">
           Recent
         </h3>
         {onShowAllChats && (
@@ -257,11 +257,11 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   const guestBanner = isGuest && (
     <div className="p-3 bg-surface-1 hud-sheen border border-line-subtle rounded-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full text-left">
       <div className="space-y-0.5">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-ink">
           <Shield className="w-3.5 h-3.5 text-cyan-glow" />
           <span>You're exploring as a guest</span>
         </div>
-        <p className="text-[11px] text-ink-muted">
+        <p className="text-2xs text-ink-muted">
           Guests get {ORACLE_GUEST_LIMITS.perDay} messages a day, and chats aren't saved. Sign up free for more.
         </p>
       </div>
@@ -272,7 +272,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
           onClick={onOpenAuthModal}
           className="shrink-0 w-full sm:w-auto !py-1 !px-3"
         >
-          <span className="flex items-center justify-center gap-1.5 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
+          <span className="eyebrow flex items-center justify-center gap-1.5">
             <UserPlus className="w-3.5 h-3.5" />
             <span>Sign Up</span>
           </span>

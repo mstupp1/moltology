@@ -216,14 +216,14 @@ export function AdminShopOrders() {
                     className="w-full p-3 text-left space-y-1 rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     <span className="flex items-baseline justify-between gap-3">
-                      <span className="flex flex-wrap items-baseline gap-x-2 text-sm font-bold text-ink">
+                      <span className="flex flex-wrap items-baseline gap-x-2 text-sm font-semibold text-ink">
                         #{orderNumber(order.id)}
-                        {order.livemode ? null : <span className="rounded-chip bg-surface-1 px-1.5 py-0.5 text-[11px] font-bold text-ink-muted">TEST</span>}
-                        {shopOrderNeedsAttention(order) ? <span className="whitespace-nowrap text-[11px] font-bold text-amber-400">Needs attention</span> : null}
+                        {order.livemode ? null : <span className="rounded-chip bg-surface-1 px-1.5 py-0.5 text-2xs font-semibold text-ink-muted">TEST</span>}
+                        {shopOrderNeedsAttention(order) ? <span className="whitespace-nowrap text-2xs font-semibold text-amber-400">Needs attention</span> : null}
                       </span>
-                      <span className="text-sm font-bold text-ink tabular-nums">{formatMerchPrice(order.totalCents)}</span>
+                      <span className="text-sm font-semibold text-ink tabular-nums">{formatMerchPrice(order.totalCents)}</span>
                     </span>
-                    <span className="flex flex-col gap-1 text-[11px] sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+                    <span className="flex flex-col gap-1 text-2xs sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
                       <span className="text-ink-muted break-words">
                         {shortDate(order.createdAt)} · {order.customerEmail ?? 'No email yet'} · {itemSummary(order)}
                       </span>
@@ -269,7 +269,7 @@ function OrderDetail({
   return (
     <div className="border-t border-line-subtle p-3 grid gap-3 md:grid-cols-2 text-xs text-ink-body" data-testid="shop-order-detail">
       <div className="space-y-2">
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Items</h3>
+        <h3 className="eyebrow">Items</h3>
         <ul className="space-y-1">
           {order.lineItems.map((item, index) => (
             <li key={index} className="flex justify-between gap-2">
@@ -283,13 +283,13 @@ function OrderDetail({
           {order.discountCents > 0 ? (<><dt>Discount{order.promotionCode ? ` · ${order.promotionCode}` : ''}</dt><dd>−{formatMerchPrice(order.discountCents)}</dd></>) : null}
           <dt>Shipping</dt><dd>{formatMerchPrice(order.shippingCents)}</dd>
           <dt>Tax</dt><dd>{formatMerchPrice(order.taxCents)}</dd>
-          <dt className="font-bold text-ink">Total</dt><dd className="font-bold text-ink">{formatMerchPrice(order.totalCents)}</dd>
+          <dt className="font-semibold text-ink">Total</dt><dd className="font-semibold text-ink">{formatMerchPrice(order.totalCents)}</dd>
           {order.refundCents > 0 ? (<><dt className="text-amber-400">Refunded</dt><dd className="text-amber-400">−{formatMerchPrice(order.refundCents)}</dd></>) : null}
         </dl>
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Customer</h3>
+        <h3 className="eyebrow">Customer</h3>
         <p>
           {order.customerEmail ?? 'No email yet'}
           {order.memberHandle ? <span className="text-ink-muted"> · member {order.memberHandle}</span> : null}
@@ -343,7 +343,7 @@ function OrderDetail({
             Email customer
           </a>
         ) : null}
-        <p className="basis-full text-[11px] text-ink-muted">
+        <p className="basis-full text-2xs text-ink-muted">
           Refund in Stripe and cancel in Printful. A refund does not stop Printful production.
         </p>
       </div>

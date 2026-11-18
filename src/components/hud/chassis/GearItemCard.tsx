@@ -59,10 +59,10 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
       className={`
         relative flex flex-col items-stretch justify-between w-full
         aspect-[9/16] min-h-[44px] rounded-sm border-2 overflow-hidden
-        bg-gradient-to-b from-[#0c1414] to-[#050808]
+        bg-gradient-to-b from-surface-1 to-abyss
         transition-transform touch-manipulation
         ${rarity.border} ${rarity.glow}
-        ${selected ? 'ring-2 ring-[#00c3ff] ring-offset-1 ring-offset-[#030606] scale-[1.02]' : ''}
+        ${selected ? 'ring-2 ring-cyan-glow ring-offset-1 ring-offset-abyss scale-[1.02]' : ''}
         ${dimmed ? 'opacity-40' : 'opacity-100'}
         hover:brightness-110 active:scale-[0.98]
         ${className}
@@ -85,10 +85,10 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
         />
       </div>
       <div className={`w-full ${compact ? 'py-0.5 px-0.5' : 'py-1 px-1'} text-center ${rarity.bar} shrink-0`}>
-        <span className="block text-[8px] sm:text-[9px] text-[#dfe3e3] font-semibold leading-tight line-clamp-2">
+        <span className="block text-2xs sm:text-2xs text-ink font-semibold leading-tight line-clamp-2">
           {catalog.name}
         </span>
-        <span className={`text-[9px] sm:text-[10px] font-bold ${rarity.text}`}>
+        <span className={`text-2xs sm:text-2xs font-semibold ${rarity.text}`}>
           {catalog.rarity}
         </span>
       </div>

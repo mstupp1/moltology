@@ -206,7 +206,7 @@ export const ReplyComposer = forwardRef<
       />
 
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] text-ink-muted/70 hidden sm:inline">
+        <span className="text-2xs text-ink-muted/70 hidden sm:inline">
           Ctrl/Cmd + Enter to post
         </span>
         <div className="flex items-center gap-2 ml-auto">

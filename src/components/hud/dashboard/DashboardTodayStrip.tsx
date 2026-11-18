@@ -41,8 +41,8 @@ function Meter({ ratio, done = false, label }: { ratio: number; done?: boolean; 
 function Readout({ label, children, footer }: { label: string; children: React.ReactNode; footer?: React.ReactNode }) {
   return (
     <div className="min-w-0 px-3 py-2.5 flex flex-col gap-1.5">
-      <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted truncate">{label}</span>
-      <div className="font-grotesk text-lg font-bold text-ink leading-none tabular-nums truncate">{children}</div>
+      <span className="eyebrow truncate">{label}</span>
+      <div className="font-grotesk text-lg font-semibold text-ink leading-none tabular-nums truncate">{children}</div>
       {footer}
     </div>
   )
@@ -146,7 +146,7 @@ export function DashboardTodayStrip() {
 
         <div className="relative z-10 p-4 sm:p-5 lg:p-6 lg:p-8 sm:min-h-[300px] flex flex-col items-start">
           <div className="max-w-[60%] sm:max-w-[55%] space-y-2">
-            <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted min-h-[1em]">
+            <p className="text-2xs font-semibold text-ink-muted min-h-[1em]">
               {dateLabel ? `Today · ${dateLabel}` : 'Today'}
             </p>
             <h1 id="dashboard-today-heading" className="font-grotesk text-base sm:text-lg font-medium text-ink-body leading-tight">
@@ -155,10 +155,10 @@ export function DashboardTodayStrip() {
           </div>
 
           <div className="mt-14 sm:mt-7 max-w-full sm:max-w-[55%]">
-            <p className="text-[11px] font-bold tracking-[0.12em] uppercase text-cyan-glow mb-2">
+            <p className="eyebrow mb-2">
               {isGuest ? 'Your journey begins here' : stageKnown ? `Stage ${progression.stage}` : <PendingBar width="7ch" label="Loading your stage" />}
             </p>
-            <h2 className="font-grotesk text-3xl lg:text-4xl font-bold text-ink leading-tight tracking-tight">
+            <h2 className="font-grotesk text-3xl lg:text-4xl font-semibold text-ink leading-tight tracking-tight">
               {stageKnown ? <span key="stage" className={REVEAL_CLASS}>{stageName}</span> : <PendingBar width="9ch" />}
             </h2>
             {!isGuest && (
@@ -197,7 +197,7 @@ export function DashboardTodayStrip() {
               {step.label}
             </HudButton>
             {step.kind === 'resume-oracle' && (
-              <span className="text-[11px] text-ink-muted truncate max-w-full sm:max-w-[16rem]" title={step.threadTitle}>
+              <span className="text-2xs text-ink-muted truncate max-w-full sm:max-w-[16rem]" title={step.threadTitle}>
                 {step.threadTitle}
               </span>
             )}
@@ -211,7 +211,7 @@ export function DashboardTodayStrip() {
           footer={
             <>
               <Meter ratio={stageKnown ? progression.progressRatio : 0} label="Progress to the next stage" />
-              <span className="text-[11px] text-ink-muted truncate">
+              <span className="text-2xs text-ink-muted truncate">
                 {!stageKnown ? (
                   <PendingBar width="9ch" />
                 ) : progression.isMaxStage ? (
@@ -234,7 +234,7 @@ export function DashboardTodayStrip() {
           footer={
             <>
               <WeekMarks days={streakKnown ? streakHistory.slice(-7) : []} />
-              <span className="text-[11px] text-ink-muted truncate">{streakDays === 1 ? 'day in a row' : 'days in a row'}</span>
+              <span className="text-2xs text-ink-muted truncate">{streakDays === 1 ? 'day in a row' : 'days in a row'}</span>
             </>
           }
         >
@@ -248,7 +248,7 @@ export function DashboardTodayStrip() {
           footer={
             <>
               <Meter ratio={completedCount / Math.max(totalCount, 1)} done={alignmentDone} label="Today’s alignment" />
-              <span className={cn('text-[11px] truncate', alignmentDone ? 'text-emerald-500' : 'text-ink-muted')}>
+              <span className={cn('text-2xs truncate', alignmentDone ? 'text-emerald-500' : 'text-ink-muted')}>
                 {alignmentDone ? 'Done today' : ready && restDay ? 'rest day' : 'done today'}
               </span>
             </>

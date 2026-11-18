@@ -178,9 +178,9 @@ export const HIRING_STEPS = [
 ]
 
 const focusRing = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-const tileBase = `inline-flex items-center justify-center min-h-10 px-4 rounded-control font-grotesk font-bold text-xs uppercase tracking-wider transition-colors shrink-0 ${focusRing}`
-const sectionLabel = 'font-grotesk text-[11px] sm:text-xs font-bold tracking-[0.08em] uppercase text-cyan-glow'
-const sectionTitle = 'mt-3 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-4xl leading-tight [text-wrap:balance]'
+const tileBase = `inline-flex items-center justify-center min-h-10 px-4 rounded-control font-grotesk font-semibold text-xs transition-colors shrink-0 ${focusRing}`
+const sectionLabel = 'eyebrow'
+const sectionTitle = 'mt-3 font-grotesk font-semibold tracking-tight text-ink text-3xl sm:text-4xl leading-tight [text-wrap:balance]'
 const card = 'rounded-card border border-line-subtle bg-surface-1'
 
 interface CareerHubProps {
@@ -195,10 +195,10 @@ const JobCard: React.FC<{ job: JobListing; onApply?: (job: JobListing) => void }
     <article className={`${card} p-5 sm:p-6`}>
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+          <p className="eyebrow">
             {DEPARTMENT_LABELS[job.department]}
           </p>
-          <h3 className="mt-1 font-grotesk font-bold text-xl text-ink">{job.title}</h3>
+          <h3 className="mt-1 font-grotesk font-semibold text-xl text-ink">{job.title}</h3>
           <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
             <span className="inline-flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
@@ -230,7 +230,7 @@ const JobCard: React.FC<{ job: JobListing; onApply?: (job: JobListing) => void }
       {open && (
         <div id={detailsId} className="mt-5 pt-5 border-t border-line-subtle grid sm:grid-cols-2 gap-6 text-sm">
           <div>
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">What you'll do</h4>
+            <h4 className="eyebrow">What you'll do</h4>
             <ul className="mt-2 space-y-1.5 list-disc pl-4 text-ink-body marker:text-ink-muted">
               {job.responsibilities.map((item) => (
                 <li key={item}>{item}</li>
@@ -238,7 +238,7 @@ const JobCard: React.FC<{ job: JobListing; onApply?: (job: JobListing) => void }
             </ul>
           </div>
           <div>
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">What you'll bring</h4>
+            <h4 className="eyebrow">What you'll bring</h4>
             <ul className="mt-2 space-y-1.5 list-disc pl-4 text-ink-body marker:text-ink-muted">
               {job.requirements.map((item) => (
                 <li key={item}>{item}</li>
@@ -271,7 +271,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onApply }) => {
       </ScrollReveal>
 
       <section id="job-board" className="scroll-mt-24" aria-labelledby="careers-roles-title">
-        <h3 id="careers-roles-title" className="font-grotesk font-bold text-xl text-ink">
+        <h3 id="careers-roles-title" className="font-grotesk font-semibold text-xl text-ink">
           Open roles <span className="text-ink-muted font-medium">({jobs.length})</span>
         </h3>
         <HorizontalScroll className="mt-4 flex gap-1 overflow-x-auto touch-pan-scroll no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0" aria-label="Filter by team">
@@ -299,14 +299,14 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onApply }) => {
       </section>
 
       <section aria-labelledby="careers-perks-title">
-        <h3 id="careers-perks-title" className="font-grotesk font-bold text-xl text-ink">
+        <h3 id="careers-perks-title" className="font-grotesk font-semibold text-xl text-ink">
           Perks
         </h3>
         <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {PERKS.map((perk) => (
             <div key={perk.title} className={`${card} p-5`}>
               <perk.icon className="w-5 h-5 text-cyan-glow" aria-hidden="true" />
-              <h4 className="mt-3 font-grotesk font-bold text-base text-ink">{perk.title}</h4>
+              <h4 className="mt-3 font-grotesk font-semibold text-base text-ink">{perk.title}</h4>
               <p className="mt-1 text-sm text-ink-muted leading-relaxed">{perk.description}</p>
             </div>
           ))}
@@ -314,14 +314,14 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onApply }) => {
       </section>
 
       <section aria-labelledby="careers-steps-title">
-        <h3 id="careers-steps-title" className="font-grotesk font-bold text-xl text-ink">
+        <h3 id="careers-steps-title" className="font-grotesk font-semibold text-xl text-ink">
           How hiring works
         </h3>
         <ol className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {HIRING_STEPS.map((step, index) => (
             <li key={step.title} className={`${card} p-5`}>
-              <span className="font-grotesk text-xs font-bold text-cyan-glow">Step {index + 1}</span>
-              <h4 className="mt-2 font-grotesk font-bold text-base text-ink">{step.title}</h4>
+              <span className="font-grotesk text-xs font-semibold text-cyan-glow">Step {index + 1}</span>
+              <h4 className="mt-2 font-grotesk font-semibold text-base text-ink">{step.title}</h4>
               <p className="mt-1 text-sm text-ink-muted leading-relaxed">{step.description}</p>
             </li>
           ))}

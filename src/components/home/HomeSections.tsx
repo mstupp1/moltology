@@ -29,10 +29,10 @@ export interface HomeSectionProps {
 }
 
 const sectionTitle =
-  'font-grotesk font-bold tracking-[-0.03em] text-ink text-[2.4rem] sm:text-5xl lg:text-6xl leading-[1.04] [text-wrap:balance]'
+  'font-grotesk font-semibold tracking-[-0.03em] text-ink text-[2.4rem] sm:text-5xl lg:text-6xl leading-[1.04] [text-wrap:balance]'
 const lede = 'text-base sm:text-lg text-ink-muted leading-relaxed [text-wrap:pretty]'
 const textLink =
-  'group inline-flex items-center gap-2 rounded-control font-grotesk font-bold text-sm transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+  'group inline-flex items-center gap-2 rounded-control font-grotesk font-semibold text-sm transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
 /**
  * The moment of the list that is lit, given how far the list has travelled through the viewport.
@@ -56,7 +56,7 @@ export const HomeMelt: React.FC = () => {
   return (
     <section
       aria-labelledby="home-melt-title"
-      className="relative isolate overflow-hidden py-16 sm:py-36 bg-gradient-to-b from-[#020408] via-[#061722] to-[#020408]"
+      className="relative isolate overflow-hidden py-16 sm:py-36 bg-gradient-to-b from-abyss via-surface-2 to-abyss"
     >
       <SectionBackdrop image={HOME_BACKDROPS.surface} position="50% 20%" tone="surface" />
       <DepthLayer kind="shafts" className="-z-10 opacity-25" />
@@ -116,21 +116,21 @@ const ReadingCard: React.FC<{ reading: HomeReading }> = ({ reading }) => {
       ref={tilt.ref}
       onPointerMove={tilt.onPointerMove}
       onPointerLeave={tilt.onPointerLeave}
-      className="home-tilt group relative h-full overflow-hidden rounded-card border border-line-subtle bg-[#05090c] shadow-[0_20px_60px_rgba(0,0,0,0.5)] hover:border-line-hover"
+      className="home-tilt group relative h-full overflow-hidden rounded-card border border-line-subtle bg-abyss shadow-[0_20px_60px_rgba(0,0,0,0.5)] hover:border-line-hover"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <StoryImg
           image={reading.image}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#05090c] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-abyss to-transparent" />
       </div>
       <div className="p-6 sm:p-7 pt-2 sm:pt-3">
-        <p className="font-grotesk text-[11px] font-bold tracking-[0.08em] uppercase" style={{ color: reading.accent }}>
+        <p className="eyebrow" style={{ color: reading.accent }}>
           {reading.name}
         </p>
-        <h3 className="mt-2 font-grotesk font-bold text-2xl text-ink">{reading.plain}</h3>
-        <p className="mt-2 text-[15px] text-ink-body leading-relaxed">{reading.body}</p>
+        <h3 className="mt-2 font-grotesk font-semibold text-2xl text-ink">{reading.plain}</h3>
+        <p className="mt-2 text-md text-ink-body leading-relaxed">{reading.body}</p>
       </div>
       <span className="home-tilt-glare" aria-hidden="true" />
     </article>
@@ -140,10 +140,10 @@ const ReadingCard: React.FC<{ reading: HomeReading }> = ({ reading }) => {
 export const HomeIdea: React.FC = () => (
   <section
     aria-labelledby="home-idea-title"
-    className="relative isolate overflow-hidden py-16 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]"
+    className="relative isolate overflow-hidden py-16 sm:py-32 bg-gradient-to-b from-abyss via-surface-1 to-abyss"
   >
     <SectionBackdrop image={HOME_BACKDROPS.seabed} position="50% 75%" drift={14} tone="seabed" />
-    <div className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-[#020408]/80 via-[#020408]/35 to-transparent" aria-hidden="true" />
+    <div className="absolute inset-x-0 top-0 h-1/2 -z-10 bg-gradient-to-b from-abyss/80 via-abyss/35 to-transparent" aria-hidden="true" />
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-12">
         <div className="max-w-3xl">
@@ -161,11 +161,11 @@ export const HomeIdea: React.FC = () => (
           className="hud-ticks hud-sheen group relative flex min-h-12 items-center justify-between gap-6 self-start rounded-card border border-line-strong bg-surface-1 px-5 py-4 text-cyan-glow transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow lg:self-end"
         >
           <span>
-            <span className="mb-1.5 flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] text-ink-muted">
+            <span className="mb-1.5 flex items-center gap-2 font-mono text-2xs text-ink-muted">
               <BookOpen className="h-3.5 w-3.5 text-cyan-glow" aria-hidden="true" />
               The Order’s doctrine
             </span>
-            <span className="font-grotesk text-base font-bold">What Moltologists believe</span>
+            <span className="font-grotesk text-base font-semibold">What Moltologists believe</span>
           </span>
           <ArrowRight className="h-5 w-5 shrink-0 transition-transform motion-safe:group-hover:translate-x-1" aria-hidden="true" />
         </Link>
@@ -208,7 +208,7 @@ const ScreenFrame: React.FC<{ step: HomeStep; onExpand: () => void; children: Re
             <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
             <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
           </div>
-          <div className="mx-auto max-w-[220px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-[11px] text-ink-muted text-center truncate">
+          <div className="mx-auto max-w-[220px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-2xs text-ink-muted text-center truncate">
             {step.url}
           </div>
           <div className="w-[34px] sm:w-[42px]" />
@@ -232,7 +232,7 @@ const StepAction: React.FC<{ step: HomeStep; onNavigate: (path: string) => void 
   <button
     type="button"
     onClick={() => onNavigate(step.actionRoute)}
-    className="group/cta mt-5 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-cyan-glow hover:text-ink transition-colors focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control"
+    className="group/cta mt-5 inline-flex items-center gap-2 font-grotesk font-semibold text-sm text-cyan-glow hover:text-ink transition-colors focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control"
   >
     {step.actionText}
     <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-0.5" aria-hidden="true" />
@@ -304,8 +304,8 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
             {HOME_STEPS.map((step, index) => (
               <li key={step.id}>
                 <ScrollReveal>
-                  <p className="font-grotesk text-sm font-bold text-[#00ffcc]">Step {index + 1}</p>
-                  <h3 className="mt-2 font-grotesk font-bold text-2xl sm:text-3xl text-ink">{step.title}</h3>
+                  <p className="font-grotesk text-sm font-semibold text-cyan-glow">Step {index + 1}</p>
+                  <h3 className="mt-2 font-grotesk font-semibold text-2xl sm:text-3xl text-ink">{step.title}</h3>
                   <p className="mt-3 text-base text-ink-body leading-relaxed [text-wrap:pretty]">{step.body}</p>
                   <div className="mt-6">
                     <ScreenFrame step={step} onExpand={() => setExpanded(index)}>
@@ -346,7 +346,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
                       aria-hidden="true"
                     />
                     <h3
-                      className="font-grotesk font-bold text-xl transition-colors duration-500"
+                      className="font-grotesk font-semibold text-xl transition-colors duration-500"
                       style={{ color: isActive ? '#ffffff' : 'rgba(223,227,227,0.35)' }}
                     >
                       <span className="mr-3 tabular-nums text-sm" style={{ color: isActive ? '#00ffcc' : 'inherit' }}>
@@ -359,7 +359,7 @@ export const HomeHowItWorks: React.FC<Pick<HomeSectionProps, 'onNavigate'>> = ({
                       style={{ gridTemplateRows: isActive ? '1fr' : '0fr', opacity: isActive ? 1 : 0 }}
                     >
                       <div className="overflow-hidden">
-                        <p className="pt-2 text-[15px] text-ink-body leading-relaxed max-w-md">{step.body}</p>
+                        <p className="pt-2 text-md text-ink-body leading-relaxed max-w-md">{step.body}</p>
                         <StepAction step={step} onNavigate={onNavigate} />
                       </div>
                     </div>
@@ -418,7 +418,7 @@ const VoicePost: React.FC<{ voice: (typeof HOME_VOICES)[number]; pinned: boolean
       className={`home-voice-post relative flex h-full flex-col rounded-card border p-6 sm:p-7 ${pinned ? 'border-cyan-glow/30 lg:p-9' : 'border-line-subtle'}`}
     >
       {pinned && (
-        <span className="absolute -top-3 right-5 inline-flex items-center gap-1 rounded-full border border-cyan-glow/40 bg-[#04131b] px-2.5 py-1 text-[11px] font-bold text-cyan-glow">
+        <span className="absolute -top-3 right-5 inline-flex items-center gap-1 rounded-full border border-cyan-glow/40 bg-surface-1 px-2.5 py-1 text-2xs font-semibold text-cyan-glow">
           <Pin className="h-3 w-3" aria-hidden="true" />
           Pinned
         </span>
@@ -426,7 +426,7 @@ const VoicePost: React.FC<{ voice: (typeof HOME_VOICES)[number]; pinned: boolean
       <figcaption className="flex items-center gap-3">
         <ForumAvatar authorName={voice.name} size={pinned ? 'lg' : 'md'} alt="" />
         <span className="min-w-0">
-          <span className="block font-grotesk font-bold text-sm text-ink truncate">{voice.name}</span>
+          <span className="block font-grotesk font-semibold text-sm text-ink truncate">{voice.name}</span>
           <span className="mt-1 inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-ink-muted">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} aria-hidden="true" />
             <span style={{ color: accent }}>{VOICE_STAGE_LABELS[voice.stage]}</span>
@@ -490,7 +490,7 @@ export const HomeVoices: React.FC = () => (
       </HorizontalScroll>
 
       <ScrollReveal>
-        <Link to="/what-is-moltology" hash="voices" className={`mt-10 sm:mt-12 text-[#00ffcc] ${textLink}`}>
+        <Link to="/what-is-moltology" hash="voices" className={`mt-10 sm:mt-12 text-cyan-glow ${textLink}`}>
           Hear more from members
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </Link>
@@ -527,7 +527,7 @@ export const HomeFaq: React.FC = () => (
             key={item.question}
             className="group rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset px-5 sm:px-6 transition-colors hover:border-line open:border-line"
           >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 sm:py-6 font-grotesk font-bold text-lg sm:text-xl text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-hidden focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 sm:py-6 font-grotesk font-semibold text-lg sm:text-xl text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-hidden focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
               {item.question}
               <Plus
                 className="h-5 w-5 shrink-0 text-cyan-glow transition-transform duration-300 group-open:rotate-45"
@@ -547,19 +547,19 @@ export const HomeFaq: React.FC = () => (
 export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate, onOpenAuth }) => (
   <section aria-labelledby="home-final-title" className="relative px-5 sm:px-8 pb-24 sm:pb-32">
     <ScrollReveal animation="scale-up">
-      <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-cyan-glow/40 bg-gradient-to-br from-[#04161c] via-[#03090d] to-[#020408] grid md:grid-cols-[1.15fr_0.85fr] items-center">
+      <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-cyan-glow/40 bg-gradient-to-br from-surface-2 via-abyss to-abyss grid md:grid-cols-[1.15fr_0.85fr] items-center">
         {/* Separate desktop and portrait compositions cover the whole invitation. */}
         <div className="absolute inset-0 -z-10" aria-hidden="true">
           <StoryImg image={HOME_FINAL_IMAGE} className="home-final-art h-full w-full object-cover" />
           <div className="home-final-vignette absolute inset-0" />
         </div>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-[#020408]/55 to-[#020408]/80 md:bg-gradient-to-r md:from-[#020408]/70 md:via-[#020408]/15 md:to-transparent" aria-hidden="true" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-abyss/55 to-abyss/80 md:bg-gradient-to-r md:from-abyss/70 md:via-abyss/15 md:to-transparent" aria-hidden="true" />
         <DepthLayer kind="caustics" className="-z-10 opacity-30" />
         <DepthLayer kind="snow" className="-z-10 opacity-25" />
         <div className="px-6 py-12 sm:p-14 lg:p-16">
           <h2
             id="home-final-title"
-            className="font-grotesk font-bold tracking-[-0.03em] text-ink text-4xl sm:text-5xl lg:text-6xl leading-[1.02] [text-wrap:balance]"
+            className="font-grotesk font-semibold tracking-[-0.03em] text-ink text-4xl sm:text-5xl lg:text-6xl leading-[1.02] [text-wrap:balance]"
           >
             Start with one small shed.
           </h2>

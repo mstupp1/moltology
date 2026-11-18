@@ -75,20 +75,20 @@ const ArticleCodeBlock: React.FC<{ language: string; code: string }> = ({ langua
       <div className="bg-surface-2 border-b border-line-subtle px-3 sm:px-4 py-2 flex items-center justify-between text-xs text-cyan-glow font-sans gap-2">
         <div className="flex items-center space-x-2 min-w-0 truncate">
           <Terminal className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-          <span className="uppercase tracking-[0.08em] font-bold text-[11px] sm:text-xs truncate">
+          <span className="eyebrow truncate">
             {language || 'TELEMETRY DATA'}
           </span>
         </div>
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[11px] text-ink-muted hover:text-ink transition-colors px-2 py-1 bg-surface-1 hover:bg-surface-2 border border-line hover:border-line-strong rounded-control shrink-0 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className="flex items-center gap-1 text-2xs text-ink-muted hover:text-ink transition-colors px-2 py-1 bg-surface-1 hover:bg-surface-2 border border-line hover:border-line-strong rounded-control shrink-0 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           title="Copy code"
         >
           {copied ? (
             <>
               <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400 font-bold">COPIED</span>
+              <span className="text-emerald-400 font-semibold">Copied</span>
             </>
           ) : (
             <>
@@ -99,7 +99,7 @@ const ArticleCodeBlock: React.FC<{ language: string; code: string }> = ({ langua
         </button>
       </div>
       <div className="relative">
-        <pre className="p-3.5 sm:p-4 overflow-x-auto touch-pan-scroll text-[11px] sm:text-xs md:text-sm font-sans text-ink-body leading-relaxed no-scrollbar select-text bg-abyss">
+        <pre className="p-3.5 sm:p-4 overflow-x-auto touch-pan-scroll text-2xs sm:text-xs md:text-sm font-sans text-ink-body leading-relaxed no-scrollbar select-text bg-abyss">
           <code>{code}</code>
         </pre>
       </div>
@@ -152,7 +152,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
           <ol key={key} className="space-y-2.5 my-3 sm:my-4 pl-1 sm:pl-2 font-sans text-sm sm:text-base text-ink-body">
             {currentListItems.map((item, i) => (
               <li key={`${key}-item-${i}`} className="flex items-start gap-3 leading-relaxed">
-                <span className="font-bold text-cyan-glow font-sans text-xs sm:text-sm shrink-0 min-w-[1.25rem] mt-0.5">
+                <span className="font-semibold text-cyan-glow font-sans text-xs sm:text-sm shrink-0 min-w-[1.25rem] mt-0.5">
                   {item.number || i + 1}.
                 </span>
                 <span className="break-words" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item.text) }} />
@@ -209,7 +209,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
         <div key={key} className="my-6 overflow-x-auto border border-line-subtle rounded-card bg-surface-1 w-full touch-pan-scroll">
           <table className="w-full text-left font-sans text-xs sm:text-sm border-collapse min-w-[500px]">
             <thead>
-              <tr className="bg-surface-2 border-b border-line text-ink font-bold uppercase tracking-[0.08em]">
+              <tr className="bg-surface-2 border-b border-line text-ink font-semibold">
                 {headerCells.map((h, hIdx) => (
                   <th key={`${key}-h-${hIdx}`} className="p-3 sm:p-3.5 border-r border-line-subtle last:border-r-0" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(h) }} />
                 ))}
@@ -467,7 +467,7 @@ export function formatInlineMarkdown(text: string): string {
   formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label: string, href: string) => {
     const safeHref = safeInlineUrl(href.trim().replace(/&amp;/g, '&'))
     if (!safeHref) return label
-    return `<a href="${escapeAttr(safeHref)}" target="_blank" rel="noopener noreferrer" class="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-sans font-bold break-words">${label}</a>`
+    return `<a href="${escapeAttr(safeHref)}" target="_blank" rel="noopener noreferrer" class="text-cyan-glow hover:text-cyan-hover underline underline-offset-2 transition-colors font-sans font-semibold break-words">${label}</a>`
   })
 
   return formatted

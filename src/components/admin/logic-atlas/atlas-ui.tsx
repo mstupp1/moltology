@@ -32,7 +32,7 @@ export const KIND_ICONS: Record<RuleKind, LucideIcon> = {
 export function KindTag({ kind, className = '' }: { kind: RuleKind; className?: string }) {
   const Icon = KIND_ICONS[kind]
   return (
-    <span className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted ${className}`}>
+    <span className={`inline-flex items-center gap-1 text-2xs font-semibold text-ink-muted ${className}`}>
       <Icon className="h-3 w-3" aria-hidden />
       {RULE_KIND_LABELS[kind]}
     </span>
@@ -46,7 +46,7 @@ export function StatusTag({ status }: { status: RuleStatus }) {
       ? 'border-transparent bg-purple-500/15 text-purple-300'
       : 'border-line text-ink-muted line-through'
   return (
-    <span className={`rounded-chip border px-1.5 py-px text-[11px] font-bold uppercase tracking-[0.08em] ${tone}`}>
+    <span className={`rounded-chip border px-1.5 py-px text-2xs font-semibold ${tone}`}>
       {RULE_STATUS_LABELS[status]}
     </span>
   )
@@ -79,7 +79,7 @@ export function DriftBadge({ drift }: { drift: DriftState }) {
           ? 'border-transparent bg-crimson-soft text-crimson-text'
           : 'border-line text-ink-muted'
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-chip border px-1.5 py-px text-[11px] font-bold uppercase tracking-[0.08em] ${tone}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-chip border px-1.5 py-px text-2xs font-semibold ${tone}`}>
       <DriftDot drift={drift} />
       {DRIFT_LABELS[drift]}
     </span>
@@ -105,7 +105,7 @@ export function FlagCallout({ flag }: { flag: AtlasFlag }) {
     >
       <FlagIcon flag={flag} className="mt-0.5 h-4 w-4 shrink-0" />
       <div>
-        <p className={`text-[11px] font-bold uppercase tracking-[0.08em] ${labelTone}`}>
+        <p className={`eyebrow ${labelTone}`}>
           {flag.level === 'gap' ? 'Known gap' : 'Watch'}
         </p>
         <p className="mt-1">{flag.note}</p>
@@ -135,7 +135,7 @@ export function DomainChip({
     </>
   )
   const base =
-    'inline-flex min-h-[30px] max-w-full items-center gap-1.5 rounded-control border px-2 py-1 text-[11px] font-semibold transition-colors'
+    'inline-flex min-h-[30px] max-w-full items-center gap-1.5 rounded-control border px-2 py-1 text-2xs font-semibold transition-colors'
   if (!onClick) {
     return (
       <span className={`${base} border-line-subtle bg-surface-2 text-ink-body`}>{content}</span>

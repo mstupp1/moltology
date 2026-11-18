@@ -31,7 +31,7 @@ export const HudInput = React.forwardRef<HTMLInputElement, HudInputProps>(
     return (
       <div className={cn('flex flex-col gap-1.5 font-sans', fullWidth && 'w-full')}>
         {label && (
-          <label htmlFor={inputId} className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted flex items-center justify-between">
+          <label htmlFor={inputId} className="eyebrow flex items-center justify-between">
             <span>{label}</span>
           </label>
         )}

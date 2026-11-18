@@ -56,11 +56,11 @@ export function HudTitlePanel({
     >
       <div className="min-w-0 flex-1 basis-56 space-y-1.5 max-w-2xl">
         {eyebrow ? (
-          <div className={cn('flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em]', accentClasses.eyebrow)}>
+          <div className={cn('eyebrow flex items-center gap-2', accentClasses.eyebrow)}>
             {eyebrow}
           </div>
         ) : null}
-        <h1 className="font-grotesk font-extrabold text-xl sm:text-2xl text-ink tracking-tight">
+        <h1 className="font-grotesk font-semibold text-xl sm:text-2xl text-ink tracking-tight">
           {title}
         </h1>
         {description ? <p className="text-xs text-ink-muted leading-relaxed">{description}</p> : null}

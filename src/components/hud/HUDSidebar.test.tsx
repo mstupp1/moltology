@@ -95,9 +95,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(sidebar.queryByText('LEARN')).not.toBeInTheDocument()
     expect(sidebar.queryByText('COMMUNITY')).not.toBeInTheDocument()
 
-    expect(sidebar.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
+    expect(sidebar.getAllByText('Dashboard').length).toBeGreaterThan(0)
     // The Oracle is reached from the synaptic core launcher, not a rail item.
-    expect(sidebar.queryByText('ORACLE')).not.toBeInTheDocument()
+    expect(sidebar.queryByText('Oracle')).not.toBeInTheDocument()
     expect(sidebar.getByRole('button', { name: /^CHARACTER$/i })).toBeInTheDocument()
     // Profile opens from the account menu, so the rail leaves it out.
     expect(sidebar.queryByRole('button', { name: /^PROFILE$/i })).not.toBeInTheDocument()
@@ -111,7 +111,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(sidebar.queryByRole('button', { name: /^MARKET$/i })).not.toBeInTheDocument()
   })
 
-  it.each([['CODEX', '/codex'], ['FORUM', '/forum'], ['CHARACTER', '/character']])('navigates to %s on nav item click', (label, route) => {
+  it.each([['Codex', '/codex'], ['Forum', '/forum'], ['Character', '/character']])('navigates to %s on nav item click', (label, route) => {
     render(<HUDSidebar />)
 
     fireEvent.click(within(screen.getByRole('complementary')).getByRole('button', { name: label }))
@@ -139,21 +139,21 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(aside).toHaveClass('md:w-20')
 
     // Check for short labels
-    expect(screen.getAllByText('CODEX').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('DASHBOARD').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('ACADEMY').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Codex').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Academy').length).toBeGreaterThan(0)
     expect(screen.queryByText('JOURNAL')).not.toBeInTheDocument()
-    expect(screen.getAllByText('CHARACTER').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('FORUM').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('SUPPORT').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Character').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Forum').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Support').length).toBeGreaterThan(0)
   })
 
   it('shows the phone bottom bar with the main pages and More, and keeps search and tasks up top', () => {
     render(<HUDSidebar />)
 
     const bar = within(screen.getByRole('navigation', { name: 'Main' }))
-    expect(bar.getAllByRole('button').map((b) => b.textContent)).toEqual(['DASHBOARD', 'CHARACTER', 'ORACLE', 'FORUM', 'More'])
-    fireEvent.click(bar.getByRole('button', { name: 'FORUM' }))
+    expect(bar.getAllByRole('button').map((b) => b.textContent)).toEqual(['Dashboard', 'Character', 'Oracle', 'Forum', 'More'])
+    fireEvent.click(bar.getByRole('button', { name: 'Forum' }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/forum' })
     // The middle slot is the synaptic core, opening the Oracle page.
     const core = bar.getByTestId('mobile-oracle-core')
@@ -180,7 +180,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(document.body.style.overflow).toBe('hidden')
     expect(screen.getByRole('button', { name: 'More' })).toHaveAttribute('aria-expanded', 'true')
     const sheet = within(dialog)
-    expect(sheet.getAllByRole('button').slice(0, 2).map((b) => b.textContent)).toEqual(['CODEX', 'ACADEMY'])
+    expect(sheet.getAllByRole('button').slice(0, 2).map((b) => b.textContent)).toEqual(['Codex', 'Academy'])
     expect(sheet.queryByRole('button', { name: /^PROFILE$/ })).not.toBeInTheDocument()
     expect(sheet.queryByRole('button', { name: /^ORACLE$/ })).not.toBeInTheDocument()
 

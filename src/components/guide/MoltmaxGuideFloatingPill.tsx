@@ -97,9 +97,9 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
     <div data-guide-pill className="guide-pill fixed bottom-3 right-3 sm:bottom-6 sm:right-6 z-40">
       <div className="group relative">
         {/* Attention cue: a light that slowly circles the border */}
-        <div className="absolute inset-0 rounded-2xl overflow-hidden bg-[#00c3ff]/25" aria-hidden="true">
+        <div className="absolute inset-0 rounded-2xl overflow-hidden bg-cyan-glow/25" aria-hidden="true">
           <div className="guide-pill-beam absolute -inset-[150%]" />
-          <div className="absolute inset-[1.5px] rounded-[14.5px] bg-[#040914]/95 group-hover:bg-[#061224] transition-colors" />
+          <div className="absolute inset-[1.5px] rounded-[14.5px] bg-surface-1/95 group-hover:bg-surface-2 transition-colors" />
         </div>
 
         {/* Cover peeks out above the card and gives a small hop every few seconds */}
@@ -116,21 +116,21 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
         <button
           type="button"
           onClick={onOpenGuideModal}
-          className="relative flex items-center gap-3 pl-[72px] pr-10 py-3 sm:py-3.5 text-left rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.55)] cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#00c3ff]"
+          className="relative flex items-center gap-3 pl-[72px] pr-10 py-3 sm:py-3.5 text-left rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.55)] cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-cyan-glow"
           aria-label="Get the free Moltmaxxing Field Manual"
         >
           <span className="block min-w-0 space-y-0.5">
-            <span className="block text-[10px] font-sans font-bold text-[#00ffcc] uppercase tracking-wider">
+            <span className="eyebrow block">
               Free PDF
             </span>
-            <span className="block text-sm font-grotesk font-bold text-white leading-tight">
+            <span className="block text-sm font-grotesk font-semibold text-white leading-tight">
               Moltmaxxing Field Manual
             </span>
-            <span className="hidden sm:block text-xs text-[#839493] font-sans">
+            <span className="hidden sm:block text-xs text-ink-muted font-sans">
               A daily plan for finishing what you start
             </span>
           </span>
-          <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#00c3ff] text-[#020408] group-hover:translate-x-0.5 transition-transform">
+          <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-cyan-glow text-abyss group-hover:translate-x-0.5 transition-transform">
             <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </span>
         </button>
@@ -139,7 +139,7 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
         <button
           type="button"
           onClick={handleDismiss}
-          className="absolute top-1.5 right-1.5 p-1 text-[#839493] hover:text-white rounded transition-colors cursor-pointer"
+          className="absolute top-1.5 right-1.5 p-1 text-ink-muted hover:text-white rounded transition-colors cursor-pointer"
           aria-label="Hide field manual offer"
         >
           <X className="w-3.5 h-3.5" />

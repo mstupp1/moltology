@@ -56,7 +56,7 @@ export const DeleteThreadDialog: React.FC<DeleteThreadDialogProps> = ({ thread, 
       >
         <div className="flex items-center gap-2 mb-2">
           <Trash2 className="w-4 h-4 text-crimson-text shrink-0" />
-          <span className="text-sm font-bold font-grotesk tracking-[0.08em] uppercase text-ink">
+          <span className="text-sm font-semibold font-grotesk text-ink">
             DELETE CHAT
           </span>
         </div>
@@ -64,9 +64,9 @@ export const DeleteThreadDialog: React.FC<DeleteThreadDialogProps> = ({ thread, 
           <span className="text-ink font-medium">{thread.title || 'Untitled Consultation'}</span> and all of its
           messages will be permanently removed.
         </p>
-        <p className="text-[11px] text-crimson-text mb-3">This cannot be undone.</p>
+        <p className="text-2xs text-crimson-text mb-3">This cannot be undone.</p>
 
-        <label className="flex items-center gap-2 mb-4 cursor-pointer select-none text-[11px] text-ink-muted hover:text-ink-body">
+        <label className="flex items-center gap-2 mb-4 cursor-pointer select-none text-2xs text-ink-muted hover:text-ink-body">
           <input
             type="checkbox"
             checked={dontAskAgain}
@@ -87,7 +87,7 @@ export const DeleteThreadDialog: React.FC<DeleteThreadDialogProps> = ({ thread, 
           <button
             type="button"
             onClick={handleConfirm}
-            className="px-3 py-1.5 text-xs font-bold tracking-[0.08em] text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro rounded-control transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className="px-3 py-1.5 text-xs font-semibold text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro rounded-control transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             DELETE
           </button>

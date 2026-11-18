@@ -377,7 +377,7 @@ export const CommandPalette: React.FC = () => {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="text-[11px] uppercase tracking-[0.12em] text-ink-muted font-semibold">
+    <span className="eyebrow">
       {children}
     </span>
   )
@@ -413,7 +413,7 @@ function ResultRow({
     >
       {leading}
       <span className="min-w-0 flex-1">
-        <span className="block text-[15px] sm:text-sm font-semibold text-ink truncate">{title}</span>
+        <span className="block text-md sm:text-sm font-semibold text-ink truncate">{title}</span>
         {detail && <span className="block text-xs text-ink-muted truncate">{detail}</span>}
       </span>
     </button>

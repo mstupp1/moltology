@@ -24,7 +24,7 @@ export function OracleCoreTip({ placement, onOpen, onDismiss, className = '' }: 
       <button
         type="button"
         onClick={onOpen}
-        className="text-xs font-medium tracking-wide text-ink cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="text-xs font-medium text-ink cursor-pointer rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         Ask the Oracle anything
       </button>

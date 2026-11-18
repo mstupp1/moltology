@@ -9,7 +9,7 @@ function UsageBar({ window, label }: { window: OracleUsageWindow; label: string 
   const low = window.remaining / window.limit <= 0.2
   return (
     <div className="space-y-1.5">
-      <p className={`text-[11px] ${low ? 'text-amber-300' : 'text-ink-muted'}`}>
+      <p className={`text-2xs ${low ? 'text-amber-300' : 'text-ink-muted'}`}>
         {window.remaining} of {window.limit.toLocaleString('en-US')} remaining · {label}
       </p>
       <div role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={window.limit} aria-valuenow={window.remaining}
@@ -34,24 +34,24 @@ export function OracleUsage({ snapshot, unavailable, expanded = false }: {
       month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
     }) : '')
   }, [snapshot?.nextAllowedAt])
-  if (!snapshot) return unavailable ? <p className="text-[11px] text-ink-muted">Usage unavailable. Try again shortly.</p> : null
+  if (!snapshot) return unavailable ? <p className="text-2xs text-ink-muted">Usage unavailable. Try again shortly.</p> : null
   const showDetails = expanded || open
   const exhausted = [snapshot.fiveHours.remaining === 0 && '5-hour', snapshot.week.remaining === 0 && '7-day'].filter(Boolean).join(' and ')
   return (
     <div className="space-y-2 text-ink-muted">
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1"><UsageBar window={snapshot.fiveHours} label="Past 5 hours" /></div>
-        {!expanded && <button type="button" className="text-[11px] underline underline-offset-2 hover:text-ink focus-visible:outline focus-visible:outline-cyan-glow"
+        {!expanded && <button type="button" className="text-2xs underline underline-offset-2 hover:text-ink focus-visible:outline focus-visible:outline-cyan-glow"
           aria-expanded={open} aria-controls={detailsId} onClick={() => setOpen(!open)}>{open ? 'Hide usage' : 'View usage'}</button>}
       </div>
       {showDetails && <div id={detailsId} className="space-y-2">
         <UsageBar window={snapshot.week} label="Past 7 days" />
-        <p className="text-[11px]">Messages become available as older messages leave each window.</p>
+        <p className="text-2xs">Messages become available as older messages leave each window.</p>
       </div>}
-      {exhausted && <p role="status" className="text-[11px] text-amber-300">
+      {exhausted && <p role="status" className="text-2xs text-amber-300">
         {exhausted} allowance used.{availableAt && ` Next message available ${availableAt}.`}
       </p>}
-      {unavailable && <p className="text-[11px]">Usage unavailable. Showing the last reading.</p>}
+      {unavailable && <p className="text-2xs">Usage unavailable. Showing the last reading.</p>}
     </div>
   )
 }

@@ -240,11 +240,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       id: 'core',
       title: '',
       items: [
-        { id: 'hub', label: 'DASHBOARD', shortLabel: 'DASHBOARD', icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'character', label: 'CHARACTER', shortLabel: 'CHARACTER', icon: Shell, path: '/character' },
-        { id: 'codex', label: 'CODEX', shortLabel: 'CODEX', icon: Scroll, path: '/codex' },
-        { id: 'academy', label: 'ACADEMY', shortLabel: 'ACADEMY', icon: BookOpen, path: '/academy' },
-        { id: 'forum', label: 'FORUM', shortLabel: 'FORUM', icon: MessagesSquare, path: '/forum' },
+        { id: 'hub', label: 'Dashboard', shortLabel: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'character', label: 'Character', shortLabel: 'Character', icon: Shell, path: '/character' },
+        { id: 'codex', label: 'Codex', shortLabel: 'Codex', icon: Scroll, path: '/codex' },
+        { id: 'academy', label: 'Academy', shortLabel: 'Academy', icon: BookOpen, path: '/academy' },
+        { id: 'forum', label: 'Forum', shortLabel: 'Forum', icon: MessagesSquare, path: '/forum' },
       ],
     },
   ]
@@ -391,7 +391,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
 
                   <span
-                    className={`inline-flex items-center justify-center gap-0.5 text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center max-w-full transition-colors duration-150 ${
+                    className={`inline-flex items-center justify-center gap-0.5 text-2xs font-sans font-semibold tracking-normal leading-none text-center max-w-full transition-colors duration-150 ${
                       isActive
                         ? 'text-ink'
                         : 'text-ink-muted group-hover/navitem:text-ink'
@@ -412,9 +412,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                   {/* Clean Floating Tooltip */}
                   <div aria-hidden className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
-                    <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-bold shadow-menu whitespace-nowrap flex items-center gap-2">
+                    <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1.5 text-xs font-sans font-semibold shadow-menu whitespace-nowrap flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow" />
-                      <span className="tracking-[0.08em] uppercase">
+                      <span className="">
                         {item.label}
                         {hidden ? ' · Hidden' : ''}
                       </span>
@@ -442,8 +442,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               )}
               <span
                 className={`font-sans ${
-                  isMobile ? 'text-xs' : 'text-[11px]'
-                } font-bold text-ink-muted group-hover/groupheader:text-ink tracking-[0.08em] uppercase truncate transition-colors duration-150`}
+                  isMobile ? 'text-xs' : 'text-2xs'
+                } font-semibold text-ink-muted group-hover/groupheader:text-ink truncate transition-colors duration-150`}
               >
                 {group.title}
               </span>
@@ -509,8 +509,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     <div className={`flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1 ${hidden ? 'opacity-40' : ''}`}>
                       <span
                         className={`${
-                          isMobile ? 'text-xs md:text-sm' : 'text-xs md:text-[12.5px]'
-                        } font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
+                          isMobile ? 'text-xs md:text-sm' : 'text-xs md:text-ui'
+                        } font-sans font-medium leading-tight transition-colors duration-150 ${
                           isActive
                             ? 'text-ink font-semibold'
                             : 'text-ink-body group-hover/navitem:text-ink'
@@ -635,7 +635,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           {/* Brand Tooltip when collapsed */}
           {isCollapsed && (
             <div aria-hidden className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
-              <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1 text-xs font-sans font-bold shadow-menu whitespace-nowrap">
+              <div className="rounded-control bg-surface-1 border border-line text-ink px-2.5 py-1 text-xs font-sans font-semibold shadow-menu whitespace-nowrap">
                 <span className="text-cyan-glow">Moltology home</span>
               </div>
             </div>
@@ -666,7 +666,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       onClick={() => handleNavClick('/admin')}
                       onMouseEnter={() => handlePrefetch('/admin')}
                       onFocus={() => handlePrefetch('/admin')}
-                      aria-label="ADMIN"
+                      aria-label="Admin"
                       className="w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/admin cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       {isAdminActive && (
@@ -682,13 +682,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       />
 
                       <span
-                        className={`text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center truncate max-w-full transition-colors duration-150 ${
+                        className={`text-2xs font-medium leading-none text-center truncate max-w-full transition-colors duration-150 ${
                           isAdminActive
                             ? 'text-cyan-glow'
                             : 'text-ink-muted group-hover/admin:text-ink'
                         }`}
                       >
-                        ADMIN
+                        Admin
                       </span>
 
                     </button>
@@ -708,7 +708,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     >
                       {effectiveRoute === '/max' && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />}
                       <Sparkles className="w-4 h-4 shrink-0 text-cyan-glow" />
-                      <span className="text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center text-cyan-glow">MAX</span>
+                      <span className="text-2xs font-medium leading-none text-center text-cyan-glow">MAX</span>
                     </button>
                   </div>
                 )}
@@ -740,13 +740,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     />
 
                     <span
-                      className={`text-[11px] font-sans font-bold tracking-normal uppercase leading-none text-center truncate max-w-full transition-colors duration-150 ${
+                      className={`text-2xs font-medium leading-none text-center truncate max-w-full transition-colors duration-150 ${
                         currentRoute === '/support'
                           ? 'text-cyan-glow'
                           : 'text-ink-muted group-hover/help:text-ink'
                       }`}
                     >
-                      SUPPORT
+                      Support
                     </span>
 
                   </button>
@@ -845,13 +845,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                     <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1">
                       <span
-                        className={`text-xs md:text-sm font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
+                        className={`text-ui md:text-sm font-medium leading-tight transition-colors duration-150 ${
                           isAdminActive
                             ? 'text-ink font-semibold'
                             : 'text-ink-body group-hover/admin:text-ink'
                         }`}
                       >
-                        ADMIN
+                        Admin
                       </span>
                     </div>
                   </button>
@@ -869,8 +869,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   >
                     {effectiveRoute === '/max' && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-glow" />}
                     <Sparkles className="w-4.5 h-4.5 shrink-0 text-cyan-glow" />
-                    <span className="text-xs font-sans font-semibold tracking-wide uppercase leading-tight text-cyan-glow">
-                      ORACLE MAX
+                    <span className="text-xs font-semibold leading-tight text-cyan-glow">
+                      Oracle MAX
                     </span>
                   </button>
                 </div>
@@ -905,13 +905,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                   <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1">
                     <span
-                      className={`text-xs md:text-sm font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
+                      className={`text-ui md:text-sm font-medium leading-tight transition-colors duration-150 ${
                         currentRoute === '/support'
                           ? 'text-ink font-semibold'
                           : 'text-ink-body group-hover/help:text-ink'
                       }`}
                     >
-                      SUPPORT
+                      Support
                     </span>
                   </div>
                 </button>

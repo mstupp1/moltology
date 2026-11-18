@@ -198,7 +198,7 @@ function HudContent() {
         <div className="absolute inset-0 bg-benthic-vignette opacity-70 pointer-events-none" />
 
         {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-abyss/80 pointer-events-none" />
 
         {/* Phone: the page panel goes full width, so its tint sits over the whole scene. */}
         <div className="md:hidden absolute inset-0 bg-surface-1/[0.82] pointer-events-none" />

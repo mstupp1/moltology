@@ -82,7 +82,7 @@ export function StoreCatalog({
         <div className="relative mx-auto w-full max-w-7xl px-5 pb-7 pt-80 sm:px-6 sm:py-16 lg:px-8">
           <div className="store-hero-copy max-w-md space-y-6">
             <div>
-              <p className="flex items-center gap-3 font-grotesk text-xs font-bold tracking-[0.18em] text-cyan-glow"><span aria-hidden="true" className="h-px w-8 bg-cyan-glow" />MOLTOLOGY STORE</p>
+              <p className="flex items-center gap-3 eyebrow text-cyan-glow"><span aria-hidden="true" className="h-px w-8 bg-cyan-glow" />Moltology Store</p>
               <h1 className="mt-4 font-grotesk text-5xl font-semibold leading-none tracking-tight text-ink sm:text-6xl lg:text-7xl">Field Issue</h1>
               <p className="mt-5 max-w-xs text-base leading-relaxed text-ink-body sm:text-lg">
                 Merch carrying the Synaptic Path. Printed when you order it.
@@ -136,7 +136,7 @@ export function StoreCatalog({
           <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3">
             {[0, 1, 2, 3, 4, 5].map((key) => (
               <div key={key} className="space-y-3">
-                <div className="aspect-[4/3] animate-pulse rounded-card bg-benthic-border" />
+                <div className="aspect-[4/3] animate-pulse rounded-card bg-surface-3" />
                 <div className="h-4 w-1/2 animate-pulse rounded-chip bg-surface-1" />
               </div>
             ))}
@@ -157,7 +157,7 @@ export function StoreCatalog({
           </ul>
         ) : null}
 
-        <section aria-label="How orders work" className="grid gap-px overflow-hidden rounded-card border border-line-subtle bg-line-subtle sm:grid-cols-3">
+        <section aria-label="How orders work" className="grid gap-px overflow-hidden rounded-card border border-line-subtle bg-surface-3 sm:grid-cols-3">
           <StorePromise title="Printed to order" body="Nothing sits in a warehouse. Your piece is printed after you check out." />
           <StorePromise title="Shipping quoted before payment" body="Enter your delivery address for current shipping options and cost." />
           <StorePromise title="Checkout on Stripe" body="Payment happens on Stripe's secure page. We never see your card number." />
@@ -236,7 +236,7 @@ function ProductCard({ product, eager }: { product: MerchProductView; eager: boo
 
   return (
     <article className="group relative">
-      <div className={`relative aspect-[4/3] overflow-hidden rounded-card ${cutout?.background ?? 'bg-benthic-border'}`}>
+      <div className={`relative aspect-[4/3] overflow-hidden rounded-card ${cutout?.background ?? 'bg-line-subtle'}`}>
         <Link to="/store/$slug" params={{ slug: product.slug }} className={`block h-full w-full rounded-card ${FOCUS}`}>
           <span className="sr-only">{product.title}</span>
           <MerchImage

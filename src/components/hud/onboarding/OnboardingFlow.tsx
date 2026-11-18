@@ -286,7 +286,7 @@ export function OnboardingFlow({ userName, onDismiss, initialStepId }: Onboardin
       >
         <header className="shrink-0 px-4 sm:px-6 pt-4 pb-3 border-b border-line-subtle">
           <div className="flex items-center justify-between gap-3">
-            <span className="font-sans text-[11px] tracking-[0.08em] uppercase text-ink-muted">
+            <span className="eyebrow">
               Step {index + 1} of {steps.length} · {step.label}
             </span>
             <button

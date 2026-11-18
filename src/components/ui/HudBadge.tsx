@@ -24,7 +24,7 @@ export const HudBadge = React.forwardRef<HTMLSpanElement, HudBadgeProps>(
       crimson: { badge: 'border-crimson-aggro/45 bg-crimson-soft text-crimson-text', dot: 'bg-crimson-aggro' },
       emerald: { badge: 'border-emerald-500/40 text-emerald-500', dot: 'bg-emerald-500' },
       warning: { badge: 'border-amber-500/40 text-amber-500', dot: 'bg-amber-500' },
-      sacred: { badge: 'border-crimson-aggro/60 bg-crimson-soft text-crimson-text', dot: 'bg-sacred-glow' },
+      sacred: { badge: 'border-crimson-aggro/60 bg-crimson-soft text-crimson-text', dot: 'bg-crimson-glow' },
       neutral: { badge: 'border-line text-ink-muted', dot: 'bg-ink-muted' },
     }[variant]
 
@@ -32,7 +32,7 @@ export const HudBadge = React.forwardRef<HTMLSpanElement, HudBadgeProps>(
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center gap-1.5 min-h-[22px] font-sans text-[11px] leading-none font-bold tracking-[0.08em] uppercase px-2 border rounded-chip select-none',
+          'inline-flex items-center gap-1.5 min-h-[22px] font-sans text-2xs leading-none font-semibold px-2 border rounded-chip select-none',
           variantStyles.badge,
           className
         )}

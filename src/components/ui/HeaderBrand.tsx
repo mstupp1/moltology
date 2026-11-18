@@ -48,7 +48,7 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
           }`}
         >
           <div
-            className={`font-grotesk font-extrabold ${isTagline ? '' : titleSizeClasses} tracking-tight flex items-center gap-2 transition-all duration-300 leading-none text-ink group-hover:text-white`}
+            className={`font-grotesk font-semibold ${isTagline ? '' : titleSizeClasses} tracking-tight flex items-center gap-2 transition-all duration-300 leading-none text-ink group-hover:text-white`}
           >
             <span>{brandTitle}</span>
           </div>
@@ -69,7 +69,7 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
           )}
           {subtext && !isTagline && (
             <div
-              className="text-[11px] font-bold tracking-widest uppercase truncate mt-0.5 text-cyan-glow"
+              className="eyebrow truncate mt-0.5"
             >
               <span>{subtext}</span>
             </div>

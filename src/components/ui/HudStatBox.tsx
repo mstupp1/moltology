@@ -67,18 +67,18 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
         {...props}
       >
         <div className="flex items-center justify-between gap-2">
-          <span className={cn('text-[11px] font-bold uppercase tracking-[0.08em] truncate', variantStyles.label)}>
+          <span className={cn('eyebrow truncate', variantStyles.label)}>
             {label}
           </span>
           {icon && <span className="text-cyan-glow shrink-0">{icon}</span>}
         </div>
 
         <div className="flex items-baseline justify-between gap-2">
-          <div className={cn('text-xl sm:text-2xl font-bold tracking-tight tabular-nums', variantStyles.value)}>
+          <div className={cn('text-xl sm:text-2xl font-semibold tracking-tight tabular-nums', variantStyles.value)}>
             {value}
           </div>
           {trend && trendValue && (
-            <span className={cn('text-[11px] font-bold tracking-[0.08em] flex items-center gap-1 tabular-nums', trendColor[trend])}>
+            <span className={cn('text-2xs font-semibold flex items-center gap-1 tabular-nums', trendColor[trend])}>
               <span>{trendSymbol[trend]}</span>
               <span>{trendValue}</span>
             </span>

@@ -26,7 +26,7 @@ export function SettingsCard({
     >
       <div>
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="font-grotesk text-sm font-bold text-ink">{title}</h2>
+          <h2 className="font-grotesk text-sm font-semibold text-ink">{title}</h2>
           {titleExtra}
         </div>
         {description ? (
@@ -66,7 +66,7 @@ export function SettingsRow({
           {icon}
         </span>
         <div className="min-w-0">
-          <span className="text-sm font-grotesk font-bold text-ink block">{label}</span>
+          <span className="text-sm font-grotesk font-semibold text-ink block">{label}</span>
           {status ? <span className="text-xs text-ink-muted font-sans block">{status}</span> : null}
         </div>
       </div>

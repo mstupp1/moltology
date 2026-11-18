@@ -170,8 +170,8 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               <Terminal className="w-4 h-4 text-cyan-glow" />
             </div>
             <div>
-              <p className="text-xs font-bold text-ink">Join the discussion</p>
-              <p className="text-[11px] text-ink-muted">
+              <p className="text-xs font-semibold text-ink">Join the discussion</p>
+              <p className="text-2xs text-ink-muted">
                 Sign in to start posts and reply to members.
               </p>
             </div>
@@ -179,7 +179,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
           <button
             type="button"
             onClick={() => openAuth('signup')}
-            className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 touch-manipulation"
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow shrink-0 touch-manipulation"
           >
             Sign In / Join
           </button>
@@ -198,8 +198,8 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <Terminal className="w-4 h-4 text-ink-muted" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink">New threads aren't open to you yet</p>
-            <p className="text-[11px] text-ink-muted leading-relaxed">{standing.topicLockReason}</p>
+            <p className="text-xs font-semibold text-ink">New threads aren't open to you yet</p>
+            <p className="text-2xs text-ink-muted leading-relaxed">{standing.topicLockReason}</p>
           </div>
         </div>
       )
@@ -243,7 +243,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
 
           <button
             type="button"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-control border border-line bg-surface-2 group-hover:border-line-strong text-cyan-glow text-[11px] font-bold uppercase tracking-[0.08em] transition-colors shrink-0"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-control border border-line bg-surface-2 group-hover:border-line-strong text-cyan-glow text-2xs font-semibold transition-colors shrink-0"
             tabIndex={-1}
           >
             <span>New Post</span>
@@ -262,18 +262,18 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
         <div className="flex items-center justify-between border-b border-line-subtle pb-2.5 sm:pb-3">
           <div className="flex items-center gap-2">
             <Terminal className="w-4 h-4 text-cyan-glow" />
-            <h2 className="text-xs text-cyan-glow font-bold tracking-[0.08em] uppercase">
+            <h2 className="eyebrow">
               New post
             </h2>
             {fixedCategory && currentCategory && (
               <span
-                className="hidden sm:inline-block text-[11px] font-bold tracking-[0.08em] px-2 py-0.5 rounded-chip"
+                className="hidden sm:inline-block text-2xs font-semibold px-2 py-0.5 rounded-chip"
                 style={{
                   color: currentCategory.color || '#00c3ff',
                   backgroundColor: `${currentCategory.color || '#00c3ff'}26`,
                 }}
               >
-                {currentCategory.name.toUpperCase()}
+                {currentCategory.name}
               </span>
             )}
           </div>
@@ -300,7 +300,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <div className="space-y-1.5">
               <label
                 htmlFor="composer-category-select"
-                className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em] block"
+                className="eyebrow block"
               >
                 Discussion Board
               </label>
@@ -309,7 +309,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
                 value={activeCategoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 disabled={fixedCategory}
-                className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-hidden rounded-control transition-[border-color,box-shadow] disabled:opacity-75"
+                className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-base sm:text-xs text-ink outline-hidden rounded-control transition-[border-color,box-shadow] disabled:opacity-75"
               >
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id} className="bg-surface-2 text-ink">
@@ -324,11 +324,11 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <div className="flex items-center justify-between text-xs">
               <label
                 htmlFor="composer-title-input"
-                className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em]"
+                className="eyebrow"
               >
                 Title
               </label>
-              <span className="text-[11px] text-ink-muted">{title.trim().length} / {FORUM_TITLE_MAX_CHARS}</span>
+              <span className="text-2xs text-ink-muted">{title.trim().length} / {FORUM_TITLE_MAX_CHARS}</span>
             </div>
             <input
               id="composer-title-input"
@@ -338,7 +338,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What would you like to discuss?"
               maxLength={FORUM_TITLE_MAX_CHARS}
-              className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-[16px] sm:text-xs text-ink outline-hidden rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
+              className="w-full min-h-[44px] sm:min-h-[38px] bg-surface-2 border border-line focus:border-cyan-glow focus:shadow-field-focus px-3 py-2 text-base sm:text-xs text-ink outline-hidden rounded-control transition-[border-color,box-shadow] placeholder:text-ink-muted"
             />
           </div>
 
@@ -346,7 +346,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <div className="flex items-center justify-between text-xs">
               <span
                 id="composer-content-label"
-                className="text-[11px] sm:text-xs text-ink-muted font-bold uppercase tracking-[0.08em]"
+                className="eyebrow"
               >
                 Content
               </span>
@@ -362,7 +362,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             />
           </div>
 
-          <p className="text-[11px] text-ink-muted leading-relaxed border-l-2 border-line pl-2.5">
+          <p className="text-2xs text-ink-muted leading-relaxed border-l-2 border-line pl-2.5">
             Be civil and constructive. Keep private credentials, keys, and tokens out of public posts.
           </p>
 
@@ -370,14 +370,14 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
             <button
               type="button"
               onClick={handleCollapse}
-              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow touch-manipulation text-center"
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-4 py-2 text-xs font-semibold rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow touch-manipulation text-center"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={creating || title.trim().length < 5 || forumVisibleLength(content) < 10 || content.trim().length > FORUM_BODY_MAX_CHARS}
-              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-5 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-2 touch-manipulation"
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-[36px] px-5 py-2 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center justify-center gap-2 touch-manipulation"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{creating ? 'Posting…' : 'Post'}</span>

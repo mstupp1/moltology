@@ -16,7 +16,7 @@ export interface LandingAuthCtasProps {
   onOpenAuth: (mode: 'login' | 'signup') => void
 }
 
-const buttonClass = 'w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider'
+const buttonClass = 'w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8'
 
 /**
  * Members get one way back to their dashboard. Guests get the same pair everywhere on the page:
@@ -37,7 +37,7 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
       >
         <span className="flex items-center justify-center gap-2.5 leading-none">
           <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-          <span>ENTER SYSTEM DASHBOARD</span>
+          <span>Enter dashboard</span>
           <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
         </span>
       </BenthicCTAButton>
@@ -66,7 +66,7 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
         onClick={() => onOpenAuth('signup')}
       >
         <span className="flex items-center justify-center gap-2.5 leading-none">
-          <span>JOIN FREE</span>
+          <span>Join free</span>
           <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
         </span>
       </BenthicCTAButton>
@@ -79,7 +79,7 @@ export function LandingAuthCtas({ variant, onNavigate, onOpenAuth }: LandingAuth
       >
         <span className="flex items-center justify-center gap-2.5 leading-none">
           <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-          <span>TRY THE DEMO</span>
+          <span>Try the demo</span>
         </span>
       </BenthicCTAButton>
     </>

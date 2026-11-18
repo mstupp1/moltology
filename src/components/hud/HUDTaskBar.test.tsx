@@ -36,7 +36,7 @@ describe('HUDTaskBar', () => {
     expect(screen.getByText('BENTHIC CHRONOMETER')).toBeInTheDocument()
     expect(screen.getByText('NEXT UPCOMING ALIGNMENT TASK')).toBeInTheDocument()
     expect(screen.getByText('Sit in silence')).toBeInTheDocument()
-    expect(screen.getByText('COMPLETE ALIGNMENT')).toBeInTheDocument()
+    expect(screen.getByText('Complete alignment')).toBeInTheDocument()
   })
 
   it('renders the phone top bar ring instead of the chronometer', () => {
@@ -88,7 +88,7 @@ describe('HUDTaskBar', () => {
     const onComplete = vi.fn()
     render(<HUDTaskBar variant="hero" onCompleteTask={onComplete} />)
     
-    const completeBtn = screen.getByText('COMPLETE ALIGNMENT')
+    const completeBtn = screen.getByText('Complete alignment')
     fireEvent.click(completeBtn)
     expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
   })

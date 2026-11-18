@@ -31,28 +31,28 @@ describe('MainFooter Component', () => {
   it('renders all high-value SEO and tactical HUD chips', () => {
     render(<MainFooter />)
 
-    expect(screen.getByText('MOLTMAXXING')).toBeInTheDocument()
-    expect(screen.getByText('FIELD MANUAL')).toBeInTheDocument()
+    expect(screen.getByText('Moltmaxxing')).toBeInTheDocument()
+    expect(screen.getByText('Field Manual')).toBeInTheDocument()
     expect(screen.getByText('QUIZ')).toBeInTheDocument()
     expect(screen.getByText('NEWS')).toBeInTheDocument()
-    expect(screen.getByText('CODEX')).toBeInTheDocument()
-    expect(screen.getByText('COMPANY')).toBeInTheDocument()
+    expect(screen.getByText('Codex')).toBeInTheDocument()
+    expect(screen.getByText('Company')).toBeInTheDocument()
   })
 
   it('renders external merch store, social channels, and RSS feed', () => {
     render(<MainFooter />)
 
-    const storeLink = screen.getByText('STORE').closest('a')
+    const storeLink = screen.getByText('Store').closest('a')
     expect(storeLink).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
     expect(storeLink).toHaveAttribute('target', '_blank')
 
-    const instagramLink = screen.getByText('INSTAGRAM').closest('a')
+    const instagramLink = screen.getByText('Instagram').closest('a')
     expect(instagramLink).toHaveAttribute('href', 'https://www.instagram.com/moltology_org/')
 
-    const youtubeLink = screen.getByText('YOUTUBE').closest('a')
+    const youtubeLink = screen.getByText('YouTube').closest('a')
     expect(youtubeLink).toHaveAttribute('href', 'https://www.youtube.com/@Moltology')
 
-    const rssLink = screen.getByText('RSS FEED').closest('a')
+    const rssLink = screen.getByText('RSS feed').closest('a')
     expect(rssLink).toHaveAttribute('href', '/rss.xml')
   })
 
@@ -68,7 +68,7 @@ describe('MainFooter Component', () => {
   it('points STORE at the on-site catalog for admins', () => {
     storeAccess = { canView: true, pending: false }
     render(<MainFooter />)
-    const storeLink = screen.getByText('STORE').closest('a')
+    const storeLink = screen.getByText('Store').closest('a')
     expect(storeLink).toHaveAttribute('href', '/store')
     expect(storeLink).not.toHaveAttribute('target', '_blank')
   })

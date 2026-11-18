@@ -157,7 +157,7 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
           transform: isVisible ? `translateY(${Math.max(0, dragOffset)}px)` : 'translateY(100%)',
           transitionDuration: isDragging ? '0ms' : undefined,
         }}
-        className={`relative transition-[transform,opacity] duration-250 ease-out motion-reduce:transition-none z-[99991] w-full rounded-t-3xl bg-[#03090cfb] border-t-2 border-t-[#00c3ff]/70 border-x-0 border-b-0 shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.25)] backdrop-blur-2xl text-xs text-[#dfe3e3] ${
+        className={`relative transition-[transform,opacity] duration-250 ease-out motion-reduce:transition-none z-[99991] w-full rounded-t-3xl bg-[#03090cfb] border-t-2 border-t-cyan-glow/70 border-x-0 border-b-0 shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.25)] backdrop-blur-2xl text-xs text-ink ${
           contentLayout === 'fill'
             ? 'flex flex-col p-0 overflow-hidden'
             : 'p-4 pb-8 space-y-3 overflow-y-auto'
@@ -179,7 +179,7 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
               contentLayout === 'fill' ? 'py-2.5 pt-3 pb-2 shrink-0' : 'py-2 -mt-2 mb-1'
             } flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none`}
           >
-            <div className="w-12 h-1 rounded-full bg-[#00c3ff]/40 hover:bg-[#00c3ff]/80 transition-colors" />
+            <div className="w-12 h-1 rounded-full bg-cyan-glow/40 hover:bg-cyan-glow/80 transition-colors" />
           </div>
         )}
 

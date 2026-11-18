@@ -36,7 +36,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
         size="sm"
         className="ring-1 ring-line"
       />
-      <span className="text-ink font-bold truncate max-w-[120px] sm:max-w-[180px]">{topic.authorName}</span>
+      <span className="text-ink font-semibold truncate max-w-[120px] sm:max-w-[180px]">{topic.authorName}</span>
     </>
   )
 
@@ -47,9 +47,9 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
     >
       <div className="min-w-0 space-y-1.5">
         {hasMeta && (
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-muted">
+          <div className="flex flex-wrap items-center gap-2 text-2xs text-ink-muted">
             {showBoard && (
-              <span className="inline-flex items-center gap-1.5 font-bold text-ink-body">
+              <span className="inline-flex items-center gap-1.5 font-semibold text-ink-body">
                 <span
                   className="w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: topic.categoryColor || '#00c3ff' }}
@@ -65,7 +65,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
           </div>
         )}
 
-        <h3 className="font-grotesk font-bold text-sm sm:text-base text-ink leading-snug line-clamp-2 group-hover:text-cyan-glow transition-colors">
+        <h3 className="font-grotesk font-semibold text-sm sm:text-base text-ink leading-snug line-clamp-2 group-hover:text-cyan-glow transition-colors">
           <Link
             to="/forum/$categorySlug/$topicSlug"
             params={{ categorySlug, topicSlug: topic.slug }}
@@ -78,7 +78,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
           {withdrawn ? FORUM_WITHDRAWN_PREVIEW : topic.content}
         </p>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1 text-[11px] text-ink-muted">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-1 text-2xs text-ink-muted">
           <span className="flex items-center gap-1.5 min-w-0">
             {topic.userId ? (
               <Link

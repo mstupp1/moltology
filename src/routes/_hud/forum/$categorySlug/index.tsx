@@ -261,7 +261,7 @@ function ForumBoardPage() {
               ) : undefined
             }
           >
-            <div className="flex flex-wrap items-center gap-3 text-[11px] text-ink-muted tabular-nums">
+            <div className="flex flex-wrap items-center gap-3 text-2xs text-ink-muted tabular-nums">
               <span>{formatForumTopicCount(category.topicCount)}</span>
               {typeof category.unreadCount === 'number' && category.unreadCount > 0 ? (
                 <ForumUnreadMark label={formatForumUnreadCount(category.unreadCount)} />
@@ -324,7 +324,7 @@ function ForumBoardPage() {
               ) : topics.length === 0 ? (
                 <div className="p-8 text-center rounded-card border border-line-subtle bg-surface-1 space-y-3" data-testid="forum-empty">
                   <MessageSquare className="w-6 h-6 text-ink-muted mx-auto" aria-hidden="true" />
-                  <p className="text-sm font-bold text-ink">{searchQuery ? 'No posts match' : 'No posts yet'}</p>
+                  <p className="text-sm font-semibold text-ink">{searchQuery ? 'No posts match' : 'No posts yet'}</p>
                   <p className="text-xs text-ink-muted">
                     {searchQuery ? 'Try other words.' : 'Start the first conversation on this board.'}
                   </p>

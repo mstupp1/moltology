@@ -30,7 +30,7 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
     "subtitle": "Entry-level soft-body phase focusing on distraction audits, daily habits, and the first real shed.",
     "img": "/images/stage1_larval.png",
     "badge": "UNARMORED",
-    "badgeColor": "border-[#ff5540]/40 text-[#ff5540] bg-[#ff5540]/10",
+    "badgeColor": "border-crimson-glow/40 text-crimson-glow bg-crimson-glow/10",
     "subStages": [
       {
         "code": "L-1",
@@ -74,7 +74,7 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
     "subtitle": "Active moulting state focusing on sub-dermal chitin growth, and deep work shielding.",
     "img": "/images/stage2_softshed.png",
     "badge": "PARTIAL CHITIN",
-    "badgeColor": "border-[#00ffff]/40 text-[#00ffff] bg-[#00ffff]/10",
+    "badgeColor": "border-cyan-glow/40 text-cyan-glow bg-cyan-glow/10",
     "subStages": [
       {
         "code": "S-1",

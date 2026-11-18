@@ -20,7 +20,7 @@ export function StageBadge({ stage }: { stage: number }) {
   const cls = STAGE_COLORS[normalized] || STAGE_COLORS[1]
   return (
     <span
-      className={`inline-block text-[11px] font-sans font-bold uppercase tracking-[0.08em] px-1.5 py-0.2 rounded-chip border ${cls}`}
+      className={`inline-block text-2xs font-sans font-semibold px-1.5 py-0.2 rounded-chip border ${cls}`}
     >
       STAGE {normalized}
     </span>
@@ -48,7 +48,7 @@ export function CategoryIcon({ icon, color }: { icon: string; color?: string }) 
 
 export function PinBadge() {
   return (
-    <span className="text-[11px] font-sans bg-crimson-soft text-crimson-text border border-line-subtle px-1.5 py-0.2 font-bold tracking-[0.08em] rounded-chip flex items-center gap-1">
+    <span className="text-2xs font-sans bg-crimson-soft text-crimson-text border border-line-subtle px-1.5 py-0.2 font-semibold rounded-chip flex items-center gap-1">
       <Pin className="w-2.5 h-2.5" /> PINNED
     </span>
   )
@@ -57,7 +57,7 @@ export function PinBadge() {
 export function LockBadge() {
   return (
     <span
-      className="text-[11px] font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-bold rounded-chip flex items-center gap-1"
+      className="text-2xs font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-semibold rounded-chip flex items-center gap-1"
       data-testid="forum-lock-badge"
     >
       <Lock className="w-2.5 h-2.5" /> Locked
@@ -68,7 +68,7 @@ export function LockBadge() {
 export function WithdrawnBadge() {
   return (
     <span
-      className="text-[11px] font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-bold rounded-chip"
+      className="text-2xs font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-semibold rounded-chip"
       data-testid="forum-withdrawn-badge"
     >
       Withdrawn
@@ -83,7 +83,7 @@ export function ForumUnreadMark({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-1 text-[11px] font-sans font-bold text-cyan-glow"
+      className="inline-flex items-center gap-1 text-2xs font-sans font-semibold text-cyan-glow"
       data-testid="forum-unread-mark"
     >
       <span
@@ -204,7 +204,7 @@ export function VoteButton({
             active ? 'text-cyan-glow fill-cyan-glow' : 'text-ink-muted group-hover:text-ink'
           }`}
         />
-        <span className="font-sans font-bold text-xs tabular-nums leading-none">
+        <span className="font-sans font-semibold text-xs tabular-nums leading-none">
           {local.count}
         </span>
       </button>
@@ -233,8 +233,8 @@ export function VoteButton({
         } ${active ? 'text-cyan-glow fill-cyan-glow' : 'text-ink-muted group-hover:text-ink'}`}
       />
       <span
-        className={`font-sans font-bold tabular-nums leading-none ${
-          size === 'sm' ? 'text-[11px]' : 'text-xs'
+        className={`font-sans font-semibold tabular-nums leading-none ${
+          size === 'sm' ? 'text-2xs' : 'text-xs'
         } ${active ? 'text-cyan-glow' : 'text-ink'}`}
       >
         {local.count}

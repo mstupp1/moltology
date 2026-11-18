@@ -58,7 +58,7 @@ export function DeliveryCheckout({ items, clearCart, testing = false, close }: {
       <div className="col-span-2">
         <label htmlFor="store-promo">Promo code (optional)</label>
         <div className="mt-1 flex gap-2">
-          <input id="store-promo" autoComplete="off" spellCheck={false} maxLength={32} className="min-w-0 flex-1 bg-surface-2 border border-line p-2 uppercase" value={promoInput} onChange={e => { setPromoInput(e.target.value); setPromo(null); setPromoError('') }} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); void applyPromo() } }} />
+          <input id="store-promo" autoComplete="off" spellCheck={false} maxLength={32} className="min-w-0 flex-1 bg-surface-2 border border-line p-2" value={promoInput} onChange={e => { setPromoInput(e.target.value); setPromo(null); setPromoError('') }} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); void applyPromo() } }} />
           <HudButton type="button" variant="secondary" disabled={promoBusy || !promoInput.trim() || !email} onClick={() => void applyPromo()}>{promoBusy ? 'Checking…' : 'Apply'}</HudButton>
         </div>
         {!email && promoInput.trim() && !promo && <p className="mt-1 text-xs text-ink-muted">Enter your email first.</p>}

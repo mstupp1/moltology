@@ -37,23 +37,23 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
   }
 
   return (
-    <div className="relative my-3.5 sm:my-4 bg-[#040708] border border-cyan-900/70 chamfer-corner overflow-hidden group shadow-lg">
+    <div className="relative my-3.5 sm:my-4 bg-abyss border border-cyan-900/70 rounded-card overflow-hidden group shadow-lg">
       {/* Code Header Bar */}
-      <div className="bg-[#0b1011] border-b border-cyan-950 px-3.5 py-1.5 flex items-center justify-between text-[11px] text-cyan-400 font-sans select-none">
+      <div className="bg-surface-1 border-b border-cyan-950 px-3.5 py-1.5 flex items-center justify-between text-2xs text-cyan-400 font-sans select-none">
         <div className="flex items-center space-x-1.5">
           <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="uppercase tracking-widest font-bold">{language || 'code'}</span>
+          <span className="font-semibold">{language || 'code'}</span>
         </div>
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-cyan-300 transition-colors p-0.5 cursor-pointer"
+          className="flex items-center gap-1 text-2xs text-ink-muted hover:text-cyan-300 transition-colors p-0.5 cursor-pointer"
           title="Copy code"
         >
           {copied ? (
             <>
               <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400 font-semibold">COPIED</span>
+              <span className="text-emerald-400 font-semibold">Copied</span>
             </>
           ) : (
             <>
@@ -93,7 +93,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
               return (
                 <h1
                   key={key}
-                  className="text-sm sm:text-base font-bold text-cyan-300 tracking-wider uppercase border-b border-cyan-900/60 pb-1.5 mt-4 sm:mt-5 mb-2.5 sm:mb-3 font-grotesk first:mt-0"
+                  className="text-sm sm:text-base font-semibold text-cyan-300 border-b border-cyan-900/60 pb-1.5 mt-4 sm:mt-5 mb-2.5 sm:mb-3 font-grotesk first:mt-0"
                 >
                   {inner}
                 </h1>
@@ -103,7 +103,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
               return (
                 <h2
                   key={key}
-                  className="text-xs sm:text-sm font-bold text-cyan-300 tracking-wider uppercase border-b border-cyan-950/80 pb-1 mt-3.5 sm:mt-4 mb-2 font-grotesk first:mt-0"
+                  className="text-xs sm:text-sm font-semibold text-cyan-300 border-b border-cyan-950/80 pb-1 mt-3.5 sm:mt-4 mb-2 font-grotesk first:mt-0"
                 >
                   {inner}
                 </h2>
@@ -113,7 +113,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
               return (
                 <h3
                   key={key}
-                  className="text-sm font-semibold text-cyan-300 tracking-wide mt-3 mb-1.5 font-grotesk first:mt-0"
+                  className="text-sm font-semibold text-cyan-300 mt-3 mb-1.5 font-grotesk first:mt-0"
                 >
                   {inner}
                 </h3>
@@ -122,7 +122,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <h4
                 key={key}
-                className="text-xs font-medium text-cyan-400 tracking-wide mt-2.5 mb-1 font-grotesk first:mt-0"
+                className="text-xs font-medium text-cyan-400 mt-2.5 mb-1 font-grotesk first:mt-0"
               >
                 {inner}
               </h4>
@@ -143,7 +143,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <div
                 key={key}
-                className="my-3.5 sm:my-4 overflow-x-auto rounded border border-cyan-900/60 bg-[#060a0d]/80 shadow-md"
+                className="my-3.5 sm:my-4 overflow-x-auto rounded border border-cyan-900/60 bg-abyss/80 shadow-md"
               >
                 <table className="w-full text-left text-sm border-collapse min-w-full">
                   <thead>
@@ -151,7 +151,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
                       {tableToken.header.map((col, hIdx) => (
                         <th
                           key={hIdx}
-                          className={`px-3.5 py-2.5 text-cyan-300 font-semibold text-xs uppercase tracking-wider ${
+                          className={`px-3.5 py-2.5 text-cyan-300 font-semibold text-xs ${
                             col.align === 'center'
                               ? 'text-center'
                               : col.align === 'right'
@@ -255,7 +255,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <code
                 key={key}
-                className="bg-cyan-950/80 border border-cyan-800/50 text-cyan-200 px-1.5 py-0.5 mx-0.5 rounded font-mono text-[11.5px] sm:text-xs"
+                className="bg-cyan-950/80 border border-cyan-800/50 text-cyan-200 px-1.5 py-0.5 mx-0.5 rounded font-mono text-2xs sm:text-xs"
               >
                 {codespanToken.text}
               </code>
@@ -265,7 +265,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
           case 'strong': {
             const strongToken = token as Tokens.Strong
             return (
-              <strong key={key} className="font-bold text-white">
+              <strong key={key} className="font-semibold text-white">
                 <RenderTokens tokens={strongToken.tokens} keyPrefix={`${key}-str`} />
               </strong>
             )
@@ -283,7 +283,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
           case 'del': {
             const delToken = token as Tokens.Del
             return (
-              <del key={key} className="line-through text-gray-400">
+              <del key={key} className="line-through text-ink-muted">
                 <RenderTokens tokens={delToken.tokens} keyPrefix={`${key}-del`} />
               </del>
             )

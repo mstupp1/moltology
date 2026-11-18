@@ -17,7 +17,7 @@ import { BoardDot } from './ForumBandCrumbs'
 import { cn } from '@/lib/utils'
 
 const RAIL_CARD = 'rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4'
-const RAIL_HEADING = 'text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted'
+const RAIL_HEADING = 'eyebrow'
 const MORE_COUNT = 4
 
 type Person = Pick<ForumPostEntry, 'userId' | 'authorName' | 'authorHandle' | 'authorAvatar' | 'authorAvatarConfig'>
@@ -87,20 +87,20 @@ export function ForumThreadRail({
           />
           <span className="min-w-0 space-y-0.5">
             <span className="flex items-center gap-1.5 min-w-0">
-              <span className="block text-sm font-bold text-ink truncate group-hover:text-cyan-glow transition-colors">
+              <span className="block text-sm font-semibold text-ink truncate group-hover:text-cyan-glow transition-colors">
                 {topic.authorName}
               </span>
               <RankCrest userId={topic.userId} />
             </span>
-            {handle ? <span className="block text-[11px] text-ink-muted truncate">@{handle}</span> : null}
-            <span className="flex items-center gap-2 text-[11px] text-ink-muted">
+            {handle ? <span className="block text-2xs text-ink-muted truncate">@{handle}</span> : null}
+            <span className="flex items-center gap-2 text-2xs text-ink-muted">
               <StageBadge stage={topic.authorStage} />
               <LocalTime value={topic.createdAt} format={relativeTime} />
             </span>
           </span>
         </PersonLink>
 
-        <div className="flex items-center gap-4 text-[11px] text-ink-muted tabular-nums">
+        <div className="flex items-center gap-4 text-2xs text-ink-muted tabular-nums">
           <span className="flex items-center gap-1">
             <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
             {topic.repliesCount} {topic.repliesCount === 1 ? 'reply' : 'replies'}
@@ -150,7 +150,7 @@ export function ForumThreadRail({
                 </li>
               ))}
               {people.length > shown.length ? (
-                <li className="w-9 h-9 rounded-full bg-surface-2 border border-line-subtle flex items-center justify-center text-[11px] font-bold text-ink-muted">
+                <li className="w-9 h-9 rounded-full bg-surface-2 border border-line-subtle flex items-center justify-center text-2xs font-semibold text-ink-muted">
                   +{people.length - shown.length}
                 </li>
               ) : null}
@@ -192,10 +192,10 @@ export function MoreFromBoard({ topic, className }: { topic: ForumTopicEntry; cl
                   params={{ categorySlug: t.categorySlug || boardSlug, topicSlug: t.slug }}
                   className="group block py-2 sm:py-2.5 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
-                  <span className="block text-xs font-bold text-ink leading-snug line-clamp-2 group-hover:text-cyan-glow transition-colors">
+                  <span className="block text-xs font-semibold text-ink leading-snug line-clamp-2 group-hover:text-cyan-glow transition-colors">
                     {t.title}
                   </span>
-                  <span className="mt-1 flex items-center gap-3 text-[11px] text-ink-muted tabular-nums">
+                  <span className="mt-1 flex items-center gap-3 text-2xs text-ink-muted tabular-nums">
                     <span className="truncate">{t.authorName}</span>
                     <span className="flex items-center gap-1 shrink-0">
                       <MessageSquare className="w-3 h-3" aria-hidden="true" />
@@ -215,7 +215,7 @@ export function MoreFromBoard({ topic, className }: { topic: ForumTopicEntry; cl
       <Link
         to="/forum/$categorySlug"
         params={{ categorySlug: boardSlug }}
-        className="inline-flex min-h-8 items-center text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="inline-flex min-h-8 items-center text-2xs font-semibold text-ink-muted hover:text-ink rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         See all in {topic.categoryName || 'this board'}
       </Link>

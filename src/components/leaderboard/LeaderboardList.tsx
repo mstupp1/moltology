@@ -47,7 +47,7 @@ function RankNumber({ rank, size }: { rank: number; size: 'sm' | 'md' }) {
   return (
     <span
       className={cn(
-        'shrink-0 inline-flex items-center justify-center rounded-full font-grotesk font-bold tabular-nums',
+        'shrink-0 inline-flex items-center justify-center rounded-full font-grotesk font-semibold tabular-nums',
         size === 'md' ? 'w-8 h-8 text-sm' : 'w-6 h-6 text-xs',
         tier ? 'border' : 'text-ink-muted',
       )}
@@ -90,18 +90,18 @@ export function LeaderboardRow({
         alt=""
       />
       <span className="min-w-0 flex-1 flex items-center gap-1.5">
-        <span className={cn('font-bold text-ink truncate group-hover:text-cyan-glow transition-colors', size === 'md' ? 'text-sm' : 'text-xs')}>
+        <span className={cn('font-semibold text-ink truncate group-hover:text-cyan-glow transition-colors', size === 'md' ? 'text-sm' : 'text-xs')}>
           {entry.name}
         </span>
         <RankCrest rank={entry.crest} />
-        {isViewer ? <span className="text-[11px] text-ink-muted shrink-0">You</span> : null}
+        {isViewer ? <span className="text-2xs text-ink-muted shrink-0">You</span> : null}
         {size === 'md' ? (
           <span className="hidden sm:inline-flex shrink-0">
             <StageBadge stage={entry.stage} />
           </span>
         ) : null}
       </span>
-      <span className={cn('shrink-0 font-grotesk font-bold tabular-nums text-ink', size === 'md' ? 'text-sm' : 'text-xs')}>
+      <span className={cn('shrink-0 font-grotesk font-semibold tabular-nums text-ink', size === 'md' ? 'text-sm' : 'text-xs')}>
         {formatXp(entry.xp)}
       </span>
     </Link>

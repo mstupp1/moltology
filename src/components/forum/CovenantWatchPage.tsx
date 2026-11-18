@@ -294,21 +294,21 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-bold text-ink">{row.reasonLabel}</span>
-                      <span className="text-[11px] font-mono uppercase tracking-[0.08em] text-ink-muted bg-surface-3 px-1.5 py-0.5 border border-line-subtle rounded-chip">
+                      <span className="text-xs font-semibold text-ink">{row.reasonLabel}</span>
+                      <span className="text-2xs font-mono text-ink-muted bg-surface-3 px-1.5 py-0.5 border border-line-subtle rounded-chip">
                         {isReplying ? 'Reply' : 'Topic'}
                       </span>
                       {row.targetWithdrawn ? (
-                        <span className="text-[11px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 rounded-chip bg-crimson-soft text-crimson-text border border-line-subtle">
+                        <span className="text-2xs font-semibold px-2 py-0.5 rounded-chip bg-crimson-soft text-crimson-text border border-line-subtle">
                           Removed from forum
                         </span>
                       ) : activeTab === 'resolved' ? (
-                        <span className="text-[11px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 rounded-chip bg-emerald-500/15 text-emerald-400 border border-line-subtle">
+                        <span className="text-2xs font-semibold px-2 py-0.5 rounded-chip bg-emerald-500/15 text-emerald-400 border border-line-subtle">
                           Dismissed (Kept)
                         </span>
                       ) : null}
                     </div>
-                    <span className="text-[11px] text-ink-muted">
+                    <span className="text-2xs text-ink-muted">
                       {activeTab === 'resolved' ? (
                         <>
                           Resolved <LocalTime value={row.updatedAt || row.createdAt} format={relativeTime} />
@@ -328,14 +328,14 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
 
                   {row.targetContent ? (
                     <div className="bg-surface-1 border-l-2 border-line p-2.5 my-1.5 text-xs text-ink-body line-clamp-4 select-text font-sans rounded-r-control">
-                      <span className="text-[11px] text-ink-muted block uppercase font-mono tracking-[0.08em] mb-1">
+                      <span className="eyebrow block font-mono mb-1">
                         Flagged transmission snippet
                       </span>
                       {row.targetContent}
                     </div>
                   ) : null}
 
-                  <div className="text-[11px] text-ink-muted space-y-0.5">
+                  <div className="text-2xs text-ink-muted space-y-0.5">
                     <p>Flagged by {row.reporterName}</p>
                     {row.note && (
                       <p className="text-xs text-ink-body leading-relaxed italic bg-surface-1 p-2 border border-line-subtle rounded-control">
@@ -351,7 +351,7 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                           to="/forum/$categorySlug/$topicSlug"
                           params={{ categorySlug: row.categorySlug, topicSlug: row.topicSlug }}
                           hash={row.postId ? forumPostAnchorId(row.postId) : undefined}
-                          className="text-[11px] font-bold text-cyan-glow hover:underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                          className="text-2xs font-semibold text-cyan-glow hover:underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                         >
                           Open transmission
                         </Link>
@@ -362,7 +362,7 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                           type="button"
                           onClick={() => void handleMarkReviewed(row.id)}
                           disabled={actioningId === row.id}
-                          className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink disabled:opacity-50 transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                          className="text-2xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50 transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                           data-testid="covenant-watch-mark-reviewed"
                         >
                           {actioningId === row.id
@@ -374,7 +374,7 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                           type="button"
                           onClick={() => void handleReopenReport(row.id)}
                           disabled={actioningId === row.id}
-                          className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink disabled:opacity-50 transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                          className="text-2xs font-semibold text-ink-muted hover:text-ink disabled:opacity-50 transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                           data-testid="covenant-watch-reopen"
                         >
                           {actioningId === row.id
@@ -388,12 +388,12 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                       {!row.targetWithdrawn ? (
                         confirmRemoveId === row.id ? (
                           <div className="inline-flex items-center gap-2 bg-crimson-soft border border-crimson-aggro/40 px-2 py-1 rounded-control">
-                            <span className="text-[11px] text-crimson-text font-bold">Remove from forum?</span>
+                            <span className="text-2xs text-crimson-text font-semibold">Remove from forum?</span>
                             <button
                               type="button"
                               onClick={() => void handleRemoveTarget(row.id)}
                               disabled={actioningId === row.id}
-                              className="text-[11px] font-bold uppercase tracking-[0.08em] text-crimson-text hover:text-abyss bg-crimson-soft hover:bg-crimson-aggro px-2 py-0.5 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                              className="text-2xs font-semibold text-crimson-text hover:text-abyss bg-crimson-soft hover:bg-crimson-aggro px-2 py-0.5 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                               data-testid="covenant-watch-confirm-remove"
                             >
                               {actioningId === row.id ? FORUM_REPORT_COPY.watchRemoving : 'Yes, remove'}
@@ -401,7 +401,7 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                             <button
                               type="button"
                               onClick={() => setConfirmRemoveId(null)}
-                              className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink px-1 py-0.5 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                              className="text-2xs font-semibold text-ink-muted hover:text-ink px-1 py-0.5 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                               data-testid="covenant-watch-cancel-remove"
                             >
                               Cancel
@@ -412,7 +412,7 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                             type="button"
                             onClick={() => setConfirmRemoveId(row.id)}
                             disabled={Boolean(actioningId)}
-                            className="text-[11px] font-bold uppercase tracking-[0.08em] text-crimson-text hover:text-crimson-hover disabled:opacity-50 transition-colors inline-flex items-center gap-1 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                            className="text-2xs font-semibold text-crimson-text hover:text-crimson-hover disabled:opacity-50 transition-colors inline-flex items-center gap-1 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                             data-testid="covenant-watch-remove-target"
                           >
                             <Trash2 className="w-3 h-3" />
@@ -424,7 +424,7 @@ export function CovenantWatchPage({ onChanged }: CovenantWatchPageProps = {}) {
                           type="button"
                           onClick={() => void handleRestoreTarget(row.id)}
                           disabled={actioningId === row.id}
-                          className="text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow hover:text-cyan-hover disabled:opacity-50 transition-colors inline-flex items-center gap-1 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                          className="text-2xs font-semibold text-cyan-glow hover:text-cyan-hover disabled:opacity-50 transition-colors inline-flex items-center gap-1 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                           data-testid="covenant-watch-restore-target"
                         >
                           <RotateCcw className="w-3 h-3" />
