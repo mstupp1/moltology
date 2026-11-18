@@ -46,7 +46,9 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
           title="Earned"
           subtitle={earned.length > 0 ? `${earned.length} issued in your name.` : undefined}
         />
-        {guest.isGuest ? (
+        {guest.isGuest && data.certificates.length === 0 ? (
+          <AcademyEmpty>{ACADEMY_COPY.emptyCertificatesGuest}</AcademyEmpty>
+        ) : guest.isGuest ? (
           <div className={cn(ACADEMY_CARD, 'p-4 flex flex-col sm:flex-row sm:items-center gap-3')}>
             <p className="text-sm text-ink-body flex-1">{ACADEMY_COPY.guestEarnedCertificates}</p>
             <HudButton type="button" variant="primary" size="sm" onClick={guest.promptSignUp}>

@@ -1,8 +1,8 @@
 ---
 id: public-profiles-and-lessons
 date: 2026-11-18
-title: "Open member profiles and Academy lessons to signed-out visitors"
-summary: "Anyone can read member profiles, every Academy lesson and the certificate list. Saving progress, quizzes, notes, friend requests and earning certificates still need a free account, and each of those spots asks visitors to sign up."
+title: "Open member profiles and the Academy to browse; starting lessons needs sign-up"
+summary: "Anyone can read member profiles and browse the Academy, including each lesson's page and the certificate list. Starting a lesson, saving progress, quizzes, notes, friend requests and earning certificates need a free account, and each of those spots asks visitors to sign up."
 domains: [data]
 rules: [data.member-share-previews]
 status: accepted
@@ -20,18 +20,18 @@ Shared profile links failed for signed-out visitors with "Authentication require
 ## Decision
 
 - Member profiles are public: name, stage, avatar, join date, Moltmax rating, bio, traits, bonds and equipped gear. Signed-out visitors see "Sign up to add friend" and "Build your own" (the guest character editor) instead of friend actions.
-- Every Academy lesson is readable without an account or enrollment. This supersedes "lessons need an account" in the 2026-11-12 guest-access decision.
-- Saving progress, notes and quiz scores still needs an account and enrollment. For visitors, Mark complete reads "Sign up to save your progress" and Submit reads "Sign up to submit"; both open sign-up.
+- Every Academy lesson page is open, so visitors see its title, summary, length and the course syllabus. The material itself (video, reading, quiz) opens on enrolling, which needs an account; visitors see "Sign up to start". One preview lesson per course stays fully open. This replaces "lessons need an account" in the 2026-11-12 guest-access decision, which kept lesson pages members-only.
+- Saving progress, notes and quiz scores needs an account and enrollment. On a preview lesson, Mark complete reads "Sign up to save your progress" for visitors and Submit reads "Sign up to submit"; both open sign-up.
 - The certificate list is public. Each certificate offers "Sign up to earn this".
-- Search: Academy tracks, courses and lessons are indexed and listed in the sitemap. Member profiles, member search and credential pages stay noindex, because they name people.
+- Search: Academy tracks, courses and preview lessons are listed in the sitemap. Locked lessons are not listed, since they show only a summary and a sign-up prompt. Member profiles, member search and credential pages stay noindex, because they name people.
 - Member search, the support form, your own profile and Settings stay members-only.
 
 ## Alternatives
 
-- Keep lessons behind enrollment with one preview lesson per course. Rejected: the preview gave search and visitors too little to judge a course by.
+- Open every lesson's material to read without an account. Rejected: Myles wants visitors to browse freely but sign up before they start the material.
 - Index member profiles. Rejected: profiles name members who did not choose to appear in search.
 
 ## Consequences
 
-- Lesson bodies and quiz questions are sent to anyone. Quiz answers are still graded on the server and only recorded for signed-in learners.
-- The sitemap now looks up each published course to list its lessons; it is cached for a day.
+- Locked lessons still withhold body, video and questions on the server; only the preview lesson's material reaches visitors.
+- The sitemap now looks up each published course to list its preview lesson; it is cached for a day.

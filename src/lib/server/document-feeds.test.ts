@@ -120,14 +120,14 @@ describe('published document feeds', () => {
     await expect(loadForumSitemapEntries('https://moltology.org')).resolves.toEqual([])
   })
 
-  it('lists published Academy tracks, courses and their lessons, and survives a failed course lookup', async () => {
+  it('lists published Academy tracks, courses and preview lessons, and survives a failed course lookup', async () => {
     vi.mocked(getAcademyHomeFn).mockResolvedValue({
       tracks: [{ slug: 'first-molt' }],
       courses: [{ slug: 'introduction-to-ecdysis' }, { slug: 'deep-water' }],
     } as never)
     vi.mocked(getAcademyCourseFn).mockImplementation((async ({ data }: { data: { slug: string } }) => {
       if (data.slug === 'deep-water') throw new Error('trench silent')
-      return { modules: [{ lessons: [{ slug: 'first-shed-check' }, { slug: 'what-to-put-down-this-week' }] }] }
+      return { modules: [{ lessons: [{ slug: 'first-shed-check', isPreview: true }, { slug: 'what-to-put-down-this-week', isPreview: false }] }] }
     }) as never)
 
     const entries = await loadAcademySitemapEntries('https://moltology.org')
@@ -135,7 +135,6 @@ describe('published document feeds', () => {
       'https://moltology.org/academy/tracks/first-molt',
       'https://moltology.org/academy/courses/introduction-to-ecdysis',
       'https://moltology.org/academy/courses/introduction-to-ecdysis/lessons/first-shed-check',
-      'https://moltology.org/academy/courses/introduction-to-ecdysis/lessons/what-to-put-down-this-week',
       'https://moltology.org/academy/courses/deep-water',
     ])
     expect(entries.some((entry) => entry.loc.includes('/certificates/'))).toBe(false)

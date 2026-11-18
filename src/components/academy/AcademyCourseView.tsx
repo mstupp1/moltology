@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, Award, BookOpen, CheckCircle2, Circle, Clock, FileText, HelpCircle, Layers, PlayCircle, User } from 'lucide-react'
+import { ArrowRight, Award, BookOpen, CheckCircle2, Circle, Clock, FileText, HelpCircle, Layers, Lock, PlayCircle, User } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import {
@@ -57,7 +57,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
   const completedCount = lessons.filter((lesson) => lesson.completed).length
   const resume = detail.resumeLessonSlug
   const nextSlug = detail.enrolled && !detail.completed ? resume : null
-  const previewSlug = detail.enrolled ? null : lessons[0]?.slug ?? null
+  const previewSlug = detail.enrolled ? null : lessons.find((lesson) => lesson.isPreview)?.slug ?? null
   let lessonNumber = 0
 
   return (
@@ -158,6 +158,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                   <ol className="space-y-0.5">
                     {module.lessons.map((lesson) => {
                       lessonNumber += 1
+                      const open = detail.enrolled || lesson.isPreview
                       const lit = lesson.slug === nextSlug
                       const KindIcon = lessonKindIcon(lesson.kind)
                       const row = (
@@ -171,10 +172,17 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                               {lit ? <span className="text-cyan-glow font-bold"> · Up next</span> : null}
                             </span>
                           </span>
+                          {lesson.isPreview && !detail.enrolled ? (
+                            <span className="rounded-chip border border-cyan-glow/40 bg-cyan-soft px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow shrink-0">
+                              Preview
+                            </span>
+                          ) : null}
                           {lesson.completed ? (
                             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" aria-label="Complete" />
-                          ) : (
+                          ) : open ? (
                             <Circle className="w-4 h-4 text-line shrink-0" aria-label="Not started" />
+                          ) : (
+                            <Lock className="w-4 h-4 text-ink-muted shrink-0" aria-label="Enroll to open" />
                           )}
                         </>
                       )
@@ -182,6 +190,8 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                         'flex items-center gap-3 rounded-control px-2 py-2.5',
                         lit && 'bg-surface-3 shadow-nav-current',
                       )
+                      // Every row opens the lesson page, so visitors can see what it covers; locked
+                      // lessons show a sign-up or enroll prompt there instead of the material.
                       return (
                         <li key={lesson.slug}>
                           <Link
@@ -220,9 +230,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
             ) : (
               <>
                 <p className="text-xs text-ink-body leading-relaxed">
-                  {guest.isGuest
-                    ? ACADEMY_COPY.guestEnrollNote
-                    : 'Every lesson is open to read. Enroll to keep your place and earn the certificate.'}
+                  {guest.isGuest ? ACADEMY_COPY.guestEnrollNote : 'Enroll to open every lesson and keep your place.'}
                 </p>
                 <HudButton type="button" variant="primary" size="md" fullWidth disabled={busy} onClick={() => void enroll()}>
                   {busy ? 'Enrolling…' : guest.isGuest ? ACADEMY_COPY.guestEnroll : 'Enroll'}
@@ -234,7 +242,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                     className={cn(academyButtonLink('secondary'), 'w-full')}
                   >
                     <BookOpen className="w-4 h-4" aria-hidden="true" />
-                    Read the first lesson
+                    Try the preview lesson
                   </Link>
                 ) : null}
               </>

@@ -28,6 +28,7 @@ export const ACADEMY_COPY = {
   emptyTracks: 'No tracks yet. A track groups courses into a path you take in order.',
   emptyCertificates: 'No certifications are published yet. Each course and track will list its own.',
   emptyFilter: 'No courses match that search. Clear a filter and look again.',
+  emptyCertificatesGuest: 'Certifications open with the first courses. Sign up and you can start earning them then.',
   emptyEarned: 'You have not earned a certification yet. Finish a course and it will be issued here.',
   enrollSuccess: 'You are enrolled. Start with the first lesson whenever you are ready.',
   enrollError: 'Could not enroll you. Please try again.',
@@ -39,6 +40,9 @@ export const ACADEMY_COPY = {
   missingLesson: 'This lesson is not in the catalog.',
   missingTrack: 'This track is not in the catalog.',
   missingCertificate: 'This certification could not be found.',
+  lessonLocked: 'Enroll in this course to open the lesson.',
+  lessonLockedGuest: 'Accounts are free. Sign up to start this lesson, keep your place and earn the certificate.',
+  guestStartLesson: 'Sign up to start',
   lessonSaveMember: 'Enroll to keep your place, notes and quiz scores, and to earn the certificate.',
   lessonSaveGuest: 'Accounts are free. Sign up to keep your place, notes and quiz scores, and to earn the certificate.',
   guestSaveProgress: 'Sign up to save your progress',
@@ -49,8 +53,7 @@ export const ACADEMY_COPY = {
   guestLock: 'Lessons and certificates need a free account. Sign up to enroll and keep your progress.',
   guestEnroll: 'Sign up to enroll',
   guestSignUp: 'Sign up free',
-  guestEnrollNote:
-    'Every lesson is open to read. Accounts are free, and enrolling keeps your place and earns the certificate.',
+  guestEnrollNote: 'Accounts are free. Sign up to start the lessons, keep your place and earn the certificate.',
 } as const
 
 export interface AcademyTrackRow {
@@ -873,9 +876,9 @@ export function assembleLessonDetail(input: {
 }): AcademyLessonDetail {
   const refs = lessonRefs(input.lessons, input.modules)
   const neighbors = adjacentLessonSlugs(refs, input.lesson.slug)
-  // Lessons are public to read (decision 2026-11-18-public-profiles-and-lessons).
-  // Enrolling only saves progress, notes and quiz scores.
-  const locked = false
+  // Anyone can see what a lesson covers; the material itself opens on enrolling, which needs
+  // an account. One preview lesson per course stays open (decision 2026-11-18-public-profiles-and-lessons).
+  const locked = !input.lesson.isPreview && !input.enrolled
   const done = completedLessonIdSet(input.progressRows)
   const currentProgress = input.progressRows.find((row) => row.lessonId === input.lesson.id) ?? null
   const modules = [...input.modules]

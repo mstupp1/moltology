@@ -95,9 +95,9 @@ export async function loadForumSitemapEntries(baseUrl = SITE_ORIGIN): Promise<Si
 }
 
 /**
- * Published Academy tracks, courses and lessons for the sitemap. Lessons are public to read
- * (docs/logic/decisions/2026-11-18-public-profiles-and-lessons.md), so search can land on them.
- * Credential pages name a learner and stay out.
+ * Published Academy tracks, courses and preview lessons for the sitemap. Other lessons open only
+ * after signing up and enrolling, so they would index as a sign-up prompt
+ * (docs/logic/decisions/2026-11-18-public-profiles-and-lessons.md). Credential pages name a learner and stay out.
  */
 export async function loadAcademySitemapEntries(baseUrl = SITE_ORIGIN): Promise<SitemapUrlEntry[]> {
   const entries: SitemapUrlEntry[] = []
@@ -116,7 +116,7 @@ export async function loadAcademySitemapEntries(baseUrl = SITE_ORIGIN): Promise<
       entries.push({ loc: coursePath, changefreq: 'weekly', priority: 0.6 })
       for (const module of details[index]?.modules ?? []) {
         for (const lesson of module.lessons) {
-          if (!lesson.slug) continue
+          if (!lesson.slug || !lesson.isPreview) continue
           entries.push({ loc: `${coursePath}/lessons/${encodeURIComponent(lesson.slug)}`, changefreq: 'monthly', priority: 0.5 })
         }
       }

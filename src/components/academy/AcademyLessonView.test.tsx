@@ -113,17 +113,33 @@ describe('AcademyLessonView quiz', () => {
     expect(submitAcademyQuizFn).toHaveBeenCalled()
   })
 
-  it('shows the whole lesson to a member who has not enrolled, with an enroll prompt to save progress', () => {
-    render(<AcademyLessonView lesson={{ ...lesson, enrolled: false }} />)
-    expect(screen.getByText(/Enroll to keep your place, notes and quiz scores/)).toBeInTheDocument()
+  it('asks a member to enroll before a locked lesson opens', () => {
+    render(<AcademyLessonView lesson={{ ...lesson, locked: true, enrolled: false, questions: [] }} />)
+    expect(screen.getByText('Enroll in this course to open the lesson.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Enroll' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Submit quiz' })).not.toBeInTheDocument()
+  })
+
+  it('shows a signed-out visitor what a locked lesson covers and asks them to sign up to start it', () => {
+    session = { userId: null, isPending: false }
+    render(<AcademyLessonView lesson={{ ...lesson, locked: true, enrolled: false, questions: [] }} />)
+    expect(screen.getByText('Three questions.')).toBeInTheDocument()
+    expect(screen.getByText(/Sign up to start this lesson/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /submit/i })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Sign up to start' }))
+    expect(screen.getByRole('dialog', { name: 'Sign up' })).toBeInTheDocument()
+  })
+
+  it('lets a member read a preview lesson before enrolling, with an enroll prompt to save progress', () => {
+    render(<AcademyLessonView lesson={{ ...lesson, enrolled: false, isPreview: true }} />)
+    expect(screen.getByText(/Enroll to keep your place, notes and quiz scores/)).toBeInTheDocument()
     expect(screen.getByText('What counts as a useful first shed?')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Submit quiz' })).toBeInTheDocument()
   })
 
-  it('lets a signed-out visitor read the lesson and asks them to sign up to submit or save', () => {
+  it('lets a signed-out visitor read a preview lesson and asks them to sign up to submit', () => {
     session = { userId: null, isPending: false }
-    render(<AcademyLessonView lesson={{ ...lesson, enrolled: false }} />)
+    render(<AcademyLessonView lesson={{ ...lesson, enrolled: false, isPreview: true }} />)
     expect(screen.getByText('What counts as a useful first shed?')).toBeInTheDocument()
     expect(screen.queryByLabelText('Your notes')).not.toBeInTheDocument()
 
@@ -134,10 +150,12 @@ describe('AcademyLessonView quiz', () => {
     expect(submitAcademyQuizFn).not.toHaveBeenCalled()
   })
 
-  it('asks a signed-out visitor to sign up when they mark a reading complete', () => {
+  it('asks a signed-out visitor to sign up when they mark a preview reading complete', () => {
     session = { userId: null, isPending: false }
     render(
-      <AcademyLessonView lesson={{ ...lesson, enrolled: false, kind: 'reading', body: 'Shed one habit.', questions: [] }} />,
+      <AcademyLessonView
+        lesson={{ ...lesson, enrolled: false, isPreview: true, kind: 'reading', body: 'Shed one habit.', questions: [] }}
+      />,
     )
     expect(screen.getByText('Shed one habit.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Sign up to save your progress' }))
