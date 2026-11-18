@@ -556,7 +556,7 @@ const FinalSection: React.FC = () => {
           Bring nothing. Everything worth keeping calcifies on the way.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <PrimaryCta to="/signup">Join free</PrimaryCta>
+          <PrimaryCta to="/auth" search={{ mode: 'signup' }}>Join free</PrimaryCta>
           <SecondaryCta to="/codex">Read the canon</SecondaryCta>
         </div>
         <p className="mt-12 font-grotesk text-xs tracking-[0.08em] uppercase text-ink-muted">
@@ -631,7 +631,7 @@ export const WhatIsMoltologyHubPage: React.FC = () => {
         actions={
           <>
             <PrimaryCta to="/moltmax">Take the diagnostic</PrimaryCta>
-            <SecondaryCta to="/signup">Join free</SecondaryCta>
+            <SecondaryCta to="/auth" search={{ mode: 'signup' }}>Join free</SecondaryCta>
           </>
         }
         cue="Begin the descent"
