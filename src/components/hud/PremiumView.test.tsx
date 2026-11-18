@@ -38,7 +38,7 @@ describe("Oracle MAX offer panel", () => {
       <PremiumOfferPanel offer={base} busy={null} preview {...handlers()} />,
     );
     expect(
-      screen.getByText("Oracle MAX is in early access."),
+      screen.getByText("Early access"),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Subscribe|Activate/ }),
@@ -62,7 +62,7 @@ describe("Oracle MAX offer panel", () => {
       screen.queryByRole("button", { name: /Manage membership/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Oracle MAX", level: 3 }),
+      screen.getByRole("heading", { name: "Oracle MAX", level: 2 }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
