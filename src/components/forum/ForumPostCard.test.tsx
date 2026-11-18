@@ -123,7 +123,7 @@ describe('ForumPostCard', () => {
 
     expect(screen.getByText('CLAW_MASTER')).toBeInTheDocument()
     expect(screen.getByText('@claw_master')).toBeInTheDocument()
-    expect(screen.getByText('STAGE 3')).toBeInTheDocument()
+    expect(screen.getByText('Stage 3')).toBeInTheDocument()
     expect(screen.getByText('This is a test comment from the claw master.')).toBeInTheDocument()
     expect(screen.getByTestId('forum-post-card')).toHaveAttribute('id', 'post-post-101')
   })

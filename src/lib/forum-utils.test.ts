@@ -18,6 +18,7 @@ import {
   FORUM_WITHDRAWN_BODY,
   formatForumTopicCount,
   tameForumTitle,
+  shortRelativeTime,
   forumTopicPreview,
   escapeLikePattern,
   isForumStaffBoard,
@@ -239,24 +240,39 @@ describe('forum list helpers', () => {
 })
 
 describe('tameForumTitle', () => {
-  it('turns an all-caps title into title case', () => {
+  it('turns an all-caps title into sentence case', () => {
     expect(tameForumTitle('BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS')).toBe(
-      'Best Practices for Shell Hardness & Pincer Torque Gains',
+      'Best practices for shell hardness & pincer torque gains',
     )
     expect(tameForumTitle('WELCOME TO THE COMMUNITY CORE: DIRECTIVE & CODE OF CONDUCT')).toBe(
-      'Welcome to the Community Core: Directive & Code of Conduct',
+      'Welcome to the community core: Directive & code of conduct',
     )
-    expect(tameForumTitle('THE CONVERGENCE OF CARCINIZATION AND RECURSIVE AGENTIC LOOPS')).toBe(
-      'The Convergence of Carcinization and Recursive Agentic Loops',
-    )
+    expect(tameForumTitle('IS IT WORTH IT? MY FIRST MOLT')).toBe('Is it worth it? My first molt')
   })
 
-  it('keeps short all-caps words such as AI and HP', () => {
-    expect(tameForumTitle('WHY AI LOVES 64 HP SHELLS')).toBe('Why AI Loves 64 HP Shells')
+  it('keeps short all-caps words such as AI, HP and I', () => {
+    expect(tameForumTitle('WHY AI LOVES 64 HP SHELLS')).toBe('Why AI loves 64 HP shells')
+    expect(tameForumTitle('WHAT I LEARNED FROM THE TRENCH')).toBe('What I learned from the trench')
+    expect(tameForumTitle('WHY I’M STILL MOLTING')).toBe('Why I’m still molting')
   })
 
   it('leaves normal and short titles exactly as typed', () => {
     expect(tameForumTitle('Telemetry audit: Optimal depth for AI')).toBe('Telemetry audit: Optimal depth for AI')
     expect(tameForumTitle('HELP ME')).toBe('HELP ME')
+  })
+})
+
+describe('shortRelativeTime', () => {
+  it('drops the "ago" suffix', () => {
+    const fiveDays = new Date(Date.now() - 5 * 86_400_000 - 1000).toISOString()
+    expect(shortRelativeTime(fiveDays)).toBe('5d')
+    expect(shortRelativeTime(new Date().toISOString())).toBe('just now')
+  })
+
+  it('drops the year for older dates this year', () => {
+    const now = new Date()
+    const old = new Date(now.getFullYear(), 0, 1, 12)
+    if (now.getTime() - old.getTime() > 40 * 86_400_000) expect(shortRelativeTime(old.toISOString())).toBe('Jan 1')
+    expect(shortRelativeTime(new Date(2020, 4, 3, 12).toISOString())).toBe('May 2020')
   })
 })

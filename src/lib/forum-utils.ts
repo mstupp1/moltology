@@ -255,6 +255,19 @@ export function toForumIso(value: string | Date | null | undefined): string | nu
  * Older dates fall back to a calendar day in `timeZone` (browser zone when unset).
  * Render it through `<LocalTime format={relativeTime}>` so hydration matches the server.
  */
+/**
+ * Compact `relativeTime` for tight rows on phones: "5d" instead of "5d ago", and "Oct 6"
+ * instead of "Oct 6, 2026" for older dates this year.
+ */
+export function shortRelativeTime(iso: DateInput, timeZone?: string): string {
+  const label = relativeTime(iso, timeZone)
+  if (label.endsWith(' ago')) return label.slice(0, -4)
+  const date = new Date(iso)
+  if (label === 'just now' || Number.isNaN(date.getTime())) return label
+  const sameYear = date.getFullYear() === new Date().getFullYear()
+  return date.toLocaleDateString('en-US', sameYear ? { month: 'short', day: 'numeric', timeZone } : { month: 'short', year: 'numeric', timeZone })
+}
+
 export function relativeTime(iso: DateInput, timeZone?: string): string {
   const then = new Date(iso).getTime()
   if (Number.isNaN(then)) return ''
@@ -270,15 +283,17 @@ export function relativeTime(iso: DateInput, timeZone?: string): string {
   if (diffWk < 5) return `${diffWk}w ago`
   return formatDay(iso, timeZone)
 }
+/** Two-letter words that are ordinary words, not acronyms, when a title is in all caps. */
 const TITLE_SMALL_WORDS = new Set([
-  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'via', 'with',
+  'a', 'an', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'if', 'in', 'is', 'it', 'me', 'my', 'no', 'of', 'on', 'or', 'so', 'to', 'up', 'us', 'vs', 'we',
 ])
 
 /**
- * Turns a title typed in all caps into title case ("BEST PRACTICES FOR SHELL GAINS" becomes
- * "Best Practices for Shell Gains"), so it does not shout in lists. Titles with normal casing,
- * and short ones, are left exactly as typed. Short all-caps words that are not small words
- * (AI, HP, XP) stay as they are.
+ * Turns a title typed in all caps into sentence case ("BEST PRACTICES FOR SHELL GAINS" becomes
+ * "Best practices for shell gains"), so it does not shout in lists. The first word of the title
+ * and of each phrase after a colon, full stop or question mark is capitalized. Titles with normal
+ * casing, and short ones, are left exactly as typed. Short all-caps words (AI, HP, XP) and "I"
+ * stay as they are.
  */
 export function tameForumTitle(title: string): string {
   const letters = title.match(/\p{L}/gu) ?? []
@@ -289,14 +304,14 @@ export function tameForumTitle(title: string): string {
   let startOfPhrase = true
   return title.replace(/[\p{L}\p{N}'’]+|[^\p{L}\p{N}'’]+/gu, (part) => {
     if (!/\p{L}/u.test(part)) {
-      if (/[:.!?—–-]/.test(part)) startOfPhrase = true
+      if (/[:.!?]/.test(part)) startOfPhrase = true
       return part
     }
     const lower = part.toLowerCase()
     const first = startOfPhrase
     startOfPhrase = false
-    if (!first && TITLE_SMALL_WORDS.has(lower)) return lower
     if (part.length <= 2 && !TITLE_SMALL_WORDS.has(lower)) return part
-    return lower.charAt(0).toUpperCase() + lower.slice(1)
+    if (first || /^i['’]/.test(lower)) return lower.charAt(0).toUpperCase() + lower.slice(1)
+    return lower
   })
 }
