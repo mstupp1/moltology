@@ -26,6 +26,20 @@ vi.mock('@/lib/server/api', () => ({
   getMemberLoadoutFn: (...args: any[]) => mockGetMemberLoadout(...args),
 }))
 
+const signedIn = {
+  user: { id: 'viewer-1' },
+  userId: 'viewer-1',
+  isPending: false,
+  isGuest: false,
+  isAuthenticated: true,
+}
+const guest = { user: null, userId: null, isPending: false, isGuest: true, isAuthenticated: false }
+let mockSession: Record<string, unknown> = signedIn
+
+vi.mock('@/hooks/useAuthSession', () => ({
+  useAuthSession: () => mockSession,
+}))
+
 vi.mock('./FriendRequestButton', () => ({
   FriendRequestButton: () => <button type="button">Request</button>,
 }))
@@ -53,6 +67,7 @@ describe('MemberProfilePage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSession = signedIn
     mockGetMemberLoadout.mockResolvedValue({ catalog: [], items: [], totals: {} })
   })
 
@@ -84,6 +99,18 @@ describe('MemberProfilePage', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('premium-badge')).not.toBeInTheDocument()
     })
+  })
+
+  it('makes no dossier lookups for a signed-out visitor behind the guest lock', async () => {
+    mockSession = guest
+
+    render(<MemberProfilePage profileId="member-a" canonicalizePath />)
+
+    expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(mockGetPublicProfile).not.toHaveBeenCalled()
+    expect(mockGetMemberLoadout).not.toHaveBeenCalled()
+    expect(screen.queryByText('Profile unavailable')).not.toBeInTheDocument()
   })
 
   it('shows a workspace ghost while the dossier hydrates', () => {

@@ -68,7 +68,10 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
       if (!nextProfile) throw new Error('Member not found.')
       return { profile: nextProfile, loadout: nextLoadout }
     },
-    enabled: !session.isPending,
+    // Dossiers need a signed-in viewer (docs/logic data.member-share-previews).
+    // GuestLockGuard still mounts this page as a blurred backdrop for guests, so
+    // skip the lookups there instead of firing calls the server must reject.
+    enabled: !session.isPending && !session.isGuest,
     staleTime: FRESH.panel,
     retry: false,
   })
