@@ -196,11 +196,12 @@ export const Eyebrow: React.FC<{ children: React.ReactNode; color?: string; clas
   </p>
 )
 
-type CtaProps = { to: string; children: React.ReactNode; className?: string }
+type CtaProps = { to: string; search?: Record<string, string>; children: React.ReactNode; className?: string }
 
-export const PrimaryCta: React.FC<CtaProps> = ({ to, children, className = '' }) => (
+export const PrimaryCta: React.FC<CtaProps> = ({ to, search, children, className = '' }) => (
   <Link
     to={to}
+    search={search}
     className={`group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm bg-cyan-glow hover:bg-cyan-hover text-abyss hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.45)] transition-[background-color,filter] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
   >
     {children}
@@ -208,9 +209,10 @@ export const PrimaryCta: React.FC<CtaProps> = ({ to, children, className = '' })
   </Link>
 )
 
-export const SecondaryCta: React.FC<CtaProps> = ({ to, children, className = '' }) => (
+export const SecondaryCta: React.FC<CtaProps> = ({ to, search, children, className = '' }) => (
   <Link
     to={to}
+    search={search}
     className={`inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm border border-line bg-surface-1/80 hud-sheen backdrop-blur-md text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
   >
     {children}
