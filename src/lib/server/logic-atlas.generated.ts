@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-16",
+  "syncedAt": "2026-11-18",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
     "rules": 138,
-    "decisions": 65,
-    "anchors": 283,
-    "drifted": 8,
+    "decisions": 66,
+    "anchors": 285,
+    "drifted": 10,
     "flagged": 8
   },
   "canvas": {
@@ -1007,10 +1007,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/simulation-engine.ts",
           "symbol": "simulateDailyRoutines",
-          "line": 644,
+          "line": 645,
           "value": "simulateDailyRoutines(dbClient, config, options)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L644"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L645"
         },
         {
           "file": "src/lib/server/simulation-wardrobe.ts",
@@ -1049,7 +1049,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1845,
         "y": 864
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "economy.cosmetics-no-stats",
@@ -1275,10 +1275,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar3d/character.ts",
           "symbol": "buildCharacter",
-          "line": 181,
+          "line": 190,
           "value": "buildCharacter(look)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L181"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L190"
         }
       ],
       "tests": [
@@ -1459,10 +1459,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3714,
+          "line": 3722,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3714"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3722"
         }
       ],
       "tests": [
@@ -1513,10 +1513,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3714,
+          "line": 3722,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3714"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3722"
         }
       ],
       "tests": [
@@ -1585,10 +1585,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "setPracticeDaysHandler",
-          "line": 3926,
+          "line": 3934,
           "value": "setPracticeDaysHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3926"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3934"
         }
       ],
       "tests": [
@@ -1628,10 +1628,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3472,
+          "line": 3480,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3472"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3480"
         },
         {
           "file": "src/lib/progression.ts",
@@ -1766,10 +1766,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3472,
+          "line": 3480,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3472"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3480"
         }
       ],
       "tests": [],
@@ -3589,18 +3589,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3288,
+          "line": 3296,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3288"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3296"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 816,
+          "line": 818,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L816"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L818"
         }
       ],
       "tests": [
@@ -4263,18 +4263,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1774,
+          "line": 1782,
           "value": "createForumTopicHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1774"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1782"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 997,
+          "line": 999,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L997"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L999"
         }
       ],
       "tests": [
@@ -4636,10 +4636,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createBlogCommentHandler",
-          "line": 816,
+          "line": 818,
           "value": "createBlogCommentHandler({ data, context })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L816"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L818"
         },
         {
           "file": "src/lib/server/forum-write-limit.ts",
@@ -5003,10 +5003,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 1005,
+          "line": 1007,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1005"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1007"
         }
       ],
       "tests": [
@@ -5049,10 +5049,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1921,
+          "line": 1929,
           "value": "createForumPostHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1921"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1929"
         }
       ],
       "tests": [
@@ -5139,26 +5139,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2567,
+          "line": 2575,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2567"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2575"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2874,
+          "line": 2882,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2874"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2882"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2944,
+          "line": 2952,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2944"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2952"
         }
       ],
       "tests": [
@@ -5229,10 +5229,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 86,
+          "line": 128,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L86"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L128"
         }
       ],
       "tests": [
@@ -5481,7 +5481,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1492,
         "y": 208
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.rate-limit",
@@ -5908,10 +5908,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 86,
+          "line": 128,
           "value": "handleOracleChatRequest(request)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L86"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L128"
         }
       ],
       "tests": [
@@ -5934,7 +5934,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1090,
         "y": 528
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.intent-context",
@@ -6542,18 +6542,34 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "data.member-share-previews",
       "domain": "data",
-      "title": "Public profile link previews",
+      "title": "Public member profiles and link previews",
       "kind": "permission",
       "status": "active",
-      "statement": "Link-preview crawlers can resolve a member's public handle or larva unit without signing in. Preview lookups exclude auth names, email, bio, stats, and inventory. The dossier and friend requests still require sign-in. Missing members or failed lookups use generic metadata rather than treating an account id as a public name.",
+      "statement": "Anyone can open a member profile without signing in. It shows name, stage, avatar, join date, Moltmax rating, bio, traits, bonds, and equipped gear, never auth names, email, settings, or unequipped inventory. Friend requests and member search still require sign-in. Link previews show only the name and portrait, with generic metadata for missing members.",
       "anchors": [
         {
           "file": "src/lib/server/member-share-data.ts",
           "symbol": "getMemberShareIdentity",
           "line": 18,
           "value": "getMemberShareIdentity(profileId)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/member-share-data.ts#L18"
+        },
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "getPublicProfileHandler",
+          "line": 4545,
+          "value": "getPublicProfileHandler({ data, context, })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4545"
+        },
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "getMemberLoadoutHandler",
+          "line": 4683,
+          "value": "getMemberLoadoutHandler({ data, context, })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4683"
         }
       ],
       "tests": [
@@ -6564,18 +6580,28 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/routes/_hud/member/-share.test.ts",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/routes/_hud/member/-share.test.ts"
+        },
+        {
+          "file": "src/lib/server/member-dossier.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/member-dossier.test.ts"
+        },
+        {
+          "file": "src/components/hud/member/MemberProfilePage.test.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/member/MemberProfilePage.test.tsx"
         }
       ],
       "dependsOn": [],
       "usedBy": [],
-      "decisions": [],
+      "decisions": [
+        "public-profiles-and-lessons"
+      ],
       "flag": null,
       "flow": null,
       "position": {
         "x": 28,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "data.neon-compute-budget",
@@ -6812,10 +6838,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "getBlogPostBySlugHandler",
-          "line": 660,
+          "line": 662,
           "value": "getBlogPostBySlugHandler({ data: slug, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L660"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L662"
         },
         {
           "file": "src/routes/news/$slug.tsx",
@@ -7136,10 +7162,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "saveCharacterHandler",
-          "line": 4156,
+          "line": 4164,
           "value": "saveCharacterHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4156"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L4164"
         },
         {
           "file": "src/lib/character-appearance.ts",
@@ -11087,6 +11113,60 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>Streak milestones count streak days, so with Mon to Fri a 7-day streak takes about a week and a half. The day is still the member&#39;s device date, within the existing one-day window.</p>"
+        }
+      ]
+    },
+    {
+      "id": "public-profiles-and-lessons",
+      "date": "2026-11-18",
+      "title": "Open member profiles and Academy lessons to signed-out visitors",
+      "summary": "Anyone can read member profiles, every Academy lesson and the certificate list. Saving progress, quizzes, notes, friend requests and earning certificates still need a free account, and each of those spots asks visitors to sign up.",
+      "domains": [
+        "data"
+      ],
+      "rules": [
+        "data.member-share-previews"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "db-services.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "academy.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/academy.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "AcademyLessonView.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/academy/AcademyLessonView.tsx"
+        },
+        {
+          "kind": "doc",
+          "label": "document-feeds.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/document-feeds.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Shared profile links failed for signed-out visitors with &quot;Authentication required&quot;, because the profile and loadout lookups demanded a session even though the page is meant to be public. The guest-access decision of 2026-11-12 had also kept Academy lessons and the certificate list behind an account, so most course content was invisible to search and to anyone following a shared link. Signup from guests is the main growth bottleneck.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<ul>\n<li>Member profiles are public: name, stage, avatar, join date, Moltmax rating, bio, traits, bonds and equipped gear. Signed-out visitors see &quot;Sign up to add friend&quot; and &quot;Build your own&quot; (the guest character editor) instead of friend actions.</li>\n<li>Every Academy lesson is readable without an account or enrollment. This supersedes &quot;lessons need an account&quot; in the 2026-11-12 guest-access decision.</li>\n<li>Saving progress, notes and quiz scores still needs an account and enrollment. For visitors, Mark complete reads &quot;Sign up to save your progress&quot; and Submit reads &quot;Sign up to submit&quot;; both open sign-up.</li>\n<li>The certificate list is public. Each certificate offers &quot;Sign up to earn this&quot;.</li>\n<li>Search: Academy tracks, courses and lessons are indexed and listed in the sitemap. Member profiles, member search and credential pages stay noindex, because they name people.</li>\n<li>Member search, the support form, your own profile and Settings stay members-only.</li>\n</ul>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep lessons behind enrollment with one preview lesson per course. Rejected: the preview gave search and visitors too little to judge a course by.</li>\n<li>Index member profiles. Rejected: profiles name members who did not choose to appear in search.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<ul>\n<li>Lesson bodies and quiz questions are sent to anyone. Quiz answers are still graded on the server and only recorded for signed-in learners.</li>\n<li>The sitemap now looks up each published course to list its lessons; it is cached for a day.</li>\n</ul>"
         }
       ]
     }

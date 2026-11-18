@@ -18,13 +18,14 @@ export const Route = createFileRoute('/_hud/academy/courses/$slug/lessons/$lesso
       return { lesson: null }
     }
   },
-  head: ({ loaderData }) => ({
+  head: ({ loaderData, params }) => ({
     meta: [
       ...seo({
         title: loaderData?.lesson
           ? `${loaderData.lesson.title} | Academy | Moltology`
           : 'Lesson | Academy | Moltology',
         description: loaderData?.lesson?.summary ?? 'A Molt Academy lesson.',
+        canonical: `https://moltology.org/academy/courses/${params.slug}/lessons/${params.lessonSlug}`,
         siteName: 'Moltology',
         twitterSite: '@moltology',
       }),
@@ -38,7 +39,7 @@ function AcademyLessonRoute() {
   const { lesson } = Route.useLoaderData()
   if (!lesson) return <AcademyMissing message={ACADEMY_COPY.missingLesson} />
   return (
-    <AcademyFrame membersOnly>
+    <AcademyFrame>
       <AcademyLessonView lesson={lesson} />
     </AcademyFrame>
   )

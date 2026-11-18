@@ -190,19 +190,17 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                         'flex items-center gap-3 rounded-control px-2 py-2.5',
                         lit && 'bg-surface-3 shadow-nav-current',
                       )
+                      // Every row opens the lesson page, so visitors can see what it covers; locked
+                      // lessons show a sign-up or enroll prompt there instead of the material.
                       return (
                         <li key={lesson.slug}>
-                          {open ? (
-                            <Link
-                              to="/academy/courses/$slug/lessons/$lessonSlug"
-                              params={{ slug: detail.slug, lessonSlug: lesson.slug }}
-                              className={cn(rowClass, !lit && 'hover:bg-surface-2', ACADEMY_FOCUS)}
-                            >
-                              {row}
-                            </Link>
-                          ) : (
-                            <div className={cn(rowClass, 'opacity-80')}>{row}</div>
-                          )}
+                          <Link
+                            to="/academy/courses/$slug/lessons/$lessonSlug"
+                            params={{ slug: detail.slug, lessonSlug: lesson.slug }}
+                            className={cn(rowClass, !lit && 'hover:bg-surface-2', ACADEMY_FOCUS)}
+                          >
+                            {row}
+                          </Link>
                         </li>
                       )
                     })}

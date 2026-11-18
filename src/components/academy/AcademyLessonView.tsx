@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, Circle, ListOrdered, Lock } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Bookmark, Check, CheckCircle2, Circle, ListOrdered, Lock } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer'
@@ -22,6 +22,7 @@ import {
   AcademyCrumbs,
   AcademyProgress,
   academyButtonLink,
+  useAcademyGuestEnroll,
 } from './AcademyChrome'
 import { lessonKindIcon } from './AcademyCourseView'
 import { AcademyVideo } from './AcademyVideo'
@@ -46,8 +47,11 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   const [note, setNote] = useState(lesson.note)
   const [noteStatus, setNoteStatus] = useState<NoteStatus>('idle')
   const [syllabusOpen, setSyllabusOpen] = useState(false)
+  // Lessons are public to read; saving progress, notes and quiz scores needs an account.
+  const guest = useAcademyGuestEnroll()
 
   async function enroll() {
+    if (guest.isGuest) return guest.promptSignUp()
     setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -71,6 +75,10 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   }
 
   async function save(action: 'complete' | 'position', extra?: { lastPositionSeconds?: number }) {
+    if (guest.isGuest) {
+      if (action === 'complete') guest.promptSignUp()
+      return
+    }
     if (action === 'complete') setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -100,6 +108,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   }
 
   async function saveNote() {
+    if (guest.isGuest) return
     if (note === detail.note) {
       setNoteStatus((status) => (status === 'dirty' ? 'idle' : status))
       return
@@ -119,6 +128,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   }
 
   async function submitQuiz() {
+    if (guest.isGuest) return guest.promptSignUp()
     setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -225,12 +235,28 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
               <span className="flex w-10 h-10 shrink-0 items-center justify-center rounded-card bg-surface-2 text-cyan-glow">
                 <Lock className="w-5 h-5" aria-hidden="true" />
               </span>
-              <p className="text-sm text-ink flex-1">{ACADEMY_COPY.lessonLocked}</p>
+              <p className="text-sm text-ink flex-1">
+                {guest.isGuest ? ACADEMY_COPY.lessonLockedGuest : ACADEMY_COPY.lessonLocked}
+              </p>
               <HudButton type="button" variant="primary" disabled={busy} onClick={() => void enroll()}>
-                {busy ? 'Enrolling…' : 'Enroll'}
+                {busy ? 'Enrolling…' : guest.isGuest ? ACADEMY_COPY.guestStartLesson : 'Enroll'}
               </HudButton>
             </section>
-          ) : (
+          ) : !detail.enrolled ? (
+            <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3')}>
+              <span className="flex w-9 h-9 shrink-0 items-center justify-center rounded-card bg-surface-2 text-cyan-glow">
+                <Bookmark className="w-4 h-4" aria-hidden="true" />
+              </span>
+              <p className="text-sm text-ink-body flex-1">
+                {guest.isGuest ? ACADEMY_COPY.lessonSaveGuest : ACADEMY_COPY.lessonSaveMember}
+              </p>
+              <HudButton type="button" variant="secondary" size="sm" disabled={busy} onClick={() => void enroll()}>
+                {busy ? 'Enrolling…' : guest.isGuest ? ACADEMY_COPY.guestEnroll : 'Enroll'}
+              </HudButton>
+            </section>
+          ) : null}
+
+          {detail.locked ? null : (
             <>
               {detail.kind === 'video' ? (
                 <AcademyVideo
@@ -355,7 +381,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
                         disabled={busy || !allAnswered || detail.questions.length === 0}
                         onClick={() => void submitQuiz()}
                       >
-                        {busy ? 'Submitting…' : 'Submit quiz'}
+                        {busy ? 'Submitting…' : guest.isGuest ? ACADEMY_COPY.guestSubmitQuiz : 'Submit quiz'}
                       </HudButton>
                     )}
                   </div>
@@ -386,7 +412,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
                       onClick={() => void save('complete')}
                       icon={detail.completed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : undefined}
                     >
-                      {detail.completed ? 'Lesson complete' : busy ? 'Saving…' : 'Mark complete'}
+                      {detail.completed ? 'Lesson complete' : busy ? 'Saving…' : guest.isGuest ? ACADEMY_COPY.guestSaveProgress : 'Mark complete'}
                     </HudButton>
                   ) : null}
                 </div>
@@ -412,31 +438,33 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
                 )}
               </nav>
 
-              <section className={cn(ACADEMY_CARD, 'p-4 space-y-2')}>
-                <div className="flex items-center justify-between gap-3">
-                  <label htmlFor="lesson-note" className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
-                    Your notes
-                  </label>
-                  <span
-                    className={cn('text-[11px]', noteStatus === 'error' ? 'text-crimson-text' : noteStatus === 'saved' ? 'text-emerald-500' : 'text-ink-muted')}
-                    aria-live="polite"
-                  >
-                    {NOTE_STATUS_LABEL[noteStatus]}
-                  </span>
-                </div>
-                <textarea
-                  id="lesson-note"
-                  value={note}
-                  onChange={(event) => {
-                    setNote(event.target.value)
-                    setNoteStatus('dirty')
-                  }}
-                  onBlur={() => void saveNote()}
-                  rows={4}
-                  className="w-full rounded-control bg-surface-2 border border-line text-sm text-ink p-3 outline-hidden placeholder:text-ink-muted hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
-                  placeholder="Only you can see these. They save when you click away."
-                />
-              </section>
+              {guest.isGuest ? null : (
+                <section className={cn(ACADEMY_CARD, 'p-4 space-y-2')}>
+                  <div className="flex items-center justify-between gap-3">
+                    <label htmlFor="lesson-note" className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
+                      Your notes
+                    </label>
+                    <span
+                      className={cn('text-[11px]', noteStatus === 'error' ? 'text-crimson-text' : noteStatus === 'saved' ? 'text-emerald-500' : 'text-ink-muted')}
+                      aria-live="polite"
+                    >
+                      {NOTE_STATUS_LABEL[noteStatus]}
+                    </span>
+                  </div>
+                  <textarea
+                    id="lesson-note"
+                    value={note}
+                    onChange={(event) => {
+                      setNote(event.target.value)
+                      setNoteStatus('dirty')
+                    }}
+                    onBlur={() => void saveNote()}
+                    rows={4}
+                    className="w-full rounded-control bg-surface-2 border border-line text-sm text-ink p-3 outline-hidden placeholder:text-ink-muted hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus"
+                    placeholder="Only you can see these. They save when you click away."
+                  />
+                </section>
+              )}
             </>
           )}
         </div>
@@ -456,6 +484,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
       >
         {syllabus}
       </HudBottomSheet>
+      {guest.modal}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { generateRssFeedXml, generateSitemapXml, SITE_ORIGIN, type SitemapUrlEntry } from '@/lib/seo'
 import { getBlogPostsFn, getForumCategoriesFn, getForumTopicsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS, type BlogPostData } from '@/lib/blog-data'
+import { getAcademyCourseFn, getAcademyHomeFn } from '@/lib/server/academy-api'
 
 export async function loadPublishedBlogPosts(): Promise<BlogPostData[]> {
   try {
@@ -93,10 +94,47 @@ export async function loadForumSitemapEntries(baseUrl = SITE_ORIGIN): Promise<Si
   return entries
 }
 
+/**
+ * Published Academy tracks, courses and preview lessons for the sitemap. Other lessons open only
+ * after signing up and enrolling, so they would index as a sign-up prompt
+ * (docs/logic/decisions/2026-11-18-public-profiles-and-lessons.md). Credential pages name a learner and stay out.
+ */
+export async function loadAcademySitemapEntries(baseUrl = SITE_ORIGIN): Promise<SitemapUrlEntry[]> {
+  const entries: SitemapUrlEntry[] = []
+  try {
+    const home = await getAcademyHomeFn()
+    for (const track of home?.tracks ?? []) {
+      if (!track.slug) continue
+      entries.push({ loc: `${baseUrl}/academy/tracks/${encodeURIComponent(track.slug)}`, changefreq: 'weekly', priority: 0.6 })
+    }
+    const courseSlugs = (home?.courses ?? []).map((course) => course.slug).filter(Boolean)
+    const details = await Promise.all(
+      courseSlugs.map((slug) => getAcademyCourseFn({ data: { slug } }).catch(() => null)),
+    )
+    courseSlugs.forEach((slug, index) => {
+      const coursePath = `${baseUrl}/academy/courses/${encodeURIComponent(slug)}`
+      entries.push({ loc: coursePath, changefreq: 'weekly', priority: 0.6 })
+      for (const module of details[index]?.modules ?? []) {
+        for (const lesson of module.lessons) {
+          if (!lesson.slug || !lesson.isPreview) continue
+          entries.push({ loc: `${coursePath}/lessons/${encodeURIComponent(lesson.slug)}`, changefreq: 'monthly', priority: 0.5 })
+        }
+      }
+    })
+  } catch (error) {
+    console.warn('Error loading Academy pages for the sitemap:', error)
+  }
+  return entries
+}
+
 export async function sitemapXmlResponse(): Promise<Response> {
-  const [posts, forum] = await Promise.all([loadPublishedBlogPosts(), loadForumSitemapEntries()])
+  const [posts, forum, academy] = await Promise.all([
+    loadPublishedBlogPosts(),
+    loadForumSitemapEntries(),
+    loadAcademySitemapEntries(),
+  ])
   return xmlDocumentResponse(
-    generateSitemapXml(posts, SITE_ORIGIN, forum),
+    generateSitemapXml(posts, SITE_ORIGIN, [...forum, ...academy]),
     'application/xml; charset=utf-8',
     'public, max-age=3600, s-maxage=86400',
   )

@@ -3,7 +3,7 @@ import { GearIcon } from '../avatar3d/GearIcon'
 import { gearStill } from '@/lib/avatar3d-gear-icon'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Calendar } from 'lucide-react'
+import { Calendar, Shell, UserPlus } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { CharacterOverlay } from '@/components/hud/CharacterOverlay'
 import { BonusList, VectorSheetPanel } from '@/components/hud/chassis/VectorSheetPanel'
@@ -11,6 +11,8 @@ import { PremiumBadge } from '@/components/hud/PremiumBadge'
 import { RankCrest, RankRecordChip } from '@/components/leaderboard/RankCrest'
 import { FriendRequestButton } from './FriendRequestButton'
 import { ProfileLinkButton } from './ProfileLinkButton'
+import { AuthModal } from '@/components/AuthModal'
+import { HudButton } from '@/components/ui/HudButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
@@ -68,6 +70,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
       if (!nextProfile) throw new Error('Member not found.')
       return { profile: nextProfile, loadout: nextLoadout }
     },
+    // Dossiers are public; a signed-in viewer's token only adds the friend relationship.
     enabled: !session.isPending,
     staleTime: FRESH.panel,
     retry: false,
@@ -84,6 +87,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     })
   }
   const [showCharacter, setShowCharacter] = useState(false)
+  const [authOpen, setAuthOpen] = useState(false)
   const closeCharacter = useCallback(() => setShowCharacter(false), [])
 
   useEffect(() => {
@@ -170,6 +174,9 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 interactive
               />
             </button>
+            {session.isGuest && (
+              <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode="signup" />
+            )}
             <CharacterOverlay
               isOpen={showCharacter}
               onClose={closeCharacter}
@@ -199,6 +206,29 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 </div>
                 <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 shrink-0 max-sm:[&>*]:flex-1">
                   {isSelf && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
+                  {session.isGuest ? (
+                    <>
+                      {/* Guests can already dress a starter character, so this is the shortest path to sign-up. */}
+                      <HudButton
+                        type="button"
+                        variant="primary"
+                        size="sm"
+                        onClick={() => void navigate({ to: '/character' })}
+                        icon={<Shell className="w-3.5 h-3.5" />}
+                      >
+                        Build your own
+                      </HudButton>
+                      <HudButton
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setAuthOpen(true)}
+                        icon={<UserPlus className="w-3.5 h-3.5" />}
+                      >
+                        Sign up to add friend
+                      </HudButton>
+                    </>
+                  ) : (
                   <FriendRequestButton
                     profileId={profile.id}
                     relationship={profile.relationship}
@@ -215,6 +245,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                       )
                     }
                   />
+                  )}
                 </div>
               </div>
               {profile.bio && (

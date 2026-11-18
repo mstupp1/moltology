@@ -3,7 +3,7 @@ import { AcademyCredential } from '@/components/academy/AcademyCertificateViews'
 import { AcademyFrame, AcademyMissing } from '@/components/academy/AcademyChrome'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { ACADEMY_COPY } from '@/lib/academy'
-import { seo } from '@/lib/seo'
+import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { getAcademyCertificateFn } from '@/lib/server/academy-api'
 
 export const Route = createFileRoute('/_hud/academy/certificates/$credentialId')({
@@ -16,9 +16,11 @@ export const Route = createFileRoute('/_hud/academy/certificates/$credentialId')
       return { credential: null }
     }
   },
+  // A credential names its learner, so it stays out of search results; the link still previews when shared.
+  headers: () => xRobotsNoindexHeaders(),
   head: ({ loaderData }) => ({
     meta: [
-      ...seo({
+      ...privatePageSeo({
         title: loaderData?.credential
           ? `${loaderData.credential.title} | Academy | Moltology`
           : 'Credential | Academy | Moltology',
