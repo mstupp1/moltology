@@ -39,11 +39,18 @@ export const ACADEMY_COPY = {
   missingLesson: 'This lesson is not in the catalog.',
   missingTrack: 'This track is not in the catalog.',
   missingCertificate: 'This certification could not be found.',
-  lessonLocked: 'Enroll in this course to open the lesson.',
+  lessonSaveMember: 'Enroll to keep your place, notes and quiz scores, and to earn the certificate.',
+  lessonSaveGuest: 'Accounts are free. Sign up to keep your place, notes and quiz scores, and to earn the certificate.',
+  guestSaveProgress: 'Sign up to save your progress',
+  guestSubmitQuiz: 'Sign up to submit',
+  guestEarnCertificate: 'Sign up to earn this',
+  guestEarnedCertificates: 'Sign up to earn certificates. Each one gets a credential page you can share.',
   videoWaiting: 'The video for this lecture is not up yet. Read the summary, then mark it complete or come back later.',
   guestLock: 'Lessons and certificates need a free account. Sign up to enroll and keep your progress.',
   guestEnroll: 'Sign up to enroll',
-  guestEnrollNote: 'Accounts are free. Enrolling opens every lesson and keeps your place.',
+  guestSignUp: 'Sign up free',
+  guestEnrollNote:
+    'Every lesson is open to read. Accounts are free, and enrolling keeps your place and earns the certificate.',
 } as const
 
 export interface AcademyTrackRow {
@@ -467,7 +474,13 @@ export function gradeQuiz(
 ): QuizGradeResult {
   const total = questions.length
   if (total === 0) {
-    return { scorePercent: 0, correctCount: 0, total: 0, passed: false, results: [] }
+    return {
+      scorePercent: 0,
+      correctCount: 0,
+      total: 0,
+      passed: false,
+      results: [],
+    }
   }
   const results = questions.map((question) => {
     const selectedIndex = Number.isInteger(answers[question.id]) ? answers[question.id] : null
@@ -860,7 +873,9 @@ export function assembleLessonDetail(input: {
 }): AcademyLessonDetail {
   const refs = lessonRefs(input.lessons, input.modules)
   const neighbors = adjacentLessonSlugs(refs, input.lesson.slug)
-  const locked = !input.lesson.isPreview && !input.enrolled
+  // Lessons are public to read (decision 2026-11-18-public-profiles-and-lessons).
+  // Enrolling only saves progress, notes and quiz scores.
+  const locked = false
   const done = completedLessonIdSet(input.progressRows)
   const currentProgress = input.progressRows.find((row) => row.lessonId === input.lesson.id) ?? null
   const modules = [...input.modules]

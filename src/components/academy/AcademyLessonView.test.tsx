@@ -17,6 +17,12 @@ vi.mock('@/lib/server/academy-api', () => ({
   submitAcademyQuizFn: vi.fn(),
 }))
 
+let session: { userId: string | null; isPending: boolean } = { userId: 'user-1', isPending: false }
+vi.mock('@/hooks/useAuthSession', () => ({ useAuthSession: () => session }))
+vi.mock('@/components/AuthModal', () => ({
+  AuthModal: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div role="dialog" aria-label="Sign up" /> : null),
+}))
+
 import { saveAcademyLessonFn, submitAcademyQuizFn } from '@/lib/server/academy-api'
 import { AcademyLessonView } from './AcademyLessonView'
 
@@ -73,6 +79,7 @@ const lesson: AcademyLessonDetail = {
 describe('AcademyLessonView quiz', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    session = { userId: 'user-1', isPending: false }
   })
 
   it('keeps submit disabled until every question has an answer, then shows the score', async () => {
@@ -106,11 +113,36 @@ describe('AcademyLessonView quiz', () => {
     expect(submitAcademyQuizFn).toHaveBeenCalled()
   })
 
-  it('asks a visitor to enroll before a locked lesson opens', () => {
-    render(<AcademyLessonView lesson={{ ...lesson, locked: true, enrolled: false, questions: [] }} />)
-    expect(screen.getByText('Enroll in this course to open the lesson.')).toBeInTheDocument()
+  it('shows the whole lesson to a member who has not enrolled, with an enroll prompt to save progress', () => {
+    render(<AcademyLessonView lesson={{ ...lesson, enrolled: false }} />)
+    expect(screen.getByText(/Enroll to keep your place, notes and quiz scores/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Enroll' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Submit quiz' })).not.toBeInTheDocument()
+    expect(screen.getByText('What counts as a useful first shed?')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Submit quiz' })).toBeInTheDocument()
+  })
+
+  it('lets a signed-out visitor read the lesson and asks them to sign up to submit or save', () => {
+    session = { userId: null, isPending: false }
+    render(<AcademyLessonView lesson={{ ...lesson, enrolled: false }} />)
+    expect(screen.getByText('What counts as a useful first shed?')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Your notes')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByLabelText('One habit you can stop this week'))
+    fireEvent.click(screen.getByLabelText('So it can harden'))
+    fireEvent.click(screen.getByRole('button', { name: 'Sign up to submit' }))
+    expect(screen.getByRole('dialog', { name: 'Sign up' })).toBeInTheDocument()
+    expect(submitAcademyQuizFn).not.toHaveBeenCalled()
+  })
+
+  it('asks a signed-out visitor to sign up when they mark a reading complete', () => {
+    session = { userId: null, isPending: false }
+    render(
+      <AcademyLessonView lesson={{ ...lesson, enrolled: false, kind: 'reading', body: 'Shed one habit.', questions: [] }} />,
+    )
+    expect(screen.getByText('Shed one habit.')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Sign up to save your progress' }))
+    expect(screen.getByRole('dialog', { name: 'Sign up' })).toBeInTheDocument()
+    expect(saveAcademyLessonFn).not.toHaveBeenCalled()
   })
 
   it('lets a failed quiz be retaken with fresh answers', async () => {

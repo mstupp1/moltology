@@ -3,7 +3,7 @@ import { GearIcon } from '../avatar3d/GearIcon'
 import { gearStill } from '@/lib/avatar3d-gear-icon'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Calendar, UserPlus } from 'lucide-react'
+import { Calendar, Shell, UserPlus } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { CharacterOverlay } from '@/components/hud/CharacterOverlay'
 import { BonusList, VectorSheetPanel } from '@/components/hud/chassis/VectorSheetPanel'
@@ -207,15 +207,27 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 shrink-0 max-sm:[&>*]:flex-1">
                   {isSelf && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
                   {session.isGuest ? (
-                    <HudButton
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setAuthOpen(true)}
-                      icon={<UserPlus className="w-3.5 h-3.5" />}
-                    >
-                      Sign up to add friend
-                    </HudButton>
+                    <>
+                      {/* Guests can already dress a starter character, so this is the shortest path to sign-up. */}
+                      <HudButton
+                        type="button"
+                        variant="primary"
+                        size="sm"
+                        onClick={() => void navigate({ to: '/character' })}
+                        icon={<Shell className="w-3.5 h-3.5" />}
+                      >
+                        Build your own
+                      </HudButton>
+                      <HudButton
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setAuthOpen(true)}
+                        icon={<UserPlus className="w-3.5 h-3.5" />}
+                      >
+                        Sign up to add friend
+                      </HudButton>
+                    </>
                   ) : (
                   <FriendRequestButton
                     profileId={profile.id}

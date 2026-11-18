@@ -20,11 +20,15 @@ import {
   AcademyEmpty,
   AcademyNav,
   AcademySectionHeading,
+  useAcademyGuestEnroll,
 } from './AcademyChrome'
+import { HudButton } from '@/components/ui/HudButton'
 
 export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) {
   const earned = data.certificates.filter((certificate) => certificate.earned)
   const available = data.certificates.filter((certificate) => !certificate.earned)
+  // The list is public; signed-out visitors get sign-up prompts where earning would start.
+  const guest = useAcademyGuestEnroll()
   return (
     <div className="space-y-4 sm:space-y-5">
       <div>
@@ -42,7 +46,14 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
           title="Earned"
           subtitle={earned.length > 0 ? `${earned.length} issued in your name.` : undefined}
         />
-        {earned.length === 0 ? (
+        {guest.isGuest ? (
+          <div className={cn(ACADEMY_CARD, 'p-4 flex flex-col sm:flex-row sm:items-center gap-3')}>
+            <p className="text-sm text-ink-body flex-1">{ACADEMY_COPY.guestEarnedCertificates}</p>
+            <HudButton type="button" variant="primary" size="sm" onClick={guest.promptSignUp}>
+              {ACADEMY_COPY.guestSignUp}
+            </HudButton>
+          </div>
+        ) : earned.length === 0 ? (
           <AcademyEmpty>{ACADEMY_COPY.emptyEarned}</AcademyEmpty>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -59,11 +70,16 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
         ) : (
           <ul className={cn(ACADEMY_CARD, 'divide-y divide-line-subtle')}>
             {available.map((certificate) => (
-              <AvailableRow key={certificate.slug} certificate={certificate} />
+              <AvailableRow
+                key={certificate.slug}
+                certificate={certificate}
+                onSignUp={guest.isGuest ? guest.promptSignUp : undefined}
+              />
             ))}
           </ul>
         )}
       </section>
+      {guest.modal}
     </div>
   )
 }
@@ -113,7 +129,24 @@ function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
   )
 }
 
-function AvailableRow({ certificate }: { certificate: AcademyCertificateCard }) {
+function AvailableRow({ certificate, onSignUp }: { certificate: AcademyCertificateCard; onSignUp?: () => void }) {
+  if (onSignUp) {
+    return (
+      <li className="flex items-start gap-3 p-4">
+        <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-control bg-surface-2 text-ink-muted">
+          <Award className="w-4 h-4" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">{scopeLabel(certificate)}</p>
+          <h3 className="font-grotesk font-bold text-ink">{certificate.title}</h3>
+          <p className="text-xs text-ink-body leading-relaxed">{certificate.description}</p>
+        </div>
+        <HudButton type="button" variant="secondary" size="sm" className="shrink-0 self-center" onClick={onSignUp}>
+          {ACADEMY_COPY.guestEarnCertificate}
+        </HudButton>
+      </li>
+    )
+  }
   return (
     <li className="flex items-start gap-3 p-4">
       <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-control bg-surface-2 text-ink-muted">

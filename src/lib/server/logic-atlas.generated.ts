@@ -12,7 +12,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 12,
     "rules": 138,
-    "decisions": 65,
+    "decisions": 66,
     "anchors": 285,
     "drifted": 10,
     "flagged": 8
@@ -6592,7 +6592,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "dependsOn": [],
       "usedBy": [],
-      "decisions": [],
+      "decisions": [
+        "public-profiles-and-lessons"
+      ],
       "flag": null,
       "flow": null,
       "position": {
@@ -11111,6 +11113,60 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<p>Streak milestones count streak days, so with Mon to Fri a 7-day streak takes about a week and a half. The day is still the member&#39;s device date, within the existing one-day window.</p>"
+        }
+      ]
+    },
+    {
+      "id": "public-profiles-and-lessons",
+      "date": "2026-11-18",
+      "title": "Open member profiles and Academy lessons to signed-out visitors",
+      "summary": "Anyone can read member profiles, every Academy lesson and the certificate list. Saving progress, quizzes, notes, friend requests and earning certificates still need a free account, and each of those spots asks visitors to sign up.",
+      "domains": [
+        "data"
+      ],
+      "rules": [
+        "data.member-share-previews"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "db-services.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "academy.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/academy.ts"
+        },
+        {
+          "kind": "doc",
+          "label": "AcademyLessonView.tsx",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/academy/AcademyLessonView.tsx"
+        },
+        {
+          "kind": "doc",
+          "label": "document-feeds.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/document-feeds.ts"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Shared profile links failed for signed-out visitors with &quot;Authentication required&quot;, because the profile and loadout lookups demanded a session even though the page is meant to be public. The guest-access decision of 2026-11-12 had also kept Academy lessons and the certificate list behind an account, so most course content was invisible to search and to anyone following a shared link. Signup from guests is the main growth bottleneck.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<ul>\n<li>Member profiles are public: name, stage, avatar, join date, Moltmax rating, bio, traits, bonds and equipped gear. Signed-out visitors see &quot;Sign up to add friend&quot; and &quot;Build your own&quot; (the guest character editor) instead of friend actions.</li>\n<li>Every Academy lesson is readable without an account or enrollment. This supersedes &quot;lessons need an account&quot; in the 2026-11-12 guest-access decision.</li>\n<li>Saving progress, notes and quiz scores still needs an account and enrollment. For visitors, Mark complete reads &quot;Sign up to save your progress&quot; and Submit reads &quot;Sign up to submit&quot;; both open sign-up.</li>\n<li>The certificate list is public. Each certificate offers &quot;Sign up to earn this&quot;.</li>\n<li>Search: Academy tracks, courses and lessons are indexed and listed in the sitemap. Member profiles, member search and credential pages stay noindex, because they name people.</li>\n<li>Member search, the support form, your own profile and Settings stay members-only.</li>\n</ul>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Keep lessons behind enrollment with one preview lesson per course. Rejected: the preview gave search and visitors too little to judge a course by.</li>\n<li>Index member profiles. Rejected: profiles name members who did not choose to appear in search.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<ul>\n<li>Lesson bodies and quiz questions are sent to anyone. Quiz answers are still graded on the server and only recorded for signed-in learners.</li>\n<li>The sitemap now looks up each published course to list its lessons; it is cached for a day.</li>\n</ul>"
         }
       ]
     }

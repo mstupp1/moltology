@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, Circle, ListOrdered, Lock } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Bookmark, Check, CheckCircle2, Circle, ListOrdered } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer'
@@ -22,6 +22,7 @@ import {
   AcademyCrumbs,
   AcademyProgress,
   academyButtonLink,
+  useAcademyGuestEnroll,
 } from './AcademyChrome'
 import { lessonKindIcon } from './AcademyCourseView'
 import { AcademyVideo } from './AcademyVideo'
@@ -46,8 +47,11 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   const [note, setNote] = useState(lesson.note)
   const [noteStatus, setNoteStatus] = useState<NoteStatus>('idle')
   const [syllabusOpen, setSyllabusOpen] = useState(false)
+  // Lessons are public to read; saving progress, notes and quiz scores needs an account.
+  const guest = useAcademyGuestEnroll()
 
   async function enroll() {
+    if (guest.isGuest) return guest.promptSignUp()
     setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -71,6 +75,10 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   }
 
   async function save(action: 'complete' | 'position', extra?: { lastPositionSeconds?: number }) {
+    if (guest.isGuest) {
+      if (action === 'complete') guest.promptSignUp()
+      return
+    }
     if (action === 'complete') setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -100,6 +108,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   }
 
   async function saveNote() {
+    if (guest.isGuest) return
     if (note === detail.note) {
       setNoteStatus((status) => (status === 'dirty' ? 'idle' : status))
       return
@@ -119,6 +128,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   }
 
   async function submitQuiz() {
+    if (guest.isGuest) return guest.promptSignUp()
     setBusy(true)
     try {
       const token = await getAuthJWTToken()
@@ -220,198 +230,202 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
             </div>
           </header>
 
-          {detail.locked ? (
-            <section className={cn(ACADEMY_CARD, 'p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row sm:items-center gap-4')}>
-              <span className="flex w-10 h-10 shrink-0 items-center justify-center rounded-card bg-surface-2 text-cyan-glow">
-                <Lock className="w-5 h-5" aria-hidden="true" />
+          {!detail.enrolled ? (
+            <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3')}>
+              <span className="flex w-9 h-9 shrink-0 items-center justify-center rounded-card bg-surface-2 text-cyan-glow">
+                <Bookmark className="w-4 h-4" aria-hidden="true" />
               </span>
-              <p className="text-sm text-ink flex-1">{ACADEMY_COPY.lessonLocked}</p>
-              <HudButton type="button" variant="primary" disabled={busy} onClick={() => void enroll()}>
-                {busy ? 'Enrolling…' : 'Enroll'}
+              <p className="text-sm text-ink-body flex-1">
+                {guest.isGuest ? ACADEMY_COPY.lessonSaveGuest : ACADEMY_COPY.lessonSaveMember}
+              </p>
+              <HudButton type="button" variant="secondary" size="sm" disabled={busy} onClick={() => void enroll()}>
+                {busy ? 'Enrolling…' : guest.isGuest ? ACADEMY_COPY.guestEnroll : 'Enroll'}
               </HudButton>
             </section>
-          ) : (
-            <>
-              {detail.kind === 'video' ? (
-                <AcademyVideo
-                  title={detail.title}
-                  url={detail.videoUrl}
-                  provider={detail.videoProvider}
-                  posterUrl={detail.posterUrl}
-                  startAt={detail.lastPositionSeconds}
-                  onPause={(seconds) => {
-                    void save('position', { lastPositionSeconds: Math.floor(seconds) })
-                  }}
-                  onEnded={() => {
-                    if (!detail.completed) void save('complete')
-                  }}
-                />
-              ) : null}
+          ) : null}
 
-              {detail.kind === 'reading' ? (
-                <article className={cn(ACADEMY_CARD, 'p-5 sm:p-8')}>
-                  <MarkdownRenderer content={detail.body ?? ''} breaks={false} className="max-w-[68ch] text-[15px]" />
-                </article>
-              ) : null}
+          <>
+            {detail.kind === 'video' ? (
+              <AcademyVideo
+                title={detail.title}
+                url={detail.videoUrl}
+                provider={detail.videoProvider}
+                posterUrl={detail.posterUrl}
+                startAt={detail.lastPositionSeconds}
+                onPause={(seconds) => {
+                  void save('position', { lastPositionSeconds: Math.floor(seconds) })
+                }}
+                onEnded={() => {
+                  if (!detail.completed) void save('complete')
+                }}
+              />
+            ) : null}
 
-              {detail.kind === 'video' && detail.body?.trim() ? (
-                <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 lg:p-5 space-y-3')} aria-labelledby="lecture-notes-heading">
-                  <h2 id="lecture-notes-heading" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
-                    Lecture notes
-                  </h2>
-                  <MarkdownRenderer content={detail.body} breaks={false} className="max-w-[68ch]" />
-                </section>
-              ) : null}
+            {detail.kind === 'reading' ? (
+              <article className={cn(ACADEMY_CARD, 'p-5 sm:p-8')}>
+                <MarkdownRenderer content={detail.body ?? ''} breaks={false} className="max-w-[68ch] text-[15px]" />
+              </article>
+            ) : null}
 
-              {detail.kind === 'quiz' ? (
-                <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 lg:p-5 space-y-5')} aria-label="Quiz">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-xs text-ink-muted">
-                      Pass mark {detail.passingScore}%. Answer every question, then submit.
+            {detail.kind === 'video' && detail.body?.trim() ? (
+              <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 lg:p-5 space-y-3')} aria-labelledby="lecture-notes-heading">
+                <h2 id="lecture-notes-heading" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+                  Lecture notes
+                </h2>
+                <MarkdownRenderer content={detail.body} breaks={false} className="max-w-[68ch]" />
+              </section>
+            ) : null}
+
+            {detail.kind === 'quiz' ? (
+              <section className={cn(ACADEMY_CARD, 'p-3 sm:p-4 lg:p-5 space-y-5')} aria-label="Quiz">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs text-ink-muted">
+                    Pass mark {detail.passingScore}%. Answer every question, then submit.
+                  </p>
+                  {detail.quizPassed && !grade ? (
+                    <p className="text-xs font-bold text-emerald-500">
+                      Passed{detail.quizScore != null ? ` with ${detail.quizScore}%` : ''}
                     </p>
-                    {detail.quizPassed && !grade ? (
-                      <p className="text-xs font-bold text-emerald-500">
-                        Passed{detail.quizScore != null ? ` with ${detail.quizScore}%` : ''}
-                      </p>
-                    ) : null}
-                  </div>
-                  {detail.questions.map((question, questionIndex) => {
-                    const review = grade?.results.find((result) => result.id === question.id)
-                    return (
-                      <fieldset key={question.id} className="space-y-2" disabled={Boolean(grade)}>
-                        <legend className="text-sm text-ink font-bold mb-2">
-                          <span className="text-ink-muted tabular-nums mr-1.5">{questionIndex + 1}.</span>
-                          {question.prompt}
-                        </legend>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {question.choices.map((choice, choiceIndex) => {
-                            const selected = answers[question.id] === choiceIndex
-                            const isCorrect = review ? review.correctIndex === choiceIndex : false
-                            const isWrongPick = review ? selected && !review.correct : false
-                            return (
-                              <label
-                                key={choice}
-                                className={cn(
-                                  'relative flex items-start gap-2.5 rounded-control border px-3 py-2.5 text-sm cursor-pointer transition-[background-color,border-color,box-shadow] duration-150',
-                                  'has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-cyan-glow',
-                                  review
-                                    ? isCorrect
-                                      ? 'border-emerald-500/60 text-ink'
-                                      : isWrongPick
-                                        ? 'border-crimson-aggro/60 text-ink'
-                                        : 'border-line-subtle text-ink-muted'
-                                    : selected
-                                      ? 'border-transparent bg-surface-3 shadow-nav-current text-ink'
-                                      : 'border-line-subtle text-ink-body hover:bg-surface-2 hover:border-line',
-                                  grade && 'cursor-default',
-                                )}
-                              >
-                                <input
-                                  type="radio"
-                                  name={question.id}
-                                  className="sr-only"
-                                  checked={selected}
-                                  onChange={() => setAnswers((current) => ({ ...current, [question.id]: choiceIndex }))}
-                                />
-                                <span
-                                  className={cn(
-                                    'mt-0.5 flex w-4 h-4 shrink-0 items-center justify-center rounded-full border',
-                                    selected ? 'border-cyan-glow' : 'border-line',
-                                  )}
-                                  aria-hidden="true"
-                                >
-                                  {selected ? <span className="w-2 h-2 rounded-full bg-cyan-glow" /> : null}
-                                </span>
-                                <span>{choice}</span>
-                              </label>
-                            )
-                          })}
-                        </div>
-                        {review ? (
-                          <p className={cn('text-xs leading-relaxed', review.correct ? 'text-emerald-500' : 'text-crimson-text')}>
-                            {review.correct ? 'Correct.' : 'Not this one.'} <span className="text-ink-body">{review.explanation}</span>
-                          </p>
-                        ) : null}
-                      </fieldset>
-                    )
-                  })}
-                  <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-line-subtle">
-                    {grade ? (
-                      <>
-                        <p className={cn('text-sm font-bold pt-3', grade.passed ? 'text-emerald-500' : 'text-ink')}>
-                          Score: {grade.scorePercent}% ({grade.correctCount} of {grade.total}).
-                        </p>
-                        {!grade.passed ? (
-                          <HudButton type="button" variant="secondary" className="mt-3" onClick={retryQuiz}>
-                            Try again
-                          </HudButton>
-                        ) : null}
-                      </>
-                    ) : (
-                      <HudButton
-                        type="button"
-                        variant="primary"
-                        className="mt-3"
-                        disabled={busy || !allAnswered || detail.questions.length === 0}
-                        onClick={() => void submitQuiz()}
-                      >
-                        {busy ? 'Submitting…' : 'Submit quiz'}
-                      </HudButton>
-                    )}
-                  </div>
-                </section>
-              ) : null}
-
-              <nav
-                className={cn(ACADEMY_CARD, 'p-2 flex items-center gap-2')}
-                aria-label="Lesson navigation"
-              >
-                {detail.previousSlug ? (
-                  <Link
-                    to="/academy/courses/$slug/lessons/$lessonSlug"
-                    params={{ slug: detail.courseSlug, lessonSlug: detail.previousSlug }}
-                    className={cn(academyButtonLink('secondary'), 'px-3 border-transparent bg-transparent')}
-                  >
-                    <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                    <span className="hidden sm:inline">Previous</span>
-                    <span className="sr-only sm:hidden">Previous lesson</span>
-                  </Link>
-                ) : null}
-                <div className="flex-1 flex justify-center">
-                  {detail.kind !== 'quiz' ? (
-                    <HudButton
-                      type="button"
-                      variant={detail.completed ? 'ghost' : 'primary'}
-                      disabled={busy || detail.completed}
-                      onClick={() => void save('complete')}
-                      icon={detail.completed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : undefined}
-                    >
-                      {detail.completed ? 'Lesson complete' : busy ? 'Saving…' : 'Mark complete'}
-                    </HudButton>
                   ) : null}
                 </div>
-                {detail.nextSlug ? (
-                  <Link
-                    to="/academy/courses/$slug/lessons/$lessonSlug"
-                    params={{ slug: detail.courseSlug, lessonSlug: detail.nextSlug }}
-                    className={academyButtonLink(detail.completed ? 'primary' : 'secondary')}
-                  >
-                    <span className="hidden sm:inline">Next lesson</span>
-                    <span className="sm:hidden">Next</span>
-                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                  </Link>
-                ) : (
-                  <Link
-                    to="/academy/courses/$slug"
-                    params={{ slug: detail.courseSlug }}
-                    className={academyButtonLink('secondary')}
-                  >
-                    <span className="hidden sm:inline">Course overview</span>
-                    <span className="sm:hidden">Overview</span>
-                  </Link>
-                )}
-              </nav>
+                {detail.questions.map((question, questionIndex) => {
+                  const review = grade?.results.find((result) => result.id === question.id)
+                  return (
+                    <fieldset key={question.id} className="space-y-2" disabled={Boolean(grade)}>
+                      <legend className="text-sm text-ink font-bold mb-2">
+                        <span className="text-ink-muted tabular-nums mr-1.5">{questionIndex + 1}.</span>
+                        {question.prompt}
+                      </legend>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {question.choices.map((choice, choiceIndex) => {
+                          const selected = answers[question.id] === choiceIndex
+                          const isCorrect = review ? review.correctIndex === choiceIndex : false
+                          const isWrongPick = review ? selected && !review.correct : false
+                          return (
+                            <label
+                              key={choice}
+                              className={cn(
+                                'relative flex items-start gap-2.5 rounded-control border px-3 py-2.5 text-sm cursor-pointer transition-[background-color,border-color,box-shadow] duration-150',
+                                'has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-cyan-glow',
+                                review
+                                  ? isCorrect
+                                    ? 'border-emerald-500/60 text-ink'
+                                    : isWrongPick
+                                      ? 'border-crimson-aggro/60 text-ink'
+                                      : 'border-line-subtle text-ink-muted'
+                                  : selected
+                                    ? 'border-transparent bg-surface-3 shadow-nav-current text-ink'
+                                    : 'border-line-subtle text-ink-body hover:bg-surface-2 hover:border-line',
+                                grade && 'cursor-default',
+                              )}
+                            >
+                              <input
+                                type="radio"
+                                name={question.id}
+                                className="sr-only"
+                                checked={selected}
+                                onChange={() => setAnswers((current) => ({ ...current, [question.id]: choiceIndex }))}
+                              />
+                              <span
+                                className={cn(
+                                  'mt-0.5 flex w-4 h-4 shrink-0 items-center justify-center rounded-full border',
+                                  selected ? 'border-cyan-glow' : 'border-line',
+                                )}
+                                aria-hidden="true"
+                              >
+                                {selected ? <span className="w-2 h-2 rounded-full bg-cyan-glow" /> : null}
+                              </span>
+                              <span>{choice}</span>
+                            </label>
+                          )
+                        })}
+                      </div>
+                      {review ? (
+                        <p className={cn('text-xs leading-relaxed', review.correct ? 'text-emerald-500' : 'text-crimson-text')}>
+                          {review.correct ? 'Correct.' : 'Not this one.'} <span className="text-ink-body">{review.explanation}</span>
+                        </p>
+                      ) : null}
+                    </fieldset>
+                  )
+                })}
+                <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-line-subtle">
+                  {grade ? (
+                    <>
+                      <p className={cn('text-sm font-bold pt-3', grade.passed ? 'text-emerald-500' : 'text-ink')}>
+                        Score: {grade.scorePercent}% ({grade.correctCount} of {grade.total}).
+                      </p>
+                      {!grade.passed ? (
+                        <HudButton type="button" variant="secondary" className="mt-3" onClick={retryQuiz}>
+                          Try again
+                        </HudButton>
+                      ) : null}
+                    </>
+                  ) : (
+                    <HudButton
+                      type="button"
+                      variant="primary"
+                      className="mt-3"
+                      disabled={busy || !allAnswered || detail.questions.length === 0}
+                      onClick={() => void submitQuiz()}
+                    >
+                      {busy ? 'Submitting…' : guest.isGuest ? ACADEMY_COPY.guestSubmitQuiz : 'Submit quiz'}
+                    </HudButton>
+                  )}
+                </div>
+              </section>
+            ) : null}
 
+            <nav
+              className={cn(ACADEMY_CARD, 'p-2 flex items-center gap-2')}
+              aria-label="Lesson navigation"
+            >
+              {detail.previousSlug ? (
+                <Link
+                  to="/academy/courses/$slug/lessons/$lessonSlug"
+                  params={{ slug: detail.courseSlug, lessonSlug: detail.previousSlug }}
+                  className={cn(academyButtonLink('secondary'), 'px-3 border-transparent bg-transparent')}
+                >
+                  <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Previous</span>
+                  <span className="sr-only sm:hidden">Previous lesson</span>
+                </Link>
+              ) : null}
+              <div className="flex-1 flex justify-center">
+                {detail.kind !== 'quiz' ? (
+                  <HudButton
+                    type="button"
+                    variant={detail.completed ? 'ghost' : 'primary'}
+                    disabled={busy || detail.completed}
+                    onClick={() => void save('complete')}
+                    icon={detail.completed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : undefined}
+                  >
+                    {detail.completed ? 'Lesson complete' : busy ? 'Saving…' : guest.isGuest ? ACADEMY_COPY.guestSaveProgress : 'Mark complete'}
+                  </HudButton>
+                ) : null}
+              </div>
+              {detail.nextSlug ? (
+                <Link
+                  to="/academy/courses/$slug/lessons/$lessonSlug"
+                  params={{ slug: detail.courseSlug, lessonSlug: detail.nextSlug }}
+                  className={academyButtonLink(detail.completed ? 'primary' : 'secondary')}
+                >
+                  <span className="hidden sm:inline">Next lesson</span>
+                  <span className="sm:hidden">Next</span>
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+              ) : (
+                <Link
+                  to="/academy/courses/$slug"
+                  params={{ slug: detail.courseSlug }}
+                  className={academyButtonLink('secondary')}
+                >
+                  <span className="hidden sm:inline">Course overview</span>
+                  <span className="sm:hidden">Overview</span>
+                </Link>
+              )}
+            </nav>
+
+            {guest.isGuest ? null : (
               <section className={cn(ACADEMY_CARD, 'p-4 space-y-2')}>
                 <div className="flex items-center justify-between gap-3">
                   <label htmlFor="lesson-note" className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
@@ -437,8 +451,8 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
                   placeholder="Only you can see these. They save when you click away."
                 />
               </section>
-            </>
-          )}
+            )}
+          </>
         </div>
 
         <aside className="hidden lg:block lg:sticky lg:top-4">
@@ -456,6 +470,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
       >
         {syllabus}
       </HudBottomSheet>
+      {guest.modal}
     </div>
   )
 }
@@ -492,13 +507,10 @@ function LessonSyllabus({
             {module.lessons.map((item) => {
               number += 1
               const active = item.slug === lesson.slug
-              const open = lesson.enrolled || item.isPreview
               const status = item.completed ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" aria-label="Complete" />
-              ) : open ? (
-                <Circle className={cn('w-4 h-4 shrink-0', active ? 'text-cyan-glow' : 'text-line')} aria-hidden="true" />
               ) : (
-                <Lock className="w-4 h-4 text-ink-muted shrink-0" aria-label="Enroll to open" />
+                <Circle className={cn('w-4 h-4 shrink-0', active ? 'text-cyan-glow' : 'text-line')} aria-hidden="true" />
               )
               return (
                 <li key={item.slug}>

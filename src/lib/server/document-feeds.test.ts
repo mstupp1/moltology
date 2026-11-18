@@ -8,14 +8,28 @@ vi.mock('@/lib/server/api', () => ({
   getForumTopicsFn: vi.fn(),
 }))
 
+vi.mock('@/lib/server/academy-api', () => ({
+  getAcademyHomeFn: vi.fn(),
+  getAcademyCourseFn: vi.fn(),
+}))
+
 import { getBlogPostsFn, getForumCategoriesFn, getForumTopicsFn } from '@/lib/server/api'
-import { loadForumSitemapEntries, loadPublishedBlogPosts, rssXmlResponse, sitemapXmlResponse } from './document-feeds'
+import { getAcademyCourseFn, getAcademyHomeFn } from '@/lib/server/academy-api'
+import {
+  loadAcademySitemapEntries,
+  loadForumSitemapEntries,
+  loadPublishedBlogPosts,
+  rssXmlResponse,
+  sitemapXmlResponse,
+} from './document-feeds'
 
 describe('published document feeds', () => {
   beforeEach(() => {
     vi.mocked(getBlogPostsFn).mockReset()
     vi.mocked(getForumCategoriesFn).mockReset().mockResolvedValue([] as never)
     vi.mocked(getForumTopicsFn).mockReset().mockResolvedValue([] as never)
+    vi.mocked(getAcademyHomeFn).mockReset().mockResolvedValue({ tracks: [], courses: [] } as never)
+    vi.mocked(getAcademyCourseFn).mockReset()
   })
 
   it('uses live published posts when the listing source returns them', async () => {
@@ -104,5 +118,29 @@ describe('published document feeds', () => {
 
     vi.mocked(getForumCategoriesFn).mockRejectedValue(new Error('down'))
     await expect(loadForumSitemapEntries('https://moltology.org')).resolves.toEqual([])
+  })
+
+  it('lists published Academy tracks, courses and their lessons, and survives a failed course lookup', async () => {
+    vi.mocked(getAcademyHomeFn).mockResolvedValue({
+      tracks: [{ slug: 'first-molt' }],
+      courses: [{ slug: 'introduction-to-ecdysis' }, { slug: 'deep-water' }],
+    } as never)
+    vi.mocked(getAcademyCourseFn).mockImplementation((async ({ data }: { data: { slug: string } }) => {
+      if (data.slug === 'deep-water') throw new Error('trench silent')
+      return { modules: [{ lessons: [{ slug: 'first-shed-check' }, { slug: 'what-to-put-down-this-week' }] }] }
+    }) as never)
+
+    const entries = await loadAcademySitemapEntries('https://moltology.org')
+    expect(entries.map((entry) => entry.loc)).toEqual([
+      'https://moltology.org/academy/tracks/first-molt',
+      'https://moltology.org/academy/courses/introduction-to-ecdysis',
+      'https://moltology.org/academy/courses/introduction-to-ecdysis/lessons/first-shed-check',
+      'https://moltology.org/academy/courses/introduction-to-ecdysis/lessons/what-to-put-down-this-week',
+      'https://moltology.org/academy/courses/deep-water',
+    ])
+    expect(entries.some((entry) => entry.loc.includes('/certificates/'))).toBe(false)
+
+    vi.mocked(getAcademyHomeFn).mockRejectedValue(new Error('catalog down'))
+    await expect(loadAcademySitemapEntries('https://moltology.org')).resolves.toEqual([])
   })
 })

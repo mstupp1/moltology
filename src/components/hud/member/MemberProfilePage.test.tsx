@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemberProfilePage } from './MemberProfilePage'
 
 const mockNavigate = vi.fn()
@@ -118,6 +118,9 @@ describe('MemberProfilePage', () => {
     expect(mockGetMemberLoadout).toHaveBeenCalled()
     expect(screen.getByRole('button', { name: /sign up to add friend/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Request' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /build your own/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/character' })
   })
 
   it('shows a workspace ghost while the dossier hydrates', () => {
