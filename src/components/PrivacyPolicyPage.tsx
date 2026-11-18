@@ -15,9 +15,9 @@ const Section: React.FC<{ id: string; title: string; children: React.ReactNode }
 }) => (
   <section id={id} className="mb-12 scroll-mt-24">
     <div className="flex items-center gap-3 mb-4 pb-3 border-b border-cyan-900/40">
-      <h2 className="text-sm font-bold text-cyan-300 tracking-widest uppercase">{title}</h2>
+      <h2 className="text-sm font-semibold text-cyan-300">{title}</h2>
     </div>
-    <div className="text-sm text-gray-400 leading-relaxed space-y-3">{children}</div>
+    <div className="text-sm text-ink-muted leading-relaxed space-y-3">{children}</div>
   </section>
 )
 
@@ -29,20 +29,20 @@ export const PrivacyPolicyPage: React.FC = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#0a0f0f] text-[#dfe3e3] font-sans">
+    <div className="min-h-screen bg-surface-1 text-ink font-sans">
       <PublicHeader />
 
       {/* Hero */}
       <div className="relative pt-28 pb-12 px-6 text-center border-b border-cyan-950/60">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,255,255,0.06)_0%,transparent_70%)] pointer-events-none" />
-        <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 text-[10px] text-cyan-400 tracking-widest uppercase mb-6">
+        <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 text-2xs text-cyan-400 mb-6">
           <Shield className="w-3 h-3" />
           <span>Moltology privacy</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">
+        <h1 className="text-2xl md:text-3xl font-semibold text-white mb-3 tracking-tight">
           Privacy Policy
         </h1>
-        <p className="text-xs text-gray-500 max-w-xl mx-auto">
+        <p className="text-xs text-ink-muted max-w-xl mx-auto">
           Moltology &nbsp;|&nbsp; Last updated: {PRIVACY_UPDATED}
         </p>
       </div>
@@ -51,8 +51,8 @@ export const PrivacyPolicyPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-10">
         {/* Sticky sidebar TOC */}
         <aside className="hidden md:block w-52 shrink-0">
-          <div className="sticky top-24 space-y-1 text-[10px] text-gray-500 tracking-widest uppercase">
-            <p className="text-cyan-500 font-bold mb-3">Contents</p>
+          <div className="eyebrow sticky top-24 space-y-1">
+            <p className="text-cyan-500 font-semibold mb-3">Contents</p>
             {PRIVACY_SECTIONS.map(({ id, title }) => (
               <a
                 key={id}
@@ -67,7 +67,7 @@ export const PrivacyPolicyPage: React.FC = () => {
 
         {/* Body */}
         <article className="flex-1 min-w-0">
-          <p className="text-sm text-gray-400 mb-10 leading-relaxed">{PRIVACY_INTRO}</p>
+          <p className="text-sm text-ink-muted mb-10 leading-relaxed">{PRIVACY_INTRO}</p>
           {PRIVACY_SECTIONS.map(({ id, title, paragraphs, links }) => (
             <Section key={id} id={id} title={title}>
               {paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
@@ -79,7 +79,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             </Section>
           ))}
 
-          <div className="mt-4 pt-6 border-t border-cyan-950/60 text-[10px] text-gray-600">
+          <div className="mt-4 pt-6 border-t border-cyan-950/60 text-2xs text-ink-muted/70">
             © {CURRENT_YEAR} Moltology. Last updated: {PRIVACY_UPDATED}
           </div>
         </article>

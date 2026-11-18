@@ -72,7 +72,7 @@ export function HudTopControls({
       onClick={onSignUp}
       aria-label="Sign up"
       title="Sign up"
-      className={`h-9 px-3 mx-1 inline-flex items-center gap-1.5 rounded-full bg-cyan-glow text-abyss text-xs font-bold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
+      className={`h-9 px-3 mx-1 inline-flex items-center gap-1.5 rounded-full bg-cyan-glow text-abyss text-xs font-semibold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
     >
       <UserPlus className="w-4 h-4" aria-hidden="true" />
       <span>Sign up</span>

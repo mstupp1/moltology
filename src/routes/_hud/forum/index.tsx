@@ -265,12 +265,12 @@ function ForumIndexPage() {
 
         <Link
           to="/forum/leaderboard"
-          className="lg:hidden flex items-center gap-2 min-h-11 px-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen text-xs font-bold text-ink hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className="lg:hidden flex items-center gap-2 min-h-11 px-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen text-xs font-semibold text-ink hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           data-testid="forum-leaderboard-link"
         >
           <Trophy className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
           <span className="flex-1">Leaderboard</span>
-          <span className="text-[11px] font-normal text-ink-muted">Top members this week</span>
+          <span className="text-2xs font-normal text-ink-muted">Top members this week</span>
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
@@ -295,7 +295,7 @@ function ForumIndexPage() {
             <section aria-labelledby="forum-posts-heading" className="min-w-0 space-y-3">
               <header className="space-y-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h2 id="forum-posts-heading" className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase flex items-center gap-2">
+                  <h2 id="forum-posts-heading" className="font-grotesk text-sm font-semibold text-ink flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
                     Posts
                   </h2>
@@ -345,7 +345,7 @@ function ForumIndexPage() {
                   {filtering ? (
                     <>
                       <SearchX className="w-6 h-6 text-ink-muted mx-auto" aria-hidden="true" />
-                      <p className="text-sm font-bold text-ink">No posts match</p>
+                      <p className="text-sm font-semibold text-ink">No posts match</p>
                       <p className="text-xs text-ink-muted">Try other words or look across every board.</p>
                       <HudButton type="button" variant="secondary" size="sm" onClick={clearFilters}>
                         Clear filters
@@ -354,7 +354,7 @@ function ForumIndexPage() {
                   ) : (
                     <>
                       <MessageSquare className="w-6 h-6 text-ink-muted mx-auto" aria-hidden="true" />
-                      <p className="text-sm font-bold text-ink">No posts yet</p>
+                      <p className="text-sm font-semibold text-ink">No posts yet</p>
                       <p className="text-xs text-ink-muted">Start the first conversation.</p>
                     </>
                   )}

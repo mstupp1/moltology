@@ -44,7 +44,7 @@ export function DashboardPanel({
             {icon}
           </span>
           <div className="min-w-0">
-            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase leading-tight truncate">{title}</h2>
+            <h2 className="font-grotesk text-sm font-semibold text-ink leading-tight truncate">{title}</h2>
             {subtitle && <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">{subtitle}</p>}
           </div>
         </div>
@@ -73,7 +73,7 @@ export function DashboardPanelAction({ label, onClick, ariaLabel, testId }: Dash
       aria-label={ariaLabel}
       data-testid={testId}
       className={cn(
-        'inline-flex items-center gap-0.5 min-h-8 px-2 -mr-2 rounded-control text-xs font-bold text-cyan-glow hover:bg-surface-2 transition-colors whitespace-nowrap',
+        'inline-flex items-center gap-0.5 min-h-8 px-2 -mr-2 rounded-control text-xs font-semibold text-cyan-glow hover:bg-surface-2 transition-colors whitespace-nowrap',
         FOCUS,
       )}
     >
@@ -90,7 +90,7 @@ export function DashboardEmptyRow({ title, body, testId }: { title: string; body
       data-testid={testId}
       className="rounded-control border border-dashed border-line-subtle px-3 py-2.5 text-xs text-ink-muted leading-relaxed"
     >
-      <span className="font-bold text-ink">{title}</span>
+      <span className="font-semibold text-ink">{title}</span>
       {body ? (
         <>
           {'. '}

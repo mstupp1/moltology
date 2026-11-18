@@ -218,7 +218,7 @@ export function ActivityStreamPage() {
         <FeedRowsGhost />
       ) : showEmpty ? (
         <div className="rounded-card border border-line-subtle bg-surface-1 px-4 py-10 text-center space-y-1.5">
-          <p className="font-grotesk text-sm font-bold text-ink">{empty.title}</p>
+          <p className="font-grotesk text-sm font-semibold text-ink">{empty.title}</p>
           <p className="text-xs text-ink-muted leading-relaxed max-w-md mx-auto">{empty.body}</p>
         </div>
       ) : (
@@ -227,7 +227,7 @@ export function ActivityStreamPage() {
             <section key={group.key} aria-labelledby={`activity-day-${group.key}`} className="space-y-1.5">
               <h2
                 id={`activity-day-${group.key}`}
-                className="px-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted"
+                className="px-1 text-2xs font-semibold text-ink-muted"
               >
                 {group.label}
               </h2>

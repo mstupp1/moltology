@@ -12,9 +12,19 @@ describe('countUiTokenViolations', () => {
     expect(countUiTokenViolations(src)).toEqual({})
   })
 
-  it('counts chamfer corners and text under 11px', () => {
-    const src = `"chamfer-corner chamfer-corner-lg text-[10px] text-[8.5px] text-[11px] text-[12px]"`
-    expect(countUiTokenViolations(src)).toEqual({ chamfer: 2, 'tiny-text': 2 })
+  it('counts cut corners, text under 11px and one-off UI sizes', () => {
+    const src = `"chamfer-corner chamfer-corner-lg hud-cut text-[10px] text-[8.5px] text-[11px] text-[12.5px] text-[0.8rem] text-[18px] text-[2.6rem] text-2xs text-ui"`
+    expect(countUiTokenViolations(src)).toEqual({ chamfer: 3, 'tiny-text': 2, 'ui-text-size': 3 })
+  })
+
+  it('counts positive tracking, uppercase and heavy weights but not the eyebrow class or negative tracking', () => {
+    const src = `"eyebrow uppercase sm:uppercase tracking-[0.08em] tracking-widest tracking-tight tracking-[-0.02em] tracking-eyebrow font-bold font-black font-semibold"`
+    expect(countUiTokenViolations(src)).toEqual({ uppercase: 2, tracking: 2, 'heavy-weight': 2 })
+  })
+
+  it('counts Tailwind greys, legacy colours and glows', () => {
+    const src = `"text-slate-400 border-gray-800/60 bg-benthic-border text-sacred-red bg-benthic-vignette shadow-hud-cyan shadow-[0_0_20px_rgba(0,195,255,0.4)] shadow-[0_4px_20px_rgba(0,0,0,0.45)] text-ink-muted"`
+    expect(countUiTokenViolations(src)).toEqual({ 'default-grey': 2, 'legacy-token': 2, glow: 2 })
   })
 
   it('counts radii off the token scale but not the token names or rounded-full', () => {
@@ -39,6 +49,13 @@ describe('findRegressions', () => {
       chamfer: 1,
       'tiny-text': 0,
       'off-scale-radius': 0,
+      'ui-text-size': 0,
+      tracking: 0,
+      uppercase: 0,
+      'heavy-weight': 0,
+      'default-grey': 0,
+      'legacy-token': 0,
+      glow: 0,
     })
   })
 })

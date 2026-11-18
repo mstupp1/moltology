@@ -70,7 +70,7 @@ export const WhatIsMoltologySubnav: React.FC = () => {
                 <li key={item.id} className="shrink-0">
                   <Link
                     to={item.path}
-                    className={`relative inline-flex items-center min-h-11 px-3.5 text-[13px] sm:text-sm font-grotesk font-semibold tracking-[0.02em] transition-[color,background-color,box-shadow] duration-300 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                    className={`relative inline-flex items-center min-h-11 px-3.5 text-ui sm:text-sm font-grotesk font-semibold transition-[color,background-color,box-shadow] duration-300 rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                       active
                         ? 'text-ink bg-surface-3 shadow-nav-current'
                         : 'text-ink-muted hover:text-ink hover:bg-white/[0.06]'

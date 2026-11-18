@@ -180,7 +180,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 bg-[#020408]/85 backdrop-blur-md guide-overlay"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 bg-abyss/85 backdrop-blur-md guide-overlay"
       onClick={onClose}
     >
       <div
@@ -189,18 +189,18 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`relative flex flex-col w-full max-h-[92dvh] sm:max-h-[calc(100dvh-3rem)] bg-[#040a15] border border-[#00c3ff]/30 border-b-0 sm:border-b rounded-t-2xl sm:rounded-2xl shadow-[0_0_60px_rgba(0,195,255,0.18)] text-[#dfe3e3] overflow-hidden outline-hidden guide-panel ${
+        className={`relative flex flex-col w-full max-h-[92dvh] sm:max-h-[calc(100dvh-3rem)] bg-surface-1 border border-cyan-glow/30 border-b-0 sm:border-b rounded-t-2xl sm:rounded-2xl shadow-[0_0_60px_rgba(0,195,255,0.18)] text-ink overflow-hidden outline-hidden guide-panel ${
           step === 'claim' ? 'sm:max-w-[840px]' : 'sm:max-w-lg'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Glow Bar */}
-        <div className="h-1 shrink-0 bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8]" />
+        <div className="h-1 shrink-0 bg-gradient-to-r from-cyan-glow via-cyan-glow to-cyan-glow" />
 
         {/* Close Button: outside the scroll area so it stays reachable */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 p-2 rounded-full text-[#839493] bg-[#040a15]/80 hover:text-white hover:bg-white/10 transition-colors z-10 cursor-pointer"
+          className="absolute top-3 right-3 p-2 rounded-full text-ink-muted bg-surface-1/80 hover:text-white hover:bg-white/10 transition-colors z-10 cursor-pointer"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
@@ -213,7 +213,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           {step === 'claim' ? (
             <div className="md:grid md:grid-cols-[280px_minmax(0,1fr)]">
               {/* Cover column (desktop) */}
-              <div className="hidden md:flex flex-col items-center justify-center gap-6 px-8 py-10 border-r border-white/10 bg-[#02070d]">
+              <div className="hidden md:flex flex-col items-center justify-center gap-6 px-8 py-10 border-r border-white/10 bg-abyss">
                 <img
                   src={getAssetUrl('images/guide/moltmaxxing-cover-v2.webp')}
                   alt="Cover of the 2026 Moltmaxxing Field Manual"
@@ -222,7 +222,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                   decoding="async"
                   className="w-48 aspect-[2/3] object-cover rounded-sm border border-white/15 shadow-[0_24px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(0,195,255,0.2)] -rotate-3"
                 />
-                <p className="text-xs text-[#839493] font-sans text-center">
+                <p className="text-xs text-ink-muted font-sans text-center">
                   {GUIDE_PDF_PAGES}-page PDF · Printable · Free
                 </p>
               </div>
@@ -239,34 +239,34 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                     className="md:hidden shrink-0 w-16 h-24 object-cover rounded-lg border border-white/15 shadow-lg -rotate-3"
                   />
                   <div className="space-y-2 min-w-0">
-                    <p className="text-[11px] font-sans font-bold text-[#00ffcc] uppercase tracking-wider">
+                    <p className="eyebrow">
                       Free field manual
                     </p>
                     <h2
                       id="guide-modal-title"
-                      className="text-[22px] sm:text-3xl font-black font-grotesk text-white tracking-tight leading-[1.15]"
+                      className="text-[22px] sm:text-3xl font-semibold font-grotesk text-white tracking-tight leading-[1.15]"
                     >
                       Shed the clutter. Finish what you start.
                     </h2>
                   </div>
                 </div>
 
-                <p className="text-sm text-[#a9b6b5] leading-relaxed">
+                <p className="text-sm text-ink-muted leading-relaxed">
                   The Moltmaxxing Field Manual is a short, printable plan for a calmer, more focused day. Read it
                   tonight, use it tomorrow morning.
                 </p>
 
                 <div className="space-y-3">
-                  <h3 className="text-xs font-sans font-bold text-[#dfe3e3] uppercase tracking-wider">
+                  <h3 className="eyebrow">
                     What’s inside, and why it helps
                   </h3>
                   <ul className="space-y-3">
                     {GUIDE_BENEFITS.map(({ icon: Icon, title, body }) => (
                       <li key={title} className="flex gap-3">
-                        <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#00c3ff]/10 border border-[#00c3ff]/20 text-[#00c3ff]">
+                        <span className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-glow/10 border border-cyan-glow/20 text-cyan-glow">
                           <Icon className="w-4 h-4" aria-hidden="true" />
                         </span>
-                        <p className="min-w-0 text-[13px] leading-snug text-[#839493] pt-0.5">
+                        <p className="min-w-0 text-ui leading-snug text-ink-muted pt-0.5">
                           <strong className="font-semibold text-white">{title}</strong> {body}
                         </p>
                       </li>
@@ -276,12 +276,12 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
 
                 {/* Email Submission Form */}
                 <form onSubmit={handleSubmit} className="space-y-3">
-                  <label htmlFor="lead-email" className="block text-xs font-sans font-semibold text-[#dfe3e3]">
+                  <label htmlFor="lead-email" className="block text-xs font-sans font-semibold text-ink">
                     Your email
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2.5">
                     <div className="relative flex-1">
-                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#839493]" aria-hidden="true" />
+                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" aria-hidden="true" />
                       <input
                         id="lead-email"
                         type="email"
@@ -293,13 +293,13 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                         placeholder="you@example.com"
                         aria-invalid={error ? true : undefined}
                         aria-describedby={error ? 'lead-email-error' : undefined}
-                        className="w-full pl-10 pr-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-base sm:text-sm placeholder:text-[#839493]/60 focus:outline-hidden focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-abyss border border-white/20 rounded-lg text-white font-sans text-base sm:text-sm placeholder:text-ink-muted/60 focus:outline-hidden focus:border-cyan-glow focus:ring-1 focus:ring-cyan-glow transition-all"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="shrink-0 py-3 px-5 rounded-lg font-grotesk font-bold text-sm bg-gradient-to-r from-[#00c3ff] to-[#00ffcc] hover:brightness-110 text-[#020408] transition-all shadow-[0_0_24px_rgba(0,195,255,0.35)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                      className="shrink-0 py-3 px-5 rounded-lg font-grotesk font-semibold text-sm bg-gradient-to-r from-cyan-glow to-cyan-glow hover:brightness-110 text-abyss transition-all shadow-[0_0_24px_rgba(0,195,255,0.35)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                     >
                       {loading ? (
                         <span>Preparing your download…</span>
@@ -312,7 +312,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                     </button>
                   </div>
                   {error && (
-                    <p id="lead-email-error" role="alert" className="text-xs text-[#ff6b61] font-sans">
+                    <p id="lead-email-error" role="alert" className="text-xs text-crimson-hover font-sans">
                       {error}
                     </p>
                   )}
@@ -323,9 +323,9 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                       type="checkbox"
                       checked={emailOptIn}
                       onChange={(e) => setEmailOptIn(e.target.checked)}
-                      className="mt-0.5 w-4 h-4 shrink-0 rounded border-white/20 bg-[#020408] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                      className="mt-0.5 w-4 h-4 shrink-0 rounded border-white/20 bg-abyss text-cyan-glow focus:ring-cyan-glow focus:ring-offset-0 cursor-pointer accent-cyan-glow"
                     />
-                    <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-snug">
+                    <span className="text-xs text-ink-muted group-hover:text-ink transition-colors font-sans leading-snug">
                       Send me occasional updates, new field manuals, and articles.
                     </span>
                   </label>
@@ -338,7 +338,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                     onExpire={() => setTurnstileToken(null)}
                   />
 
-                  <p className="text-[11px] text-[#839493] font-sans">
+                  <p className="text-2xs text-ink-muted font-sans">
                     The download starts right away. We only email you if you tick the box.
                   </p>
                 </form>
@@ -347,36 +347,36 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           ) : (
             /* Step 2: Download confirmation + Free Account Upsell Bridge */
             <div className="px-5 pt-6 pb-6 sm:p-8 space-y-6 text-center">
-              <div className="inline-flex p-3 rounded-full bg-[#00ffcc]/10 border border-[#00ffcc]/40 text-[#00ffcc]">
+              <div className="inline-flex p-3 rounded-full bg-cyan-glow/10 border border-cyan-glow/40 text-cyan-glow">
                 <CheckCircle2 className="w-9 h-9" aria-hidden="true" />
               </div>
 
               <div className="space-y-2">
                 <h2
                   id="guide-modal-success-title"
-                  className="text-2xl sm:text-[28px] font-black font-grotesk text-white tracking-tight leading-tight"
+                  className="text-2xl sm:text-[28px] font-semibold font-grotesk text-white tracking-tight leading-tight"
                 >
                   Your manual is downloading
                 </h2>
-                <p className="text-sm text-[#a9b6b5] max-w-sm mx-auto leading-relaxed">
+                <p className="text-sm text-ink-muted max-w-sm mx-auto leading-relaxed">
                   If it didn’t start, use the download link at the bottom of this window.
                 </p>
               </div>
 
               {/* Free Account Bridge Box */}
-              <div className="p-5 rounded-xl bg-white/[0.03] border border-[#00c3ff]/30 text-left space-y-4">
+              <div className="p-5 rounded-xl bg-white/[0.03] border border-cyan-glow/30 text-left space-y-4">
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold font-grotesk text-white">
+                  <h3 className="text-base font-semibold font-grotesk text-white">
                     Next: turn the checklist into a habit
                   </h3>
-                  <p className="text-xs text-[#839493] leading-relaxed">
+                  <p className="text-xs text-ink-muted leading-relaxed">
                     A free Moltology account gives the manual somewhere to live.
                   </p>
                 </div>
                 <ul className="space-y-2">
                   {ACCOUNT_PERKS.map((perk) => (
-                    <li key={perk} className="flex items-start gap-2 text-[13px] text-[#dfe3e3]">
-                      <Check className="w-4 h-4 text-[#00ffcc] shrink-0 mt-0.5" aria-hidden="true" />
+                    <li key={perk} className="flex items-start gap-2 text-ui text-ink">
+                      <Check className="w-4 h-4 text-cyan-glow shrink-0 mt-0.5" aria-hidden="true" />
                       <span>{perk}</span>
                     </li>
                   ))}
@@ -384,7 +384,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
 
                 <button
                   onClick={handleCreateAccount}
-                  className="w-full py-3 px-4 rounded-lg font-grotesk font-bold text-sm bg-[#00c3ff] hover:bg-[#00e5ff] text-[#020408] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(0,195,255,0.35)]"
+                  className="w-full py-3 px-4 rounded-lg font-grotesk font-semibold text-sm bg-cyan-glow hover:bg-cyan-hover text-abyss transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(0,195,255,0.35)]"
                 >
                   <UserPlus className="w-4 h-4" aria-hidden="true" />
                   <span>Create my free account</span>
@@ -399,7 +399,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   download={GUIDE_PDF_FILENAME}
-                  className="inline-flex items-center gap-1.5 text-[#00c3ff] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-cyan-glow hover:underline"
                 >
                   <Download className="w-3.5 h-3.5" aria-hidden="true" />
                   <span>Download again</span>
@@ -407,7 +407,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                 <span className="text-white/20" aria-hidden="true">|</span>
                 <button
                   onClick={onClose}
-                  className="text-[#839493] hover:text-white transition-colors cursor-pointer"
+                  className="text-ink-muted hover:text-white transition-colors cursor-pointer"
                 >
                   Close
                 </button>

@@ -15,7 +15,7 @@ describe('HudGhostLoader Primitives', () => {
       const skeleton = container.firstChild as HTMLElement
       expect(skeleton).toBeInTheDocument()
       expect(skeleton).toHaveClass('animate-pulse')
-      expect(skeleton).toHaveClass('bg-[#101515]')
+      expect(skeleton).toHaveClass('bg-surface-1')
       expect(skeleton).toHaveStyle({ width: '150px', height: '30px' })
     })
 
@@ -24,7 +24,7 @@ describe('HudGhostLoader Primitives', () => {
         <HudGhostSkeleton variant="crimson" preset="badge" />
       )
       const skeleton = container.firstChild as HTMLElement
-      expect(skeleton).toHaveClass('bg-[#180d0d]')
+      expect(skeleton).toHaveClass('bg-surface-crimson')
     })
   })
 

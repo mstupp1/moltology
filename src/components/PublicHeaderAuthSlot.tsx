@@ -85,7 +85,7 @@ export function PublicHeaderAuthSlot({
             <button
               type="button"
               onClick={() => onOpenAuth?.('signup')}
-              className={`h-9 px-3.5 mx-0.5 inline-flex items-center rounded-full bg-cyan-glow text-abyss text-sm font-bold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
+              className={`h-9 px-3.5 mx-0.5 inline-flex items-center rounded-full bg-cyan-glow text-abyss text-sm font-semibold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
             >
               Join
             </button>
@@ -159,7 +159,7 @@ export function PublicHeaderAuthSlot({
         </button>
         <button
           onClick={() => onOpenAuth?.('signup')}
-          className={`h-9 px-4 mx-0.5 inline-flex items-center gap-1.5 rounded-full bg-cyan-glow text-abyss text-sm font-bold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
+          className={`h-9 px-4 mx-0.5 inline-flex items-center gap-1.5 rounded-full bg-cyan-glow text-abyss text-sm font-semibold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
         >
           <UserPlus className="w-4 h-4" aria-hidden="true" />
           <span>Join</span>
@@ -206,7 +206,7 @@ export function PublicHeaderAuthSlot({
           onMobileClose?.()
           onOpenAuth?.('signup')
         }}
-        className={`h-12 w-full inline-flex items-center justify-center gap-2 rounded-control bg-cyan-glow text-abyss font-grotesk font-bold text-base hover:bg-cyan-hover transition-colors active:scale-[0.99] ${focusRing}`}
+        className={`h-12 w-full inline-flex items-center justify-center gap-2 rounded-control bg-cyan-glow text-abyss font-grotesk font-semibold text-base hover:bg-cyan-hover transition-colors active:scale-[0.99] ${focusRing}`}
       >
         <UserPlus className="w-5 h-5" aria-hidden="true" />
         <span>Join Moltology</span>

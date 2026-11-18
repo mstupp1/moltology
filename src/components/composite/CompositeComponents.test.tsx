@@ -90,7 +90,7 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('Directive title')).toBeInTheDocument()
     expect(screen.getByText('subtitle')).toBeInTheDocument()
     expect(screen.getByText('Read the full dispatch')).toBeInTheDocument()
-    expect(screen.getByText('Visit Moltology').closest('.hud-cut')).toHaveClass('bg-cyan-glow')
+    expect(screen.getByText('Visit Moltology').closest('.bg-cyan-glow')).not.toBeNull()
   })
 
   it('renders ReelOutroCard with the lockup, headline and CTA, without the old telemetry lines', () => {

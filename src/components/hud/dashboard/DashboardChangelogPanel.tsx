@@ -45,9 +45,9 @@ export function DashboardChangelogPanel() {
               params={{ slug: entry.slug }}
               className={cn('group grid grid-cols-[3.25rem_minmax(0,1fr)] gap-3 py-2 sm:py-2.5 rounded-control hover:bg-surface-2 -mx-2 px-2 transition-colors', DASHBOARD_FOCUS)}
             >
-              <span className="text-[11px] font-bold text-ink-muted tabular-nums pt-0.5">{formatReleaseDay(entry.releasedAt)}</span>
+              <span className="text-2xs font-semibold text-ink-muted tabular-nums pt-0.5">{formatReleaseDay(entry.releasedAt)}</span>
               <span className="min-w-0 flex flex-col gap-0.5">
-                <span className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-1">
+                <span className="text-sm font-semibold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-1">
                   {entry.title}
                 </span>
                 <span className="text-xs text-ink-muted leading-relaxed line-clamp-1">{entry.summary}</span>

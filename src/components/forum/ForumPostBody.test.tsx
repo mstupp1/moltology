@@ -44,7 +44,7 @@ describe('ForumPostBody', () => {
     render(
       <ForumPostBody content="This is **bold**, this is *italic*, here is `inline_code`, and [Website](https://moltology.com)." />,
     )
-    expect(screen.getByText('bold')).toHaveClass('font-bold')
+    expect(screen.getByText('bold')).toHaveClass('font-semibold')
     expect(screen.getByText('italic')).toHaveClass('italic')
     expect(screen.getByText('inline_code')).toHaveClass('font-mono')
     const link = screen.getByRole('link', { name: 'Website' })

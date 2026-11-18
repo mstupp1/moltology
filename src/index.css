@@ -45,8 +45,13 @@
     min-height: 100%;
     background-color: #030708;
     color: #dfe3e3;
-    font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     overflow-x: hidden;
+  }
+  /* Page and section titles keep the brand face; UI and reading text are Inter. */
+  h1,
+  h2 {
+    font-family: 'Space Grotesk', 'Inter', ui-sans-serif, sans-serif;
   }
   svg.lucide {
     stroke-width: 2.2px;
@@ -105,10 +110,18 @@
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 45%);
 }
 
-/* The one cut corner (top right) used on filled primary buttons. Apply to the fill layer, not
-   the focusable element, so the focus outline is not clipped. */
-.hud-cut {
-  clip-path: polygon(0 0, calc(100% - var(--hud-cut, 10px)) 0, 100% var(--hud-cut, 10px), 100% 100%, 0 100%);
+@layer components {
+  /* Small uppercase section label: the one place UI text is uppercase and tracked. Colour and
+     spacing come from the element (text-ink-muted by default). */
+  .eyebrow {
+    font-family: 'Inter', ui-sans-serif, sans-serif;
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-muted, #8fa0a0);
+  }
 }
 
 /* GlowEmblem: the emblem in its own light (src/components/ui/GlowEmblem.tsx). The halo is a

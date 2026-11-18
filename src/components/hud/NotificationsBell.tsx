@@ -18,10 +18,10 @@ export interface NotificationsBellProps {
 
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-const sectionLabel = 'text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted'
+const sectionLabel = 'eyebrow'
 const listFrame = 'rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden'
 const countBadge =
-  'min-w-[18px] h-[18px] px-1 rounded-chip bg-crimson-aggro text-abyss text-[11px] font-bold leading-[18px] text-center tabular-nums'
+  'min-w-[18px] h-[18px] px-1 rounded-chip bg-crimson-aggro text-abyss text-2xs font-semibold leading-[18px] text-center tabular-nums'
 
 /**
  * Friend requests, forum replies and mentions. The inbox reads on load and on tab
@@ -92,7 +92,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
         className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${unread ? 'bg-cyan-glow' : 'bg-surface-3'}`}
       />
       <span className="min-w-0 flex-1 space-y-0.5">
-        {title && <span className="block text-xs font-bold text-ink">{title}</span>}
+        {title && <span className="block text-xs font-semibold text-ink">{title}</span>}
         {detail && <span className="block text-xs text-ink-body leading-snug">{detail}</span>}
       </span>
     </div>
@@ -101,7 +101,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
   const renderPanel = () => (
     <>
       <div className="flex items-center justify-between gap-2">
-        <span className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Notifications</span>
+        <span className="font-grotesk text-sm font-semibold text-ink">Notifications</span>
         <div className="flex items-center gap-1">
           {unreadCount > 0 && (
             <button
@@ -110,7 +110,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
                 e.stopPropagation()
                 void markAllRead()
               }}
-              className={`min-h-8 px-1.5 rounded-control text-[11px] font-bold text-ink-muted hover:text-ink transition-colors ${focusRing}`}
+              className={`min-h-8 px-1.5 rounded-control text-2xs font-semibold text-ink-muted hover:text-ink transition-colors ${focusRing}`}
             >
               Mark all read
             </button>
@@ -138,7 +138,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
         ) : (
           <div className="py-6 text-center space-y-1">
             <Bell className="w-5 h-5 text-ink-muted mx-auto" aria-hidden="true" />
-            <div className="text-sm font-bold text-ink">Nothing new</div>
+            <div className="text-sm font-semibold text-ink">Nothing new</div>
             <div className="text-xs text-ink-muted">Friend requests, replies, and mentions show up here.</div>
           </div>
         ))}
@@ -155,7 +155,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
                     <>
                       <button
                         type="button"
-                        className={`min-h-8 px-2.5 text-[11px] font-bold rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss transition-colors ${focusRing}`}
+                        className={`min-h-8 px-2.5 text-2xs font-semibold rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss transition-colors ${focusRing}`}
                         onClick={(e) => {
                           e.stopPropagation()
                           void acceptFriendRequest(n.payload.requestId!, n.id)
@@ -165,7 +165,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
                       </button>
                       <button
                         type="button"
-                        className={`min-h-8 px-2.5 text-[11px] font-bold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
+                        className={`min-h-8 px-2.5 text-2xs font-semibold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
                         onClick={(e) => {
                           e.stopPropagation()
                           void declineFriendRequest(n.payload.requestId!, n.id)
@@ -181,7 +181,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
                       params={{
                         profileId: resolveMemberPublicParam({ id: n.payload.profileId, handle: n.actorHandle }),
                       }}
-                      className={`min-h-8 inline-flex items-center px-2.5 text-[11px] font-bold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
+                      className={`min-h-8 inline-flex items-center px-2.5 text-2xs font-semibold rounded-control border border-line text-ink-muted hover:text-ink hover:border-line-strong transition-colors ${focusRing}`}
                       onClick={close}
                     >
                       View profile
@@ -298,7 +298,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant, c
                 }`}
                 aria-hidden="true"
               />
-              <span className="flex-1 min-w-0 text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase text-ink-body group-hover/bell:text-ink">
+              <span className="flex-1 min-w-0 text-xs md:text-ui font-sans font-medium text-ink-body group-hover/bell:text-ink">
                 Notifications
               </span>
               {unreadCount > 0 && (

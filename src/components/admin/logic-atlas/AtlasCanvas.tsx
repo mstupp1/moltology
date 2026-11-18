@@ -68,13 +68,13 @@ const DomainNode = memo(function DomainNode({ data }: NodeProps<DomainFlowNode>)
           <span className="mt-2 h-3 w-3 shrink-0 rotate-45" style={{ background: domain.color }} aria-hidden />
           <div className="min-w-0">
             <p
-              className={`font-grotesk font-bold uppercase tracking-[0.08em] text-ink ${
+              className={`font-grotesk font-semibold text-ink ${
                 lod === 'compact' ? 'text-[34px] leading-none' : 'text-[22px] leading-tight'
               }`}
             >
               {domain.title}
             </p>
-            {lod === 'full' ? <p className="mt-1 truncate text-[12px] text-ink-muted">{domain.summary}</p> : null}
+            {lod === 'full' ? <p className="mt-1 truncate text-xs text-ink-muted">{domain.summary}</p> : null}
           </div>
         </div>
       )}
@@ -96,12 +96,12 @@ const DomainLabelNode = memo(function DomainLabelNode({ data }: NodeProps<Domain
       style={{ '--domain': domain.color } as React.CSSProperties}
     >
       <p
-        className="font-grotesk font-bold uppercase leading-[1.05] tracking-[0.08em] text-ink"
+        className="font-grotesk font-semibold leading-[1.05] text-ink"
         style={{ fontSize: titleSize }}
       >
         {domain.title}
       </p>
-      <p className="mt-[0.4em] font-bold uppercase tracking-[0.08em] text-ink-body" style={{ fontSize: titleSize * 0.42 }}>
+      <p className="mt-[0.4em] font-semibold text-ink-body" style={{ fontSize: titleSize * 0.42 }}>
         {domain.ruleIds.length} rules
         {flagged > 0 ? <span className="text-amber-400"> · {flagged} flagged</span> : null}
       </p>
@@ -130,10 +130,10 @@ const RuleNode = memo(function RuleNode({ data }: NodeProps<RuleFlowNode>) {
           <DriftDot drift={rule.drift} />
         </span>
       </div>
-      <p className="atlas-rule-title mt-1 font-grotesk text-[14px] font-bold leading-snug text-ink">
+      <p className="atlas-rule-title mt-1 font-grotesk text-sm font-semibold leading-snug text-ink">
         {rule.title}
       </p>
-      <p className="atlas-rule-body atlas-rule-statement mt-1 text-[11.5px] leading-snug text-ink-muted">
+      <p className="atlas-rule-body atlas-rule-statement mt-1 text-2xs leading-snug text-ink-muted">
         {rule.statement}
       </p>
       <Handle type="source" position={Position.Bottom} isConnectable={false} />

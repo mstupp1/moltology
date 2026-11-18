@@ -188,7 +188,7 @@ export const Eyebrow: React.FC<{ children: React.ReactNode; color?: string; clas
   className = '',
 }) => (
   <p
-    className={`inline-flex items-center gap-2 text-[11px] sm:text-xs font-grotesk font-bold tracking-[0.08em] uppercase ${className}`}
+    className={`inline-flex items-center gap-2 text-2xs sm:text-xs font-grotesk font-semibold ${className}`}
     style={{ color }}
   >
     <span className="h-px w-6" style={{ background: color }} aria-hidden="true" />
@@ -202,7 +202,7 @@ export const PrimaryCta: React.FC<CtaProps> = ({ to, search, children, className
   <Link
     to={to}
     search={search}
-    className={`group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm bg-cyan-glow hover:bg-cyan-hover text-abyss hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.45)] transition-[background-color,filter] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
+    className={`group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-semibold text-sm bg-cyan-glow hover:bg-cyan-hover text-abyss transition-[background-color,filter] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
   >
     {children}
     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -213,7 +213,7 @@ export const SecondaryCta: React.FC<CtaProps> = ({ to, search, children, classNa
   <Link
     to={to}
     search={search}
-    className={`inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm border border-line bg-surface-1/80 hud-sheen backdrop-blur-md text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
+    className={`inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-semibold text-sm border border-line bg-surface-1/80 hud-sheen backdrop-blur-md text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${className}`}
   >
     {children}
   </Link>
@@ -257,15 +257,15 @@ export const StoryHero: React.FC<{
           <StoryImg image={media.image} eager className="h-full w-full object-cover" />
         ) : null}
       </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#020408] via-[#020408]/55 to-[#020408]/20" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408]/80 via-[#020408]/20 to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-abyss via-abyss/55 to-abyss/20" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-abyss/80 via-abyss/20 to-transparent" />
 
       <div
         className="relative w-full max-w-6xl mx-auto px-5 sm:px-8 pb-16 sm:pb-24 pt-24"
         style={{ opacity: 'calc(1 - max(0, var(--p) - 0.5) * 2.4)' }}
       >
         <Eyebrow>{eyebrow}</Eyebrow>
-        <h1 className="mt-5 max-w-4xl font-grotesk font-bold tracking-tight text-ink text-[2.6rem] leading-[1.02] sm:text-6xl lg:text-7xl">
+        <h1 className="mt-5 max-w-4xl font-grotesk font-semibold tracking-tight text-ink text-[2.6rem] leading-[1.02] sm:text-6xl lg:text-7xl">
           {title}
         </h1>
         <div className="mt-6 max-w-2xl text-base sm:text-lg text-ink-body leading-relaxed [text-wrap:pretty]">{lede}</div>
@@ -284,7 +284,7 @@ export const StoryHero: React.FC<{
       )}
 
       {cue && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-1 text-[11px] font-grotesk tracking-[0.08em] uppercase text-ink-muted">
+        <div className="eyebrow absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-1">
           {cue}
           <ChevronDown className="w-4 h-4 animate-bounce motion-reduce:animate-none" aria-hidden="true" />
         </div>
@@ -328,13 +328,13 @@ export const DepthGauge: React.FC<{ targetRef: React.RefObject<HTMLElement | nul
       aria-hidden="true"
     >
       <div className="text-right font-grotesk">
-        <p className="text-[11px] tracking-[0.08em] uppercase text-ink-muted">Depth</p>
-        <p className="text-lg font-bold text-ink tabular-nums">{meters.toLocaleString('en-US')} m</p>
-        <p className="text-[11px] tracking-[0.08em] uppercase text-cyan-glow">{zone}</p>
+        <p className="eyebrow">Depth</p>
+        <p className="text-lg font-semibold text-ink tabular-nums">{meters.toLocaleString('en-US')} m</p>
+        <p className="eyebrow">{zone}</p>
       </div>
       <div className="relative h-48 w-[3px] rounded-full bg-surface-3 overflow-hidden">
         <div
-          className="absolute inset-x-0 top-0 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#00c3ff] to-[#00ffcc]"
+          className="absolute inset-x-0 top-0 rounded-full bg-gradient-to-b from-cyan-glow via-cyan-glow to-cyan-glow"
           style={{ height: `${progress * 100}%` }}
         />
       </div>

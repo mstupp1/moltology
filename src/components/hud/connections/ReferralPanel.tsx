@@ -47,7 +47,7 @@ export function ReferralPanel() {
     <section aria-labelledby="referral-title" className="border-t border-line-subtle pt-4 space-y-3">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="space-y-1">
-          <h2 id="referral-title" className="font-grotesk text-sm font-bold text-ink">Invite a friend</h2>
+          <h2 id="referral-title" className="font-grotesk text-sm font-semibold text-ink">Invite a friend</h2>
           <p className="text-xs text-ink-muted leading-relaxed max-w-xl">
             Earn {REFERRAL_XP} XP when a new member joins through your link, creates their character and username, and completes their first liturgy.
             {' '}Up to {REFERRAL_MONTHLY_CAP} rewards per calendar month (UTC).

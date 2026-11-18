@@ -55,7 +55,7 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
       data-slot="fullBody"
       data-renderer="3d"
       data-state={placeholder ? 'placeholder' : look && ready ? 'ready' : 'loading'}
-      className={`relative overflow-hidden rounded-sm bg-[#081419]/90 shrink-0 ${GLASS_CASE_FRAME_CLASS} ${className}`}
+      className={`relative overflow-hidden rounded-sm bg-surface-1/90 shrink-0 ${GLASS_CASE_FRAME_CLASS} ${className}`}
     >
       {scene ? (
         <div aria-hidden data-testid="avatar-3d-scene" className="absolute inset-0" style={scene} />

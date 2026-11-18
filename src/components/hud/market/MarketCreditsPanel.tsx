@@ -18,7 +18,7 @@ export function MarketCreditsPanel({
       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
         <h2 className="text-sm font-semibold text-ink">Molt Credits</h2>
         {live ? null : (
-          <span className="rounded-chip bg-surface-3 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink">
+          <span className="rounded-chip bg-surface-3 px-2 py-0.5 text-2xs font-semibold text-ink">
             Coming soon
           </span>
         )}
@@ -34,7 +34,7 @@ export function MarketCreditsPanel({
               <img src={getAssetUrl('/images/molt_credit.png')} alt="" className="w-8 h-8 object-contain" />
               <div className="leading-tight">
                 <p className="text-sm font-semibold text-ink">{pack.name}</p>
-                <p className="font-grotesk text-base font-bold text-ink tabular-nums">
+                <p className="font-grotesk text-base font-semibold text-ink tabular-nums">
                   {pack.credits.toLocaleString('en-US')} credits
                 </p>
               </div>

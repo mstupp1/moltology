@@ -36,16 +36,16 @@ describe('MoltNationFooter Component', () => {
     render(<MoltNationFooter />)
 
     expect(screen.getByText('NEWS')).toBeInTheDocument()
-    expect(screen.getByText('MOLTMAXXING')).toBeInTheDocument()
-    expect(screen.getByText('FIELD MANUAL')).toBeInTheDocument()
+    expect(screen.getByText('Moltmaxxing')).toBeInTheDocument()
+    expect(screen.getByText('Field Manual')).toBeInTheDocument()
     expect(screen.getByText('QUIZ')).toBeInTheDocument()
-    expect(screen.getByText('CODEX')).toBeInTheDocument()
-    expect(screen.getByText('MOLTOLOGY HOME')).toBeInTheDocument()
-    expect(screen.getByText('COMPANY')).toBeInTheDocument()
-    expect(screen.getByText('STORE').closest('a')).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
-    expect(screen.getByText('INSTAGRAM')).toBeInTheDocument()
-    expect(screen.getByText('YOUTUBE')).toBeInTheDocument()
-    expect(screen.getByText('RSS FEED')).toBeInTheDocument()
+    expect(screen.getByText('Codex')).toBeInTheDocument()
+    expect(screen.getByText('Moltology home')).toBeInTheDocument()
+    expect(screen.getByText('Company')).toBeInTheDocument()
+    expect(screen.getByText('Store').closest('a')).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
+    expect(screen.getByText('Instagram')).toBeInTheDocument()
+    expect(screen.getByText('YouTube')).toBeInTheDocument()
+    expect(screen.getByText('RSS feed')).toBeInTheDocument()
   })
 
   it('renders copyright and legal compliance links', () => {
@@ -59,7 +59,7 @@ describe('MoltNationFooter Component', () => {
   it('points STORE at the on-site catalog for admins', () => {
     storeAccess = { canView: true, pending: false }
     render(<MoltNationFooter />)
-    const storeLink = screen.getByText('STORE').closest('a')
+    const storeLink = screen.getByText('Store').closest('a')
     expect(storeLink).toHaveAttribute('href', '/store')
     expect(storeLink).not.toHaveAttribute('target', '_blank')
   })

@@ -93,7 +93,7 @@ export function ForumFlagControl({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className="inline-flex items-center gap-1.5 px-2 py-1 text-2xs font-semibold text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           data-testid="forum-flag"
         >
           <Flag className="w-3.5 h-3.5" />
@@ -108,7 +108,7 @@ export function ForumFlagControl({
         >
           <div className="w-full max-w-md rounded-card border border-line bg-surface-1 shadow-menu overflow-hidden font-sans">
             <div className="bg-surface-2 border-b border-line-subtle p-4 flex items-center justify-between">
-              <h2 className="text-xs text-ink font-bold tracking-[0.08em] uppercase">
+              <h2 className="eyebrow">
                 {FORUM_REPORT_COPY.dialogTitle}
               </h2>
               <button
@@ -150,8 +150,8 @@ export function ForumFlagControl({
                       className="mt-0.5 accent-cyan-glow"
                     />
                     <span className="space-y-0.5">
-                      <span className="block text-xs font-bold text-ink">{option.label}</span>
-                      <span className="block text-[11px] text-ink-muted leading-relaxed">
+                      <span className="block text-xs font-semibold text-ink">{option.label}</span>
+                      <span className="block text-2xs text-ink-muted leading-relaxed">
                         {option.description}
                       </span>
                     </span>
@@ -160,7 +160,7 @@ export function ForumFlagControl({
               </fieldset>
 
               <label className="block space-y-1">
-                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+                <span className="eyebrow">
                   {FORUM_REPORT_COPY.noteLabel}
                 </span>
                 <textarea
@@ -178,14 +178,14 @@ export function ForumFlagControl({
                 <button
                   type="button"
                   onClick={reset}
-                  className="px-3 py-1.5 rounded-control text-xs font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className="px-3 py-1.5 rounded-control text-xs font-semibold text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   {FORUM_REPORT_COPY.cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={busy}
-                  className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-bold uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className="px-4 py-1.5 rounded-control bg-cyan-glow hover:bg-cyan-hover disabled:opacity-50 text-abyss text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   data-testid="forum-flag-submit"
                 >
                   {busy ? FORUM_REPORT_COPY.submitting : FORUM_REPORT_COPY.submit}

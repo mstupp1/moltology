@@ -1,8 +1,10 @@
 # UI tokens
 
-The shared colours, corners and sizes for the main site and the app. They live in
+The shared colours, type, corners and sizes for the main site and the app. They live in
 [`tailwind.config.js`](../../tailwind.config.js) and [`src/index.css`](../../src/index.css); this page
 says when to use each. New UI uses these and the primitives in `src/components/ui/`, not raw hex.
+The rules they follow (a Linear-style dark system with Moltology's colours) are locked in
+[DESIGN.md](DESIGN.md).
 
 ## Colour
 
@@ -13,7 +15,7 @@ says when to use each. New UI uses these and the primitives in `src/components/u
 | `surface-crimson` | Ground for crimson cards and stat boxes. |
 | `line-subtle` / `line` / `line-hover` / `line-strong` | Card edges and dividers / field and button borders / hovered field / hovered interactive card or button (cyan). |
 | `ink` / `ink-body` / `ink-muted` | Headings and labels on controls / reading text / helper text, field labels, placeholders. |
-| `cyan-glow`, `cyan-hover`, `cyan-soft` | The signal: main action fill, focus outline, live state / hover fill / tinted badge ground. |
+| `cyan-glow`, `cyan-hover`, `cyan-soft` | The signal: main action fill, focus outline, links, live state / hover fill / tinted badge ground. Never decoration. |
 | `crimson-aggro`, `crimson-hover`, `crimson-text`, `crimson-soft` | Sacred and destructive: fill / hover fill / red text on dark grounds / tinted ground. |
 | `emerald-500`, `amber-500` | Done and warning, always with a word or ▲ ▼. |
 
@@ -44,20 +46,40 @@ This keeps stored emblem URLs current without relying on image caches.
 regenerates exports from these tokens; `npm run brand:check` detects stale colors,
 icons or geometry and verifies the original-icon backups.
 
+## Type
+
+Space Grotesk (`font-grotesk`, and every `h1`/`h2` by default) for page and section titles and
+the brand; Inter (`font-sans`, the default) for all UI and reading text. Weights are 400 for
+reading, 500 (`font-medium`) for UI and 600 (`font-semibold`) for titles; no bold.
+
+| Token | Size | Use |
+| --- | --- | --- |
+| `text-2xs` | 11px | Badges, eyebrows, tiny meta |
+| `text-xs` | 12px | Meta, captions, small buttons |
+| `text-ui` | 13px | Buttons, tabs, menu rows, dense lists |
+| `text-sm` | 14px | Default UI text and list titles |
+| `text-md` | 15px | Comfortable reading inside cards |
+| `text-base` | 16px | Reading text, and every phone input (stops iOS zoom) |
+| `text-lg` to `text-2xl` | 18 to 24px | Section and page titles, with `tracking-tight` |
+
+Sizes are in rem, so they step up with the root size on larger screens. UI text is sentence
+case. The one exception is `eyebrow`: a small uppercase, tracked section label in `ink-muted`
+("What you will practice", "Module 2"). Do not add `uppercase` or positive tracking anywhere else.
+
 ## Corners
 
 | Token | Size | Use |
 | --- | --- | --- |
 | `rounded-chip` | 2px | Badges, status squares. |
-| `rounded-control` | 4px | Buttons, fields, menu rows, pagination. |
+| `rounded-control` | 6px | Buttons, fields, menu rows, pagination. |
 | `rounded-card` | 8px | Cards, menus, stat boxes. |
 | `rounded-panel` | 12px | Large main-site panels and screenshot frames. |
-| `rounded-full` | | Avatars and status dots only. |
+| `rounded-full` | | Avatars, status dots and filter or view pills. |
 
-## The sharp details
+## Depth
 
-- `.hud-cut`: the single cut corner (top right) on filled buttons. Put it on the fill layer, never on the
-  focusable element, so the focus outline is not clipped. Size comes from `--hud-cut`.
+- Elevation comes from surface steps (`surface-1` → `surface-2` → `surface-3`) and 1px lines, not glow.
+- No cut corners or corner brackets on anything.
 - `.hud-sheen`: faint light from above on a surface, paired with a `bg-surface-*` colour.
 
 ## Sizes and states
@@ -86,11 +108,11 @@ Pages never wrap themselves in an extra outer card; the page panel is the frame.
   The desktop header's XP bar shares the same centered cap and horizontal page padding.
 - Focus: `outline-2 outline-offset-2 outline-cyan-glow` on buttons and tabs; fields switch to a
   `cyan-glow` border with `shadow-field-focus` (`shadow-field-error` when invalid).
-- Glow is for the main action on hover and for live states only. Resting cards and buttons do not glow.
+- Glow is for live states only (an active Oracle core, recording, streaming). Buttons and cards do not glow.
 
 ## Public header nav
 
-The current page is a lit tile (`bg-surface-3 shadow-nav-current`, cyan icon). A faint
+The current page is a lit tile (`bg-surface-3 shadow-nav-current`: a faint light edge, cyan icon). A faint
 lens slides to whatever is hovered or focused. No underline marks. Section sub-tabs
 (the About subnav) use the same lit tile for the current section. On phones the same
 tab list becomes a full-height sheet with a one-line hint per page and account actions
@@ -98,19 +120,24 @@ pinned to the bottom.
 
 ## Primitives
 
-`HudButton` variants: `primary` (alias `cyan`), `crimson`, `secondary` (alias `dark`), `ghost`, `danger`
-(alias `sacred`). One `primary` per screen. There are two tab styles and no underline tabs:
+`HudButton` variants: `primary` (alias `cyan`, solid cyan), `crimson`, `secondary` (alias `dark`, a
+faint `surface-2` fill with a `line-subtle` edge), `ghost`, `danger` (alias `sacred`). Inter 13px weight
+500, sentence case, no glow. One `primary` per screen. There are two tab styles and no underline tabs:
 
 - Section tabs, the top row of a header band: `BandSectionNav` (each section has a URL) or
-  `HudTabs` (in-page state). Plain tracked labels, the current one in full ink.
-- In-page view tabs and filters: `pillTabClass()` from `src/components/ui/pillTab.ts`, the
-  current one a lit `surface-3` pill.
+  `HudTabs` (in-page state). Inter 13px weight 500, the current one in full ink.
+- In-page view tabs and filters: `pillTabClass()` from `src/components/ui/pillTab.ts`, round
+  pills with the current one a lit `surface-3` pill.
 
 ## Guard
 
 `npm run ui:check` (run in CI by `.github/workflows/hygiene.yml`) fails when a component adds an arbitrary
-hex colour class (`bg-[#…]`, `text-[#…]`, `border-[#…]` …), a `chamfer-corner`, text under 11px, or a radius
-off the scale above (`rounded-lg`, `rounded-[28px]` …). Older hits are recorded per file in
+hex colour class (`bg-[#…]`, `text-[#…]`, `border-[#…]` …), a cut corner (`hud-cut`, `chamfer-corner`),
+text under 11px, a one-off UI font size (`text-[13px]`), positive tracking, `uppercase`, `font-bold` or heavier,
+a Tailwind grey (`text-slate-400`), an old `benthic-*`/`sacred-*` colour, a cyan or red glow
+(`shadow-hud-*`, `shadow-[0_0_20px_rgba(0,195,255,…)]`) or a radius off the scale above (`rounded-lg`,
+`rounded-[28px]` …). It scans `src/**/*.tsx` and `src/**/*.ts`. Social composites and rendered artwork
+keep their recorded counts. Older hits are recorded per file in
 `scripts/ui-token-baseline.json` and may only go down. After cleaning a file up, run
 `npm run ui:check -- --update` to lock in the lower count.
 

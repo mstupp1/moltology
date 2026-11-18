@@ -71,7 +71,7 @@ export function NewTopicDialog({
         <div className="bg-surface-2 border-b border-line-subtle p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-cyan-glow" />
-            <h2 className="text-xs text-ink font-bold tracking-[0.08em] uppercase">
+            <h2 className="eyebrow">
               NEW POST
             </h2>
           </div>
@@ -103,7 +103,7 @@ export function NewTopicDialog({
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs text-ink-muted font-bold uppercase tracking-[0.08em]">
+            <label className="eyebrow">
               Discussion Board
             </label>
             <select
@@ -121,10 +121,10 @@ export function NewTopicDialog({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label className="text-ink-muted font-bold uppercase tracking-[0.08em]">
+              <label className="text-ink-muted font-semibold">
                 Title
               </label>
-              <span className="text-[11px] text-ink-muted">{title.trim().length} / {FORUM_TITLE_MAX_CHARS}</span>
+              <span className="text-2xs text-ink-muted">{title.trim().length} / {FORUM_TITLE_MAX_CHARS}</span>
             </div>
             <input
               type="text"
@@ -138,7 +138,7 @@ export function NewTopicDialog({
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span id={contentLabelId} className="text-ink-muted font-bold uppercase tracking-[0.08em]">
+              <span id={contentLabelId} className="text-ink-muted font-semibold">
                 Content
               </span>
             </div>
@@ -154,7 +154,7 @@ export function NewTopicDialog({
             />
           </div>
 
-          <p className="text-[11px] text-ink-muted leading-relaxed border-l-2 border-line pl-2.5">
+          <p className="text-2xs text-ink-muted leading-relaxed border-l-2 border-line pl-2.5">
             Be civil and constructive. Keep private credentials, keys, and tokens out of public posts.
           </p>
 

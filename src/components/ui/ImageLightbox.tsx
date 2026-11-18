@@ -154,19 +154,19 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
     >
       {/* Main Lightbox Card with Neutral Border */}
       <div
-        className={`relative w-full ${wide ? 'max-w-[min(96vw,1600px)]' : 'max-w-5xl'} my-auto bg-[#030709] border border-white/10 chamfer-corner-lg overflow-hidden flex flex-col shadow-2xl transition-all duration-300`}
+        className={`relative w-full ${wide ? 'max-w-[min(96vw,1600px)]' : 'max-w-5xl'} my-auto bg-abyss border border-white/10 rounded-panel overflow-hidden flex flex-col shadow-2xl transition-all duration-300`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── 1. MODAL TOP HEADER BAR ── */}
-        <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-3.5 bg-[#050b0e] border-b border-white/10 gap-3">
+        <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-3.5 bg-abyss border-b border-white/10 gap-3">
           <div className="flex items-center gap-3 min-w-0">
             {activeTitle && (
-              <h3 className="text-base sm:text-lg font-bold font-grotesk text-white tracking-wider uppercase truncate">
+              <h3 className="text-base sm:text-lg font-semibold font-grotesk text-white truncate">
                 {activeTitle}
               </h3>
             )}
             {galleryItems && galleryItems.length > 1 && (
-              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded border border-white/10 bg-white/5 text-gray-300">
+              <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded border border-white/10 bg-white/5 text-ink-body">
                 {activeIndex + 1} / {galleryItems.length}
               </span>
             )}
@@ -175,7 +175,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="p-1.5 sm:p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 rounded chamfer-corner transition-colors cursor-pointer shrink-0"
+            className="p-1.5 sm:p-2 text-ink-muted hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 rounded-control transition-colors cursor-pointer shrink-0"
             aria-label="Close image preview"
           >
             <X className="w-5 h-5" />
@@ -183,7 +183,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
         </div>
 
         {/* ── 2. MAIN IMAGE STAGE ── */}
-        <div className={`relative z-10 ${wide ? 'p-2 sm:p-3' : 'p-3 sm:p-6'} flex items-center justify-center bg-[#020406] min-h-[260px] sm:min-h-[380px] ${wide ? 'max-h-[84vh]' : 'max-h-[72vh]'} overflow-hidden group`}>
+        <div className={`relative z-10 ${wide ? 'p-2 sm:p-3' : 'p-3 sm:p-6'} flex items-center justify-center bg-abyss min-h-[260px] sm:min-h-[380px] ${wide ? 'max-h-[84vh]' : 'max-h-[72vh]'} overflow-hidden group`}>
           {/* Multi-Item Prev Button */}
           {galleryItems && galleryItems.length > 1 && (
             <button
@@ -196,7 +196,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
           )}
 
           {/* Screenshot Image Display */}
-          <div className={`relative max-w-full ${wide ? 'max-h-[80vh]' : 'max-h-[66vh]'} flex items-center justify-center overflow-hidden rounded border border-white/10 shadow-2xl bg-[#010203]`}>
+          <div className={`relative max-w-full ${wide ? 'max-h-[80vh]' : 'max-h-[66vh]'} flex items-center justify-center overflow-hidden rounded border border-white/10 shadow-2xl bg-abyss`}>
             <img
               key={activeSrc}
               src={activeSrc}
@@ -219,22 +219,22 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
 
         {/* ── 3. MODAL FOOTER & CONTEXT INFO ── */}
         {(activeDescription || activeSpecs || activeActionRoute) && (
-          <div className="relative z-10 px-4 sm:px-6 py-4 bg-[#050b0e] border-t border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="relative z-10 px-4 sm:px-6 py-4 bg-abyss border-t border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="space-y-2 max-w-2xl">
               {activeSubtitle && (
-                <div className="text-xs font-mono font-semibold text-gray-400 uppercase">
+                <div className="eyebrow font-mono">
                   {activeSubtitle}
                 </div>
               )}
               {activeDescription && (
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-ink-body leading-relaxed font-sans">
                   {activeDescription}
                 </p>
               )}
               {activeSpecs && activeSpecs.length > 0 && (
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1">
                   {activeSpecs.map((spec, i) => (
-                    <div key={i} className="flex items-center gap-1.5 text-xs text-gray-300">
+                    <div key={i} className="flex items-center gap-1.5 text-xs text-ink-body">
                       <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
                       <span className="font-sans text-xs">{spec}</span>
                     </div>
@@ -256,7 +256,7 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
                       window.location.href = activeActionRoute
                     }
                   }}
-                  className="w-full md:w-auto py-2.5 px-5 text-xs font-grotesk font-bold uppercase tracking-wider rounded chamfer-corner border border-white/20 bg-white/10 hover:bg-white/15 text-white flex items-center justify-center gap-2 transition-all duration-300 group/btn cursor-pointer shadow-lg"
+                  className="w-full md:w-auto py-2.5 px-5 text-xs font-grotesk font-semibold rounded-control border border-white/20 bg-white/10 hover:bg-white/15 text-white flex items-center justify-center gap-2 transition-all duration-300 group/btn cursor-pointer shadow-lg"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
                   <span>{activeActionText || 'EXPLORE FEATURE'}</span>
@@ -315,7 +315,7 @@ export const ZoomableImage: React.FC<ZoomableImageProps> = ({
 
         {/* Hover zoom affordance badge with neutral border */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/zoom:opacity-100 transition-opacity duration-200 flex items-center justify-center p-2 backdrop-blur-[1px]">
-          <span className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#03080a]/90 border border-white/20 text-white font-sans text-xs font-bold tracking-wider uppercase shadow-lg transform translate-y-1 group-hover/zoom:translate-y-0 transition-transform duration-200">
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded bg-abyss/90 border border-white/20 text-white font-sans text-xs font-semibold shadow-lg transform translate-y-1 group-hover/zoom:translate-y-0 transition-transform duration-200">
             <Maximize2 className="w-3.5 h-3.5 text-cyan-300" />
             {overlayBadgeText}
           </span>

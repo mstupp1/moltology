@@ -47,7 +47,7 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     render(<NewsPostDetail />)
 
     expect(await screen.findByText('NEWS DISPATCH NOT FOUND', {}, { timeout: 5000 })).toBeInTheDocument()
-    expect(screen.getByText('RETURN TO MOLTNATION NEWS')).toBeInTheDocument()
+    expect(screen.getByText('Back to MoltNation News')).toBeInTheDocument()
   })
 
   it('renders article headline, subtitle, author, share trigger, and benthic conversion CTA for a valid post', async () => {

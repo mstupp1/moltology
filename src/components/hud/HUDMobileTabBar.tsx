@@ -68,7 +68,7 @@ export function HUDMobileTabBar({
         {badge}
       </span>
       <span
-        className={`text-[11px] font-sans font-bold uppercase leading-none truncate max-w-full ${
+        className={`text-2xs font-medium leading-none truncate max-w-full ${
           current ? 'text-ink' : 'text-ink-muted'
         }`}
       >
@@ -105,11 +105,11 @@ export function HUDMobileTabBar({
         {/* Same icon-height spacer as the other cells, so the labels share a baseline. */}
         <span aria-hidden className="w-5 h-5 shrink-0" />
         <span
-          className={`relative text-[11px] font-sans font-bold uppercase leading-none ${
+          className={`relative text-2xs font-medium leading-none ${
             isCurrent ? 'text-ink' : 'text-ink-muted'
           }`}
         >
-          ORACLE
+          Oracle
         </span>
       </button>
     )
@@ -177,7 +177,7 @@ export function HUDMobileTabBar({
           <span
             aria-hidden
             data-testid="more-badge"
-            className="absolute -top-1.5 -right-2.5 min-w-4 h-4 px-1 rounded-full bg-cyan-glow text-[11px] font-bold leading-4 text-center text-abyss tabular-nums"
+            className="absolute -top-1.5 -right-2.5 min-w-4 h-4 px-1 rounded-full bg-cyan-glow text-2xs font-semibold leading-4 text-center text-abyss tabular-nums"
           >
             {moreBadge > 9 ? '9+' : moreBadge}
           </span>

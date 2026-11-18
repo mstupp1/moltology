@@ -64,7 +64,7 @@ export function formatCodexInline(text: string, highlight?: string): React.React
       )
     } else if (matchedStr.startsWith('**') && matchedStr.endsWith('**')) {
       parts.push(
-        <strong key={partKey} className="font-bold opacity-100">
+        <strong key={partKey} className="font-semibold opacity-100">
           {highlightMatches(matchedStr.slice(2, -2), highlight, `${partKey}-hit`)}
         </strong>
       )
@@ -140,7 +140,7 @@ function renderVerseBlocks(rawText: string, dropCap = false, highlight?: string)
     if (item.kind === 'num') {
       elements.push(
         <div key={key} className="flex items-baseline gap-3 pl-1">
-          <span className="font-sans text-[0.72em] font-bold tabular-nums opacity-70 shrink-0 min-w-[1.25em]">
+          <span className="font-sans text-[0.72em] font-semibold tabular-nums opacity-70 shrink-0 min-w-[1.25em]">
             {item.marker}.
           </span>
           <div className="flex-1">{formatCodexInline(text, highlight)}</div>
@@ -266,17 +266,17 @@ export function CodexDocumentSheet({
   return (
     <article className={cn('relative', compact ? 'space-y-7' : 'space-y-7 sm:space-y-10')}>
       <header className="space-y-3 sm:space-y-4">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
+        <div className="eyebrow flex flex-wrap items-center gap-x-2 gap-y-1 opacity-70">
           <span>{scripture.volumeName}</span>
           <span aria-hidden="true">·</span>
           <span>{scripture.id}</span>
         </div>
 
-        <h2 className="font-garamond font-bold text-[1.85rem] leading-[1.05] sm:text-[2.6rem] md:text-5xl tracking-[-0.01em] text-balance">
+        <h2 className="font-garamond font-semibold text-[1.85rem] leading-[1.05] sm:text-[2.6rem] md:text-5xl tracking-[-0.01em] text-balance">
           {highlightMatches(scripture.title, highlight, 'title')}
         </h2>
 
-        <p className="font-sans text-xs sm:text-[13px] opacity-75">
+        <p className="font-sans text-xs sm:text-ui opacity-75">
           {scripture.authorUnit}
           <span aria-hidden="true" className="mx-2">·</span>
           Revised {formatRevisedDate(scripture.lastRevised)}
@@ -284,7 +284,7 @@ export function CodexDocumentSheet({
       </header>
 
       <figure className="border-l-2 border-current/40 pl-4 sm:pl-6 space-y-2">
-        <figcaption className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] opacity-70">
+        <figcaption className="eyebrow opacity-70">
           Mandate
         </figcaption>
         <blockquote className="font-garamond italic text-[1.15rem] sm:text-2xl leading-snug">
@@ -295,7 +295,7 @@ export function CodexDocumentSheet({
         )}
       </figure>
 
-      <div className="font-garamond text-[17px] sm:text-[19px] leading-[1.7] space-y-9 hyphens-auto sm:hyphens-none">
+      <div className="font-garamond text-base sm:text-[19px] leading-[1.7] space-y-9 hyphens-auto sm:hyphens-none">
         {scripture.verses.map((verse, index) => (
           <section
             key={verse.verseNumber}
@@ -303,7 +303,7 @@ export function CodexDocumentSheet({
             className="space-y-3 scroll-mt-20 lg:scroll-mt-6"
           >
             {verse.heading && (
-              <h3 className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] opacity-70 pb-1.5 border-b border-current/15">
+              <h3 className="font-sans text-2xs font-semibold opacity-70 pb-1.5 border-b border-current/15">
                 {highlightMatches(verse.heading, highlight, 'heading')}
               </h3>
             )}
@@ -314,7 +314,7 @@ export function CodexDocumentSheet({
 
       {scripture.crossReferences.length > 0 && (
         <aside className="pt-5 border-t border-current/15 space-y-3">
-          <h3 className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] opacity-70">See also</h3>
+          <h3 className="eyebrow opacity-70">See also</h3>
           <ul className="flex flex-wrap gap-2">
             {scripture.crossReferences.map((ref) => {
               const matched = findScriptureByTitle(ref)
@@ -324,12 +324,12 @@ export function CodexDocumentSheet({
                     <button
                       type="button"
                       onClick={() => onSelectScripture(matched.id)}
-                      className="min-h-8 px-3 rounded-control border border-current/25 font-garamond text-[15px] hover:bg-current/10 hover:border-current/50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+                      className="min-h-8 px-3 rounded-control border border-current/25 font-garamond text-md hover:bg-current/10 hover:border-current/50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
                     >
                       {ref}
                     </button>
                   ) : (
-                    <span className="inline-flex min-h-8 items-center px-3 font-garamond text-[15px] opacity-70">{ref}</span>
+                    <span className="inline-flex min-h-8 items-center px-3 font-garamond text-md opacity-70">{ref}</span>
                   )}
                 </li>
               )
@@ -349,7 +349,7 @@ export function CodexDocumentSheet({
               onClick={onPrev}
               className="group w-full h-full text-left rounded-control border border-current/20 px-3 py-2.5 hover:bg-current/[0.06] hover:border-current/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
             >
-              <span className="block text-[11px] font-bold uppercase tracking-[0.14em] opacity-65">← Previous</span>
+              <span className="eyebrow block opacity-65">← Previous</span>
               {prevTitle && <span className="block font-garamond text-base leading-snug mt-0.5">{prevTitle}</span>}
             </button>
           )}
@@ -361,12 +361,12 @@ export function CodexDocumentSheet({
               onClick={onNext}
               className="group w-full h-full text-right rounded-control border border-current/20 px-3 py-2.5 hover:bg-current/[0.06] hover:border-current/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
             >
-              <span className="block text-[11px] font-bold uppercase tracking-[0.14em] opacity-65">Next →</span>
+              <span className="eyebrow block opacity-65">Next →</span>
               {nextTitle && <span className="block font-garamond text-base leading-snug mt-0.5">{nextTitle}</span>}
             </button>
           )}
         </div>
-        <p className="col-span-2 text-center text-[11px] uppercase tracking-[0.14em] opacity-60 tabular-nums">
+        <p className="eyebrow col-span-2 text-center opacity-60 tabular-nums">
           {pageIndex + 1} of {pageCount}
         </p>
       </nav>

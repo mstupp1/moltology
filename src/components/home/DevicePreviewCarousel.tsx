@@ -145,7 +145,7 @@ export function DevicePreviewCarousel() {
       <p className="relative z-20 mx-auto mb-5 min-h-[2.5rem] sm:min-h-0 max-w-[34rem] px-2 text-center text-sm sm:text-base text-ink-body [text-wrap:balance]" aria-live={paused ? 'polite' : 'off'}>
         {current.caption}
       </p>
-      <div className="group/frame relative mx-auto max-w-[340px] sm:max-w-none rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 border-[#0f1d22] sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-[#061014]/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
+      <div className="group/frame relative mx-auto max-w-[340px] sm:max-w-none rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 border-surface-2 sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-surface-1/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
         <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-10 h-5 w-20 rounded-full bg-black" aria-hidden="true" />
         <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-line-subtle bg-surface-2">
           <div className="flex gap-1.5" aria-hidden="true">
@@ -153,7 +153,7 @@ export function DevicePreviewCarousel() {
             <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/80" />
           </div>
-          <div className="mx-auto max-w-[260px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-[11px] text-ink-muted text-center truncate">moltology.org{current.route}</div>
+          <div className="mx-auto max-w-[260px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-2xs text-ink-muted text-center truncate">moltology.org{current.route}</div>
           <div className="w-[42px]" aria-hidden="true" />
         </div>
         <div className="relative aspect-[540/790] sm:aspect-[1280/600] overflow-hidden">

@@ -81,7 +81,7 @@ export function AdminStarterPrompts() {
                 role="radio"
                 aria-checked={visitor === v.id}
                 onClick={() => setVisitor(v.id)}
-                className={`rounded-chip px-3 py-1 text-xs font-bold transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                className={`rounded-chip px-3 py-1 text-xs font-semibold transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                   visitor === v.id ? 'bg-cyan-soft text-cyan-glow' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
                 }`}
               >
@@ -124,10 +124,10 @@ export function AdminStarterPrompts() {
                 const shown = starterPromptVisible(p, group === 'page' ? ctx : { ...ctx, page: null })
                 return (
                   <li key={p.id} className={`flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-2 ${shown ? '' : 'opacity-50'}`}>
-                    <span className="sm:w-64 shrink-0 text-sm font-bold text-ink">{p.label}</span>
+                    <span className="sm:w-64 shrink-0 text-sm font-semibold text-ink">{p.label}</span>
                     <span className="flex-1 min-w-0 text-xs text-ink-muted">{starterPromptText(p)}</span>
-                    <span className="shrink-0 text-[11px] text-ink-muted">{rules(p)}</span>
-                    <span className={`shrink-0 text-[11px] font-bold ${shown ? 'text-cyan-glow' : 'text-ink-muted'}`}>
+                    <span className="shrink-0 text-2xs text-ink-muted">{rules(p)}</span>
+                    <span className={`shrink-0 text-2xs font-semibold ${shown ? 'text-cyan-glow' : 'text-ink-muted'}`}>
                       {shown ? 'Shown' : 'Hidden'}
                     </span>
                   </li>

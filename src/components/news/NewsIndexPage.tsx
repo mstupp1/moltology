@@ -74,7 +74,7 @@ export function NewsIndexPage() {
   const lastUpdated = formatPostDate(leadPost?.publishedAt)
 
   return (
-    <div className="min-h-screen bg-[#05080a] text-ink font-sans relative flex flex-col justify-between">
+    <div className="min-h-screen bg-abyss text-ink font-sans relative flex flex-col justify-between">
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-60" />
 
       <AuthModal
@@ -87,7 +87,7 @@ export function NewsIndexPage() {
       <PublicHeader activePage="news" onOpenAuth={openAuth} />
 
       {/* Masthead */}
-      <header className="w-full relative pt-24 pb-8 sm:pt-28 sm:pb-10 px-4 sm:px-8 flex justify-center items-center overflow-hidden bg-[#030608]">
+      <header className="w-full relative pt-24 pb-8 sm:pt-28 sm:pb-10 px-4 sm:px-8 flex justify-center items-center overflow-hidden bg-abyss">
         <img
           src={getAssetUrl('/images/moltnation_flag_bg.jpg')}
           alt="MoltNation Flag Background"
@@ -95,14 +95,14 @@ export function NewsIndexPage() {
           className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
         />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(3,6,8,0.3)_0%,rgba(3,6,8,0.85)_85%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#05080a] via-transparent to-[#030608] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-abyss pointer-events-none" />
         <div className="relative z-10 flex flex-col items-center gap-4 text-center">
           <MoltNationLogo size="lg" theme="dark" align="center" />
         </div>
       </header>
 
       {/* Section bar */}
-      <div className="w-full border-y border-line-subtle bg-[#05080a]/95 backdrop-blur relative z-20">
+      <div className="w-full border-y border-line-subtle bg-abyss/95 backdrop-blur relative z-20">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-8 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 py-2">
           <HorizontalScroll as="nav"
             aria-label="News sections"
@@ -227,7 +227,7 @@ export function NewsIndexPage() {
                   <aside aria-labelledby="latest-heading" className="lg:col-span-4 lg:border-l lg:border-line-subtle lg:pl-10">
                     <h2
                       id="latest-heading"
-                      className="font-sans text-xs font-bold uppercase tracking-[0.08em] text-ink-muted border-b border-line-subtle pb-3"
+                      className="font-sans text-xs font-semibold text-ink-muted border-b border-line-subtle pb-3"
                     >
                       Latest
                     </h2>
@@ -272,7 +272,7 @@ export function NewsIndexPage() {
               <section aria-labelledby="more-heading" className="space-y-8">
                 <h2
                   id="more-heading"
-                  className="font-sans text-xs font-bold uppercase tracking-[0.08em] text-ink-muted border-t-2 border-ink/80 pt-3"
+                  className="font-sans text-xs font-semibold text-ink-muted border-t-2 border-ink/80 pt-3"
                 >
                   More stories
                 </h2>
@@ -287,7 +287,7 @@ export function NewsIndexPage() {
             {/* Archive */}
             {archivePosts.length > 0 && (
               <nav aria-label="News archive" className="space-y-4">
-                <h2 className="font-sans text-xs font-bold uppercase tracking-[0.08em] text-ink-muted border-t-2 border-ink/80 pt-3">
+                <h2 className="font-sans text-xs font-semibold text-ink-muted border-t-2 border-ink/80 pt-3">
                   From the archive
                 </h2>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12">

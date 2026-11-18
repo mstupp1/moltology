@@ -36,7 +36,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
     <section
       ref={sectionRef}
       aria-labelledby="home-hero-title"
-      className="home-hero relative isolate w-full overflow-hidden bg-[#020408] pt-28 sm:pt-32 lg:pt-28"
+      className="home-hero relative isolate w-full overflow-hidden bg-abyss pt-28 sm:pt-32 lg:pt-28"
     >
       {/*
         A server-rendered night sky sits behind the shell and copy on first paint, and the sea
@@ -62,13 +62,13 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
         <div className="home-hero-copy relative z-[3] order-1 text-center lg:text-left">
           <h1
             id="home-hero-title"
-            className="home-hero-title font-grotesk font-bold tracking-[-0.035em] text-white text-[clamp(3rem,13vw,4.5rem)] sm:text-[clamp(4.25rem,8vw,6.75rem)] lg:text-[clamp(4rem,5.6vw,6rem)] leading-[0.95] [text-shadow:0_10px_40px_rgba(0,0,0,0.85)]"
+            className="home-hero-title font-grotesk font-semibold tracking-[-0.035em] text-white text-[clamp(3rem,13vw,4.5rem)] sm:text-[clamp(4.25rem,8vw,6.75rem)] lg:text-[clamp(4rem,5.6vw,6rem)] leading-[0.95] [text-shadow:0_10px_40px_rgba(0,0,0,0.85)]"
           >
             <span className="block whitespace-nowrap">Shed the noise.</span>
             <span className="home-hero-gradient block pb-[0.08em] [text-shadow:none]">Grow a shell.</span>
           </h1>
 
-          <p className="home-hero-rise mt-6 sm:mt-7 mx-auto lg:mx-0 max-w-2xl lg:max-w-[34rem] text-base sm:text-lg lg:text-xl text-[#c9d4d4] leading-relaxed [text-wrap:pretty] drop-shadow-[0_4px_14px_rgba(0,0,0,0.9)]" style={{ animationDelay: '80ms' }}>
+          <p className="home-hero-rise mt-6 sm:mt-7 mx-auto lg:mx-0 max-w-2xl lg:max-w-[34rem] text-base sm:text-lg lg:text-xl text-ink-body leading-relaxed [text-wrap:pretty] drop-shadow-[0_4px_14px_rgba(0,0,0,0.9)]" style={{ animationDelay: '80ms' }}>
             Moltology is a free practice and community for people who are tired of melting into their
             notifications. Build daily routines, protect your focus, and finish what you start, one small
             shed at a time.
@@ -89,8 +89,8 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
 
           <p className="home-hero-rise mt-4 inline-flex items-center gap-2 text-sm text-ink-body" style={{ animationDelay: '200ms' }}>
             <span className="relative flex h-2 w-2" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-60 motion-safe:animate-ping" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00ffcc]" />
+              <span className="absolute inline-flex h-full w-full rounded-full bg-cyan-glow opacity-60 motion-safe:animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-glow" />
             </span>
             Free to join. No card needed.
           </p>
@@ -113,7 +113,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           >
             {WHAT_YOU_GET.map(({ icon: Icon, label }) => (
               <li key={label} className="inline-flex items-center gap-2">
-                <Icon className="w-4 h-4 text-[#00ffcc]" aria-hidden="true" />
+                <Icon className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
                 {label}
               </li>
             ))}
@@ -130,7 +130,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ authReady, onNavigate, onOpe
           <div className="absolute -inset-x-10 -top-10 bottom-0 rounded-[3rem] bg-[radial-gradient(ellipse_at_top,rgba(0,195,255,0.35),transparent_65%)] blur-2xl pointer-events-none" aria-hidden="true" />
           <DevicePreviewCarousel />
           {/* Only the last stretch sinks into the page colour, so the screenshot stays readable. Wider than the device so its ring and glow fade too, leaving no edge where the next section starts. */}
-          <div className="absolute -inset-x-16 -bottom-px z-20 h-24 sm:h-32 bg-gradient-to-t from-[#020408] from-[10%] via-[#020408]/60 to-transparent pointer-events-none" aria-hidden="true" />
+          <div className="absolute -inset-x-16 -bottom-px z-20 h-24 sm:h-32 bg-gradient-to-t from-abyss from-[10%] via-abyss/60 to-transparent pointer-events-none" aria-hidden="true" />
         </div>
       </div>
     </section>

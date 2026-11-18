@@ -161,7 +161,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
 
       <div className="flex-1 overflow-y-auto px-2 pb-2 min-h-0">
         {userId && !isAuthPending && !isLoadingThreads && threads.length >= CHAT_LIMIT && (
-          <p className="px-2 pb-2 text-[11px] text-ink" data-testid="chat-limit-note">
+          <p className="px-2 pb-2 text-2xs text-ink" data-testid="chat-limit-note">
             Delete a chat to start another.
           </p>
         )}
@@ -196,9 +196,9 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           <div className="p-3 space-y-3 font-sans">
             <div className="flex items-center space-x-2 text-cyan-glow">
               <Lock className="w-4 h-4 text-cyan-glow shrink-0" />
-              <span className="text-xs font-bold tracking-[0.08em] uppercase">GUEST MODE</span>
+              <span className="eyebrow">GUEST MODE</span>
             </div>
-            <p className="text-[11px] text-ink-muted leading-relaxed">
+            <p className="text-2xs text-ink-muted leading-relaxed">
               Guest chats aren't saved. Sign up free to keep them.
             </p>
             <BenthicCTAButton
@@ -207,9 +207,9 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
               fullWidth
               onClick={onOpenAuthModal}
             >
-              <span className="flex items-center justify-center gap-1.5 text-xs font-bold font-grotesk tracking-[0.08em] uppercase">
+              <span className="eyebrow flex items-center justify-center gap-1.5">
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>SIGN UP FREE</span>
+                <span>Sign up free</span>
               </span>
             </BenthicCTAButton>
           </div>
@@ -225,7 +225,7 @@ export const OracleChatsPanel: React.FC<OracleChatsPanelProps> = ({
           >
             <div className="min-h-0 overflow-hidden">
               <section aria-label="Usage" className="max-h-64 overflow-y-auto p-2 pb-4 space-y-3">
-                {!usageSnapshot && !usageUnavailable && <p role="status" className="text-[11px] text-ink-muted">Loading usage…</p>}
+                {!usageSnapshot && !usageUnavailable && <p role="status" className="text-2xs text-ink-muted">Loading usage…</p>}
                 <OracleUsage snapshot={usageSnapshot} unavailable={usageUnavailable} expanded />
               </section>
             </div>

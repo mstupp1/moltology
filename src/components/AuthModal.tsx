@@ -239,10 +239,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold font-grotesk text-ink tracking-wider uppercase">
+          <h2 className="text-2xl font-semibold font-grotesk text-ink tracking-wider uppercase">
             {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p className="text-xs text-cyan-glow/80 mt-1 uppercase tracking-[0.08em] font-sans">
+          <p className="eyebrow mt-1">
             {mode === 'signup'
               ? (subtitle ?? 'Sign up to persist your session')
               : 'Sign in to access your saved state'}
@@ -253,7 +253,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="space-y-4" data-testid="email-verification-pending">
             <div className="text-center space-y-2">
               <Mail className="w-8 h-8 text-cyan-glow mx-auto" aria-hidden="true" />
-              <h3 className="text-lg font-bold font-grotesk text-ink tracking-wide">
+              <h3 className="text-lg font-semibold font-grotesk text-ink">
                 {EMAIL_VERIFICATION_COPY.title}
               </h3>
               <p className="text-sm text-ink-body font-sans">
@@ -306,7 +306,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setMode('signup')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+            className={`flex-1 py-2.5 text-xs font-semibold font-grotesk text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
               mode === 'signup'
                 ? 'border-cyan-glow text-ink'
                 : 'border-transparent text-ink-muted hover:text-ink'
@@ -320,7 +320,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setMode('login')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+            className={`flex-1 py-2.5 text-xs font-semibold font-grotesk text-center border-b-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
               mode === 'login'
                 ? 'border-cyan-glow text-ink'
                 : 'border-transparent text-ink-muted hover:text-ink'
@@ -372,7 +372,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* Standard Centered OR Divider */}
           <div className="relative flex items-center justify-center my-3">
             <div className="border-t border-line-subtle w-full" />
-            <span className="bg-surface-1 px-3 text-xs text-ink-muted font-bold uppercase tracking-[0.08em] absolute">OR</span>
+            <span className="bg-surface-1 px-3 text-xs text-ink-muted font-semibold absolute">OR</span>
           </div>
         </div>
         )}
@@ -439,7 +439,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   Keep me updated with Moltology news, articles, and product updates.
                 </span>
               </label>
-              <p className="text-[11px] text-ink-muted mt-1 pl-6 font-sans">
+              <p className="text-2xs text-ink-muted mt-1 pl-6 font-sans">
                 Zero spam. Unsubscribe at any time.
               </p>
             </div>

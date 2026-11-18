@@ -143,7 +143,7 @@ export function XpRing({ size, portrait, ratio, done, total, badge, instant, pul
         <span
           key={badge}
           data-testid="xp-ring-badge"
-          className="xp-badge-in absolute left-1/2 -translate-x-1/2 px-1 py-[2px] rounded-control bg-abyss border border-cyan-glow/50 text-[11px] font-sans font-bold leading-none tabular-nums text-ink whitespace-nowrap pointer-events-none"
+          className="xp-badge-in absolute left-1/2 -translate-x-1/2 px-1 py-[2px] rounded-control bg-abyss border border-cyan-glow/50 text-2xs font-sans font-semibold leading-none tabular-nums text-ink whitespace-nowrap pointer-events-none"
           style={{ top: g.badgeTop }}
         >
           {badge}

@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils'
 
 const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 const CARD = 'rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5'
-const HEADING = 'font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase'
+const HEADING = 'font-grotesk text-sm font-semibold text-ink'
 
 const WINDOW_LABELS: Record<LeaderboardWindow, string> = { week: 'This week', all: 'All time' }
 
@@ -36,7 +36,7 @@ function WindowTabs({ value, onChange }: { value: LeaderboardWindow; onChange: (
             aria-pressed={lit}
             onClick={() => onChange(key)}
             className={cn(
-              'min-h-8 px-3 rounded-control text-xs font-bold transition-colors',
+              'min-h-8 px-3 rounded-control text-xs font-semibold transition-colors',
               lit ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
               FOCUS,
             )}
@@ -89,11 +89,11 @@ function CrestPodium({ view }: { view: LeaderboardView | undefined }) {
                       alt=""
                     />
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: tier.color }}>
+                  <span className="inline-flex items-center gap-1 text-2xs font-semibold" style={{ color: tier.color }}>
                     <CrestMedal rank={rank} />#{rank}
                   </span>
-                  <span className="w-full text-xs font-bold text-ink truncate group-hover:text-cyan-glow transition-colors">{entry.name}</span>
-                  <span className="text-[11px] text-ink-muted tabular-nums">{formatXp(entry.xp)}</span>
+                  <span className="w-full text-xs font-semibold text-ink truncate group-hover:text-cyan-glow transition-colors">{entry.name}</span>
+                  <span className="text-2xs text-ink-muted tabular-nums">{formatXp(entry.xp)}</span>
                 </Link>
               ) : (
                 <div className="flex flex-col items-center gap-1.5 text-center px-1 py-2">
@@ -101,7 +101,7 @@ function CrestPodium({ view }: { view: LeaderboardView | undefined }) {
                     className={cn('rounded-full border border-dashed border-line-subtle bg-surface-2', rank === 1 ? 'w-14 h-14' : 'w-11 h-11 sm:w-12 sm:h-12')}
                     aria-hidden="true"
                   />
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: tier.color }}>
+                  <span className="inline-flex items-center gap-1 text-2xs font-semibold" style={{ color: tier.color }}>
                     <CrestMedal rank={rank} />#{rank}
                   </span>
                   <span className="text-xs text-ink-muted">{view ? 'Open' : ' '}</span>
@@ -131,7 +131,7 @@ function StageFilter({ value, onChange }: { value: number | null; onChange: (nex
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
         data-testid="leaderboard-stage-filter"
-        className="min-h-8 rounded-control border border-line bg-surface-2 px-2.5 text-xs font-bold text-ink outline-hidden hover:border-line-hover focus:border-cyan-glow"
+        className="min-h-8 rounded-control border border-line bg-surface-2 px-2.5 text-xs font-semibold text-ink outline-hidden hover:border-line-hover focus:border-cyan-glow"
       >
         {STAGE_FILTERS.map((f) => (
           <option key={f.label} value={f.value ?? ''} className="bg-surface-2 text-ink">
@@ -184,7 +184,7 @@ export function LeaderboardPage() {
               {listLabel}
             </h2>
             {first ? (
-              <span className="text-[11px] text-ink-muted tabular-nums">
+              <span className="text-2xs text-ink-muted tabular-nums">
                 {first.total} {first.total === 1 ? 'member' : 'members'}
                 {period === 'week' ? ' · resets Monday 00:00 UTC' : ''}
               </span>

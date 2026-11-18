@@ -704,7 +704,7 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
     expect(screen.getAllByText(/GUEST MODE/i).length).toBeGreaterThan(0)
     expect(screen.getByText(/Guest chats aren't saved/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /SIGN UP FREE/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Sign up free/i })).toBeInTheDocument()
   })
 
   it('does not paint guest chrome while the session is pending', () => {
@@ -713,7 +713,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Sign up free/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
 
@@ -723,7 +723,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Sign up free/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
 })

@@ -75,7 +75,7 @@ export function AdminStoreCoupons() {
       />
 
       <form className="grid gap-3 sm:grid-cols-2" onSubmit={e => { e.preventDefault(); void create() }}>
-        <label className="block"><span className={ADMIN_LABEL}>Code</span><input required className={`${FIELD} uppercase`} maxLength={32} placeholder="LAUNCH15" value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} /></label>
+        <label className="block"><span className={ADMIN_LABEL}>Code</span><input required className={`${FIELD} `} maxLength={32} placeholder="LAUNCH15" value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} /></label>
         <div className="grid grid-cols-[auto_1fr] gap-2">
           <label className="block"><span className={ADMIN_LABEL}>Type</span><select className={FIELD} value={form.kind} onChange={e => setForm({ ...form, kind: e.target.value as 'percent' | 'amount' })}><option value="percent">Percent off</option><option value="amount">Dollars off</option></select></label>
           <label className="block"><span className={ADMIN_LABEL}>{form.kind === 'percent' ? 'Percent' : 'Dollars'}</span><input required type="number" min={form.kind === 'percent' ? 1 : 0.01} max={form.kind === 'percent' ? 100 : 1000} step={form.kind === 'percent' ? 1 : 0.01} className={FIELD} value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} /></label>
@@ -94,7 +94,7 @@ export function AdminStoreCoupons() {
           {coupons.map(coupon => (
             <li key={coupon.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div className="min-w-0">
-                <p className="font-grotesk font-semibold tracking-wide text-ink">
+                <p className="font-grotesk font-semibold text-ink">
                   {coupon.code} <span className="font-sans font-normal text-ink-body">· {storeCouponLabel(coupon)}</span>
                   {!coupon.active ? <span className="ml-2 rounded-chip border border-line px-2 text-xs font-normal text-ink-muted">Off</span> : null}
                 </p>

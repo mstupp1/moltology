@@ -28,7 +28,7 @@ import {
 } from '@/lib/moltmaxxing-content'
 
 const sectionTitle =
-  'font-grotesk font-bold tracking-[-0.03em] text-ink text-4xl sm:text-5xl leading-[1.04] [text-wrap:balance]'
+  'font-grotesk font-semibold tracking-[-0.03em] text-ink text-4xl sm:text-5xl leading-[1.04] [text-wrap:balance]'
 const lede = 'text-base sm:text-lg text-ink-muted leading-relaxed [text-wrap:pretty]'
 const readingImage = (id: string): StoryImage => HOME_READINGS.find((reading) => reading.id === id)?.image ?? STORY_MEDIA.plating
 
@@ -51,12 +51,12 @@ const MoveCard: React.FC<{ move: MoltmaxxingMove; index: number }> = ({ move, in
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-surface-1 to-transparent" />
     </div>
     <div className="p-5 sm:p-6 pt-1 sm:pt-2">
-      <p className="font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-ink-muted">
+      <p className="eyebrow">
         <span className="text-cyan-glow">{String(index + 1).padStart(2, '0')}</span> · {move.term}
       </p>
-      <h3 className="mt-2 font-grotesk font-bold text-2xl text-ink">{move.verb}</h3>
+      <h3 className="mt-2 font-grotesk font-semibold text-2xl text-ink">{move.verb}</h3>
       <p className="mt-1 font-grotesk font-medium text-ink-body">{move.plain}</p>
-      <p className="mt-3 text-[15px] text-ink-muted leading-relaxed [text-wrap:pretty]">{move.body}</p>
+      <p className="mt-3 text-md text-ink-muted leading-relaxed [text-wrap:pretty]">{move.body}</p>
     </div>
   </article>
 )
@@ -135,7 +135,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
                 funny because it is familiar. Most days melt the same way, one small interruption at a time.
               </p>
               <div className="mt-10 border-t border-line-subtle pt-8">
-                <h3 className="font-grotesk font-bold text-xl text-ink">And looksmaxxing?</h3>
+                <h3 className="font-grotesk font-semibold text-xl text-ink">And looksmaxxing?</h3>
                 <p className="mt-3 text-base text-ink-muted leading-relaxed [text-wrap:pretty]">
                   Looksmaxxing works on how you look. Moltmaxxing works on how you hold up: your focus, your boundaries
                   and your follow-through. You can do both. Only one of them comes with a shell.
@@ -145,19 +145,19 @@ export const MoltmaxxingPillarPage: React.FC = () => {
 
             <ScrollReveal>
               <div className="rounded-panel border border-line-subtle bg-surface-1 hud-sheen overflow-hidden">
-                <div className="hidden sm:grid grid-cols-2 border-b border-line-subtle font-grotesk text-xs font-bold tracking-[0.08em] uppercase">
+                <div className="hidden sm:grid grid-cols-2 border-b border-line-subtle font-grotesk text-xs font-semibold">
                   <p className="px-6 py-4 text-crimson-text">A melted day</p>
                   <p className="px-6 py-4 text-cyan-glow border-l border-line-subtle">A molted day</p>
                 </div>
                 <ul className="divide-y divide-line-subtle">
                   {MELT_VS_MOLT.melt.map((melt, index) => (
                     <li key={melt} className="grid sm:grid-cols-2">
-                      <p className="px-5 sm:px-6 pt-5 sm:py-5 text-[15px] text-ink-muted leading-relaxed">
-                        <span className="sm:hidden font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-crimson-text">Melted · </span>
+                      <p className="px-5 sm:px-6 pt-5 sm:py-5 text-md text-ink-muted leading-relaxed">
+                        <span className="eyebrow sm:hidden text-crimson-text">Melted · </span>
                         {melt}
                       </p>
-                      <p className="px-5 sm:px-6 pt-2 pb-5 sm:py-5 text-[15px] text-ink leading-relaxed sm:border-l border-line-subtle">
-                        <span className="sm:hidden font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-cyan-glow">Molted · </span>
+                      <p className="px-5 sm:px-6 pt-2 pb-5 sm:py-5 text-md text-ink leading-relaxed sm:border-l border-line-subtle">
+                        <span className="eyebrow sm:hidden">Molted · </span>
                         {MELT_VS_MOLT.molt[index]}
                       </p>
                     </li>
@@ -189,9 +189,9 @@ export const MoltmaxxingPillarPage: React.FC = () => {
               {MOLTMAXXING_DAY.map((task) => (
                 <li key={task.key} className="relative pl-6 sm:pl-8 pb-8 last:pb-0">
                   <span className="absolute -left-[5px] top-2 h-2.5 w-2.5 rounded-full bg-surface-3 border border-line" aria-hidden="true" />
-                  <p className="font-grotesk text-xs font-bold tracking-[0.08em] text-ink-muted tabular-nums">{task.time}</p>
-                  <h3 className="mt-1 font-grotesk font-bold text-lg sm:text-xl text-ink">{task.title}</h3>
-                  <p className="mt-1.5 text-[15px] text-ink-muted leading-relaxed [text-wrap:pretty]">{task.note}</p>
+                  <p className="font-grotesk text-xs font-semibold text-ink-muted tabular-nums">{task.time}</p>
+                  <h3 className="mt-1 font-grotesk font-semibold text-lg sm:text-xl text-ink">{task.title}</h3>
+                  <p className="mt-1.5 text-md text-ink-muted leading-relaxed [text-wrap:pretty]">{task.note}</p>
                 </li>
               ))}
             </ol>
@@ -222,11 +222,11 @@ export const MoltmaxxingPillarPage: React.FC = () => {
             <ol className="mt-12 grid gap-px overflow-hidden rounded-card border border-line-subtle bg-line-subtle sm:grid-cols-2 lg:grid-cols-4">
               {AUDIT_READINGS.map((reading) => (
                 <li key={reading.name} className="bg-surface-1 p-5 sm:p-6">
-                  <p className="font-grotesk text-xs font-bold tracking-[0.08em] uppercase text-ink-muted tabular-nums">
+                  <p className="eyebrow tabular-nums">
                     Score {reading.min}–{reading.max}
                   </p>
-                  <h3 className="mt-2 font-grotesk font-bold text-lg text-ink">{reading.name}</h3>
-                  <p className="mt-2 text-[15px] text-ink-muted leading-relaxed [text-wrap:pretty]">{reading.body}</p>
+                  <h3 className="mt-2 font-grotesk font-semibold text-lg text-ink">{reading.name}</h3>
+                  <p className="mt-2 text-md text-ink-muted leading-relaxed [text-wrap:pretty]">{reading.body}</p>
                 </li>
               ))}
             </ol>
@@ -263,7 +263,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
                   open={index === 0}
                   className="group rounded-card border border-line-subtle bg-surface-1 hud-sheen px-5 sm:px-6 transition-colors hover:border-line open:border-line"
                 >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-grotesk font-bold text-lg text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-hidden focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-grotesk font-semibold text-lg text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-hidden focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
                     {item.question}
                     <Plus className="h-5 w-5 shrink-0 text-cyan-glow transition-transform duration-300 group-open:rotate-45" aria-hidden="true" />
                   </summary>
@@ -294,7 +294,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => openAuth('signup')}
-                    className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-bold text-sm border border-line bg-surface-1/80 hud-sheen backdrop-blur-md text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                    className="inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-control font-grotesk font-semibold text-sm border border-line bg-surface-1/80 hud-sheen backdrop-blur-md text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
                     Join free
                   </button>

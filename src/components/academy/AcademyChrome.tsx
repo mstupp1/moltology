@@ -106,7 +106,7 @@ export function AcademyProgress({
   return (
     <div className="space-y-1.5">
       {compact ? null : (
-        <div className="flex justify-between text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+        <div className="eyebrow flex justify-between">
           <span>{label}</span>
           <span className={done ? 'text-emerald-500' : 'text-ink'}>{done ? 'Complete' : `${safe}%`}</span>
         </div>
@@ -128,7 +128,7 @@ export function AcademyProgress({
 export function LevelMark({ level }: { level: AcademyLevel }) {
   const bars = level === 'beginner' ? 1 : level === 'intermediate' ? 2 : 3
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
+    <span className="inline-flex items-center gap-1.5 text-2xs text-ink-muted font-semibold">
       <span className="inline-flex items-end gap-0.5" aria-hidden="true">
         {[1, 2, 3].map((bar) => (
           <span
@@ -166,7 +166,7 @@ export function AcademySectionHeading({
   return (
     <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
       <div className="space-y-0.5">
-        <h2 id={id} className="font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">
+        <h2 id={id} className="font-grotesk text-sm font-semibold text-ink">
           {title}
         </h2>
         {subtitle ? <p className="text-xs text-ink-muted leading-relaxed">{subtitle}</p> : null}
@@ -178,15 +178,15 @@ export function AcademySectionHeading({
 
 /** Small cyan text action with an arrow, for "Open …" links in section headers and cards. */
 export const ACADEMY_TEXT_ACTION = cn(
-  'inline-flex items-center gap-1 min-h-8 px-2 -mx-2 rounded-control text-xs font-bold text-cyan-glow hover:bg-surface-2 transition-colors whitespace-nowrap',
+  'inline-flex items-center gap-1 min-h-8 px-2 -mx-2 rounded-control text-xs font-semibold text-cyan-glow hover:bg-surface-2 transition-colors whitespace-nowrap',
   ACADEMY_FOCUS,
 )
 
 /** Link styled like a HudButton, for navigation that should look like an action. */
 export function academyButtonLink(variant: 'primary' | 'secondary', size: 'md' | 'lg' = 'md') {
   return cn(
-    'inline-flex items-center justify-center gap-2 rounded-control font-bold uppercase tracking-[0.08em] transition-colors',
-    size === 'lg' ? 'min-h-12 px-6 text-[13px]' : 'min-h-10 px-[18px] text-xs',
+    'inline-flex items-center justify-center gap-2 rounded-control font-semibold transition-colors',
+    size === 'lg' ? 'min-h-12 px-6 text-ui' : 'min-h-10 px-[18px] text-xs',
     variant === 'primary'
       ? 'bg-cyan-glow text-abyss hover:bg-cyan-hover'
       : 'border border-line bg-surface-1 text-ink hover:bg-surface-2 hover:border-line-strong',
@@ -224,7 +224,7 @@ export function AcademyCover({
         <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
           <span className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_30%_20%,rgba(0,195,255,0.18),transparent_60%)]" />
           {label ? (
-            <span className="relative font-grotesk font-extrabold text-2xl tracking-[0.12em] text-ink/15 select-none">{label}</span>
+            <span className="relative font-grotesk font-semibold text-2xl tracking-[0.12em] text-ink/15 select-none">{label}</span>
           ) : (
             <GraduationCap className="relative w-10 h-10 text-ink/15" />
           )}

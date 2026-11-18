@@ -78,17 +78,17 @@ function CommentRow({ comment }: { comment: BlogCommentEntry }) {
         avatar
       )}
       <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-ink-muted">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-2xs text-ink-muted">
           {profileParams ? (
             <Link
               to="/member/$profileId"
               params={profileParams}
-              className={`text-ink font-bold text-xs sm:text-sm truncate max-w-[60vw] sm:max-w-none hover:text-cyan-glow transition-colors rounded-control ${FOCUS}`}
+              className={`text-ink font-semibold text-xs sm:text-sm truncate max-w-[60vw] sm:max-w-none hover:text-cyan-glow transition-colors rounded-control ${FOCUS}`}
             >
               {comment.authorName}
             </Link>
           ) : (
-            <span className="text-ink font-bold text-xs sm:text-sm truncate">{comment.authorName}</span>
+            <span className="text-ink font-semibold text-xs sm:text-sm truncate">{comment.authorName}</span>
           )}
           <StageBadge stage={comment.authorStage} />
           <LocalTime value={comment.createdAt} format={relativeTime} titleFormat={formatDayTime} />
@@ -297,7 +297,7 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
         <div className="flex items-center justify-end gap-2">
           {charCount >= COUNT_SHOWS_AT && (
             <span
-              className={`mr-auto text-[11px] ${isOverLimit ? 'text-crimson-text font-bold' : 'text-ink-muted'}`}
+              className={`mr-auto text-2xs ${isOverLimit ? 'text-crimson-text font-semibold' : 'text-ink-muted'}`}
               data-testid="blog-comment-count"
             >
               {charCount} / {MAX_CHAR_LIMIT}
@@ -333,10 +333,10 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
       className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-line-subtle space-y-3 sm:space-y-4"
       aria-labelledby="blog-comments-heading"
     >
-      <h2 id="blog-comments-heading" className="font-grotesk text-base sm:text-lg font-bold text-ink flex items-center gap-2">
+      <h2 id="blog-comments-heading" className="font-grotesk text-base sm:text-lg font-semibold text-ink flex items-center gap-2">
         Comments
         {!loadingComments && (
-          <span className="text-xs font-sans font-bold px-2 py-0.5 bg-surface-2 border border-line-subtle text-ink-body rounded-chip">
+          <span className="text-xs font-sans font-semibold px-2 py-0.5 bg-surface-2 border border-line-subtle text-ink-body rounded-chip">
             {count}
           </span>
         )}

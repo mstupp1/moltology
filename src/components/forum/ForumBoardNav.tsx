@@ -41,7 +41,7 @@ export function ForumSortTabs({
             aria-pressed={lit}
             onClick={() => onChange(key)}
             className={cn(
-              'min-h-8 px-3 rounded-control text-xs font-bold transition-colors',
+              'min-h-8 px-3 rounded-control text-xs font-semibold transition-colors',
               lit ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
               FOCUS,
             )}
@@ -94,9 +94,9 @@ export function ForumBoardNav({
               >
                 <span className="flex items-center gap-1.5 min-w-0">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: board.color }} aria-hidden="true" />
-                  <span className="text-xs font-bold text-ink leading-snug line-clamp-2">{board.name}</span>
+                  <span className="text-xs font-semibold text-ink leading-snug line-clamp-2">{board.name}</span>
                 </span>
-                <span className="mt-auto flex flex-wrap items-center justify-between gap-2 text-[11px] text-ink-muted tabular-nums">
+                <span className="mt-auto flex flex-wrap items-center justify-between gap-2 text-2xs text-ink-muted tabular-nums">
                   <span>{postCount(board.topicCount)}</span>
                   {board.unreadCount && board.unreadCount > 0 ? (
                     <ForumUnreadMark label={formatForumUnreadCount(board.unreadCount)} />
@@ -129,14 +129,14 @@ export function ForumBoardNav({
               <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: board.color }} aria-hidden="true" />
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-ink group-hover:text-cyan-glow transition-colors truncate">{board.name}</span>
+                  <span className="text-xs font-semibold text-ink group-hover:text-cyan-glow transition-colors truncate">{board.name}</span>
                   {board.unreadCount && board.unreadCount > 0 ? (
                     <ForumUnreadMark label={formatForumUnreadCount(board.unreadCount)} />
                   ) : null}
                 </span>
-                <span className="text-[11px] text-ink-muted leading-relaxed line-clamp-1">{board.description}</span>
+                <span className="text-2xs text-ink-muted leading-relaxed line-clamp-1">{board.description}</span>
               </span>
-              <span className="flex items-center gap-1 text-[11px] text-ink-muted tabular-nums shrink-0 mt-0.5">
+              <span className="flex items-center gap-1 text-2xs text-ink-muted tabular-nums shrink-0 mt-0.5">
                 {postCount(board.topicCount)}
                 <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
               </span>

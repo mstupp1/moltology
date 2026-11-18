@@ -62,7 +62,7 @@ const STARTER_PICKS: GearPicks = Object.fromEntries(Object.entries(STARTER_CHARA
 function Chips<T extends string>({ label, options, value, onChange, labels }: { label: string; options: readonly T[]; value: T; onChange: (v: T) => void; labels: Readonly<Record<string, string>> }) {
   return (
     <fieldset className="min-w-0">
-      <legend className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{label}</legend>
+      <legend className="eyebrow mb-1.5">{label}</legend>
       <div className="flex flex-wrap gap-1.5">
         {options.map((option) => (
           <button
@@ -87,7 +87,7 @@ function Chips<T extends string>({ label, options, value, onChange, labels }: { 
 function Swatches<T extends string>({ label, options, value, onChange }: { label: string; options: readonly { id: T; label: string; color: string }[]; value: T; onChange: (v: T) => void }) {
   return (
     <fieldset className="min-w-0">
-      <legend className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{label}</legend>
+      <legend className="eyebrow mb-1.5">{label}</legend>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => (
           <button
@@ -163,7 +163,7 @@ export function Avatar3DLab() {
           onChange={(v) => set('eyeColor', v)}
         />
         <fieldset className="min-w-0">
-          <legend className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Gear</legend>
+          <legend className="eyebrow mb-1.5">Gear</legend>
           <div className="mb-3 flex flex-wrap gap-1.5">
             <button type="button" onClick={() => setGear(STARTER_PICKS)} className="inline-flex min-h-8 items-center rounded-control bg-surface-2 px-2.5 text-xs font-medium text-ink-muted transition-colors hover:bg-surface-3/60 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
               Starter set

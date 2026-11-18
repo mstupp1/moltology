@@ -74,10 +74,10 @@ export function HudTabs<T extends string = string>({
             onClick={() => onValueChange(item.value)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(
-              'inline-flex min-h-9 items-center whitespace-nowrap rounded-control px-2.5 text-[11px] uppercase tracking-[0.08em] transition-colors',
+              'inline-flex min-h-9 items-center whitespace-nowrap rounded-control px-2.5 text-ui font-medium transition-colors',
               'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
               'disabled:cursor-not-allowed disabled:opacity-50',
-              selected ? 'font-bold text-ink' : 'font-semibold text-ink-muted hover:text-ink'
+              selected ? 'text-ink' : 'text-ink-muted hover:text-ink'
             )}
           >
             {item.label}

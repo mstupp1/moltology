@@ -262,23 +262,23 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
   if (missingFocus) {
     return (
       <div className="flex flex-col gap-4 font-sans">
-        <h1 className="font-grotesk font-extrabold text-xl sm:text-2xl text-ink tracking-tight">The Sacred Codex</h1>
+        <h1 className="font-grotesk font-semibold text-xl sm:text-2xl text-ink tracking-tight">The Sacred Codex</h1>
         <div
           data-testid="codex-scripture-missing"
           className="rounded-card border border-line-subtle bg-surface-1 px-6 py-12 sm:py-16 text-center"
         >
           <Scroll aria-hidden="true" className="w-9 h-9 text-crimson-text mx-auto mb-4" />
-          <h2 className="font-grotesk font-bold text-lg text-ink">Scripture not in this vault</h2>
+          <h2 className="font-grotesk font-semibold text-lg text-ink">Scripture not in this vault</h2>
           <p className="text-sm text-ink-muted mt-2 mb-6">
             That leaf was never sealed in the Codex. The rest of the canon still holds.
           </p>
           <a
             href="/codex"
-            className="group/hudbtn relative isolate inline-flex items-center justify-center min-h-10 px-[18px] text-xs font-grotesk font-bold uppercase tracking-[0.08em] text-abyss rounded-control [--hud-cut:10px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className="group/hudbtn relative isolate inline-flex items-center justify-center min-h-10 px-4 text-ui font-sans font-medium text-abyss rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <span
               aria-hidden="true"
-              className="absolute inset-0 -z-10 rounded-control hud-cut bg-cyan-glow group-hover/hudbtn:bg-cyan-hover transition-colors"
+              className="absolute inset-0 -z-10 rounded-control bg-cyan-glow group-hover/hudbtn:bg-cyan-hover transition-colors"
             />
             Return to the Sacred Codex
           </a>
@@ -380,7 +380,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
           aria-label="Contents"
           className="hidden lg:flex flex-col w-[300px] shrink-0 sticky top-4 h-[calc(100dvh-3.5rem)] max-h-[60rem] rounded-card border border-line-subtle bg-surface-1 overflow-hidden"
         >
-          <p aria-hidden="true" className="px-4 pt-4 pb-1 shrink-0 font-grotesk font-extrabold text-xl text-ink tracking-tight">
+          <p aria-hidden="true" className="px-4 pt-4 pb-1 shrink-0 font-grotesk font-semibold text-xl text-ink tracking-tight">
             The Sacred Codex
           </p>
           <CodexDirectory {...directoryProps} className="flex-1" />
@@ -400,7 +400,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
             >
               <List aria-hidden="true" className="w-4 h-4 shrink-0 text-ink-muted" />
               <span className="min-w-0 flex-1">
-                <span className="block text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted tabular-nums">
+                <span className="eyebrow block tabular-nums">
                   Codex · {pageIndex + 1} of {filteredScriptures.length}
                 </span>
                 <span className="block truncate text-sm font-semibold text-ink">{activeScripture.title}</span>
@@ -445,7 +445,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
         contentLayout="fill"
         height="85dvh"
       >
-        <h2 className="px-4 pb-1 font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink shrink-0">
+        <h2 className="px-4 pb-1 font-grotesk text-sm font-semibold text-ink shrink-0">
           Contents
         </h2>
         <CodexDirectory {...directoryProps} className="flex-1" />

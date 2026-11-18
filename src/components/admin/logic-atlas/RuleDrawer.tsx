@@ -18,7 +18,7 @@ export interface RuleDrawerProps {
 
 function SectionTitle({ icon: Icon, children }: { icon: React.ComponentType<{ className?: string }>; children: React.ReactNode }) {
   return (
-    <h3 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+    <h3 className="eyebrow flex items-center gap-1.5">
       <Icon className="h-3.5 w-3.5" />
       {children}
     </h3>
@@ -86,7 +86,7 @@ export function RuleDrawer({
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-control px-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:bg-surface-3 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow min-[900px]:hidden"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-control px-1.5 text-2xs font-semibold text-ink-muted hover:bg-surface-3 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow min-[900px]:hidden"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to map
@@ -108,9 +108,9 @@ export function RuleDrawer({
             <KindTag kind={rule.kind} />
             <StatusTag status={rule.status} />
           </div>
-          <h2 className="mt-2 font-grotesk text-xl font-bold leading-tight text-ink">{rule.title}</h2>
+          <h2 className="mt-2 font-grotesk text-xl font-semibold leading-tight text-ink">{rule.title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-body">{rule.statement}</p>
-          <p className="mt-2 text-[11px] text-ink-muted">
+          <p className="mt-2 text-2xs text-ink-muted">
             {RULE_KIND_HINTS[rule.kind]} · <span className="font-mono">{rule.id}</span>
           </p>
         </header>
@@ -124,7 +124,7 @@ export function RuleDrawer({
               <button
                 type="button"
                 onClick={onExpandFlow}
-                className="inline-flex min-h-[32px] items-center gap-1.5 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow hover:text-cyan-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="inline-flex min-h-[32px] items-center gap-1.5 rounded-control text-2xs font-semibold text-cyan-glow hover:text-cyan-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <Maximize2 className="h-3 w-3" />
                 Open large
@@ -155,11 +155,11 @@ export function RuleDrawer({
               {rule.anchors.map((anchor) => (
                 <li key={`${anchor.file}#${anchor.symbol}`} className="rounded-card border border-line-subtle bg-surface-2">
                   <div className="flex items-center justify-between gap-2 px-2.5 pt-2">
-                    <span className="truncate font-mono text-[12px] font-semibold text-ink">{anchor.symbol}</span>
+                    <span className="truncate font-mono text-xs font-semibold text-ink">{anchor.symbol}</span>
                     <DriftBadge drift={anchor.drift} />
                   </div>
                   {anchor.value ? (
-                    <pre className="mx-2.5 mt-1.5 whitespace-pre-wrap break-words rounded-control bg-abyss px-2 py-1.5 font-mono text-[11px] leading-relaxed text-ink-body">
+                    <pre className="mx-2.5 mt-1.5 whitespace-pre-wrap break-words rounded-control bg-abyss px-2 py-1.5 font-mono text-2xs leading-relaxed text-ink-body">
                       {anchor.value}
                     </pre>
                   ) : null}
@@ -167,7 +167,7 @@ export function RuleDrawer({
                     href={anchor.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1.5 px-2.5 py-2 font-mono text-[11px] text-ink-muted hover:text-cyan-glow"
+                    className="flex items-center gap-1.5 px-2.5 py-2 font-mono text-2xs text-ink-muted hover:text-cyan-glow"
                   >
                     <span className="truncate">
                       {anchor.file}
@@ -216,10 +216,10 @@ export function RuleDrawer({
                     onClick={() => onOpenDecision(decision.id)}
                     className="w-full rounded-card border border-line-subtle bg-surface-2 px-3 py-2 text-left transition-colors hover:border-line-hover hover:bg-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                   >
-                    <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+                    <span className="eyebrow">
                       {shortDate(decision.date)}
                     </span>
-                    <span className="mt-0.5 block text-[13px] font-semibold text-ink">{decision.title}</span>
+                    <span className="mt-0.5 block text-ui font-semibold text-ink">{decision.title}</span>
                     <span className="mt-0.5 block text-xs leading-snug text-ink-muted">{decision.summary}</span>
                   </button>
                 </li>
@@ -238,7 +238,7 @@ export function RuleDrawer({
                     href={test.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex max-w-full items-center gap-1.5 font-mono text-[11px] text-ink-muted hover:text-cyan-glow"
+                    className="inline-flex max-w-full items-center gap-1.5 font-mono text-2xs text-ink-muted hover:text-cyan-glow"
                   >
                     <span className="truncate">{test.file}</span>
                     <ExternalLink className="h-3 w-3 shrink-0" />

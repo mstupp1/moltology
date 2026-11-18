@@ -154,7 +154,7 @@ function RuntimeErrorCard({
         <div className="flex items-center justify-between pb-4 border-b border-line-subtle mb-5">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-crimson-aggro" />
-            <span className="text-xs font-semibold text-crimson-text uppercase tracking-[0.08em]">
+            <span className="eyebrow text-crimson-text">
               Application Error
             </span>
           </div>
@@ -194,10 +194,10 @@ function RuntimeErrorCard({
                 {showDetails ? <ChevronDown className="w-4 h-4 text-cyan-glow" /> : <ChevronRight className="w-4 h-4" />}
                 {showDetails ? 'Hide technical details' : 'Show technical details'}
               </span>
-              <span className="text-[11px] text-ink-muted font-sans">Stack Trace</span>
+              <span className="text-2xs text-ink-muted font-sans">Stack Trace</span>
             </button>
             {showDetails && (
-              <pre className="p-4 bg-abyss text-[11px] text-ink-body font-sans overflow-x-auto max-h-48 border-t border-line-subtle whitespace-pre-wrap leading-relaxed select-text">
+              <pre className="p-4 bg-abyss text-2xs text-ink-body font-sans overflow-x-auto max-h-48 border-t border-line-subtle whitespace-pre-wrap leading-relaxed select-text">
                 {errorStack}
               </pre>
             )}

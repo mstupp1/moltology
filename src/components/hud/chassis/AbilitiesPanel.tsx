@@ -7,7 +7,7 @@ export interface AbilitiesPanelProps {
 /** Legacy export retained for callers; powers are descriptive item lore. */
 export const AbilitiesPanel: React.FC<AbilitiesPanelProps> = ({ abilities }) => (
   <section className="space-y-3 text-sm">
-    <h2 className="font-grotesk font-bold">Item lore</h2>
+    <h2 className="font-grotesk font-semibold">Item lore</h2>
     {abilities.length ? (
       <ul className="space-y-3">
         {abilities.map((a) => (

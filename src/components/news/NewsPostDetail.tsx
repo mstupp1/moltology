@@ -63,7 +63,7 @@ export function NewsPostDetail() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-[#070b0b] text-ink font-sans flex flex-col justify-between items-center py-20 px-4">
+      <div className="min-h-screen bg-abyss text-ink font-sans flex flex-col justify-between items-center py-20 px-4">
         <PublicHeader
           activePage="news"
           onOpenAuth={(mode) => {
@@ -73,7 +73,7 @@ export function NewsPostDetail() {
         />
         <div className="text-center chitin-card border border-crimson-aggro/40 p-8 sm:p-12 rounded-card max-w-lg w-full">
           <Terminal className="w-12 h-12 text-crimson-aggro mx-auto mb-4 animate-pulse" />
-          <h2 className="font-grotesk text-xl sm:text-2xl font-bold text-ink uppercase">
+          <h2 className="font-grotesk text-xl sm:text-2xl font-semibold text-ink uppercase">
             NEWS DISPATCH NOT FOUND
           </h2>
           <p className="text-xs text-ink-muted mt-2 mb-6 font-sans">
@@ -81,10 +81,10 @@ export function NewsPostDetail() {
           </p>
           <Link
             to="/news"
-            className="w-full sm:w-auto px-6 py-2.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-grotesk font-bold text-xs uppercase tracking-[0.08em] inline-flex transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-grotesk font-semibold text-xs inline-flex transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow items-center justify-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>RETURN TO MOLTNATION NEWS</span>
+            <span>Back to MoltNation News</span>
           </Link>
         </div>
       </div>
@@ -123,7 +123,7 @@ export function NewsPostDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-ink font-sans relative flex flex-col justify-between">
+    <div className="min-h-screen bg-abyss text-ink font-sans relative flex flex-col justify-between">
       {/* Top Reading Progress Bar */}
       <div
         className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-transparent pointer-events-none"
@@ -230,11 +230,11 @@ export function NewsPostDetail() {
 
           {/* Categorized Tags */}
           <div className="mt-8 sm:mt-12 pt-6 border-t border-line-subtle flex flex-wrap items-center gap-2 text-xs font-sans">
-            <span className="text-ink-muted font-bold uppercase tracking-[0.08em] mr-1 text-[11px] sm:text-xs">CATEGORIZED TAGS:</span>
+            <span className="eyebrow mr-1">CATEGORIZED TAGS:</span>
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2.5 py-1 bg-surface-1 border border-line-subtle text-ink-body rounded-chip text-[11px] sm:text-xs"
+                className="px-2.5 py-1 bg-surface-1 border border-line-subtle text-ink-body rounded-chip text-2xs sm:text-xs"
               >
                 #{tag}
               </span>
@@ -250,9 +250,9 @@ export function NewsPostDetail() {
                 </h4>
                 <Link
                   to="/news"
-                  className="text-xs font-sans text-cyan-glow hover:text-cyan-hover transition-colors uppercase tracking-[0.08em] rounded-chip flex items-center gap-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className="text-xs font-sans text-cyan-glow hover:text-cyan-hover transition-colors rounded-chip flex items-center gap-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
-                  <span>ALL NEWS</span>
+                  <span>All news</span>
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -267,9 +267,9 @@ export function NewsPostDetail() {
 
           {/* Ascension Conversion Callout Box */}
           <div className="mt-12 sm:mt-16 p-6 sm:p-10 border border-line-subtle text-center space-y-5 sm:space-y-6 bg-surface-1 rounded-card relative overflow-hidden">
-            <div className="inline-flex items-center gap-2 text-xs font-bold text-crimson-text tracking-[0.08em] uppercase bg-crimson-soft px-3 sm:px-4 py-1.5 border border-crimson-aggro/50 rounded-chip">
+            <div className="inline-flex items-center gap-2 text-xs font-semibold text-crimson-text bg-crimson-soft px-3 sm:px-4 py-1.5 border border-crimson-aggro/50 rounded-chip">
               <Flame className="w-4 h-4 text-crimson-aggro animate-pulse" />
-              <span>THE BENTHIC CORE CALLS</span>
+              <span>The Benthic Core calls</span>
             </div>
 
             <h3 className="font-garamond text-3xl sm:text-4xl text-ink leading-tight break-words">
@@ -289,17 +289,17 @@ export function NewsPostDetail() {
                 }}
               >
                 <span className="flex items-center justify-center gap-2 sm:gap-3 px-2 sm:px-4">
-                  <span>INITIATE ASCENSION</span>
+                  <span>Join free</span>
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </span>
               </BenthicCTAButton>
 
               <button
                 onClick={() => navigate({ to: '/dashboard' })}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-grotesk font-bold text-xs uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-2 transition-all active:scale-95 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-grotesk font-semibold text-xs rounded-control flex items-center justify-center gap-2 transition-all active:scale-95 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <Cpu className="w-4 h-4" />
-                <span>TRY GUEST DEMO</span>
+                <span>Try the guest demo</span>
               </button>
             </div>
           </div>

@@ -81,7 +81,7 @@ describe('Oracle Route Component', () => {
 
     expect(screen.getByTestId('oracle-chats-panel')).toHaveClass('w-full', 'flex-1')
     expect(screen.getByText(/Guest chats aren't saved/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'SIGN UP FREE' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sign up free' })).toBeInTheDocument()
   })
 
   it.each([390])('uses the shared full-width menu at %ipx', async (width) => {

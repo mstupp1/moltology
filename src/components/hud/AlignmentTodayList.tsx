@@ -115,7 +115,7 @@ export function AlignmentTodayList({
     <>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-baseline gap-2 min-w-0">
-          <span className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Today</span>
+          <span className="font-grotesk text-sm font-semibold text-ink">Today</span>
           {todayLabel && <span className="text-xs text-ink-muted truncate">{todayLabel}</span>}
         </div>
         {showClose && <button
@@ -133,7 +133,7 @@ export function AlignmentTodayList({
           <div className="flex items-start gap-3">
             <Moon className="w-5 h-5 mt-0.5 shrink-0 text-cyan-glow" aria-hidden="true" />
             <div className="min-w-0 space-y-1">
-              <p className="text-sm font-bold text-ink">Rest day</p>
+              <p className="text-sm font-semibold text-ink">Rest day</p>
               <p className="text-xs leading-relaxed text-ink-muted">
                 Today isn't one of your practice days, so there's nothing to do and your
                 {streakDays > 0 ? ` ${streakDays}-day` : ''} streak is safe.
@@ -169,7 +169,7 @@ export function AlignmentTodayList({
       <div className="space-y-2.5">
           <div className="flex items-center justify-between gap-2">
             {countReady ? (
-              <span className={`text-xs ${allTasksCompleted ? 'text-emerald-500 font-bold' : 'text-ink-muted'}`}>
+              <span className={`text-xs ${allTasksCompleted ? 'text-emerald-500 font-semibold' : 'text-ink-muted'}`}>
                 {allTasksCompleted ? 'All eight done for today' : `${completedCount} of ${tasks.length} done`}
                 {actions && isOffDay && (
                   <span className="text-ink-muted font-normal" data-testid="alignment-off-day-note"> · Off day, so this is a bonus</span>
@@ -207,13 +207,13 @@ export function AlignmentTodayList({
               const body = (
                 <>
                   <span
-                    className={`block ${roomy ? 'text-sm' : 'text-[13px]'} ${roomy ? 'line-clamp-2' : 'truncate'} ${
-                      t.completed ? 'text-ink-muted' : 'text-ink font-bold'
+                    className={`block ${roomy ? 'text-sm' : 'text-ui'} ${roomy ? 'line-clamp-2' : 'truncate'} ${
+                      t.completed ? 'text-ink-muted' : 'text-ink font-semibold'
                     }`}
                   >
                     {t.title}
                   </span>
-                  <span className={`block truncate text-[11px] ${isNext ? 'text-cyan-glow' : 'text-ink-muted'}`}>
+                  <span className={`block truncate text-2xs ${isNext ? 'text-cyan-glow' : 'text-ink-muted'}`}>
                     {name ? `${name} · ${t.time}` : t.time}
                     {detail && <span data-testid="alignment-one-thing-line"> · {detail}</span>}
                   </span>

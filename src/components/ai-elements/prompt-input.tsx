@@ -47,7 +47,7 @@ export const OracleModelPicker: React.FC<OracleModelPickerProps> = ({
       <HudDropdownMenuTrigger asChild>
         <button
           type="button"
-          className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
+          className={`flex min-h-8 items-center gap-1 text-2xs sm:text-xs text-ink-body hover:text-ink bg-surface-1 border border-line hover:bg-surface-3 hover:border-line-strong px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING}`}
           title="Select model"
           aria-label="Select model"
         >
@@ -155,7 +155,7 @@ export const OracleSkillMenu: React.FC<{
     return (
       <button
         {...shared}
-        className={`flex min-h-8 items-center gap-1 text-[11px] sm:text-xs text-ink-body hover:text-ink border px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING} ${
+        className={`flex min-h-8 items-center gap-1 text-2xs sm:text-xs text-ink-body hover:text-ink border px-2 py-1 rounded-control transition-colors cursor-pointer ${FOCUS_RING} ${
           open ? 'bg-surface-3 border-line-strong text-ink' : 'bg-surface-1 border-line hover:bg-surface-3 hover:border-line-strong'
         }`}
         title="Skills (or type /)"
@@ -170,7 +170,7 @@ export const OracleSkillMenu: React.FC<{
     <span className="inline-flex min-w-0 max-w-[12rem] sm:max-w-[16rem] items-center rounded-control border border-line bg-surface-3 hover:border-line-strong transition-colors">
       <button
         {...shared}
-        className={`flex min-h-[30px] min-w-0 items-center gap-1 pl-2 ${onClear ? 'pr-1' : 'pr-2'} py-1 text-[11px] sm:text-xs font-semibold text-ink cursor-pointer ${FOCUS_RING} rounded-control`}
+        className={`flex min-h-[30px] min-w-0 items-center gap-1 pl-2 ${onClear ? 'pr-1' : 'pr-2'} py-1 text-2xs sm:text-xs font-semibold text-ink cursor-pointer ${FOCUS_RING} rounded-control`}
         title="Change skill (or type /)"
         aria-label={`Skill: ${activeSkill.name}. Change skill`}
       >
@@ -540,7 +540,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     >
       <p
         id={`${skillListId}-label`}
-        className="shrink-0 px-4 pt-3 pb-1.5 text-[13px] font-medium text-ink-muted md:px-3.5 md:pt-2.5 md:pb-1 md:text-[11px]"
+        className="shrink-0 px-4 pt-3 pb-1.5 text-ui font-medium text-ink-muted md:px-3.5 md:pt-2.5 md:pb-1 md:text-2xs"
       >
         Skills
       </p>
@@ -551,7 +551,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-1.5 pb-1.5 md:px-1 md:pb-1"
       >
         {skillMatches.length === 0 ? (
-          <p className="px-2.5 py-3 text-[13px] text-ink-muted md:py-2 md:text-xs">No skill matches.</p>
+          <p className="px-2.5 py-3 text-ui text-ink-muted md:py-2 md:text-xs">No skill matches.</p>
         ) : (
           skillMatches.map((skill, index) => {
             const on = index === skillCursor
@@ -569,7 +569,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                   if (!on) setSkillCursor(index)
                 }}
                 onClick={() => pickSkill(skill.id)}
-                className={`flex h-12 w-full items-center gap-3 rounded-card px-2.5 text-left text-[15px] font-medium text-ink transition-colors md:h-9 md:gap-2.5 md:rounded-control md:text-[13px] ${
+                className={`flex h-12 w-full items-center gap-3 rounded-card px-2.5 text-left text-md font-medium text-ink transition-colors md:h-9 md:gap-2.5 md:rounded-control md:text-ui ${
                   on ? 'bg-surface-3' : ''
                 }`}
               >
@@ -589,7 +589,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
           href={BROWSE_SKILLS_HREF}
           tabIndex={-1}
           onMouseDown={(e) => e.preventDefault()}
-          className="flex h-12 w-full items-center gap-3 rounded-card px-2.5 text-[15px] text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink md:h-9 md:gap-2.5 md:rounded-control md:text-[13px]"
+          className="flex h-12 w-full items-center gap-3 rounded-card px-2.5 text-md text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink md:h-9 md:gap-2.5 md:rounded-control md:text-ui"
         >
           <ScrollText className="h-5 w-5 shrink-0 md:h-4 md:w-4" aria-hidden="true" />
           Browse all skills
@@ -602,7 +602,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
   const skillChip =
     activeSkill && !skillMenu ? (
       <div className="flex px-1 pb-1">
-        <span className="inline-flex max-w-full items-center gap-1 rounded-chip border border-line bg-surface-3 pl-2 pr-0.5 py-0.5 text-[12px] font-semibold text-ink">
+        <span className="inline-flex max-w-full items-center gap-1 rounded-chip border border-line bg-surface-3 pl-2 pr-0.5 py-0.5 text-xs font-semibold text-ink">
           <OracleSkillIcon
             icon={skills?.find((s) => s.id === activeSkill.id)?.icon}
             className="w-3 h-3 shrink-0 text-cyan-glow"
@@ -654,7 +654,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
         )}
       </form>
       {lengthError && (
-        <p id={lengthFeedbackId} aria-live="polite" className="mt-1 px-1.5 text-[11px] text-crimson-text">
+        <p id={lengthFeedbackId} aria-live="polite" className="mt-1 px-1.5 text-2xs text-crimson-text">
           {lengthError}
         </p>
       )}
@@ -665,7 +665,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
     footnote ? (
       <>
         {node}
-        <p className="mt-1.5 text-center text-[11px] text-ink-muted">{footnote}</p>
+        <p className="mt-1.5 text-center text-2xs text-ink-muted">{footnote}</p>
       </>
     ) : (
       node

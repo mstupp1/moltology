@@ -242,7 +242,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
               type="button"
               onClick={() => setIsHistoryOpen((prev) => !prev)}
               aria-expanded={isHistoryOpen}
-              className="inline-flex items-center gap-1.5 rounded-full bg-surface-1/75 backdrop-blur-md border border-line-subtle hover:border-line hover:bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-ink-body hover:text-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="inline-flex items-center gap-1.5 rounded-full bg-surface-1/75 backdrop-blur-md border border-line-subtle hover:border-line hover:bg-surface-2 px-2.5 py-1 text-2xs font-medium text-ink-body hover:text-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <History className="w-3.5 h-3.5 text-cyan-glow" />
               <span>Context ({priorMessages.length})</span>
@@ -260,7 +260,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
               onClick={() => setIsCaptionMinimized((prev) => !prev)}
               aria-label={isCaptionMinimized ? 'Show response HUD' : 'Minimize response HUD'}
               title={isCaptionMinimized ? 'Show response HUD' : 'Minimize response HUD'}
-              className="inline-flex items-center gap-1 rounded-full bg-surface-1/75 backdrop-blur-md border border-line-subtle hover:border-line hover:bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-ink-muted hover:text-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="inline-flex items-center gap-1 rounded-full bg-surface-1/75 backdrop-blur-md border border-line-subtle hover:border-line hover:bg-surface-2 px-2.5 py-1 text-2xs font-medium text-ink-muted hover:text-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               {isCaptionMinimized ? (
                 <>
@@ -285,13 +285,13 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
           className="relative z-20 mx-3 mt-1 max-h-56 overflow-y-auto rounded-card bg-surface-1/90 backdrop-blur-md border border-line shadow-menu p-3 space-y-2.5 select-text"
         >
           <div className="flex items-center justify-between border-b border-line-subtle pb-1.5">
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+            <span className="eyebrow font-mono">
               Prior Neural Context ({priorMessages.length} {priorMessages.length === 1 ? 'turn' : 'turns'})
             </span>
             <button
               type="button"
               onClick={() => setIsHistoryOpen(false)}
-              className="text-[11px] text-ink-muted hover:text-ink rounded-control px-1.5 py-0.5 cursor-pointer"
+              className="text-2xs text-ink-muted hover:text-ink rounded-control px-1.5 py-0.5 cursor-pointer"
             >
               Close
             </button>
@@ -306,8 +306,8 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
                     : 'bg-abyss/60 border border-line-subtle text-ink-body'
                 }`}
               >
-                <div className="mb-1 flex items-center justify-between text-[11px] text-ink-muted">
-                  <span className="font-semibold uppercase tracking-wider">
+                <div className="mb-1 flex items-center justify-between text-2xs text-ink-muted">
+                  <span className="font-semibold">
                     {msg.role === 'user' ? 'You' : 'Synaptic Oracle'}
                   </span>
                   {msg.timestamp && <span>{msg.timestamp}</span>}
@@ -388,7 +388,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
                   onClick={onOpenAuthModal}
                   className="shrink-0 w-full sm:w-auto !py-1 !px-3"
                 >
-                  <span className="flex items-center justify-center gap-1 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
+                  <span className="eyebrow flex items-center justify-center gap-1">
                     <UserPlus className="w-3 h-3" />
                     <span>Sign Up</span>
                   </span>
@@ -407,14 +407,14 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
               {latestUserMsg && (
                 <div className="flex items-start justify-between gap-2 border-b border-line-subtle bg-surface-2/50 px-3 py-2">
                   <div className="min-w-0 flex-1">
-                    <span className="mr-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-cyan-glow">
+                    <span className="eyebrow mr-2 font-mono">
                       Query
                     </span>
                     <span className="text-xs text-ink line-clamp-2">{latestUserMsg.content}</span>
                     {latestUserMsg.failedError && (
                       <p
                         role="alert"
-                        className="mt-1 flex items-center gap-1.5 text-[11px] text-crimson-text"
+                        className="mt-1 flex items-center gap-1.5 text-2xs text-crimson-text"
                       >
                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                         <span>{latestUserMsg.failedError}</span>
@@ -427,7 +427,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
                       <button
                         type="button"
                         onClick={() => onEditFailed(latestUserMsg.id)}
-                        className="inline-flex items-center h-7 px-1.5 rounded-control text-[11px] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer"
+                        className="inline-flex items-center h-7 px-1.5 rounded-control text-2xs text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer"
                       >
                         Edit
                       </button>
@@ -459,7 +459,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
                       </div>
                     )}
                     {latestAssistantMsg.stopped && (
-                      <p className="text-[11px] text-ink-muted">
+                      <p className="text-2xs text-ink-muted">
                         {latestAssistantMsg.content
                           ? 'Stopped.'
                           : 'Stopped before a reply came through.'}
@@ -477,7 +477,7 @@ export const SynapticEntityHud: React.FC<SynapticEntityHudProps> = ({
                         <button
                           type="button"
                           onClick={onOpenAuthModal}
-                          className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-glow hover:underline cursor-pointer"
+                          className="inline-flex items-center gap-1 text-2xs font-medium text-cyan-glow hover:underline cursor-pointer"
                         >
                           <UserPlus className="w-3 h-3" />
                           <span>Sign up to keep this chat</span>

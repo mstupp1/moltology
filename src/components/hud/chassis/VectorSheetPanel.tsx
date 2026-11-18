@@ -56,11 +56,11 @@ function VectorRow({
     <li className="space-y-1.5" data-testid={`vector-${vector}`}>
       <div className="flex items-baseline justify-between gap-3">
         <div className="min-w-0">
-          <span className="text-[13px] font-semibold text-ink">{meta.label}</span>
-          <span className="ml-2 text-[11px] text-ink-muted hidden sm:inline">{meta.description}</span>
+          <span className="text-ui font-semibold text-ink">{meta.label}</span>
+          <span className="ml-2 text-2xs text-ink-muted hidden sm:inline">{meta.description}</span>
         </div>
-        <div className="shrink-0 tabular-nums text-[13px]" aria-label={`${meta.label} ${base} base, ${formatBonus(gear)} from gear`}>
-          <span className="font-bold text-ink">{base}</span>
+        <div className="shrink-0 tabular-nums text-ui" aria-label={`${meta.label} ${base} base, ${formatBonus(gear)} from gear`}>
+          <span className="font-semibold text-ink">{base}</span>
           <span className={`ml-1 ${gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}`}>({formatBonus(gear)})</span>
           {preview !== undefined && <Change from={gear} to={next} />}
         </div>
@@ -107,7 +107,7 @@ export const VectorSheetPanel: React.FC<VectorSheetPanelProps> = ({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">{title}</h2>
+          <h2 className="font-grotesk text-sm font-semibold text-ink">{title}</h2>
           <p className="text-xs text-ink-muted mt-0.5">
             {sheet.source === 'audit' ? (
               <>Base from the Moltmax audit. Gear adds the bonus.</>
@@ -125,9 +125,9 @@ export const VectorSheetPanel: React.FC<VectorSheetPanelProps> = ({
           </p>
         </div>
         <div className={`shrink-0 text-right ${hideRating ? 'hidden' : ''}`}>
-          <div className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">Moltmax rating</div>
+          <div className="eyebrow">Moltmax rating</div>
           <div className="tabular-nums leading-none mt-1">
-            <span className="font-grotesk text-2xl font-extrabold text-ink">{sheet.rating.base}</span>
+            <span className="font-grotesk text-2xl font-semibold text-ink">{sheet.rating.base}</span>
             <span className={`ml-1 text-sm ${sheet.rating.gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}`}>
               ({formatBonus(sheet.rating.gear)})
             </span>

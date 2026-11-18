@@ -56,7 +56,7 @@ export function RankCrest({
       <span
         data-testid="rank-crest"
         data-rank={rank}
-        className={cn('inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] rounded-chip border shrink-0', className)}
+        className={cn('inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-semibold rounded-chip border shrink-0', className)}
         style={{ color: tier.color, borderColor: tier.ring, backgroundColor: tier.soft }}
       >
         <CrestMedal rank={rank} />
@@ -87,7 +87,7 @@ export function RankRecordChip({ userId, className }: { userId: string | null | 
     <span
       data-testid="rank-record"
       className={cn(
-        'inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] rounded-chip border border-line-subtle bg-surface-2 text-ink-body shrink-0',
+        'inline-flex items-center gap-1 px-2 py-0.5 text-2xs font-semibold rounded-chip border border-line-subtle bg-surface-2 text-ink-body shrink-0',
         className,
       )}
       title="Weeks this member finished in the leaderboard's top 3"

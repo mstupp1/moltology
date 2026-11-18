@@ -91,7 +91,7 @@ function NewsCard({ post }: { post: BlogPostData }) {
         <h3 className="font-garamond text-base leading-snug text-ink group-hover:text-cyan-glow transition-colors line-clamp-2">
           {headline}
         </h3>
-        <p className="text-[11px] text-ink-muted">{formatPostDate(post.publishedAt, 'short')}</p>
+        <p className="text-2xs text-ink-muted">{formatPostDate(post.publishedAt, 'short')}</p>
       </div>
     </a>
   )
@@ -104,14 +104,14 @@ function ChangelogCard({ entry }: { entry: ChangelogEntry }) {
       params={{ slug: entry.slug }}
       className={`group block p-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line transition-colors ${FOCUS}`}
     >
-      <span className="flex flex-wrap items-center gap-2 text-[11px]">
-        <span className="rounded-chip bg-cyan-soft px-2 py-0.5 font-bold text-cyan-glow">{entry.category}</span>
+      <span className="flex flex-wrap items-center gap-2 text-2xs">
+        <span className="rounded-chip bg-cyan-soft px-2 py-0.5 font-semibold text-cyan-glow">{entry.category}</span>
         {entry.version && <span className="text-ink-muted">{entry.version}</span>}
         <span className="ml-auto text-ink-muted tabular-nums">{formatPostDate(entry.releasedAt, 'short')}</span>
       </span>
-      <span className="mt-1.5 block text-sm font-bold text-ink group-hover:text-cyan-glow leading-snug">{entry.title}</span>
+      <span className="mt-1.5 block text-sm font-semibold text-ink group-hover:text-cyan-glow leading-snug">{entry.title}</span>
       <span className="mt-1 block text-xs text-ink-muted leading-relaxed line-clamp-2">{entry.summary}</span>
-      <span className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-cyan-glow">
+      <span className="mt-1.5 inline-flex items-center gap-1 text-2xs font-semibold text-cyan-glow">
         Read update <ArrowRight className="w-3 h-3" aria-hidden="true" />
       </span>
     </Link>
@@ -126,7 +126,7 @@ function CodexCard({ passage }: { passage: OracleCodexCard }) {
       className={`group block p-3.5 rounded-card border no-underline transition-colors ${FOCUS}`}
       style={{ backgroundColor: '#191714', borderColor: '#2e2a24', color: '#e6dfd0' }}
     >
-      <span className="flex items-center gap-2 text-[11px] uppercase tracking-[0.08em] opacity-70">
+      <span className="eyebrow flex items-center gap-2 opacity-70">
         <BookOpenText className="w-3 h-3" aria-hidden="true" />
         <span>{passage.id}</span>
         {passage.verse && <span>· Verse {passage.verse.verseNumber}</span>}
@@ -135,7 +135,7 @@ function CodexCard({ passage }: { passage: OracleCodexCard }) {
         {passage.title}
       </span>
       {passage.verse && (
-        <span className="mt-1.5 block font-garamond text-[15px] leading-relaxed opacity-90 line-clamp-4">
+        <span className="mt-1.5 block font-garamond text-md leading-relaxed opacity-90 line-clamp-4">
           {passage.verse.heading ? <em className="not-italic font-semibold">{passage.verse.heading}. </em> : null}
           {passage.verse.text}
         </span>
@@ -153,10 +153,10 @@ function AcademyCard({ course }: { course: AcademyCourseCard }) {
     >
       <GraduationCap className="w-5 h-5 mt-0.5 shrink-0 text-cyan-glow" aria-hidden="true" />
       <span className="min-w-0">
-        <span className="block text-[11px] text-ink-muted">
+        <span className="block text-2xs text-ink-muted">
           {course.code ? `${course.code} · ` : ''}{course.category} · {course.lessonCount} lessons
         </span>
-        <span className="block text-sm font-bold text-ink group-hover:text-cyan-glow leading-snug">{course.title}</span>
+        <span className="block text-sm font-semibold text-ink group-hover:text-cyan-glow leading-snug">{course.title}</span>
         {course.subtitle && <span className="block text-xs text-ink-muted line-clamp-2">{course.subtitle}</span>}
       </span>
     </Link>
@@ -206,12 +206,12 @@ export function OracleReadCards({ reads, signedIn }: { reads: readonly OracleRea
 
   const icon = <BookOpenText className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
   const header = link && cards.length === 0 ? (
-    <a href={link.href} title={link.title} className={`flex w-fit items-center gap-1 rounded-chip text-[11px] font-medium text-ink-muted hover:text-ink ${FOCUS}`}>
+    <a href={link.href} title={link.title} className={`flex w-fit items-center gap-1 rounded-chip text-2xs font-medium text-ink-muted hover:text-ink ${FOCUS}`}>
       {icon}
       {label}
     </a>
   ) : (
-    <p className="flex w-fit items-center gap-1 text-[11px] font-medium text-ink-muted">
+    <p className="flex w-fit items-center gap-1 text-2xs font-medium text-ink-muted">
       {icon}
       {label}
     </p>
@@ -236,7 +236,7 @@ export function OracleReadCards({ reads, signedIn }: { reads: readonly OracleRea
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className={`flex w-fit items-center gap-1 rounded-control px-2 py-1 -mx-2 text-xs font-bold text-cyan-glow hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer ${FOCUS}`}
+          className={`flex w-fit items-center gap-1 rounded-control px-2 py-1 -mx-2 text-xs font-semibold text-cyan-glow hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer ${FOCUS}`}
         >
           Show {hidden} more <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
         </button>

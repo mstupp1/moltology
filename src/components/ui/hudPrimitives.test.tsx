@@ -43,7 +43,8 @@ describe('HUD Primitive Component Library', () => {
     it('maps legacy variant names onto the four button styles', () => {
       const { rerender } = render(<HudButton variant="cyan">Cyan</HudButton>)
       expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'primary')
-      expect(screen.getByTestId('hud-button-fill')).toHaveClass('bg-cyan-glow', 'hud-cut')
+      expect(screen.getByTestId('hud-button-fill')).toHaveClass('bg-cyan-glow')
+      expect(screen.getByTestId('hud-button-fill')).not.toHaveClass('hud-cut')
 
       rerender(<HudButton variant="crimson">Crimson</HudButton>)
       expect(screen.getByTestId('hud-button-fill')).toHaveClass('bg-crimson-aggro')
@@ -54,7 +55,7 @@ describe('HUD Primitive Component Library', () => {
 
       rerender(<HudButton variant="dark">Dark</HudButton>)
       expect(screen.getByRole('button')).toHaveAttribute('data-variant', 'secondary')
-      expect(screen.getByRole('button')).toHaveClass('border-line')
+      expect(screen.getByRole('button')).toHaveClass('border-line-subtle')
     })
 
     it('uses the control radius and lets a caller override it', () => {

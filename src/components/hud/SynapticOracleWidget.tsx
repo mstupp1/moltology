@@ -281,7 +281,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
               aria-hidden
               className={`${showIntro ? 'hidden ' : ''}pointer-events-none -mr-7 flex h-10 items-center overflow-hidden whitespace-nowrap rounded-full border border-line bg-surface-1/95 backdrop-blur-xl shadow-menu max-w-0 pl-0 pr-0 opacity-0 transition-[max-width,padding,opacity] duration-300 ease-out group-hover:max-w-[240px] group-hover:pl-4 group-hover:pr-10 group-hover:opacity-100 group-focus-visible:max-w-[240px] group-focus-visible:pl-4 group-focus-visible:pr-10 group-focus-visible:opacity-100 motion-reduce:transition-none`}
             >
-              <span className="text-xs tracking-wide text-ink-body font-medium">{DEFAULT_ORACLE_PLACEHOLDER}</span>
+              <span className="text-xs text-ink-body font-medium">{DEFAULT_ORACLE_PLACEHOLDER}</span>
               <span
                 data-testid="oracle-caret-cursor"
                 className="inline-block w-[1.5px] h-3.5 ml-1 bg-cyan-glow animate-caret-blink shrink-0"

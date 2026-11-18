@@ -42,7 +42,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
           {/* Brand & Tagline */}
           <div className="space-y-2 flex flex-col items-center md:items-start max-w-md">
             <FooterBrand />
-            <p className="text-[11px] sm:text-xs text-ink-muted font-sans text-center md:text-left leading-relaxed">
+            <p className="text-2xs sm:text-xs text-ink-muted font-sans text-center md:text-left leading-relaxed">
               Stories about AI, work, and the long road to becoming a crab.
             </p>
           </div>
@@ -54,7 +54,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
           >
             <Link
               to="/news"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Newspaper className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
               <span>NEWS</span>
@@ -62,23 +62,23 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
 
             <Link
               to="/moltmaxxing"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Flame className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>MOLTMAXXING</span>
+              <span>Moltmaxxing</span>
             </Link>
 
             <Link
               to="/guide"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <BookOpen className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>FIELD MANUAL</span>
+              <span>Field Manual</span>
             </Link>
 
             <Link
               to="/moltmax"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Activity className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
               <span>QUIZ</span>
@@ -86,34 +86,34 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
 
             <Link
               to="/forum"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <MessageSquare className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>FORUMS</span>
+              <span>Forums</span>
             </Link>
 
             <Link
               to="/codex"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Scroll className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>CODEX</span>
+              <span>Codex</span>
             </Link>
 
             <Link
               to="/"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Compass className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>MOLTOLOGY HOME</span>
+              <span>Moltology home</span>
             </Link>
 
             <Link
               to="/org"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Building2 className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>COMPANY</span>
+              <span>Company</span>
             </Link>
 
             {storeDestination.external ? (
@@ -121,19 +121,19 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
                 href={storeDestination.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-amber-500/40 hover:border-amber-500/70 text-amber-300 hover:text-amber-200 text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-amber-500/40 hover:border-amber-500/70 text-amber-300 hover:text-amber-200 text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <ShoppingBag className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>STORE</span>
+                <span>Store</span>
                 <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
               </a>
             ) : (
               <Link
                 to="/store"
-                className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-amber-500/40 hover:border-amber-500/70 text-amber-300 hover:text-amber-200 text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-amber-500/40 hover:border-amber-500/70 text-amber-300 hover:text-amber-200 text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <ShoppingBag className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>STORE</span>
+                <span>Store</span>
               </Link>
             )}
 
@@ -141,10 +141,10 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
               href="https://www.instagram.com/moltology_org/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Instagram className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>INSTAGRAM</span>
+              <span>Instagram</span>
               <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
             </a>
 
@@ -152,10 +152,10 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
               href="https://www.youtube.com/@Moltology"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-ink text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Youtube className="w-3.5 h-3.5 text-cyan-glow shrink-0" />
-              <span>YOUTUBE</span>
+              <span>YouTube</span>
               <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
             </a>
 
@@ -163,16 +163,16 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
               href="/rss.xml"
               target="_blank"
               rel="noopener noreferrer"
-              className="col-span-2 sm:col-span-1 px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-cyan-glow text-[11px] sm:text-xs font-grotesk font-bold uppercase tracking-[0.08em] rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="col-span-2 sm:col-span-1 px-3.5 py-2.5 bg-surface-1 hud-sheen hover:bg-surface-2 border border-line hover:border-line-strong text-cyan-glow text-2xs sm:text-xs font-grotesk font-semibold rounded-control flex items-center justify-center gap-1.5 transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Rss className="w-3.5 h-3.5 shrink-0" />
-              <span>RSS FEED</span>
+              <span>RSS feed</span>
             </a>
           </nav>
         </div>
 
         {/* Bottom Legal & Status Strip */}
-        <div className="pt-6 border-t border-line-subtle flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-ink-muted font-sans text-center sm:text-left">
+        <div className="pt-6 border-t border-line-subtle flex flex-col sm:flex-row items-center justify-between gap-4 text-2xs text-ink-muted font-sans text-center sm:text-left">
           <div>
             © 2026 MOLTNATION MEDIA GROUP. ALL RIGHTS RESERVED.
           </div>
@@ -180,14 +180,14 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <Link
               to="/privacy"
-              className="hover:text-cyan-glow transition-colors uppercase tracking-[0.08em] text-[11px] rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="hover:text-cyan-glow transition-colors text-2xs rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Privacy Policy
             </Link>
             <span className="text-ink-muted/50">·</span>
             <Link
               to="/terms"
-              className="hover:text-cyan-glow transition-colors uppercase tracking-[0.08em] text-[11px] rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="hover:text-cyan-glow transition-colors text-2xs rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Terms of Service
             </Link>

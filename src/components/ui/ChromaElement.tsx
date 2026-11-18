@@ -59,9 +59,9 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
         <div
           className={`absolute inset-0 rounded-2xl blur-md opacity-15 pointer-events-none ${
             glowColor === 'cyan'
-              ? 'bg-[#00c3ff]'
+              ? 'bg-cyan-glow'
               : glowColor === 'crimson'
-              ? 'bg-[#ff453a]'
+              ? 'bg-crimson-aggro'
               : 'bg-[#ffd700]'
           }`}
         />

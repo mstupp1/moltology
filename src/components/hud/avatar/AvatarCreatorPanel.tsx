@@ -74,7 +74,7 @@ function OptionGroup({
 }) {
   return (
     <fieldset className="space-y-1.5 min-w-0">
-      <legend className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted mb-1.5">
+      <legend className="eyebrow mb-1.5">
         {label}
       </legend>
       {/* Phones get one swipeable row per group so a tab is a short list, not a wall of tiles. */}
@@ -159,7 +159,7 @@ function Tile({
         />
       </span>
       <span
-        className={`text-[11px] leading-tight font-sans text-center ${selected ? 'text-ink font-semibold' : 'text-ink-body'}`}
+        className={`text-2xs leading-tight font-sans text-center ${selected ? 'text-ink font-semibold' : 'text-ink-body'}`}
       >
         {label}
       </span>
@@ -214,8 +214,8 @@ function Dial({
   return (
     <div className="space-y-1.5 min-w-0">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[11px] font-sans font-semibold tracking-[0.08em] uppercase text-ink-muted">{label}</span>
-        <span className="text-[11px] font-sans text-ink-muted tabular-nums">{Math.round(shown * 100)}%</span>
+        <span className="eyebrow">{label}</span>
+        <span className="text-2xs font-sans text-ink-muted tabular-nums">{Math.round(shown * 100)}%</span>
       </div>
       <input
         type="range"
@@ -240,7 +240,7 @@ function Dial({
         onKeyUp={settle}
         onBlur={settle}
       />
-      <div className="flex justify-between text-[11px] font-sans text-ink-muted">
+      <div className="flex justify-between text-2xs font-sans text-ink-muted">
         <span>{low}</span>
         <span>{high}</span>
       </div>
@@ -383,7 +383,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                   role="tab"
                   aria-selected={tab === t.id}
                   onClick={() => setTab(t.id)}
-                  className={`flex-1 min-h-8 rounded-control text-[11px] font-sans font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`flex-1 min-h-8 rounded-control text-2xs font-sans font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     tab === t.id
                       ? 'bg-surface-3 shadow-nav-current text-ink'
                       : 'text-ink-muted hover:text-ink hover:bg-surface-2'

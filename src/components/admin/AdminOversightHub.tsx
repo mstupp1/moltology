@@ -285,10 +285,10 @@ function MemberDirectory({
                 className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 py-2.5 md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-x-6"
               >
                 <div className="min-w-0">
-                  <p className="flex items-center gap-2 text-sm font-bold text-ink">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-ink">
                     <span className="truncate">{name}</span>
                     {member.role === 'admin' ? (
-                      <span className="shrink-0 rounded-chip bg-amber-500/15 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-amber-400">
+                      <span className="shrink-0 rounded-chip bg-amber-500/15 px-1.5 py-0.5 text-2xs font-semibold text-amber-400">
                         Admin
                       </span>
                     ) : null}
@@ -412,7 +412,7 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
         <ul className="divide-y divide-line-subtle border-y border-line-subtle" data-testid="admin-purchase-list">
           {rows.map((row) => (
             <li key={row.id} className="space-y-0.5 py-2.5">
-              <p className="text-sm font-bold text-ink">{memberName(row.handle, row.larvaId)}</p>
+              <p className="text-sm font-semibold text-ink">{memberName(row.handle, row.larvaId)}</p>
               <p className="text-xs text-ink-muted">{row.email ?? 'No email'}</p>
               <p className="text-xs text-ink-body">
                 {row.isPremium ? 'Oracle MAX active' : 'Oracle MAX inactive'}
@@ -500,7 +500,7 @@ function ExperimentSwitches({ userId }: { userId: string | null }) {
           {rows.map((row) => (
             <li key={row.id} className="flex items-start justify-between gap-4 py-3">
               <div className="space-y-1">
-                <p className="text-sm font-bold text-ink">{row.title}</p>
+                <p className="text-sm font-semibold text-ink">{row.title}</p>
                 <p className="text-xs text-ink-muted">{row.description}</p>
               </div>
               <AdminSwitch

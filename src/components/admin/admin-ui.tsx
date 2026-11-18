@@ -13,7 +13,7 @@ export const QUIET_LINK =
   'inline-flex items-center gap-1 rounded-control text-xs font-semibold text-ink-body transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
 /** Field label on admin forms. */
-export const ADMIN_LABEL = 'text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted'
+export const ADMIN_LABEL = 'eyebrow'
 
 /** Card heading: icon, title, optional note and actions on the right. */
 export function AdminCardHeading({
@@ -32,7 +32,7 @@ export function AdminCardHeading({
   return (
     <div className={cn('flex flex-wrap items-start justify-between gap-x-4 gap-y-2', className)}>
       <div className="min-w-0 space-y-1">
-        <h2 className="flex items-center gap-2 font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">
+        <h2 className="flex items-center gap-2 font-grotesk text-sm font-semibold text-ink">
           {icon ? <span className="text-ink-muted [&_svg]:h-4 [&_svg]:w-4" aria-hidden>{icon}</span> : null}
           {title}
         </h2>

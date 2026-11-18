@@ -26,7 +26,7 @@ import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 import { relativeTime } from '@/lib/forum-utils'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
-export const CONNECTIONS_HUB_TITLE = 'CONNECTIONS'
+export const CONNECTIONS_HUB_TITLE = 'Connections'
 export const CONNECTIONS_HUB_EMPTY_COPY = {
   title: 'The circle is quiet',
   body: 'Search a designation to send a request.',
@@ -67,7 +67,7 @@ function CountTabs({
             type="button"
             onClick={onOpen}
             className={cn(
-              'inline-flex items-center gap-1.5 min-h-8 px-2.5 text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
+              'inline-flex items-center gap-1.5 min-h-8 px-2.5 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
               lit ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
             )}
           >
@@ -100,7 +100,7 @@ function HubAvatarStack({ members, overflow }: { members: ConnectionsListView['f
         ))}
       </div>
       {overflow > 0 && (
-        <span className="ml-1.5 text-[11px] font-bold tabular-nums text-ink-muted">+{overflow}</span>
+        <span className="ml-1.5 text-2xs font-semibold tabular-nums text-ink-muted">+{overflow}</span>
       )}
     </div>
   )
@@ -237,10 +237,10 @@ function HubConnectionRow({
           size={96}
         />
         <span className="min-w-0 flex flex-col">
-          <span className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
+          <span className="text-sm font-semibold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
             {member.displayName}
           </span>
-          <span className="text-[11px] text-ink-muted truncate">
+          <span className="text-2xs text-ink-muted truncate">
             {incoming ? 'Wants to connect' : member.kind === 'sent' ? 'Request sent' : `Stage ${member.stage} · ${member.stageLabel}`}
             {ageLabel ? ` · ${ageLabel}` : ''}
           </span>

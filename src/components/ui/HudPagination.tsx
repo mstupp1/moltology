@@ -89,7 +89,7 @@ export function HudPagination({
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
             aria-label="Go to previous page"
-            className="min-h-8 px-2.5 bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1 font-grotesk font-bold"
+            className="min-h-8 px-2.5 bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1 font-grotesk font-semibold"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span className="hidden xs:inline">PREV</span>
@@ -119,7 +119,7 @@ export function HudPagination({
                   onClick={() => onPageChange(p)}
                   aria-current={isActive ? 'page' : undefined}
                   aria-label={`Page ${p}`}
-                  className={`min-w-8 h-8 px-2 text-xs font-bold tabular-nums rounded-control transition-colors flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                  className={`min-w-8 h-8 px-2 text-xs font-semibold tabular-nums rounded-control transition-colors flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                     isActive
                       ? 'bg-cyan-glow text-abyss'
                       : 'bg-surface-1 text-ink-body hover:text-ink border border-line hover:border-line-strong'
@@ -137,7 +137,7 @@ export function HudPagination({
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             aria-label="Go to next page"
-            className="min-h-8 px-2.5 bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1 font-grotesk font-bold"
+            className="min-h-8 px-2.5 bg-surface-1 border border-line hover:border-line-strong text-ink-body hover:text-ink disabled:opacity-30 disabled:pointer-events-none rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow flex items-center gap-1 font-grotesk font-semibold"
           >
             <span className="hidden xs:inline">NEXT</span>
             <ChevronRight className="w-3.5 h-3.5" />

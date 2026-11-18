@@ -31,7 +31,7 @@ describe('GuestLockGuard Component', () => {
     expect(screen.getByText('MOLT ACADEMY LOCKED')).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(screen.getByText('Coursework requires an initiate account.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Sign up to unlock/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Already have an account\? Sign In/i })).toBeInTheDocument()
 
     // Verify background content exists under dim blur layer
@@ -47,7 +47,7 @@ describe('GuestLockGuard Component', () => {
       </GuestLockGuard>
     )
 
-    const signUpBtn = screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })
+    const signUpBtn = screen.getByRole('button', { name: /Sign up to unlock/i })
     fireEvent.click(signUpBtn)
 
     expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('GuestLockGuard Component', () => {
     expect(screen.getByText('Unlocked Biological Specimens')).toBeInTheDocument()
     expect(screen.queryByText('BENTHIC ARCHIVE LOCKED')).not.toBeInTheDocument()
     expect(screen.queryByText('RESTRICTED ACCESS')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Sign up to unlock/i })).not.toBeInTheDocument()
   })
 
   it('bypasses guest lock when bypass prop is set to true', () => {
@@ -109,7 +109,7 @@ describe('GuestLockGuard Component', () => {
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
     expect(screen.queryByText('LECTURES LOCKED')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Sign up to unlock/i })).not.toBeInTheDocument()
   })
 
   it('renders default HudWorkspaceGhost when authClient.useSession is pending', () => {

@@ -65,14 +65,14 @@ export function DashboardStorePanel() {
                 params={{ slug: product.slug }}
                 className={cn('group block rounded-control -m-1 p-1 hover:bg-surface-2 transition-colors', DASHBOARD_FOCUS)}
               >
-                <span className={cn('block aspect-[4/3] overflow-hidden rounded-control border border-line-subtle', image?.background ?? 'bg-benthic-border')}>
+                <span className={cn('block aspect-[4/3] overflow-hidden rounded-control border border-line-subtle', image?.background ?? 'bg-surface-3')}>
                   <MerchImage
                     src={image?.src ?? product.featuredImageUrl}
                     alt={image?.alt ?? product.title}
                     className={cn('h-full w-full transition duration-500 group-hover:scale-[1.03]', image ? 'object-contain p-3' : 'object-cover')}
                   />
                 </span>
-                <span className="mt-2 block text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-2">
+                <span className="mt-2 block text-sm font-semibold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-2">
                   {product.title}
                 </span>
                 <span className="block text-xs text-ink-muted">{orderingOpen ? merchPriceLabel(product) : 'Coming soon'}</span>

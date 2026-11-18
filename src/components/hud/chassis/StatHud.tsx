@@ -47,7 +47,7 @@ function Delta({ from, to, className = '' }: { from: number; to: number; classNa
   if (from === to) return null
   const up = to > from
   return (
-    <span className={`font-bold ${up ? 'text-emerald-400' : 'text-crimson-text'} ${className}`}>
+    <span className={`font-semibold ${up ? 'text-emerald-400' : 'text-crimson-text'} ${className}`}>
       <span aria-hidden="true">{up ? '▲' : '▼'}</span>
       {formatBonus(to - from)}
       <span className="sr-only"> if equipped</span>
@@ -84,8 +84,8 @@ function StatGuide({
       <div className="flex items-center gap-3">
         <RatingHex value={sheet.rating.total} />
         <div className="min-w-0">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-glow">Moltmax rating</div>
-          <div className="font-grotesk text-lg font-bold text-ink tabular-nums leading-tight">
+          <div className="eyebrow">Moltmax rating</div>
+          <div className="font-grotesk text-lg font-semibold text-ink tabular-nums leading-tight">
             {sheet.rating.total}{' '}
             <span className="text-sm font-semibold text-ink-muted">
               = {sheet.rating.base} base{' '}
@@ -124,25 +124,25 @@ function StatGuide({
             >
               <div className="flex items-baseline justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="text-[13px] font-bold text-ink">{meta.label}</span>
-                  <span className="ml-2 text-[11px] font-bold tracking-[0.14em] text-ink-muted">{meta.short}</span>
+                  <span className="text-ui font-semibold text-ink">{meta.label}</span>
+                  <span className="ml-2 text-2xs font-semibold text-ink-muted">{meta.short}</span>
                 </div>
-                <div className="shrink-0 tabular-nums text-[13px]">
-                  <span className="font-bold text-ink">{base}</span>{' '}
+                <div className="shrink-0 tabular-nums text-ui">
+                  <span className="font-semibold text-ink">{base}</span>{' '}
                   <span className={gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}>{formatBonus(gear)}</span>{' '}
-                  <Delta from={gear} to={next} className="text-[12px]" />
+                  <Delta from={gear} to={next} className="text-xs" />
                 </div>
               </div>
               <p className="text-xs text-ink-body mt-0.5">{meta.description}</p>
               <div className="mt-1.5 flex items-center gap-2">
                 <Segments base={base} gear={gear} next={next} size="lg" />
               </div>
-              <p className="text-[11px] text-ink-muted mt-1">Raised by {slotNames(k)} gear.</p>
+              <p className="text-2xs text-ink-muted mt-1">Raised by {slotNames(k)} gear.</p>
             </li>
           )
         })}
       </ul>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-ink-muted">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-2xs text-ink-muted">
         <span className="inline-flex items-center gap-1.5"><i className="stat-hud-key" data-kind="base" />Base</span>
         <span className="inline-flex items-center gap-1.5"><i className="stat-hud-key" data-kind="gear" />Gear bonus</span>
         <span className="inline-flex items-center gap-1.5"><i className="stat-hud-key" data-kind="up" />If equipped</span>
@@ -215,11 +215,11 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
           aria-haspopup="dialog"
           onClick={() => show(null)}
         >
-          <span className="inline-flex items-center gap-0.5 text-[11px] font-bold tracking-[0.02em] text-cyan-glow">
+          <span className="inline-flex items-center gap-0.5 text-2xs font-semibold text-cyan-glow">
             MAX
             <Info className="w-2.5 h-2.5" aria-hidden="true" />
           </span>
-          <span className="font-grotesk text-[15px] font-bold text-ink tabular-nums stat-hud-glow">
+          <span className="font-grotesk text-md font-semibold text-ink tabular-nums stat-hud-glow">
             {sheet.rating.total}
           </span>
         </button>
@@ -238,9 +238,9 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
               onClick={() => show(k)}
             >
               <span className="flex items-baseline justify-between">
-                <span className="text-[11px] font-bold tracking-[0.1em] text-ink-muted">{meta.short}</span>
-                <span className="text-[11px] leading-[14px] font-bold text-ink tabular-nums">
-                  {next !== gear ? <Delta from={gear} to={next} className="text-[11px] mr-0.5" /> : null}
+                <span className="text-2xs font-semibold text-ink-muted">{meta.short}</span>
+                <span className="text-2xs leading-[14px] font-semibold text-ink tabular-nums">
+                  {next !== gear ? <Delta from={gear} to={next} className="text-2xs mr-0.5" /> : null}
                   {sheet.total[k]}
                 </span>
               </span>
@@ -292,14 +292,14 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
         >
           <RatingHex value={sheet.rating.total} size="sm" />
           <span className="text-left">
-            <span className="block text-[11px] font-bold tracking-[0.14em] text-cyan-glow">MOLTMAX</span>
-            <span className="block text-[11px] tabular-nums">
+            <span className="block text-2xs font-semibold text-cyan-glow">Moltmax</span>
+            <span className="block text-2xs tabular-nums">
               <span className={sheet.rating.gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}>
                 {formatBonus(sheet.rating.gear)} gear
               </span>
               {nextRating !== null && <Delta from={sheet.rating.total} to={nextRating} className="ml-1" />}
             </span>
-            <span className="block text-[11px] text-ink-muted group-hover:text-ink">What&apos;s this?</span>
+            <span className="block text-2xs text-ink-muted group-hover:text-ink">What&apos;s this?</span>
           </span>
         </button>
         {VECTOR_KEYS.map((k) => {
@@ -319,13 +319,13 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
               onClick={() => show(k)}
             >
               <span className="flex items-baseline justify-between gap-1.5">
-                <span className="text-[12px] font-bold tracking-[0.14em] text-ink-muted group-hover:text-ink">{meta.short}</span>
-                <span className="shrink-0 font-grotesk text-[15px] font-bold text-ink tabular-nums">{base}</span>
+                <span className="text-xs font-semibold text-ink-muted group-hover:text-ink">{meta.short}</span>
+                <span className="shrink-0 font-grotesk text-md font-semibold text-ink tabular-nums">{base}</span>
               </span>
               <span className="mt-1.5 block">
                 <Segments base={base} gear={gear} next={next} />
               </span>
-              <span className="flex items-center justify-end gap-1 mt-1 h-3.5 text-[11px] tabular-nums">
+              <span className="flex items-center justify-end gap-1 mt-1 h-3.5 text-2xs tabular-nums">
                 <span className="truncate">
                   <span className={gear > 0 ? 'text-cyan-glow font-semibold' : 'text-ink-muted'}>{formatBonus(gear)} gear</span>
                   <Delta from={gear} to={next} className="ml-1" />
@@ -334,7 +334,7 @@ export const StatHud: React.FC<StatHudProps> = ({ sheet, preview, variant, class
               {/* Hover hint: the one-line meaning, so the stat reads without opening the guide. */}
               {!open && (
                 <span role="tooltip" className="stat-hud-tip">
-                  <span className="block font-bold text-ink">{meta.label}</span>
+                  <span className="block font-semibold text-ink">{meta.label}</span>
                   {meta.description}
                   <span className="block mt-1 text-cyan-glow">Click for all stats</span>
                 </span>

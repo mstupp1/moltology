@@ -52,9 +52,9 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
     <Link to={href.to} params={href.params} className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col h-full')}>
       <AcademyCover url={course.coverImageUrl} className="aspect-[16/7] border-b border-line-subtle">
         <div className="flex h-full items-start justify-between gap-2 p-3">
-          <span className="rounded-chip bg-abyss/70 px-1.5 py-0.5 text-[11px] font-bold tracking-[0.08em] text-ink">{course.code}</span>
+          <span className="rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">{course.code}</span>
           {course.completed ? (
-            <span className="inline-flex items-center gap-1 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-emerald-500">
+            <span className="inline-flex items-center gap-1 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-emerald-500">
               <Check className="w-3 h-3" aria-hidden="true" /> Done
             </span>
           ) : null}
@@ -62,10 +62,10 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
       </AcademyCover>
       <div className="p-3 sm:p-4 flex flex-col gap-2.5 flex-1">
         <div className="space-y-1">
-          <h3 className="font-grotesk font-bold text-base text-ink leading-snug">{course.title}</h3>
+          <h3 className="font-grotesk font-semibold text-base text-ink leading-snug">{course.title}</h3>
           <p className="text-xs text-ink-body leading-relaxed">{course.subtitle}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink-muted">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs text-ink-muted">
           <LevelMark level={course.level} />
           <span className="inline-flex items-center gap-1">
             <Layers className="w-3.5 h-3.5" aria-hidden="true" />
@@ -76,12 +76,12 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
             {formatCourseLength(course.estimatedMinutes)}
           </span>
         </div>
-        <p className="text-[11px] text-ink-muted">
+        <p className="text-2xs text-ink-muted">
           {course.instructorName} · {course.category}
         </p>
         <div className="mt-auto pt-1 space-y-2.5">
           {course.enrolled ? <AcademyProgress percent={course.progressPercent} /> : null}
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-cyan-glow">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
             {courseAction(course)}
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
           </span>
@@ -99,10 +99,10 @@ function ContinueRow({ course }: { course: AcademyCourseCard }) {
       <div className="flex-1 min-w-0 p-3 sm:p-4 space-y-2">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">{course.code}</p>
-            <h3 className="font-grotesk font-bold text-sm text-ink truncate">{course.title}</h3>
+            <p className="eyebrow">{course.code}</p>
+            <h3 className="font-grotesk font-semibold text-sm text-ink truncate">{course.title}</h3>
           </div>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-cyan-glow shrink-0">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow shrink-0">
             {courseAction(course)}
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
           </span>
@@ -122,7 +122,7 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
     >
       <AcademyCover url={track.coverImageUrl} className="h-24 sm:h-auto sm:w-40 shrink-0 border-b sm:border-b-0 sm:border-r border-line-subtle">
         <div className="flex h-full items-end p-3">
-          <span className="inline-flex items-center gap-1.5 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-ink">
+          <span className="inline-flex items-center gap-1.5 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">
             <RouteIcon className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
             Track
           </span>
@@ -131,16 +131,16 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
       <div className="p-3 sm:p-4 flex flex-col gap-2 flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <LevelMark level={track.level} />
-          <span className="text-[11px] text-ink-muted">
+          <span className="text-2xs text-ink-muted">
             {track.courseCount} {track.courseCount === 1 ? 'course' : 'courses'} · about {track.estimatedHours} hr
           </span>
         </div>
-        <h3 className="font-grotesk font-bold text-lg text-ink leading-snug">{track.title}</h3>
+        <h3 className="font-grotesk font-semibold text-lg text-ink leading-snug">{track.title}</h3>
         <p className="text-xs text-ink-body leading-relaxed">{track.description}</p>
         {track.progressPercent > 0 ? (
           <AcademyProgress percent={track.progressPercent} label={`${track.completedCourseCount} of ${track.courseCount} courses`} />
         ) : null}
-        <span className="mt-auto inline-flex items-center gap-1 text-xs font-bold text-cyan-glow">
+        <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
           {track.progressPercent > 0 ? 'Continue track' : 'View track'}
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </span>
@@ -181,11 +181,11 @@ function AcademyComingSoon() {
             <GraduationCap className="w-6 h-6" aria-hidden="true" />
           </span>
           <div className="space-y-2 max-w-2xl">
-            <p className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">
+            <p className="inline-flex items-center gap-2 text-2xs font-semibold text-cyan-glow">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow animate-pulse" aria-hidden="true" />
               In preparation
             </p>
-            <h2 id="academy-coming-soon" className="font-grotesk font-extrabold text-xl sm:text-2xl text-ink leading-tight">
+            <h2 id="academy-coming-soon" className="font-grotesk font-semibold text-xl sm:text-2xl text-ink leading-tight">
               {ACADEMY_COPY.comingSoonTitle}
             </h2>
             <p className="text-sm text-ink-body leading-relaxed">{ACADEMY_COPY.comingSoonBody}</p>
@@ -205,8 +205,8 @@ function AcademyComingSoon() {
               <span className="flex w-7 h-7 items-center justify-center rounded-control bg-surface-2 text-cyan-glow">
                 <Icon className="w-4 h-4" aria-hidden="true" />
               </span>
-              <span className="text-[11px] font-bold text-ink-muted tabular-nums">0{index + 1}</span>
-              <h3 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em] text-ink">{title}</h3>
+              <span className="text-2xs font-semibold text-ink-muted tabular-nums">0{index + 1}</span>
+              <h3 className="font-grotesk text-sm font-semibold text-ink">{title}</h3>
             </div>
             <p className="text-xs text-ink-body leading-relaxed">{body}</p>
           </li>
@@ -235,15 +235,15 @@ function CertificateRow({ certificate }: { certificate: AcademyCertificateCard }
         <Award className="w-4 h-4" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+        <span className="eyebrow block">
           {certificate.scope === 'track' ? 'Track certification' : 'Course certification'}
         </span>
-        <span className="block font-grotesk font-bold text-sm text-ink truncate">{certificate.title}</span>
+        <span className="block font-grotesk font-semibold text-sm text-ink truncate">{certificate.title}</span>
       </span>
       {certificate.earned ? (
-        <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-emerald-500 shrink-0">Earned</span>
+        <span className="eyebrow text-emerald-500 shrink-0">Earned</span>
       ) : (
-        <span className="text-[11px] text-ink-muted shrink-0">Not yet</span>
+        <span className="text-2xs text-ink-muted shrink-0">Not yet</span>
       )}
     </>
   )
@@ -429,7 +429,7 @@ function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'shrink-0 min-h-8 px-3 rounded-control text-[11px] font-bold uppercase tracking-[0.08em] whitespace-nowrap cursor-pointer transition-[background-color,color,box-shadow] duration-200',
+        'shrink-0 min-h-8 px-3 rounded-control text-2xs font-semibold whitespace-nowrap cursor-pointer transition-[background-color,color,box-shadow] duration-200',
         active ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
         ACADEMY_FOCUS,
       )}
