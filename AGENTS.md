@@ -34,6 +34,20 @@ Read [asset workflows](docs/assets-and-media.md) before media work. `npm run ass
 
 Before any content pipeline, read [content workflows and skill routing](content/README.md), including its shared prerequisites. This covers Codex, Academy, blog/social creation, research, composites, and supporting assets. Use the matching skill; queue and publish through repo CLIs only, never Zernio MCP tools.
 
+## Handing work to the Codex agent
+
+This section is for Claude Code sessions on Myles's Mac, which have the OpenAI Codex plugin (`/codex:rescue`). If you are Codex, skip it. Here, "Codex" means the OpenAI coding agent, not the in-app scripture Codex. Claude tokens are worth more to Myles than Codex usage, and spreading work across both matters as much as raw savings.
+
+- **Image generation always goes to Codex** on Luna at low effort: `/codex:rescue --background --model gpt-6-luna --effort low <brief>`. Write the full brief, prompts and references first. Use medium effort only when Codex has to choose between references or compose the shot. Claude reviews the images.
+- **Offer Codex once the decision is made and what's left is repeating it.** Use Sol 6.2 at medium effort (Codex's default model, so omit `--model`): `/codex:rescue --background --effort medium <task>`. Ask in one line before handing off; if Myles says no, do it in Claude. Good fits:
+  - Sweeps that apply a settled rule across many files (renames and redirects, token or class swaps, copy rules). Claude fixes one example first, and the brief points to it.
+  - Screenshot and recapture sets, `mockups:stale`, and before/after sets.
+  - Read-the-whole-repo audits that produce a list (pagination, caching, Logic Atlas checks). Claude decides what to do with the list.
+  - Upkeep: security advisory bumps, type/lint/test fixes, catching the dev database up on migrations.
+  - Content runs once the workflow is settled (see [content workflows](content/README.md)).
+- **Keep in Claude:** plans, design and feel calls, anything touching money, trust/standing or the LLM budget, production database changes, and the final review and merge.
+- Go up to `--effort high` only after a medium run has failed on the same problem. Leave the plugin's review gate off. Review Codex's diff before committing it.
+
 ## Logic Atlas
 
 Business rules and decisions live in [docs/logic/](docs/logic/) and render for staff at `/admin/logic`. After merging changes to thresholds, access, economy, screening, moderation, or data handling, refresh it with [logic-atlas](.agents/skills/logic-atlas/SKILL.md).
