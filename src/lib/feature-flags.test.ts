@@ -32,7 +32,7 @@ describe('feature-flags', () => {
 
   it('requires admins to opt in to Premium', () => {
     expect(isFeatureFlagEnabled('premium', { role: 'admin' })).toBe(false)
-    expect(isFeatureFlagEnabled('premium', { role: 'admin', experiments: ['new-store'] })).toBe(false)
+    expect(isFeatureFlagEnabled('premium', { role: 'admin', experiments: ['molt-credits'] })).toBe(false)
   })
 
   it('returns false for unknown feature flags', () => {

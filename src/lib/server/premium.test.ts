@@ -69,7 +69,7 @@ describe('setPremiumAccessHandler staff gate', () => {
   })
 
   it('refuses an admin who has not enabled the Oracle MAX experiment', async () => {
-    const db = membershipDb([[{ ...freeMembership, role: 'admin', experiments: ['new-store'] }]])
+    const db = membershipDb([[{ ...freeMembership, role: 'admin', experiments: ['molt-credits'] }]])
     vi.mocked(getDb).mockReturnValue(db as never)
     await expect(setPremiumAccessHandler({
       data: { action: 'grant' },

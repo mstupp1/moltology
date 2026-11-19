@@ -7267,7 +7267,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Public access requires explicit launch controls",
       "kind": "gate",
       "status": "soft-launch",
-      "statement": "Public catalog reads and guest checkout require both the saved public setting and deployment launch authorization. Otherwise only opted-in new-store admins can enter; other visitors retain Etsy.",
+      "statement": "Public catalog reads and guest checkout require both the saved public setting and deployment launch authorization. Otherwise only admins can enter; other visitors retain Etsy.",
       "anchors": [
         {
           "file": "src/lib/server/store.ts",

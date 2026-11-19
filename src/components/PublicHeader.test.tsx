@@ -8,7 +8,7 @@ import { getUserProfileFn } from '@/lib/server/api'
 // The small avatar's 3D face is covered by its own tests; here it stays on the 2D picture.
 vi.mock('@/hooks/usePortrait3D', () => ({ usePortrait3D: () => null }))
 vi.mock('@/lib/jwt', () => ({ getAuthJWTToken: vi.fn().mockResolvedValue(null) }))
-vi.mock('@/lib/server/api', () => ({ getUserProfileFn: vi.fn().mockResolvedValue({ role: 'admin', experiments: ['new-store'] }) }))
+vi.mock('@/lib/server/api', () => ({ getUserProfileFn: vi.fn().mockResolvedValue({ role: 'admin', experiments: ['molt-credits'] }) }))
 
 let mockPathname = '/'
 
@@ -49,7 +49,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.queryByText('NEW')).not.toBeInTheDocument()
   })
 
-  it('points STORE at the on-site catalog for opted-in admins', async () => {
+  it('points STORE at the on-site catalog for admins', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
       isPending: false,
@@ -62,10 +62,10 @@ describe('PublicHeader Navigation Component', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never)
   })
 
-  it('keeps Etsy for admins with the store experiment off', async () => {
-    vi.mocked(getUserProfileFn).mockResolvedValueOnce({ role: 'admin', experiments: [] } as never)
+  it('keeps Etsy for members while the store is private', async () => {
+    vi.mocked(getUserProfileFn).mockResolvedValueOnce({ role: 'user', experiments: [] } as never)
     vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'admin-off', role: 'admin' } }, isPending: false,
+      data: { user: { id: 'member-1', role: 'user' } }, isPending: false,
     } as never)
     render(<PublicHeader activePage="home" />)
     await vi.waitFor(() => expect(getUserProfileFn).toHaveBeenCalled())

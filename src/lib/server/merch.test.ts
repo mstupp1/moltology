@@ -18,11 +18,10 @@ function storeDb(profile: { role: string; experiments?: string[] }) {
   return { select: vi.fn(() => query) }
 }
 
-describe('new store experiment server gate', () => {
+describe('private store server gate', () => {
   it.each([
-    { role: 'admin', experiments: [] },
-    { role: 'admin', experiments: ['premium'] },
-    { role: 'user', experiments: ['new-store'] },
+    { role: 'user', experiments: [] },
+    { role: 'user', experiments: ['premium'] },
   ])('blocks catalog and checkout for $role with $experiments', async (profile) => {
     const db = storeDb(profile)
     vi.mocked(getDb).mockReturnValue(db as never)
@@ -40,7 +39,7 @@ describe('new store experiment server gate', () => {
     const orderBy = vi.fn().mockResolvedValueOnce(rows).mockResolvedValueOnce([])
     const query = {
       from: () => query, where: () => query, orderBy,
-      limit: vi.fn().mockResolvedValue([{ role: 'admin', experiments: ['new-store'] }]),
+      limit: vi.fn().mockResolvedValue([{ role: 'admin', experiments: [] }]),
       then: (resolve: (value: unknown[]) => void) => resolve([]),
     }
     const db = { select: () => query }
@@ -51,8 +50,8 @@ describe('new store experiment server gate', () => {
     expect(result).toHaveLength(2)
   })
 
-  it('loads the catalog for an opted-in admin', async () => {
-    const db = storeDb({ role: 'admin', experiments: ['new-store'] })
+  it('loads the private catalog for any admin', async () => {
+    const db = storeDb({ role: 'admin', experiments: [] })
     vi.mocked(getDb).mockReturnValue(db as never)
     await expect(getMerchCatalogHandler({ context: { user: { sub: 'admin-1' }, db: db as never } })).resolves.toEqual([])
     expect(db.select).toHaveBeenCalled()
