@@ -7,7 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { AVATAR_POSES, type AvatarPose } from '../../../src/lib/avatar/traits'
 import { lookFromConfig, type Avatar3DLook } from '../../../src/lib/avatar3d/look'
-import type { Reaction } from '../../../src/lib/avatar3d/motion'
+import { GESTURES, GESTURE_SECONDS, jitter, type Gesture, type Reaction } from '../../../src/lib/avatar3d/motion'
 import { SET_NAMES, type SetName } from '../../../src/lib/avatar3d/sets'
 import { SHOTS, type AnimationTimeline, type CameraMove, type ShotName, type TimelineCue } from '../../../src/lib/avatar3d/scripted'
 import { parseLobsterAvatarConfig } from '../../../src/lib/lobster-avatar'
@@ -26,10 +26,21 @@ const MARK_X: Record<Mark, number> = { left: -0.75, center: 0, right: 0.75 }
 /** The narrator: a voice with no body, so no mouth moves while it speaks. */
 export const NARRATOR = 'narrator'
 
+/**
+ * How much a character acts on its own while it talks and listens: gestures on stressed words,
+ * nods, head tilts on questions, weight shifts (see actingCues). "calm" is smaller and rarer.
+ */
+export const ACTING = ['auto', 'calm', 'none'] as const
+export type Acting = (typeof ACTING)[number]
+
 /** What one character does in a scene. */
 export interface CharacterDirection {
   pose?: AvatarPose
   react?: { kind: Reaction; word?: number; side?: 1 | -1 }[]
+  /** Hand-placed talking gestures, each on a word of the line. Any here replace the automatic ones. */
+  gesture?: { kind: Gesture; word?: number; side?: 1 | -1 }[]
+  /** Automatic acting for this character in this scene (default: the lesson's). */
+  acting?: Acting
   look?: LessonLook | 'other'
   /** Turn in degrees (positive turns to the viewer's left). */
   turn?: number
@@ -54,6 +65,10 @@ export interface LessonScene {
   pose?: AvatarPose
   /** Reactions, each on a word of this scene's line (0-based), or at the start without one. */
   react?: { kind: Reaction; word?: number; side?: 1 | -1 }[]
+  /** Hand-placed talking gestures on words of the line; any here replace the automatic ones. */
+  gesture?: { kind: Gesture; word?: number; side?: 1 | -1 }[]
+  /** Automatic acting for the scene's subject (default: the lesson's). */
+  acting?: Acting
   /** Where the eyes go. Default camera alone; in a dialogue the speaker looks at the other ("other"). */
   look?: LessonLook | 'other'
   /** Turn of the whole character in degrees (positive turns to the viewer's left). */
@@ -88,6 +103,8 @@ export interface Lesson {
   cast?: { id: string; at: Mark }[]
   /** Set dressing in front of the backdrop: codex-study, reef-office or open-water. */
   set?: SetName
+  /** How much the cast acts on their own while talking and listening. Default auto. */
+  acting?: Acting
   /** The Codex passage taught, when there is one. */
   codex?: { id: string; title: string; url: string }
   /** The exact first sentence of the first scene's line. Shown big during the spoken hook. */
@@ -163,6 +180,7 @@ export function lessonProblems(lesson: Lesson): string[] {
   if (!ids.includes(lesson.host)) problems.push('cast must include the host')
   if (new Set(cast.map((c) => c.at)).size !== cast.length) problems.push('each cast member needs their own mark')
   if (cast.some((c) => !MARKS.includes(c.at))) problems.push(`cast marks are ${MARKS.join(', ')}`)
+  if (lesson.acting && !ACTING.includes(lesson.acting)) problems.push(`acting "${lesson.acting}" is not one of ${ACTING.join(', ')}`)
   if (lesson.set && !SET_NAMES.includes(lesson.set)) problems.push(`set "${lesson.set}" is not one of ${SET_NAMES.join(', ')}`)
   if (!Array.isArray(lesson.hashtags) || lesson.hashtags.length > 3) problems.push('at most three hashtags')
   const scenes = Array.isArray(lesson.scenes) ? lesson.scenes : []
@@ -181,6 +199,11 @@ export function lessonProblems(lesson: Lesson): string[] {
       if (who !== 'scene' && !ids.includes(who)) problems.push(`${at} directs "${who}", who is not in the cast`)
       if (d.look && d.look !== 'other' && !LOOKS.includes(d.look)) problems.push(`${at} look "${d.look}" is not one of ${LOOKS.join(', ')}, other`)
       if (d.pose && !AVATAR_POSES.includes(d.pose)) problems.push(`${at} pose "${d.pose}" is not one of ${AVATAR_POSES.join(', ')}`)
+      if (d.acting && !ACTING.includes(d.acting)) problems.push(`${at} acting "${d.acting}" is not one of ${ACTING.join(', ')}`)
+      for (const g of d.gesture ?? []) {
+        if (!GESTURES.includes(g.kind)) problems.push(`${at} gesture "${g.kind}" is not one of ${GESTURES.join(', ')}`)
+        if (g.word !== undefined && (g.word < 0 || g.word >= count)) problems.push(`${at} gesture word ${g.word} is outside its ${count}-word line`)
+      }
       for (const r of d.react ?? []) {
         if (!REACTIONS.includes(r.kind)) problems.push(`${at} reaction "${r.kind}" is not one of ${REACTIONS.join(', ')}`)
         if (r.word !== undefined && (r.word < 0 || r.word >= count)) problems.push(`${at} reaction word ${r.word} is outside its ${count}-word line`)
@@ -280,7 +303,7 @@ export function buildTimeline(
   looks: Record<string, Avatar3DLook>,
   words: WordBoundaryEvent[],
   talkBy: number[][],
-  options: TimelineOptions & { set?: SetName },
+  options: TimelineOptions & { set?: SetName; mouthBy?: string[] },
 ): { timeline: AnimationTimeline; windows: ReturnType<typeof sceneWindows>; hookEnd: number } {
   const fps = options.fps
   const cast = castOf(lesson)
@@ -348,9 +371,15 @@ export function buildTimeline(
         const at = r.word === undefined ? t0 : words[firstWord + r.word].startMs / 1000
         cues.push({ t: Math.min(at, t1), who, react: { kind: r.kind, side: r.side } })
       }
+      for (const g of own.gesture ?? []) {
+        // A gesture starts a moment before its word so the hit lands on it.
+        const at = g.word === undefined ? t0 : words[firstWord + g.word].startMs / 1000 - GESTURE_LEAD
+        cues.push({ t: Math.max(t0, Math.min(at, t1)), who, gesture: { kind: g.kind, side: g.side ?? 1 } })
+      }
     }
     cues.push({ t: t0, spin: deg(scene.spin ?? 0) })
   })
+  cues.push(...actingCues(lesson, words, windows, cues, xOf))
   cues.sort((a, b) => a.t - b.t)
   const castLooks = cast.map((c) => ({ look: { ...looks[c.id], pose: firstPose(c.id) }, x: MARK_X[c.at] }))
   const tracks = cast.map((_, i) => (talkBy[i] ?? []).slice(0, frames))
@@ -364,6 +393,7 @@ export function buildTimeline(
       cues,
       talk: tracks[0],
       talkBy: tracks,
+      mouthBy: options.mouthBy?.map((m) => m.slice(0, frames)),
       cast: solo ? undefined : castLooks,
       set: options.set ?? lesson.set,
       lighting: 'cinematic',
@@ -371,6 +401,132 @@ export function buildTimeline(
     windows,
     hookEnd,
   }
+}
+
+/** How far ahead of its word a gesture starts, so the hit lands on the word. */
+const GESTURE_LEAD = 0.12
+
+const strip = (word: string) => word.replace(/[^a-z0-9']/gi, '')
+/** Words worth a gesture: long ones, numbers and anything said with an exclamation. */
+const stressed = (word: string) => strip(word).length >= 5 || /\d/.test(word) || /!$/.test(word)
+/** Tiny function words never carry a beat, however they are spelled. */
+const LIGHT = new Set(['because', 'through', 'without', 'another', 'something', 'anything', 'everything', 'really', 'should', 'would', 'could'])
+
+/**
+ * The cast acting on their own, so nobody stands frozen through a line: the speaker beats a claw
+ * on stressed words, opens both claws out or offers one to whoever is listening, tilts the head
+ * on a question and shifts weight between thoughts; listeners nod at the ends of sentences and
+ * tilt at questions. Choices come from a fixed hash of the scene and word, so a re-render acts
+ * the same way. Nothing lands near a hand-written reaction, gesture or pose change.
+ */
+export function actingCues(
+  lesson: Lesson,
+  words: WordBoundaryEvent[],
+  windows: ReturnType<typeof sceneWindows>,
+  written: TimelineCue[],
+  xOf: (id: string) => number,
+): TimelineCue[] {
+  const cast = castOf(lesson)
+  const out: TimelineCue[] = []
+  const busy = (who: number, t: number, before: number, after: number) =>
+    written.some((c) => (c.who ?? 0) === who && (c.react || c.gesture || (c.pose && c.t > 0.01)) && t > c.t - before && t < c.t + after)
+  const last = new Map<string, number>()
+  const lastKind = new Map<string, Gesture>()
+  const add = (who: number, t: number, kind: Gesture, side: 1 | -1, amount: number) => {
+    out.push({ t, who, gesture: { kind, side, amount: Math.round(amount * 100) / 100 }, auto: true })
+    last.set(`${who}`, t)
+    lastKind.set(`${who}`, kind)
+  }
+  lesson.scenes.forEach((scene, i) => {
+    const { start: t0, end: t1, firstWord } = windows[i]
+    const count = wordsOf(scene.line).length
+    const speaker = speakerOf(lesson, scene)
+    const sceneWords = words.slice(firstWord, firstWord + count)
+    // Close shots crop the claws, so gestures there are smaller and mostly in the head.
+    const close = scene.shot === 'close' || scene.shot === 'extreme'
+    cast.forEach((member, who) => {
+      const subject = speaker === NARRATOR ? lesson.host : speaker
+      const own: CharacterDirection = member.id === subject ? scene : (scene.act?.[member.id] ?? {})
+      const acting = own.acting ?? lesson.acting ?? 'auto'
+      if (acting === 'none' || own.gesture?.length) return
+      const calm = acting === 'calm'
+      const scale = (calm ? 0.6 : 1) * (close ? 0.75 : 1)
+      const partner = cast.find((c) => c.id !== member.id)
+      // The side facing the other character (1 is the character's own left, the viewer's right).
+      const near: 1 | -1 = partner ? (xOf(partner.id) > xOf(member.id) ? 1 : -1) : 1
+      const gap = calm ? 2.2 : 0.95
+      const key = `${who}`
+      const free = (t: number) => t - (last.get(key) ?? -10) >= gap && !busy(who, t, 0.5, 0.8) && t >= t0 + 0.15 && t <= t1 - 0.35
+
+      if (member.id === speaker) {
+        let beats = 0
+        sceneWords.forEach((w, k) => {
+          const t = w.startMs / 1000 - GESTURE_LEAD
+          const sentenceEnd = sceneWords.slice(k).find((x) => /[.!?]["')\]]?$/.test(x.word))
+          const question = sentenceEnd ? /\?["')\]]?$/.test(sentenceEnd.word) : false
+          const isLast = w === sentenceEnd
+          if (question && isLast && free(t)) {
+            add(who, t, 'tilt', jitter(i * 31 + k) > 0.5 ? 1 : -1, scale)
+            return
+          }
+          if (!stressed(w.word) || LIGHT.has(strip(w.word).toLowerCase()) || !free(t)) return
+          const roll = jitter(i * 97 + k * 13 + who)
+          let kind: Gesture
+          if (close) kind = roll < 0.55 ? 'beat' : roll < 0.8 ? 'tilt' : 'nod'
+          else if (roll < 0.45) kind = 'beat'
+          // Both claws out needs room on both sides, so only a character alone on stage opens up.
+          else if (roll < 0.7) kind = partner ? 'offer' : lastKind.get(key) === 'open' ? 'beat' : 'open'
+          else if (roll < 0.85) kind = partner ? 'beat' : 'offer'
+          else kind = beats % 2 ? 'shift' : 'beat'
+          if (kind === 'tilt' && w === sceneWords[0]) kind = 'beat'
+          // Beats use the claw away from a neighbour, alternating when alone; offers reach toward them.
+          const side: 1 | -1 = kind === 'offer' ? near : partner ? (-near as 1 | -1) : beats % 2 ? -1 : 1
+          add(who, t, kind, side, scale * (kind === 'beat' ? 0.8 + 0.3 * jitter(k + i) : 1))
+          beats++
+        })
+        return
+      }
+      // Listening: a nod at the end of most sentences, a tilt at a question, and a shift of weight
+      // now and then on a long line, all a beat after the words that prompt them.
+      sceneWords.forEach((w, k) => {
+        if (!/[.!?]["')\]]?$/.test(w.word)) return
+        const t = w.endMs / 1000 + 0.08
+        if (!free(t)) return
+        const roll = jitter(i * 53 + k * 7 + who * 3)
+        if (/\?/.test(w.word)) add(who, t, 'tilt', near, scale * 0.8)
+        else if (roll < 0.6) add(who, t, 'nod', 1, scale * (/!/.test(w.word) ? 1 : 0.7))
+        else if (roll < 0.8) add(who, t, 'shift', jitter(k) > 0.5 ? 1 : -1, scale * 0.8)
+      })
+    })
+  })
+  return out
+}
+
+/**
+ * Tones down automatic gestures that make parts pass through each other: each one playing on a
+ * clipping frame for a character involved is halved, and dropped once it would be too small to
+ * read. Returns how many were changed; hand-written direction is never touched.
+ */
+export function softenClippingGestures(timeline: AnimationTimeline, clips: { frame: number; who: number; other: number }[]): number {
+  let changed = 0
+  const hit = new Set<TimelineCue>()
+  for (const clip of clips) {
+    const t = clip.frame / timeline.fps
+    for (const cue of timeline.cues) {
+      if (!cue.auto || !cue.gesture) continue
+      const who = cue.who ?? 0
+      if (who !== clip.who && who !== clip.other) continue
+      if (t >= cue.t && t <= cue.t + GESTURE_SECONDS[cue.gesture.kind]) hit.add(cue)
+    }
+  }
+  for (const cue of hit) {
+    const amount = (cue.gesture!.amount ?? 1) * 0.5
+    if (amount < 0.3) {
+      timeline.cues.splice(timeline.cues.indexOf(cue), 1)
+    } else cue.gesture!.amount = Math.round(amount * 100) / 100
+    changed++
+  }
+  return changed
 }
 
 /** The reel draft `npm run reel:create -- --custom-video` needs to archive and queue the finished file. */

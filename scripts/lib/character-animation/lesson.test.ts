@@ -118,4 +118,38 @@ describe('animated lessons', () => {
     expect(draft.scenePrompts).toHaveLength(6)
     expect((draft.scenePrompts as string[]).join(' ')).toContain('Both face camera')
   })
+
+  it('adds acting from the voice timing: speaker gestures, listener nods, the same every time', () => {
+    const looks = Object.fromEntries(castOf(dialogue).map((c) => [c.id, castLook(c.id)]))
+    const words = estimateWords(narrationOf(dialogue))
+    const plan = () => buildTimeline(dialogue, looks, words, [[], []], { width: 540, height: 960, fps: 30 }).timeline
+    const gestures = plan().cues.filter((c) => c.gesture)
+    expect(gestures.length).toBeGreaterThan(8)
+    expect(gestures.every((c) => c.auto)).toBe(true)
+    // Listeners nod; speakers do more than nod.
+    expect(new Set(gestures.map((c) => c.gesture!.kind)).size).toBeGreaterThanOrEqual(3)
+    expect(gestures.some((c) => c.gesture!.kind === 'nod')).toBe(true)
+    expect(plan().cues.filter((c) => c.gesture)).toEqual(gestures)
+    // Nothing automatic lands on top of a hand-written reaction.
+    for (const g of gestures) {
+      const near = plan().cues.filter((c) => c.react && (c.who ?? 0) === (g.who ?? 0) && Math.abs(c.t - g.t) < 0.5)
+      expect(near, `gesture at ${g.t}`).toEqual([])
+    }
+    // acting: none turns it off; a hand-placed gesture replaces the automatic ones in its scene.
+    const still = buildTimeline({ ...dialogue, acting: 'none' }, looks, words, [[], []], { width: 540, height: 960, fps: 30 }).timeline
+    expect(still.cues.filter((c) => c.gesture)).toEqual([])
+    const placed = { ...dialogue, acting: 'none' as const, scenes: dialogue.scenes.map((s, i) => (i === 2 ? { ...s, gesture: [{ kind: 'open' as const, word: 1 }] } : s)) }
+    expect(lessonProblems(placed)).toEqual([])
+    const one = buildTimeline(placed, looks, words, [[], []], { width: 540, height: 960, fps: 30 }).timeline.cues.filter((c) => c.gesture)
+    expect(one).toHaveLength(1)
+    expect(one[0].auto).toBeUndefined()
+  })
+
+  it('passes mouth shape tracks through to the timeline, trimmed to its length', () => {
+    const looks = Object.fromEntries(castOf(dialogue).map((c) => [c.id, castLook(c.id)]))
+    const words = estimateWords(narrationOf(dialogue))
+    const { timeline } = buildTimeline(dialogue, looks, words, [[], []], { width: 540, height: 960, fps: 30, mouthBy: ['XAB'.repeat(5000), 'D'] })
+    expect(timeline.mouthBy?.[0]).toHaveLength(timeline.frames)
+    expect(timeline.mouthBy?.[1]).toBe('D')
+  })
 })

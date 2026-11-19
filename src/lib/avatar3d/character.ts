@@ -9,9 +9,11 @@ import { equipAll } from './equipment'
 import { shapeKey, type Avatar3DLook } from './look'
 import { loftDetail } from './loft'
 import { bakeOcclusion, prepareBake, type BakeOptions } from './bake'
+import { BODY, bodySpheres, SWINGS, type BodySphere } from './collide'
 import { buildOccluders, buildSprings, type Spring } from './flex'
 import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
-import { arc, hops, jitter, MOODS, REACTION_SECONDS, type Mood, type Reaction } from './motion'
+import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
+import { blendMouth, MOUTH_HOLE, MOUTH_PARAMS, mouthParams, type MouthParams, type MouthShape } from './mouth-shapes'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
 import { buildCrab, buildLobster, EYE_STRETCH, SWIMMERETS, TAIL_FAN, type FaceRig } from './species'
@@ -19,6 +21,14 @@ import { buildCrab, buildLobster, EYE_STRETCH, SWIMMERETS, TAIL_FAN, type FaceRi
 const PUPIL_SCALE = { standard: 1, big: 1.28, sparkle: 1.1, keen: 0.72 } as const
 /** How long a pose change takes, wind-up and settle included. */
 const POSE_SECONDS = 0.62
+/** How far behind the body each part of an arm starts a pose change, in seconds. */
+const LAGS: [RegExp, number][] = [
+  [/^arm[LR]$/, 0.04],
+  [/^forearm[LR]$/, 0.08],
+  [/^(claw|thumb)[LR]$/, 0.12],
+]
+const MAX_LAG = 0.12
+const lagOf = (name: string) => LAGS.find(([test]) => test.test(name))?.[1] ?? 0
 /** How long one step takes when the feet catch up with a turn. */
 const STEP_SECONDS = 0.26
 /** How far the body turns past its feet before one of them steps round. */
@@ -72,10 +82,30 @@ export interface Character3D {
   /** Play a short reaction over the current pose. `side` is 1 for the character's left claw. */
   react: (kind: Reaction, side?: 1 | -1) => void
   /**
-   * How loud the character is speaking right now, 0 (silent) to 1, for scripted animation. The
-   * mouth opens with it and the head nods a little on the louder syllables.
+   * How loud the character is speaking right now, 0 (silent) to 1, for scripted animation, and
+   * the cartoon mouth shape for the sound being made (mouth-shapes.ts). Without a shape the mouth
+   * just opens with the level. The head nods a little on the louder syllables either way.
    */
-  setTalk: (level: number) => void
+  setTalk: (level: number, shape?: MouthShape | null) => void
+  /**
+   * A talking gesture over the current pose (scripted animation): a beat of a claw, both claws
+   * opening out, a claw offered to someone, a head tilt, a nod or a shift of weight. `side` is 1
+   * for the character's left claw; `amount` scales how big it is (1 full).
+   */
+  gesture: (kind: Gesture, side?: 1 | -1, amount?: number) => void
+  /**
+   * Keep the claws out of the body and out of `obstacles` (other characters' contact spheres):
+   * after posing, any forearm, claw or pincer inside something swings out at the shoulder until
+   * it only touches. Scripted animation turns it on; the app leaves it off.
+   */
+  avoidContacts: (on: boolean, obstacles?: readonly BodySphere[]) => void
+  /** Spheres inside each solid part, where they are after the last update (collide.ts). */
+  contacts: () => readonly BodySphere[]
+  /**
+   * Run contact avoidance again once everyone on stage has moved this frame, so two characters
+   * never both swing into where the other just was. Does nothing unless avoidance is on.
+   */
+  settleContacts: () => void
   /** The bone that carries a mesh of this character (for working out what was tapped). */
   boneOf: (object: Object3D) => string | null
   /** Advance the pose blend and idle motion. `time` is seconds; pass `idle = false` to hold still. */
@@ -345,6 +375,15 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   // Face parts that move with reactions: the open mouth, the brows and the eyes' squash.
   const mouthBone = rig.bones.get('mouthOpen') ?? null
   const mouthLine = rig.bones.get('mouthLine') ?? null
+  // Teeth and tongue ride beside the open mouth; each keeps where it was built and the way the
+  // mouth faces, to be placed against the oval as it opens.
+  const mouthParts = (['mouthTeethUp', 'mouthTeethLo', 'mouthTongue'] as const).map((name) => {
+    const bone = rig.bones.get(name) ?? null
+    return bone ? { bone, rest: bone.position.clone(), facing: bone.quaternion.clone() } : null
+  })
+  const mouthNow = mouthParams('X')
+  const mouthWant = mouthParams('X')
+  const partAt = new Vector3()
   const brows = (['L', 'R'] as const).flatMap((tag) => {
     const bone = rig.bones.get(`brow${tag}`)
     const rest = rig.rest.get(`brow${tag}`)
@@ -363,8 +402,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   let reaction: { kind: Reaction; start: number | null; side: 1 | -1 } | null = null
   /** The pose to go back to once a reaction that borrows another pose is over. */
   let held: AvatarPose | null = null
-  /** Speech level from a scripted voice track (0 silent, 1 loudest). */
+  /** Speech level from a scripted voice track (0 silent, 1 loudest), and the mouth shape for it. */
   let talk = 0
+  let talkShape: MouthShape | null = null
+  /** Talking gestures playing over the pose (scripted animation only). */
+  let gestures: { kind: Gesture; side: 1 | -1; amount: number; start: number | null }[] = []
 
   const overlay = (name: string, axis: Vector3, angle: number) => {
     const bone = rig.bones.get(name)
@@ -387,6 +429,141 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     extra.footR.copy(extraTarget.footR)
     extra.eyes = [...extraTarget.eyes]
   }
+  /** Shape the open mouth, teeth, tongue and drawn mouth for one set of mouth numbers. */
+  const placeMouth = (m: MouthParams) => {
+    if (!mouthBone) return
+    const open = m.open > 0.06
+    // The open mouth takes the drawn one's place rather than sitting over it.
+    mouthBone.visible = open
+    if (mouthLine) {
+      mouthLine.visible = !open
+      // Lips pressed together (M, B, P): the drawn mouth narrows and flattens.
+      mouthLine.scale.set(1 - 0.18 * m.press, 1 - 0.5 * m.press, 1)
+    }
+    // Speech shapes read bigger than a reaction's mouth: a cartoon mouth works the whole lower face.
+    const big = 1 + 0.3 * m.speech
+    const sx = m.width * 1.2 * big
+    const sy = Math.max(m.open * big, 1e-3)
+    mouthBone.scale.set(sx, sy, 1)
+    const H = MOUTH_HOLE.y * sy
+    const W = MOUTH_HOLE.x * sx
+    /** How far forward the oval's surface is at height y (in the mouth's own space). */
+    const front = (y: number) => MOUTH_HOLE.z * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
+    /** Width of the oval at height y. */
+    const across = (y: number) => W * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
+    const place = (part: (typeof mouthParts)[number], y: number, z: number, scale: [number, number]) => {
+      if (!part) return
+      part.bone.visible = open && scale[1] > 0.04
+      part.bone.position.copy(part.rest).add(partAt.set(0, y, z).applyQuaternion(part.facing))
+      part.bone.scale.set(Math.max(scale[0], 1e-3), Math.max(scale[1], 1e-3), 1)
+    }
+    // Each row of teeth tucks under the top or bottom of the oval and is as wide as the oval is there.
+    const row = (amount: number) => Math.min(0.011, H * 0.5) * amount
+    const up = row(m.teethUp)
+    const yUp = H - up - m.bite * Math.max(0, H - up - 0.004)
+    place(mouthParts[0], yUp, Math.max(0.006, front(yUp) - 0.003), [(0.94 * across(yUp)) / 0.05, up / 0.011])
+    const lo = row(m.teethLo)
+    place(mouthParts[1], -H + lo, Math.max(0.006, front(-H + lo) - 0.003), [(0.94 * across(-H + lo)) / 0.05, lo / 0.011])
+    // The tongue lies on the floor of the mouth, or rises to touch the top teeth.
+    const th = Math.min(0.017, H * 0.42)
+    const floor = -H + th * 0.95
+    const ceiling = H - Math.max(up, 0.004) - th * 0.9
+    const yT = floor + m.tongueUp * Math.max(0, ceiling - floor)
+    place(mouthParts[2], yT, front(yT) * 0.45, [Math.min(0.042, 0.6 * across(yT)) / 0.042, (th / 0.017) * (m.open > 0.42 ? 1 : 0)])
+  }
+
+  /** How a bone is turned in the character's own space (its parents' turns included). */
+  const inRootQ = (node: Object3D | null, out: Quaternion) => {
+    out.identity()
+    for (let n = node; n && n !== rig.root; n = n.parent) out.premultiply(n.quaternion)
+    return out
+  }
+  const parentQ = new Quaternion()
+  const boneQ = new Quaternion()
+  const swing = new Quaternion()
+  const along = new Vector3()
+  const aimAt = new Vector3()
+  /**
+   * Swing a limb bone part of the way (w, 0..1) toward pointing along `target`, a direction in the
+   * character's own space (x its left, y up, z toward the viewer). Unlike a turn about the bone's
+   * own axes, this moves the same way whatever pose the arm starts from.
+   */
+  const aim = (name: string, target: Vector3, w: number) => {
+    const bone = rig.bones.get(name)
+    if (!bone || w <= 0) return
+    inRootQ(bone.parent, parentQ)
+    boneQ.copy(parentQ).multiply(bone.quaternion)
+    // Bones point down their own -y (rig.ts aimQuaternion).
+    along.set(0, -1, 0).applyQuaternion(boneQ)
+    swing.setFromUnitVectors(along, target.normalize())
+    swing.slerp(q.identity(), 1 - Math.min(w, 1))
+    bone.quaternion.copy(parentQ.invert().multiply(swing).multiply(boneQ))
+  }
+
+  // Contact avoidance (scripted animation only): built on first use.
+  let avoiding = false
+  let obstacles: readonly BodySphere[] = []
+  let body: ReturnType<typeof bodySpheres> | null = null
+  const pivot = new Vector3()
+  const push = new Vector3()
+  const lever = new Vector3()
+  const turnAxis = new Vector3()
+  const worldQ = new Quaternion()
+  const parentWorldQ = new Quaternion()
+  const nudge = new Quaternion()
+  /** Swing each arm out at the shoulder until its forearm, claw and pincer only touch what they were inside. */
+  const solveContacts = () => {
+    if (!body) return
+    body.update()
+    for (const tag of ['L', 'R'] as const) {
+      const shoulder = rig.bones.get(`arm${tag}`)
+      if (!shoulder) continue
+      // Each push is cut back once it overshoots into something else, so it settles instead of rocking.
+      let step = 1
+      let before = Infinity
+      for (let round = 0; round < 16; round++) {
+        // Every part of the arm that is inside something pushes the arm round the shoulder, each
+        // straight out of what it is in and as hard as it is deep; summed, a claw caught between
+        // two things (a neighbour's open pincer) comes out sideways instead of zig-zagging.
+        shoulder.getWorldPosition(pivot)
+        turnAxis.set(0, 0, 0)
+        let deepest = 0
+        let total = 0
+        for (const a of body.spheres) {
+          if (!SWINGS.test(a.name) || a.name.slice(-1) !== tag) continue
+          const check = (b: BodySphere) => {
+            const depth = a.radius + b.radius - a.world.distanceTo(b.world)
+            if (depth <= 0.002) return
+            push.copy(a.world).sub(b.world)
+            if (push.lengthSq() < 1e-10) push.set(0, 0, 1)
+            push.normalize()
+            lever.copy(a.world).sub(pivot)
+            turnAxis.addScaledVector(lever.cross(push), depth)
+            deepest = Math.max(deepest, depth)
+            total += depth
+          }
+          for (const b of body.spheres) if (BODY.test(b.name) || (SWINGS.test(b.name) && b.name.slice(-1) !== tag)) check(b)
+          for (const b of obstacles) check(b)
+        }
+        if (!total) break
+        if (total > before) step *= 0.5
+        before = total
+        // turnAxis is now the depth-weighted sum of lever × push; its length over the total depth
+        // is the typical lever, so this angle moves the deepest part about clear.
+        const reach = turnAxis.length() / total
+        if (reach < 1e-5) break
+        turnAxis.normalize()
+        const angle = Math.min(0.4, (deepest + 0.004) / reach) * step
+        nudge.setFromAxisAngle(turnAxis, angle)
+        shoulder.getWorldQuaternion(worldQ)
+        shoulder.parent!.getWorldQuaternion(parentWorldQ)
+        shoulder.quaternion.copy(parentWorldQ.invert().multiply(nudge).multiply(worldQ))
+        shoulder.updateMatrixWorld(true)
+        body.update()
+      }
+    }
+  }
+
   /** Open the pincer and clap it shut `count` times over p in 0..1. Returns the opening in radians. */
   const snapping = (p: number, count: number) => {
     const each = (p * count) % 1
@@ -401,7 +578,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     for (const [name, target] of targets) {
       const c = current.get(name)!
       const from = transition?.from.get(name)
-      if (from && progress < 1) c.slerpQuaternions(from, target, e)
+      // The body leads and the limbs follow: each bone further out along an arm starts a moment
+      // later, so a pose change rolls out from the shoulder to the claw instead of moving as one.
+      const own = transition && idle ? progress - lagOf(name) / POSE_SECONDS : 1
+      if (from && own < 1) c.slerpQuaternions(from, target, poseEase(own))
       else c.copy(target)
       rig.bones.get(name)!.quaternion.copy(c)
     }
@@ -413,7 +593,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     extra.footR.lerpVectors(was.footR, extraTarget.footR, mix)
     extra.eyes[0] = was.eyes[0] + (extraTarget.eyes[0] - was.eyes[0]) * mix
     extra.eyes[1] = was.eyes[1] + (extraTarget.eyes[1] - was.eyes[1]) * mix
-    if (progress >= 1) transition = null
+    if (!idle || progress >= 1 + MAX_LAG / POSE_SECONDS) transition = null
     for (const { node, rest } of sockets) node.quaternion.copy(rest)
 
     const chest = rig.bone('chest')
@@ -567,16 +747,66 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           fanCurl = held
         }
       }
-      if (talk > 0.02) {
-        // Speaking: the mouth opens with the voice (a reaction's bigger mouth wins), the head
-        // nods a touch on the louder syllables and the brows ride up with emphasis.
-        // A square-root curve so ordinary syllables, not just the loudest peaks, read as open.
-        const open = 0.3 + 0.75 * Math.sqrt(talk)
-        if (open > mouthOpen) {
-          mouthOpen = open
-          mouthRound = 0.25 + 0.3 * talk
+      // Talking gestures: each plays once on its own clock, over the pose and the idle motion.
+      if (gestures.length) {
+        gestures = gestures.filter((g) => g.start === null || time - g.start < GESTURE_SECONDS[g.kind])
+        for (const g of gestures) {
+          if (g.start === null) g.start = time
+          const p = (time - g.start) / GESTURE_SECONDS[g.kind]
+          const a = g.amount * (reaction ? 0.3 : 1)
+          const tagOf = (s: number) => (s === 1 ? 'L' : 'R')
+          // Most gestures wind up a touch the other way first, hit, and settle out slowly.
+          const hit = gestureCurve(p)
+          if (g.kind === 'beat') {
+            // The claw comes up in front and chops down on the word; the head dips with it.
+            const t = tagOf(g.side)
+            aim(`arm${t}`, aimAt.set(g.side * 0.7, -0.5, 0.6), 0.4 * a * hit)
+            aim(`forearm${t}`, aimAt.set(g.side * 0.35, 0.4, 1), 0.75 * a * hit)
+            overlay(`thumb${t}`, Zaxis, -g.side * 0.25 * a * arc(p))
+            overlay('chest', X, 0.05 * a * arc(Math.min(1, p * 1.6)))
+            browUp += 0.008 * a * hit
+          } else if (g.kind === 'open') {
+            // Both claws open out to the sides, pincers apart: "here is the whole idea".
+            for (const s of [1, -1] as const) {
+              const t = tagOf(s)
+              aim(`arm${t}`, aimAt.set(s, -0.15, 0.35), 0.45 * a * hit)
+              aim(`forearm${t}`, aimAt.set(s * 0.75, 0.3, 0.6), 0.5 * a * hit)
+              overlay(`thumb${t}`, Zaxis, -s * 0.4 * a * hit)
+            }
+            overlay('chest', X, -0.04 * a * hit)
+            browUp += 0.012 * a * hit
+          } else if (g.kind === 'offer') {
+            // One claw comes forward, open, toward whoever is listening.
+            const t = tagOf(g.side)
+            aim(`arm${t}`, aimAt.set(g.side * 0.45, -0.35, 1), 0.65 * a * hit)
+            aim(`forearm${t}`, aimAt.set(g.side * 0.25, 0.05, 1), 0.75 * a * hit)
+            overlay(`thumb${t}`, Zaxis, -g.side * 0.45 * a * hit)
+            overlay('chest', Yaxis, g.side * 0.08 * a * hit)
+            overlay('chest', X, 0.04 * a * hit)
+          } else if (g.kind === 'tilt') {
+            // A questioning tilt of the head, one brow up.
+            overlay('chest', Zaxis, g.side * 0.1 * a * hit)
+            overlay(`antenna${tagOf(g.side)}`, X, -0.08 * a * hit)
+            browUp += 0.014 * a * hit
+          } else if (g.kind === 'nod') {
+            // Two small nods, the second smaller.
+            overlay('chest', X, 0.08 * a * Math.abs(Math.sin(p * Math.PI * 2)) * (1 - 0.45 * Math.floor(p * 2)))
+            dy -= 0.012 * a * arc(p) * legLength
+          } else {
+            // Weight onto one leg: hips slide over and roll, the chest leans back the other way.
+            const w = arc(p) ** 0.7
+            dx += g.side * 0.035 * a * w
+            overlay('pelvis', Zaxis, -g.side * 0.05 * a * w)
+            overlay('chest', Zaxis, g.side * 0.07 * a * w)
+            for (const s of [1, -1] as const) overlay(`arm${tagOf(s)}`, Zaxis, s * 0.05 * a * w)
+          }
         }
+      }
+      // Speaking: the head nods a touch on the louder syllables and the brows ride up with
+      // emphasis; the chest drifts as the sentence goes on, so a long line never freezes.
+      if (talk > 0.02 || talkShape) {
         overlay('chest', X, -0.03 * talk)
+        overlay('chest', Yaxis, Math.sin(time * 1.7) * 0.03 * Math.min(1, talk * 2))
         browUp += 0.006 * talk
       }
       // Eyes squash a little as they blink and stretch when startled.
@@ -590,11 +820,23 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
 
     pelvisBone.position.set(pelvisRest.x + dx, pelvisRest.y + dy, pelvisRest.z)
     if (mouthBone) {
-      // The open mouth takes the drawn one's place rather than sitting over it.
-      mouthBone.visible = mouthOpen > 0.06
-      if (mouthLine) mouthLine.visible = !mouthBone.visible
-      // A cheer is wide, a gasp is round.
-      mouthBone.scale.set((1 - 0.42 * mouthRound) * (1 + 0.45 * (1 - mouthRound)), Math.max(mouthOpen * (1 + 0.35 * mouthRound), 1e-3), 1)
+      // What the mouth is doing: a cartoon mouth shape while speaking, opening with the voice when
+      // there is no shape, and a reaction's bigger mouth over either. A cheer is wide, a gasp is round.
+      const want = mouthWant
+      Object.assign(want, MOUTH_PARAMS[talkShape ?? 'X'])
+      if (talkShape) {
+        want.open *= 0.9 + 0.2 * talk
+        want.speech = 1
+      }
+      else if (talk > 0.02) Object.assign(want, { open: 0.3 + 0.75 * Math.sqrt(talk), width: 0.95, teethUp: 0.5, teethLo: 0 })
+      if (mouthOpen > want.open) {
+        Object.assign(want, MOUTH_PARAMS.X)
+        want.open = mouthOpen * (1 + 0.35 * mouthRound)
+        want.width = ((1 - 0.42 * mouthRound) * (1 + 0.45 * (1 - mouthRound))) / 1.2
+      }
+      // Shapes change within a frame or two: snappy like a drawn mouth, never a one-frame flicker.
+      blendMouth(mouthNow, want, idle ? 1 - Math.exp(-dt * 40) : 1)
+      placeMouth(mouthNow)
     }
     for (const b of brows) {
       b.bone.position.copy(b.rest)
@@ -645,6 +887,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     }
     spring.update(dt, idle)
     rig.root.updateMatrixWorld(true)
+    if (avoiding) solveContacts()
     occluders.update()
   }
 
@@ -706,8 +949,36 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         aimPose('cheer')
       }
     },
-    setTalk(level) {
+    setTalk(level, shape = null) {
       talk = Math.min(1, Math.max(0, level))
+      talkShape = shape
+    },
+    avoidContacts(on, others = []) {
+      avoiding = on
+      obstacles = others
+      if (on && !body) {
+        rig.root.updateMatrixWorld(true)
+        body = bodySpheres(rig)
+        body.update()
+      }
+    },
+    settleContacts() {
+      if (!avoiding) return
+      solveContacts()
+      occluders.update()
+    },
+    contacts() {
+      if (!body) {
+        rig.root.updateMatrixWorld(true)
+        body = bodySpheres(rig)
+      }
+      body.update()
+      return body.spheres
+    },
+    gesture(kind, side = 1, amount = 1) {
+      // A new gesture of the same kind takes over from one still playing.
+      gestures = gestures.filter((g) => g.kind !== kind)
+      gestures.push({ kind, side, amount, start: null })
     },
     boneOf(object) {
       // A skinned part (a bendy antenna, a joint's membrane) names the bone it belongs to.

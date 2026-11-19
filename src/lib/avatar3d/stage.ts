@@ -109,8 +109,11 @@ export interface Stage {
   setProps: (props: Object3D | null) => void
   /** Switch a manual stage between the whole figure and the head-and-shoulders framing. */
   setFraming: (framing: 'full' | 'portrait') => void
-  /** Move time on by `dt` seconds and draw. For manual stages (tests and review renders). */
-  step: (dt: number) => void
+  /**
+   * Move time on by `dt` seconds and draw. For manual stages (tests and review renders); pass
+   * `render = false` to move everything on without drawing (skipping ahead to a later frame).
+   */
+  step: (dt: number, render?: boolean) => void
   resize: () => void
   /** Stop drawing while the character is off screen, and pick up again when it is back. */
   setActive: (active: boolean) => void
@@ -388,7 +391,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     frame()
   }
 
-  const draw = (dt: number, time: number) => {
+  const draw = (dt: number, time: number, render = true) => {
     if (framing !== 'portrait') {
       target()
       // Ease in like a game camera; snap when motion is reduced or nothing has been drawn yet.
@@ -410,8 +413,14 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       e.character.root.position.set(e.x, 0, e.z)
       e.character.update(dt, time, !options.reducedMotion)
     }
+    // With a cast, everyone has moved now: settle claws that swung into a neighbour (scripted only).
+    for (let pass = 0; extras.length && pass < 2; pass++) {
+      character?.settleContacts()
+      for (const e of extras) e.character.settleContacts()
+    }
     // A close portrait would be all halo, so only the whole figure wears it.
     halo.visible = glowing && framing === 'full'
+    if (!render) return
     renderer.render(scene, camera)
     retired?.dispose()
     retired = null
@@ -652,11 +661,11 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       started = false
       frame()
     },
-    step(dt) {
+    step(dt, render = true) {
       clock += dt
       // A manual stage turns on its own turntable too (scripted animation uses it).
       yaw += spin * dt
-      draw(dt, clock)
+      draw(dt, clock, render)
     },
     resize: () => {
       resize()

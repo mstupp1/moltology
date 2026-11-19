@@ -13,7 +13,8 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
-import { buildTimeline, castLook, castOf, lessonProblems, reelDraftFrom, type Lesson } from './lib/character-animation/lesson'
+import { buildTimeline, castLook, castOf, lessonProblems, reelDraftFrom, softenClippingGestures, type Lesson } from './lib/character-animation/lesson'
+import { rehearse, type FrameClip } from '../src/lib/avatar3d/rehearse'
 import { voiceLesson } from './lib/character-animation/voices'
 import { renderFrames } from './lib/character-animation/render'
 import { defaultBackdrop, headlineOverlays, normaliseBackdrop, renderHeadlineCards, renderOutroText, renderSceneClip } from './lib/character-animation/compose'
@@ -37,10 +38,12 @@ interface Args {
   force: boolean
   maxSeconds?: number
   art: boolean
+  allowClipping: boolean
+  check: boolean
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { lesson: '', silent: false, scale: 1, framesOnly: false, reuseFrames: false, force: false, art: true }
+  const args: Args = { lesson: '', silent: false, scale: 1, framesOnly: false, reuseFrames: false, force: false, art: true, allowClipping: false, check: false }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--lesson') args.lesson = argv[++i]
@@ -53,6 +56,8 @@ function parseArgs(argv: string[]): Args {
     else if (a === '--force') args.force = true
     else if (a === '--max-seconds') args.maxSeconds = Number(argv[++i])
     else if (a === '--no-art') args.art = false
+    else if (a === '--allow-clipping') args.allowClipping = true
+    else if (a === '--check') args.check = true
     else if (a === '--help' || a === '-h') {
       console.log(`Usage: npm run anim:create -- --lesson <lesson.json> [options]
 
@@ -64,7 +69,9 @@ function parseArgs(argv: string[]): Args {
   --reuse-frames    Skip the 3D render and reuse frames/ from the last run
   --out-dir <dir>   Default tmp/anim-<lesson id>
   --no-art          Ignore the set's painted art kit (plain colours, drawn backdrop)
-  --force           Render even if the lesson check finds problems`)
+  --force           Render even if the lesson check finds problems
+  --check           Voice, plan and rehearse only (acting + clipping report), no frames
+  --allow-clipping  Render even if the rehearsal finds body parts passing through each other`)
       process.exit(0)
     }
   }
@@ -83,6 +90,41 @@ function previewStills(video: string, outDir: string, moments: Record<string, nu
   }
 }
 
+/**
+ * Rehearses the whole timeline without drawing (a second or two) and makes sure no claw, leg or
+ * body passes through another. Automatic gestures that cause it are toned down until it is clean;
+ * anything left comes from hand-written direction and stops the render, with the frames listed.
+ */
+function checkClipping(timeline: Parameters<typeof rehearse>[0], ids: string[], outDir: string, allow: boolean) {
+  let clips: FrameClip[] = rehearse(timeline)
+  for (let round = 0; clips.length && round < 4; round++) {
+    const changed = softenClippingGestures(timeline, clips)
+    if (!changed) break
+    console.log(`🦾 Toned down ${changed} gesture${changed === 1 ? '' : 's'} that crossed a body part`)
+    clips = rehearse(timeline)
+  }
+  fs.writeFileSync(path.join(outDir, 'clipping.json'), JSON.stringify(clips, null, 2))
+  if (!clips.length) {
+    console.log('🦾 Clipping check: clean (no parts pass through each other)')
+    return
+  }
+  // One line per run of frames with the same parts.
+  const runs: { from: number; to: number; clip: FrameClip }[] = []
+  for (const c of clips) {
+    const prev = runs.find((r) => r.clip.who === c.who && r.clip.other === c.other && r.clip.parts.join() === c.parts.join() && c.frame - r.to <= 2)
+    if (prev) {
+      prev.to = c.frame
+      if (c.depth > prev.clip.depth) prev.clip = c
+    } else runs.push({ from: c.frame, to: c.frame, clip: c })
+  }
+  const lines = runs.map(({ from, to, clip }) => {
+    const whom = clip.who === clip.other ? `${ids[clip.who]}'s ${clip.parts[0]} through its own ${clip.parts[1]}` : `${ids[clip.who]}'s ${clip.parts[0]} through ${ids[clip.other]}'s ${clip.parts[1]}`
+    return `   • ${(from / timeline.fps).toFixed(2)}s–${(to / timeline.fps).toFixed(2)}s (frames ${from}–${to}): ${whom}, ${Math.round(clip.depth * 100)}% deep`
+  })
+  console.log(`⚠️  Clipping check found parts passing through each other:\n${lines.join('\n')}`)
+  if (!allow) throw new Error('Fix the direction at those moments (pose, reaction, turn or marks), or pass --allow-clipping for a test render')
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2))
   const lessonPath = path.resolve(args.lesson)
@@ -99,11 +141,18 @@ async function main() {
   const looks = Object.fromEntries(castOf(lesson).map((c) => [c.id, castLook(c.id)]))
   const look = looks[lesson.host]
   const narratorVoice = args.voice || (process.env.FISH_VOICE_REFERENCE_ID ? '' : NARRATOR)
-  const { audio, words, talkBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice })
+  const { audio, words, talkBy, mouthBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice })
   const width = even(1080 * args.scale)
   const height = even(1920 * args.scale)
-  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail: 0.8, hookLift: 0.9 })
+  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail: 0.8, hookLift: 0.9, mouthBy })
   if (args.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(args.maxSeconds * FPS))
+  const gestures = timeline.cues.filter((c) => c.gesture)
+  console.log(`🎭 Acting: ${gestures.length} gestures (${gestures.filter((c) => c.auto).length} automatic)`)
+  checkClipping(timeline, castOf(lesson).map((c) => c.id), outDir, args.allowClipping || args.check)
+  if (args.check) {
+    fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, talkBy: undefined }, null, 2))
+    return
+  }
   // The set's painted art kit (content/animation/sets/), if it has one: textures go to the 3D set,
   // the plate becomes the default backdrop.
   const art = args.art ? await setArtFiles(lesson.set) : {}
