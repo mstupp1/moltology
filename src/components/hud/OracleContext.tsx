@@ -7,7 +7,11 @@ import { markOracleCoreIntroSeen } from '@/lib/ai/oracle-core-intro'
 
 export type OracleMode = 'closed' | 'popout' | 'sidebar' | 'page'
 
-export const STORAGE_KEY_ORACLE_LAST_MODE = 'moltology:oracle_last_mode'
+// v2 (2026-11-19): fullscreen became the desktop default. The old key saved every open,
+// so nearly everyone had 'popout' stored without ever picking it; a fresh key lets every
+// desktop member see fullscreen first, then remembers the mode they switch to.
+export const STORAGE_KEY_ORACLE_LAST_MODE = 'moltology:oracle_last_mode_v2'
+const LEGACY_STORAGE_KEY_ORACLE_LAST_MODE = 'moltology:oracle_last_mode'
 
 export interface OracleThread {
   id: string
@@ -64,9 +68,11 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (saved === 'sidebar' || saved === 'popout' || saved === 'page') {
           return saved
         }
+        localStorage.removeItem(LEGACY_STORAGE_KEY_ORACLE_LAST_MODE)
       } catch {}
     }
-    return 'popout'
+    // Desktop opens fullscreen until the member picks another mode (phones always use the overlay).
+    return 'page'
   })
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
   const [pendingSkillId, setPendingSkillId] = useState<string | null>(null)

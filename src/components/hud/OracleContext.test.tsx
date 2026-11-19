@@ -37,6 +37,27 @@ describe('OracleContext & Mode Management', () => {
     expect(result.current).toBeUndefined()
   })
 
+  it('opens fullscreen on desktop by default, ignoring the old auto-saved key', () => {
+    localStorage.clear()
+    localStorage.setItem('moltology:oracle_last_mode', 'popout')
+    const wrapper = ({ children }: { children: React.ReactNode }) => <OracleProvider>{children}</OracleProvider>
+    const { result } = renderHook(() => useOracle(), { wrapper })
+    expect(result.current.lastActiveMode).toBe('page')
+    expect(localStorage.getItem('moltology:oracle_last_mode')).toBeNull()
+    act(() => result.current.toggleMode())
+    expect(result.current.mode).toBe('page')
+  })
+
+  it('remembers a mode the member picks after the default', () => {
+    localStorage.clear()
+    const wrapper = ({ children }: { children: React.ReactNode }) => <OracleProvider>{children}</OracleProvider>
+    const first = renderHook(() => useOracle(), { wrapper })
+    act(() => first.result.current.setMode('popout'))
+    first.unmount()
+    const { result } = renderHook(() => useOracle(), { wrapper })
+    expect(result.current.lastActiveMode).toBe('popout')
+  })
+
   it('provides default closed mode and allows mode switching', async () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <OracleProvider>{children}</OracleProvider>
