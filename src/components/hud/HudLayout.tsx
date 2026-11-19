@@ -250,7 +250,9 @@ function HudContent() {
                       ? 'absolute top-1 right-2'
                       : // The pill (74px with the XP ring) straddles the page panel's top edge and sits
                         // in the panel's top padding, so content starts right under it, not under a bar.
-                        'sticky -top-6 -mt-6 -mx-2 px-2 pt-2.5 -mb-[44px] shrink-0'
+                        // Pulled back up so the pill (74px with the avatar ring) is centred on the
+                        // band's title row, which is --hud-band-h tall from the panel's top edge.
+                        'sticky -top-6 -mt-6 -mx-2 px-2 pt-2.5 -mb-[calc(37px+var(--hud-band-h)/2)] shrink-0'
                   }`}
                 >
                   <div id="hud-top-controls-slot" className="pointer-events-auto" />
@@ -266,7 +268,7 @@ function HudContent() {
                   data-hud-page-panel
                   data-hud-main-only={isMainOnly ? '' : undefined}
                   className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1312px] md:px-[15px] md:pb-6 ${
-                    isMainOnly ? 'md:pt-6' : 'md:pt-[54px]'
+                    isMainOnly ? 'md:pt-6' : 'md:pt-[var(--hud-band-top)]'
                   } md:rounded-panel md:border md:border-line-subtle md:bg-surface-1/[0.68] md:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]`}
                 >
                   <Outlet />

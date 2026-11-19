@@ -393,14 +393,14 @@ export const ChassisStatusPage: React.FC = () => {
     // Phones: header, character and tabs stay pinned as one compact stage while
     // only the options scroll. Wide screens: character on the left, editor on the right.
     <div
-      className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-x-6 gap-y-3 lg:gap-y-5 items-start font-sans relative max-lg:pb-16"
+      className="hud-grid-band-top grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-x-6 gap-y-3 lg:gap-y-5 items-start font-sans relative max-lg:pb-16"
       data-testid="character-workspace"
     >
       {/* The page's header band. Below lg the whole stage is pinned as one compact block (title
           row, section tabs, then the character) while only the options scroll; on wide screens
           only the title row forms the band. */}
-      <div className="hud-title-band-lead max-lg:sticky max-lg:z-20 max-sm:-top-2.5 sm:max-md:-top-4 md:max-lg:-top-6 max-lg:pt-3 md:max-lg:pt-[0.6875rem] max-lg:pb-2 max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
-        <div className="hud-title-band-lead-lg lg:col-span-2 flex flex-wrap items-center gap-x-4 gap-y-2 lg:bg-surface-2 lg:border-b lg:border-line-subtle lg:pt-[0.6875rem] lg:pb-3.5">
+      <div className="hud-title-band-lead max-lg:sticky max-lg:z-20 max-sm:-top-2.5 sm:max-md:-top-4 md:max-lg:-top-6 max-lg:pt-3 md:max-lg:pt-[var(--hud-band-pad)] max-lg:pb-2 max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
+        <div className="hud-title-band-lead-lg lg:col-span-2 flex flex-wrap items-center gap-x-4 gap-y-2 lg:bg-surface-2 lg:border-b lg:border-line-subtle">
           <BandHeadingRow
             title="Character"
             titleClassName="truncate"

@@ -172,8 +172,11 @@ the top bar on phones) with a `surface-2` fill and a `line-subtle` bottom divide
 stands apart from the `surface-1` panel. Use it as the first element of every standard page
 (Academy, Certificates, Forum, Shop, Progress, Admin, Logic Atlas, Support, Settings, Search,
 Profile; Character and Codex build
-the same band by hand with `BandHeadingRow`). On desktop the search pill straddles the band's
-top-right corner, so the title row leaves room for it.
+the same band by hand with `BandHeadingRow`). On desktop the band's title row is `--hud-band-h` (4.5rem, twice
+the 2.25rem row content `--hud-band-row`, padding `--hud-band-pad`) and the floating search pill is
+centred on it, so the title, tabs, actions and pill share one centre line on every page. The pill
+and avatar medallion are solid, never see-through. Nothing in the title row may be
+taller than 2.25rem (tab tiles `min-h-9`, `HudButton size="sm"`, one-line `BandStat`).
 
 One band, the same rows on every page:
 
@@ -183,7 +186,7 @@ One band, the same rows on every page:
    title is the area's name on every one of its tabs (Character on Customize, Shop and Progress);
    the current tab is a lit tile. `actions` sit on the right of the same row (Forum's New post,
    Character's save, or a few figures as `BandStat`) and stop short of the pill
-   (`.hud-pill-clear`). Admin, with six sections, passes `sectionsBelow` to give its tabs their
+   (`.hud-pill-clear`, only as wide as the pill reaches into the panel). Admin, with six sections, passes `sectionsBelow` to give its tabs their
    own row. No eyebrow.
 2. Optional description: one short line. `hideDescriptionOnPhone` drops it where the tabs
    and figures already say enough (Shop).
@@ -192,8 +195,9 @@ One band, the same rows on every page:
 
 On phones the title row holds the title and short actions; section tabs get their own row
 under it (scrolling sideways), then figures (`actionsBelowOnPhone`), then the toolbar.
-Pages that open with their own hero instead of a band (Dashboard) add `hud-page-flush-top`
-so the hero starts at the panel's top edge rather than under the strip kept for the pill.
+Pages that open with their own hero instead of a band (Dashboard, another member's profile)
+add `hud-page-hero-top` on the page and `hud-band-hero` on the hero, so the hero is the band:
+it starts at the panel's top edge and runs to its sides.
 Codex builds the same band by hand on desktop (title, stage and position, reader actions).
 
 `actions` holds page-level commands or a short status summary. `toolbar` spans the

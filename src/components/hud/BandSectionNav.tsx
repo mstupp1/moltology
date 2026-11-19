@@ -84,11 +84,12 @@ export function BandStat({
   title?: string
 }) {
   return (
-    <div className="min-w-0" title={title}>
+    // One line from md up (label, then value) so it fits the band's title row.
+    <div className="min-w-0 md:flex md:items-baseline md:gap-1.5" title={title}>
       <div className="text-xs text-ink-muted whitespace-nowrap">{label}</div>
       <div
         className={cn(
-          'font-grotesk text-lg font-semibold leading-tight tabular-nums',
+          'font-grotesk text-lg md:text-md font-semibold leading-tight tabular-nums',
           tone === 'cyan' ? 'text-cyan-glow' : tone === 'amber' ? 'text-amber-400' : 'text-ink',
         )}
       >

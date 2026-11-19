@@ -100,7 +100,7 @@ export function XpRing({ size, portrait, ratio, done, total, badge, instant, pul
         </defs>
 
         {/* XP towards the next sub-stage */}
-        {/* Empty rails are faint and see-through so the pill shows between the rings */}
+        {/* Empty rails are faint; the medallion's solid disc sits behind them */}
         <path d={track} fill="none" strokeWidth={g.xpStroke} strokeLinecap="round" className="stroke-ink/15" />
         <path
           data-testid="xp-ring-fill"

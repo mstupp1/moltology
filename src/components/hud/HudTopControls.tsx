@@ -8,9 +8,8 @@ import { xpRingGeometry } from './XpRing'
 import { HUDTaskBar } from './HUDTaskBar'
 import { NotificationsBell } from './NotificationsBell'
 
-/** Frosted pill shared by the phone top bar and the desktop top-right controls. */
-export const HUD_GLASS_PILL =
-  'rounded-full bg-surface-1/85 backdrop-blur-xl backdrop-saturate-150 border border-line-subtle shadow-menu'
+/** Solid pill shared by the phone top bar and the desktop top-right controls (no see-through). */
+export const HUD_GLASS_PILL = 'rounded-full bg-surface-1 border border-line-subtle shadow-menu'
 
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
@@ -79,10 +78,14 @@ export function HudTopControls({
     </button>
   )
 
-  // The portrait medallion sits beside the pill as its own piece; its rings stay see-through.
+  // The portrait medallion sits beside the pill as its own piece, on a solid disc like the pill,
+  // so the page never shows through its rings.
   const medallion = Boolean(user) || isSessionPending
   const medallionLayer = medallion ? (
-    <span data-testid="top-controls-medallion" className="relative shrink-0 flex">
+    <span
+      data-testid="top-controls-medallion"
+      className="relative shrink-0 flex rounded-full bg-surface-1 border border-line-subtle shadow-menu"
+    >
       {account}
     </span>
   ) : null
@@ -128,7 +131,7 @@ export function HudTopControls({
       </button>
       {/* A faint, low pill: echoes the desktop pill without the glass bulk */}
       <div className="flex items-center gap-1.5 shrink-0 -mr-1.5">
-        <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2/50 border border-line-subtle">
+        <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2 border border-line-subtle">
           {controls}
         </div>
         {medallionLayer}
