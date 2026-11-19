@@ -17,6 +17,7 @@ import { voiceLesson } from './lib/character-animation/voices'
 import { renderFrames } from './lib/character-animation/render'
 import { defaultBackdrop, headlineOverlays, normaliseBackdrop, renderHeadlineCards, renderOutroText, renderSceneClip } from './lib/character-animation/compose'
 import { tokenizeScriptText } from './lib/tts-engine'
+import { setArtFiles, textureUrls } from './lib/character-animation/set-art'
 import { SHOTS } from '../src/lib/avatar3d/scripted'
 
 /** Same narrator as the reels (scripts/create-reel.ts REEL_NARRATOR_VOICE). */
@@ -34,10 +35,11 @@ interface Args {
   reuseFrames: boolean
   force: boolean
   maxSeconds?: number
+  art: boolean
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { lesson: '', silent: false, scale: 1, framesOnly: false, reuseFrames: false, force: false }
+  const args: Args = { lesson: '', silent: false, scale: 1, framesOnly: false, reuseFrames: false, force: false, art: true }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--lesson') args.lesson = argv[++i]
@@ -49,6 +51,7 @@ function parseArgs(argv: string[]): Args {
     else if (a === '--reuse-frames') args.reuseFrames = true
     else if (a === '--force') args.force = true
     else if (a === '--max-seconds') args.maxSeconds = Number(argv[++i])
+    else if (a === '--no-art') args.art = false
     else if (a === '--help' || a === '-h') {
       console.log(`Usage: npm run anim:create -- --lesson <lesson.json> [options]
 
@@ -59,6 +62,7 @@ function parseArgs(argv: string[]): Args {
   --frames-only     Stop after rendering frames
   --reuse-frames    Skip the 3D render and reuse frames/ from the last run
   --out-dir <dir>   Default tmp/anim-<lesson id>
+  --no-art          Ignore the set's painted art kit (plain colours, drawn backdrop)
   --force           Render even if the lesson check finds problems`)
       process.exit(0)
     }
@@ -99,7 +103,18 @@ async function main() {
   const height = even(1920 * args.scale)
   const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail: 0.8, hookLift: 0.9 })
   if (args.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(args.maxSeconds * FPS))
-  fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, talkBy: undefined, windows, hookEnd }, null, 2))
+  // The set's painted art kit (content/animation/sets/), if it has one: textures go to the 3D set,
+  // the plate becomes the default backdrop.
+  const art = args.art ? await setArtFiles(lesson.set) : {}
+  if (Object.keys(art).length) console.log(`🎨 Set art: ${Object.keys(art).join(', ')}`)
+  timeline.setArt = textureUrls(art)
+  fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, talkBy: undefined, setArt: Object.keys(timeline.setArt), windows, hookEnd }, null, 2))
+  const setBackdrop = () =>
+    lesson.backdrop
+      ? normaliseBackdrop(rel(lesson.backdrop), path.join(outDir, 'backdrop.png'))
+      : art.plate
+        ? normaliseBackdrop(art.plate, path.join(outDir, 'backdrop.png'))
+        : defaultBackdrop(path.join(outDir, 'backdrop.png'), lesson.set)
 
   const framesDir = path.join(outDir, 'frames')
   if (!args.reuseFrames) {
@@ -134,7 +149,7 @@ async function main() {
       console.log('👋 Rendering outro...')
       await renderFrames(outroTimeline, { outDir: outroDir })
     }
-    const backdrop = await (lesson.backdrop ? normaliseBackdrop(rel(lesson.backdrop), path.join(outDir, 'backdrop.png')) : defaultBackdrop(path.join(outDir, 'backdrop.png'), lesson.set))
+    const backdrop = await setBackdrop()
     outroVideo = await renderSceneClip({
       framesDir: outroDir,
       fps: FPS,
@@ -148,7 +163,7 @@ async function main() {
 
   // Scenes: backdrop, character, and the hook headline over the opening.
   console.log('🎞️  Building scene clips...')
-  const defaultSet = lesson.backdrop ? await normaliseBackdrop(rel(lesson.backdrop), path.join(outDir, 'backdrop.png')) : await defaultBackdrop(path.join(outDir, 'backdrop.png'), lesson.set)
+  const defaultSet = await setBackdrop()
   const hookCount = tokenizeScriptText(lesson.hookHeadline).length
   const cards = renderHeadlineCards(lesson.hookHeadline, path.join(outDir, 'headline'))
   const clips: string[] = []

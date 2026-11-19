@@ -6,7 +6,7 @@
 import type { AvatarPose } from '../avatar/traits'
 import type { Avatar3DLook } from './look'
 import type { Reaction } from './motion'
-import { buildSet, type SetName } from './sets'
+import { buildSet, type SetArt, type SetName } from './sets'
 import type { Stage } from './stage'
 
 /** Named camera setups, so scripts say "close" rather than numbers. */
@@ -79,6 +79,8 @@ export interface AnimationTimeline {
   talkBy?: number[][]
   /** Set dressing in front of the backdrop. */
   set?: SetName
+  /** Painted textures and the cut-out layer for the set (see sets.ts). */
+  setArt?: SetArt
 }
 
 /**
@@ -94,7 +96,7 @@ export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
   const members = timeline.cast?.length ?? 1
   if (timeline.cast?.length) stage.setCast(timeline.cast)
   else stage.setLook(timeline.look, true)
-  const set = timeline.set ? buildSet(timeline.set) : null
+  const set = timeline.set ? buildSet(timeline.set, timeline.setArt) : null
   if (set) stage.setProps(set.root)
   const apply = (cue: TimelineCue) => {
     const who = cue.who ?? 0
@@ -107,6 +109,8 @@ export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
     if (cue.look !== undefined) character?.lookAt(cue.look)
   }
   return {
+    /** Resolves when the set's art has loaded; wait for it before the first frame. */
+    ready: set?.ready ?? Promise.resolve(),
     /** Draw frame `index` (the next one in order). */
     seek(index: number) {
       if (index <= drawn) throw new Error(`Frames must be drawn in order (asked for ${index} after ${drawn})`)

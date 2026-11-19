@@ -8,7 +8,7 @@ import { timelinePlayer, type AnimationTimeline } from '../../../src/lib/avatar3
 declare global {
   interface Window {
     __anim: {
-      setup: (timeline: AnimationTimeline) => void
+      setup: (timeline: AnimationTimeline) => Promise<void>
       frame: (index: number) => string
     }
   }
@@ -19,7 +19,7 @@ let player: ReturnType<typeof timelinePlayer> | null = null
 let canvas: HTMLCanvasElement | null = null
 
 window.__anim = {
-  setup(timeline) {
+  async setup(timeline) {
     canvas = document.createElement('canvas')
     canvas.width = timeline.width
     canvas.height = timeline.height
@@ -28,6 +28,7 @@ window.__anim = {
     document.body.appendChild(canvas)
     stage = createStage(canvas, { manual: true, preserveDrawingBuffer: true, pixelRatio: 1, lighting: timeline.lighting ?? 'cinematic', quality: 'high' })
     player = timelinePlayer(stage, timeline)
+    await player.ready
   },
   frame(index) {
     if (!player || !canvas) throw new Error('setup() first')
