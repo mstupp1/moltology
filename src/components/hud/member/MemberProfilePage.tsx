@@ -15,6 +15,7 @@ import { AuthModal } from '@/components/AuthModal'
 import { HudButton } from '@/components/ui/HudButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { cn } from '@/lib/utils'
 import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
 import type { PublicProfileView } from '@/lib/connections'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -41,6 +42,8 @@ export interface MemberProfilePageProps {
   profileId: string
   /** Public `/member/$profileId` only. `/profile` stays the signed-in self dossier. */
   canonicalizePath?: boolean
+  /** The profile opens the page (no header band above it), so its hero becomes the band. */
+  opensPage?: boolean
 }
 
 type MemberLoadout = {
@@ -53,6 +56,7 @@ type MemberLoadout = {
 export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   profileId,
   canonicalizePath = false,
+  opensPage = false,
 }) => {
   const navigate = useNavigate()
   const session = useAuthSession()
@@ -148,10 +152,13 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   const auditTaken = sheet.source === 'audit' && profile.moltmax?.score != null
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
+    <div className={cn('space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative', opensPage && 'hud-page-hero-top')}>
       <section
         aria-labelledby="member-name"
-        className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset"
+        className={cn(
+          opensPage && 'hud-band-hero',
+          'relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset',
+        )}
       >
         {/* Quiet depth light behind the portrait; no motion. */}
         <div
@@ -204,7 +211,12 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                     <RankRecordChip userId={profile.id} />
                   </div>
                 </div>
-                <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 shrink-0 max-sm:[&>*]:flex-1">
+                <div
+                  className={cn(
+                    'flex flex-wrap justify-center sm:justify-end items-center gap-2 shrink-0 max-sm:[&>*]:flex-1',
+                    opensPage && 'hud-hero-pill-clear',
+                  )}
+                >
                   {isSelf && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
                   {session.isGuest ? (
                     <>

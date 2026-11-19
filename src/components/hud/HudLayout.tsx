@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
@@ -18,6 +18,7 @@ import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
 import '@/styles/scene.css'
 import { useBackdropCovered } from '@/hooks/useBackdropCovered'
+import { usePillClearance } from '@/hooks/usePillClearance'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
@@ -70,6 +71,8 @@ function HudContent() {
               (location.search as string).includes('mainOnly=true') ||
               (location.search as string).includes('main_only=true')))
     )
+  const panelRef = useRef<HTMLDivElement>(null)
+  usePillClearance(panelRef, !isFullscreenRoute && !isMainOnly)
 
   const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
@@ -226,7 +229,9 @@ function HudContent() {
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
-                  : 'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain'
+                  : // Always keep the scrollbar's lane, so pages that scroll and pages that don't share one
+                  // panel width and nothing shifts when switching tabs or pages.
+                  'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain [scrollbar-gutter:stable]'
               } ${
                 // Desktop standard pages keep the scene bright around one see-through page panel.
                 // Phones get the full-width panel tint from the backdrop layer above, so main stays clear there.
@@ -257,6 +262,7 @@ function HudContent() {
                 // Desktop gutters: main 8px + panel border 1px + panel 15px = the 24px pages had before
                 // the panel, and 1312px max leaves 1280px of content, so page layouts keep their width.
                 <div
+                  ref={panelRef}
                   data-hud-page-panel
                   data-hud-main-only={isMainOnly ? '' : undefined}
                   className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1312px] md:px-[15px] md:pb-6 ${

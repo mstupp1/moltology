@@ -402,13 +402,13 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
           Stage {activeScripture.stageClearance} · {pageIndex + 1} of {filteredScriptures.length}
         </span>
         {actions}
-        <span aria-hidden="true" className="hidden lg:block w-[204px] shrink-0" />
+        <span aria-hidden="true" className="hidden lg:block w-[max(0px,calc(var(--hud-pill-clear,220px)-1rem))] shrink-0" />
       </div>
 
       <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 items-start">
         <aside
           aria-label="Contents"
-          className="hidden lg:flex flex-col w-[300px] shrink-0 sticky top-4 h-[calc(100dvh-3.5rem)] max-h-[60rem] rounded-card border border-line-subtle bg-surface-1 overflow-hidden"
+          className="hidden lg:flex flex-col w-[300px] shrink-0 sticky -top-4 h-[calc(100dvh-1rem)] max-h-[60rem] rounded-card border border-line-subtle bg-surface-1 overflow-hidden"
         >
           <CodexDirectory {...directoryProps} className="flex-1 pt-3" />
         </aside>
