@@ -542,7 +542,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     </button>
   )
 
-  // Full-screen phone menu, shaped like the app's Account screen: X · MENU bar, rows, account at the foot.
+  // Full-screen phone menu, shaped like the app's Account screen: Menu title with the close X top right, rows, account at the foot.
   const mobileMenu =
     portalReady && menuPresence.mounted
       ? createPortal(
@@ -558,6 +558,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             className="lg:hidden fixed inset-0 z-[99980] flex flex-col bg-surface-1 font-sans transition-transform duration-250 ease-out motion-reduce:transition-none"
           >
             <div className="shrink-0 h-14 px-2 pt-[env(safe-area-inset-top)] box-content flex items-center gap-2 border-b border-line-subtle">
+              {/* Balances the close button so the title stays centred; close sits top right, under the menu button. */}
+              <span className="w-11 shrink-0" aria-hidden="true" />
+              <h2 className="flex-1 text-center font-grotesk text-sm font-semibold text-ink">Menu</h2>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
@@ -566,8 +569,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
-              <h2 className="flex-1 text-center font-grotesk text-sm font-semibold text-ink">Menu</h2>
-              <span className="w-11 shrink-0" aria-hidden="true" />
             </div>
             <nav aria-label="Mobile Navigation" className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
               <div className="max-w-xl mx-auto">{navTabs.map(renderMobileItem)}</div>

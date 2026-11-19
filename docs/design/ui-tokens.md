@@ -86,6 +86,8 @@ case. The one exception is `eyebrow`: a small uppercase, tracked section label i
 
 - Controls are `min-h-8`, `min-h-10` or `min-h-12` (32, 40, 48px at the base font size).
 - No text under 11px.
+- Close buttons on menus, sheets, dialogs and full-screen overlays sit top right, on phone and desktop. A
+  full-screen bar centres its title with a blank 44px slot on the left to balance the X.
 
 ## Spacing
 
