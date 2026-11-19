@@ -2,11 +2,10 @@ import React, { useId } from 'react'
 
 /** Geometry for the two sizes the portrait comes in. */
 export const XP_RING_SIZES = {
-  // Phone top bar is 56px tall: the medallion (54px) fits inside it. On both sizes the
-  // badge tucks 4px into the portrait's bottom edge (badgeTop is from the medallion's top).
-  phone: { portrait: 36, gapInner: 1.5, xpStroke: 3, gapOuter: 2, notchStroke: 2.5, badgeTop: 41 },
+  // Phone top bar is 56px tall: the medallion (54px) fits inside it.
+  phone: { portrait: 36, gapInner: 1.5, xpStroke: 3, gapOuter: 2, notchStroke: 2.5 },
   // Desktop has room to spare: a 50px portrait in a 74px medallion beside the 56px pill.
-  desktop: { portrait: 50, gapInner: 2, xpStroke: 4, gapOuter: 2.5, notchStroke: 3.5, badgeTop: 58 },
+  desktop: { portrait: 50, gapInner: 2, xpStroke: 4, gapOuter: 2.5, notchStroke: 3.5 },
 } as const
 
 export type XpRingSize = keyof typeof XP_RING_SIZES
@@ -16,7 +15,11 @@ export function xpRingGeometry(size: XpRingSize) {
   const xpRadius = g.portrait / 2 + g.gapInner + g.xpStroke / 2
   const notchRadius = xpRadius + g.xpStroke / 2 + g.gapOuter + g.notchStroke / 2
   const box = Math.ceil(2 * (notchRadius + g.notchStroke / 2))
-  return { ...g, xpRadius, notchRadius, box, center: box / 2 }
+  const center = box / 2
+  // The sub-stage badge sits in the rings' bottom opening, its top edge touching the
+  // portrait's bottom edge (no gap, no overlap), so it never covers the character.
+  const badgeTop = Math.round(center + g.portrait / 2 - 1)
+  return { ...g, xpRadius, notchRadius, box, center, badgeTop }
 }
 
 /** Both rings leave a 60° opening at the bottom for the sub-stage badge. */
@@ -143,7 +146,7 @@ export function XpRing({ size, portrait, ratio, done, total, badge, instant, pul
         <span
           key={badge}
           data-testid="xp-ring-badge"
-          className="xp-badge-in absolute left-1/2 -translate-x-1/2 px-1 py-[2px] rounded-control bg-abyss border border-cyan-glow/50 text-2xs font-sans font-semibold leading-none tabular-nums text-ink whitespace-nowrap pointer-events-none"
+          className="xp-badge-in absolute z-10 left-1/2 -translate-x-1/2 px-1 py-[2px] rounded-control bg-abyss border border-cyan-glow/50 text-2xs font-sans font-semibold leading-none tabular-nums text-ink whitespace-nowrap pointer-events-none"
           style={{ top: g.badgeTop }}
         >
           {badge}
