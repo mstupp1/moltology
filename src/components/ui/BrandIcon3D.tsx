@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import geometry from './brand-geometry.json'
 import { BrandIcon } from './BrandMark'
+import { EMBLEM_MATCAP } from '@/lib/emblem-light'
 
 export interface BrandIcon3DProps {
   /** Square display size in CSS pixels. */
@@ -114,7 +115,7 @@ function canUseWebGL(): boolean {
 
 /**
  * Interactive Three.js 3D Synaptic Path emblem extruded directly from `brand-geometry.json`.
- * Features satin crimson chitin faces, metallic beveled side walls, benthic cyan rim lighting,
+ * Features satin crimson chitin faces and glossy beveled side walls, shaded from baked matcaps,
  * gentle orbital motion, and pointer-responsive tilt, with automatic 2D vector fallback.
  */
 export function BrandIcon3D({
@@ -143,6 +144,9 @@ export function BrandIcon3D({
     let emblemGeo: THREE.ExtrudeGeometry | null = null
     const materials: THREE.Material[] = []
     let frameId = 0
+    let disposed = false
+    const textures: THREE.Texture[] = []
+    let stopWatching: (() => void) | null = null
 
     try {
       renderer = new THREE.WebGLRenderer({
@@ -161,51 +165,16 @@ export function BrandIcon3D({
       camera.position.set(0, 0, 198)
       camera.lookAt(0, 0, 0)
 
-      // Group 0 (Front/Back caps): true Moltology crimson-aggro (#ff453a) satin chitin
-      const capMaterial = new THREE.MeshStandardMaterial({
-        color: 0xff3b30,
-        emissive: 0xd92318,
-        emissiveIntensity: 0.28,
-        roughness: 0.48,
-        metalness: 0.08,
-      })
-
-      // Group 1 (Extruded walls & 6-segment bevels): deep sculpted carnelian with bright specular edge catchlights
-      const bevelMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0x9e160d,
-        emissive: 0x380502,
-        emissiveIntensity: 0.2,
-        roughness: 0.2,
-        metalness: 0.42,
-        clearcoat: 0.9,
-        clearcoatRoughness: 0.12,
-        reflectivity: 1.0,
-      })
+      // Baked light (npm run emblem:bake): each material is shaded from a lit ball rendered once
+      // with the old five-light rig plus a dark studio for reflections, so no lights run per frame.
+      // Group 0 is the satin crimson face, group 1 the glossy carnelian walls and bevels.
+      const capMaterial = new THREE.MeshMatcapMaterial({ color: 0xffffff })
+      const bevelMaterial = new THREE.MeshMatcapMaterial({ color: 0xffffff })
       materials.push(capMaterial, bevelMaterial)
 
       emblemGeo = createBrandEmblemGeometry()
       const emblemMesh = new THREE.Mesh(emblemGeo, [capMaterial, bevelMaterial])
       scene.add(emblemMesh)
-
-      // Grazing multi-point lighting so the front cap stays rich #ff453a while bevels & sides pop
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.55)
-      scene.add(ambientLight)
-
-      const keyLight = new THREE.DirectionalLight(0xfff0ea, 2.1)
-      keyLight.position.set(80, 95, 70)
-      scene.add(keyLight)
-
-      const bevelHighlightLight = new THREE.DirectionalLight(0xffb4a8, 1.8)
-      bevelHighlightLight.position.set(-95, 55, 45)
-      scene.add(bevelHighlightLight)
-
-      const cyanRimLight = new THREE.DirectionalLight(0x00c3ff, 2.4)
-      cyanRimLight.position.set(90, -55, -35)
-      scene.add(cyanRimLight)
-
-      const crimsonUnderLight = new THREE.DirectionalLight(0xff453a, 1.1)
-      crimsonUnderLight.position.set(-30, -90, 40)
-      scene.add(crimsonUnderLight)
 
       const reduceMotion =
         typeof window.matchMedia === 'function' &&
@@ -215,15 +184,63 @@ export function BrandIcon3D({
 
       // Initial angled 3D pose so extruded walls & bevels are immediately visible
       emblemMesh.rotation.set(initialRotateX, initialRotateY, 0)
-      renderer.render(scene, camera)
-      setWebglReady(true)
+
+      // Only draw while the emblem is on screen and the tab is visible.
+      let onScreen = true
+      let loaded = false
+      let tick: ((now: number) => void) | null = null
+      const resume = () => {
+        if (!tick || frameId || !loaded || !onScreen || document.hidden) return
+        frameId = window.requestAnimationFrame(tick)
+      }
+      const observer =
+        typeof IntersectionObserver === 'function'
+          ? new IntersectionObserver(([entry]) => {
+              onScreen = entry?.isIntersecting ?? true
+              resume()
+            })
+          : null
+      observer?.observe(canvas)
+      document.addEventListener('visibilitychange', resume)
+      stopWatching = () => {
+        observer?.disconnect()
+        document.removeEventListener('visibilitychange', resume)
+      }
+
+      const loader = new THREE.TextureLoader()
+      const load = (url: string, material: THREE.MeshMatcapMaterial) =>
+        new Promise<void>((resolve, reject) => {
+          loader.load(
+            url,
+            (texture) => {
+              texture.colorSpace = THREE.SRGBColorSpace
+              material.matcap = texture
+              material.needsUpdate = true
+              textures.push(texture)
+              resolve()
+            },
+            undefined,
+            reject,
+          )
+        })
+      Promise.all([load(EMBLEM_MATCAP.cap, capMaterial), load(EMBLEM_MATCAP.bevel, bevelMaterial)])
+        .then(() => {
+          if (disposed || !renderer) return
+          loaded = true
+          renderer.render(scene, camera)
+          setWebglReady(true)
+          resume()
+        })
+        .catch(() => {
+          // Keeps the flat vector emblem.
+        })
 
       if (shouldAnimate) {
         const startTime = performance.now()
         let currentPointerX = 0
         let currentPointerY = 0
 
-        const tick = (now: number) => {
+        tick = (now: number) => {
           const elapsed = (now - startTime) * 0.001
 
           currentPointerX += (pointerTargetRef.current.x - currentPointerX) * 0.08
@@ -236,19 +253,21 @@ export function BrandIcon3D({
           emblemMesh.position.y = Math.sin(elapsed * 1.5) * 1.4
 
           renderer?.render(scene, camera)
-          frameId = window.requestAnimationFrame(tick)
+          frameId = 0
+          resume()
         }
-
-        frameId = window.requestAnimationFrame(tick)
       }
     } catch {
       setWebglReady(false)
     }
 
     return () => {
+      disposed = true
       if (frameId) window.cancelAnimationFrame(frameId)
+      stopWatching?.()
       emblemGeo?.dispose()
       materials.forEach((m) => m.dispose())
+      textures.forEach((t) => t.dispose())
       renderer?.dispose()
     }
   }, [size, animate, initialRotateX, initialRotateY])

@@ -145,8 +145,30 @@
   0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.96); }
   50% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
 }
+/* GlowEmblem's mark: the baked 3D emblem turntable (src/lib/emblem-light.ts). The frames are a
+   little larger than the mark's box because the 3D emblem leaves a margin for its rocking. The
+   strip steps one frame at a time: 36 frames over 6s. */
+.emblem-turntable {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 112%;
+  height: 112%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+.emblem-turntable-strip {
+  display: block;
+  height: 100%;
+  max-width: none;
+  animation: emblem-turntable 6s steps(36) infinite;
+}
+@keyframes emblem-turntable {
+  to { transform: translateX(-100%); }
+}
 @media (prefers-reduced-motion: reduce) {
   .glow-emblem-breathe .glow-emblem-halo { animation: none; }
+  .emblem-turntable-strip { animation: none; }
 }
 
 /* Logo lockup: title over a tracked tagline stretched to the title's width (HeaderBrand).
