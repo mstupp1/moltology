@@ -12,10 +12,10 @@ A lesson is one JSON file. `npm run anim:create` checks it before rendering and 
 | `format` | `short` (the only format built so far) |
 | `host` | Cast id from `content/animation/cast.json` (`host-crab`); speaks any line without a `speaker` |
 | `cast` | Optional `[{ "id", "at" }]` for two or more characters; `at` is a mark: `left`, `center` or `right`. Must include the host |
-| `set` | Optional 3D set: `codex-study`, `reef-office` or `open-water` (pieces stay behind and beside the marks) |
+| `set` | Optional 3D set: `codex-study`, `reef-office` or `open-water` (pieces stay behind and beside the marks). Its art kit from `content/animation/sets/` is used automatically |
 | `codex` | `{ id, title, url }` when teaching a passage |
 | `hookHeadline` | Exact start of scene 1's line, under 14 words |
-| `backdrop` | Optional 9:16 image, relative to the lesson file |
+| `backdrop` | Optional 9:16 image, relative to the lesson file; overrides the set's painted plate |
 | `scenes` | Six to ten scenes (below) |
 | `caption`, `hashtags`, `firstComment`, `youtubeTitle`, `youtubeDescription`, `youtubeTags`, `ctaGoal` | Platform copy, same rules as reels |
 | `outro` | Optional finished outro image; without it the host waves under "Read the full passage at moltology.org" |
