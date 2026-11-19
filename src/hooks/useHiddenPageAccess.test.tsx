@@ -24,7 +24,7 @@ describe('experiment page access', () => {
   })
 
   it('refreshes after switching an experiment without enabling the other feature', async () => {
-    vi.mocked(getUserProfileFn).mockResolvedValue({ role: 'admin', experiments: ['new-store'] } as never)
+    vi.mocked(getUserProfileFn).mockResolvedValue({ role: 'admin', experiments: ['molt-credits'] } as never)
     const { result } = renderHook(() => useHiddenPageAccess('premium'))
     await waitFor(() => expect(result.current).toEqual({ canView: false, pending: false }))
     vi.mocked(getUserProfileFn).mockResolvedValue({ role: 'admin', experiments: ['premium'] } as never)
@@ -37,7 +37,7 @@ describe('experiment page access', () => {
 
   it('fails closed when the profile cannot be read', async () => {
     vi.mocked(getUserProfileFn).mockRejectedValue(new Error('unavailable'))
-    const { result } = renderHook(() => useHiddenPageAccess('new-store'))
+    const { result } = renderHook(() => useHiddenPageAccess('molt-credits'))
     await waitFor(() => expect(result.current).toEqual({ canView: false, pending: false }))
   })
 
@@ -45,8 +45,8 @@ describe('experiment page access', () => {
     vi.mocked(useAuthSession).mockReturnValue({
       userId: 'member-1', user: { id: 'member-1', role: 'user' }, isPending: false,
     } as never)
-    vi.mocked(getUserProfileFn).mockResolvedValue({ role: 'user', experiments: ['new-store'] } as never)
-    const { result, rerender } = renderHook(() => useHiddenPageAccess('new-store'))
+    vi.mocked(getUserProfileFn).mockResolvedValue({ role: 'user', experiments: ['molt-credits'] } as never)
+    const { result, rerender } = renderHook(() => useHiddenPageAccess('molt-credits'))
     await waitFor(() => expect(result.current).toEqual({ canView: false, pending: false }))
     vi.mocked(useAuthSession).mockReturnValue({ userId: null, user: null, isPending: false } as never)
     rerender()

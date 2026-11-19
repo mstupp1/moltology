@@ -33,7 +33,7 @@ export function StoreShell() {
         {publicEnabled || path === '/store/status' ? (
           <StoreBody />
         ) : (
-          <HiddenPageGuard experiment="new-store" skeleton={<div className="mx-auto max-w-7xl px-4 py-10"><HUDPageLoader /></div>}>
+          <HiddenPageGuard skeleton={<div className="mx-auto max-w-7xl px-4 py-10"><HUDPageLoader /></div>}>
             <StoreBody />
           </HiddenPageGuard>
         )}

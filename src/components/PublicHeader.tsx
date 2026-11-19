@@ -4,7 +4,7 @@
  * Shared navigation bar across top-level public pages (Landing / Org).
  * Features a rounded card tab bar: the current page is a lit tile and a faint lens follows hover and focus.
  * Phones get the app's top bar (faint pill, XP-ring portrait) and a full-screen menu like the app's Account screen.
- * The new-store experiment switches opted-in admins from Etsy to /store.
+ * Store links go to /store once the store is public (admins always); otherwise Etsy.
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'

@@ -7,7 +7,6 @@ import { merchOrders, merchProducts, merchVariants, storeSettings, storeOverride
 import { buildMerchCheckoutSessionParams, buildPricedCheckoutLines, buildPrintfulOrderPayload, type CheckoutLineRequest, type PricedVariant, shouldDraftPrintfulOrder } from '../merch'
 import { STORE_DEFAULTS, STORE_QUOTE_TTL_MS, quoteBinding, selectStandardRate, storeDeliverySchema, type StoreSettings } from '../store'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
-import { hasExperiment } from '../experiments'
 import { isAdmin } from '../permissions'
 import { profiles } from '../../db/schema'
 import sync from '../../../content/merch/printful-sync.json'
@@ -29,8 +28,8 @@ export async function requireStoreAccess(args: StoreArgs) {
   const settings = await readStoreSettings()
   const auth = await resolveWriteAuth({ ...args, requireAuth: false })
   if (!isStorePublic(settings)) {
-    const [profile] = auth ? await auth.dbClient.select().from(profiles).where(eq(profiles.id, auth.userId)).limit(1) : []
-    if (!profile || !hasExperiment(profile.role, profile.experiments, 'new-store')) throw new Error('This page is not available.')
+    const [profile] = auth ? await auth.dbClient.select({ role: profiles.role }).from(profiles).where(eq(profiles.id, auth.userId)).limit(1) : []
+    if (!profile || !isAdmin(null, profile.role)) throw new Error('This page is not available.')
   }
   return { settings, auth }
 }
