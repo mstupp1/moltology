@@ -1,6 +1,7 @@
 import { BandStat } from '@/components/hud/BandSectionNav'
 import React, { useState } from 'react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexStages'
 import { PIPELINE_CLEARANCES, clearanceIndexForXp } from '@/lib/pipeline-explorer'
@@ -24,9 +25,10 @@ export default function PipelineView() {
     <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans">
       <HudTitlePanel
         treatment="band"
-        joined
         accent="cyan"
-        title="Progress"
+        title="Character"
+        sections={<CharacterSectionNav current="progress" />}
+        actionsBelowOnPhone
         actions={
           <div className="flex items-center gap-5">
             <BandStat label="Your XP" value={formatXp(xp)} />

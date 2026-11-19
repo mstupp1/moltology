@@ -1,3 +1,4 @@
+import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
 import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { EquipmentCategory, EquipmentRarity } from '@/db/schema'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
@@ -425,9 +426,11 @@ export function MarketShopPage() {
     <div className="space-y-3 sm:space-y-4 font-sans pb-2">
       <HudTitlePanel
         treatment="band"
-        joined
         accent="cyan"
-        title="Shop"
+        title="Character"
+        sections={<CharacterSectionNav current="shop" />}
+        actionsBelowOnPhone
+        hideDescriptionOnPhone
         description={
           tab === 'skills'
             ? 'Methods the Oracle can walk you through. Pick one in the chat box, or let the Oracle reach for it.'

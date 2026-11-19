@@ -5,6 +5,8 @@ import { Check, Dices, Loader2, Undo2, UserPlus } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { HudWorkspaceGhost } from '../HudGhostSkeletons'
 import { HudButton } from '@/components/ui/HudButton'
+import { BandHeadingRow } from '@/components/hud/HudTitlePanel'
+import { CharacterSectionNav } from './CharacterSectionNav'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHudPersist } from '@/hooks/useHudPersist'
@@ -394,50 +396,55 @@ export const ChassisStatusPage: React.FC = () => {
       className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-x-6 gap-y-3 lg:gap-y-5 items-start font-sans relative max-lg:pb-16"
       data-testid="character-workspace"
     >
-      {/* Below lg this pinned stage continues the page's header band (the section tabs sit just
-          above it, from the route); on wide screens only the title row does. */}
-      <div className="hud-title-band-rest max-lg:sticky max-lg:z-20 max-sm:-top-2.5 sm:max-md:-top-4 md:max-lg:-top-6 max-lg:pt-1 max-lg:pb-2 max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
-        <div className="hud-title-band-rest-lg lg:col-span-2 flex items-center justify-between gap-3 lg:bg-surface-2 lg:border-b lg:border-line-subtle lg:pt-2 lg:pb-5">
-          <h1 className="font-grotesk font-semibold text-lg sm:text-2xl text-ink tracking-tight truncate">
-            Character
-          </h1>
-          <div className="flex shrink-0 gap-2">
-            <HudButton
-              size="sm"
-              variant="secondary"
-              className="w-8 px-0"
-              aria-label="Discard changes"
-              title="Discard changes"
-              disabled={saving || !dirty}
-              onClick={() => {
-                accept(saved)
-                if (isGuest && saved.config) saveGuestCharacter(saved.config, saved.items)
-              }}
-            >
-              <Undo2 className="w-4 h-4" aria-hidden="true" />
-            </HudButton>
-            {isGuest ? (
-              <HudButton size="sm" onClick={() => void save()} icon={<UserPlus className="w-3.5 h-3.5" />}>
-                Save my character
-              </HudButton>
-            ) : (
-              <HudButton
-                size="sm"
-                className="w-8 px-0"
-                aria-label={saving ? 'Saving' : 'Save changes'}
-                title="Save changes"
-                aria-busy={saving || undefined}
-                disabled={saving || !dirty}
-                onClick={() => void save()}
-              >
-                {saving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+      {/* The page's header band. Below lg the whole stage is pinned as one compact block (title
+          row, section tabs, then the character) while only the options scroll; on wide screens
+          only the title row forms the band. */}
+      <div className="hud-title-band-lead max-lg:sticky max-lg:z-20 max-sm:-top-2.5 sm:max-md:-top-4 md:max-lg:-top-6 max-lg:pt-3 md:max-lg:pt-[0.6875rem] max-lg:pb-2 max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
+        <div className="hud-title-band-lead-lg lg:col-span-2 flex flex-wrap items-center gap-x-4 gap-y-2 lg:bg-surface-2 lg:border-b lg:border-line-subtle lg:pt-[0.6875rem] lg:pb-3.5">
+          <BandHeadingRow
+            title="Character"
+            titleClassName="truncate"
+            sections={<CharacterSectionNav current="customize" />}
+            actions={
+              <div className="flex shrink-0 gap-2">
+                <HudButton
+                  size="sm"
+                  variant="secondary"
+                  className="w-8 px-0"
+                  aria-label="Discard changes"
+                  title="Discard changes"
+                  disabled={saving || !dirty}
+                  onClick={() => {
+                    accept(saved)
+                    if (isGuest && saved.config) saveGuestCharacter(saved.config, saved.items)
+                  }}
+                >
+                  <Undo2 className="w-4 h-4" aria-hidden="true" />
+                </HudButton>
+                {isGuest ? (
+                  <HudButton size="sm" onClick={() => void save()} icon={<UserPlus className="w-3.5 h-3.5" />}>
+                    Save my character
+                  </HudButton>
                 ) : (
-                  <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+                  <HudButton
+                    size="sm"
+                    className="w-8 px-0"
+                    aria-label={saving ? 'Saving' : 'Save changes'}
+                    title="Save changes"
+                    aria-busy={saving || undefined}
+                    disabled={saving || !dirty}
+                    onClick={() => void save()}
+                  >
+                    {saving ? (
+                      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+                    )}
+                  </HudButton>
                 )}
-              </HudButton>
-            )}
-          </div>
+              </div>
+            }
+          />
         </div>
         <div className="lg:row-start-2 lg:sticky lg:top-6 lg:self-start space-y-3">
           <div className="grid grid-cols-1 lg:grid-cols-[84px_minmax(0,1fr)_84px] gap-2 items-center">

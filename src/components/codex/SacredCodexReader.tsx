@@ -375,43 +375,46 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
         />
       )}
 
+      <h1 className="sr-only">The Sacred Codex</h1>
+      {/* Phone: one slim sticky bar where tapping the title opens the contents. Desktop: the
+          page's header band, level with the search pill: title, place in the canon, actions. */}
+      <div className="hud-codex-band sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:gap-4 lg:mb-5 lg:bg-surface-2 lg:backdrop-blur-none">
+        <p aria-hidden="true" className="hidden lg:block font-grotesk font-semibold text-xl sm:text-2xl text-ink tracking-tight">
+          Codex
+        </p>
+        <span aria-hidden="true" className="hidden lg:block h-5 w-px shrink-0 bg-line" />
+        <button
+          type="button"
+          onClick={() => setContentsOpen(true)}
+          aria-label={`Contents, reading ${activeScripture.title}`}
+          className="lg:hidden flex-1 min-w-0 flex items-center gap-2.5 min-h-12 px-2 rounded-control text-left hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
+        >
+          <List aria-hidden="true" className="w-4 h-4 shrink-0 text-ink-muted" />
+          <span className="min-w-0 flex-1">
+            <span className="eyebrow block tabular-nums">
+              Codex · {pageIndex + 1} of {filteredScriptures.length}
+            </span>
+            <span className="block truncate text-sm font-semibold text-ink">{activeScripture.title}</span>
+          </span>
+          <ChevronDown aria-hidden="true" className="w-4 h-4 shrink-0 text-ink-muted" />
+        </button>
+        <span className="hidden lg:inline flex-1 text-xs text-ink-body tabular-nums whitespace-nowrap">
+          Stage {activeScripture.stageClearance} · {pageIndex + 1} of {filteredScriptures.length}
+        </span>
+        {actions}
+        <span aria-hidden="true" className="hidden lg:block w-[204px] shrink-0" />
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 items-start">
         <aside
           aria-label="Contents"
           className="hidden lg:flex flex-col w-[300px] shrink-0 sticky top-4 h-[calc(100dvh-3.5rem)] max-h-[60rem] rounded-card border border-line-subtle bg-surface-1 overflow-hidden"
         >
-          <p aria-hidden="true" className="px-4 pt-4 pb-1 shrink-0 font-grotesk font-semibold text-xl text-ink tracking-tight">
-            The Sacred Codex
-          </p>
-          <CodexDirectory {...directoryProps} className="flex-1" />
+          <CodexDirectory {...directoryProps} className="flex-1 pt-3" />
         </aside>
 
         <div className="flex-1 min-w-0 w-full">
-          <h1 className="sr-only">The Sacred Codex</h1>
           <div ref={sheetTopRef} className="scroll-mt-20 lg:scroll-mt-4" />
-
-          {/* Phone: one slim sticky bar where tapping the title opens the contents. Desktop: position and actions. */}
-          <div className="sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 lg:mt-0 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:static lg:mx-0 lg:px-0 lg:bg-transparent lg:backdrop-blur-none lg:border-0">
-            <button
-              type="button"
-              onClick={() => setContentsOpen(true)}
-              aria-label={`Contents, reading ${activeScripture.title}`}
-              className="lg:hidden flex-1 min-w-0 flex items-center gap-2.5 min-h-12 px-2 rounded-control text-left hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow"
-            >
-              <List aria-hidden="true" className="w-4 h-4 shrink-0 text-ink-muted" />
-              <span className="min-w-0 flex-1">
-                <span className="eyebrow block tabular-nums">
-                  Codex · {pageIndex + 1} of {filteredScriptures.length}
-                </span>
-                <span className="block truncate text-sm font-semibold text-ink">{activeScripture.title}</span>
-              </span>
-              <ChevronDown aria-hidden="true" className="w-4 h-4 shrink-0 text-ink-muted" />
-            </button>
-            <span className="hidden lg:inline flex-1 text-xs text-ink-body tabular-nums whitespace-nowrap">
-              Stage {activeScripture.stageClearance} · {pageIndex + 1} of {filteredScriptures.length}
-            </span>
-            {actions}
-          </div>
 
           <div
             ref={sheetRef}

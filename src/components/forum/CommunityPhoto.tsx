@@ -185,7 +185,7 @@ export function CommunityPhoto() {
       </div>
       <div className="flex items-center gap-2 border-t border-line-subtle px-3 py-2 sm:px-4">
         <Users className="h-3.5 w-3.5 text-cyan-glow" aria-hidden="true" />
-        <h2 id="community-photo-heading" className="eyebrow">
+        <h2 id="community-photo-heading" className="text-xs font-medium text-ink">
           Community
         </h2>
         <span className="text-2xs text-ink-muted">{photo.spots.length === 1 ? '1 member' : `${photo.spots.length} members`}</span>
