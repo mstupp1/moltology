@@ -1,0 +1,22 @@
+{
+  "codex-study": {
+    "plate": { "key": "animation/sets/codex-study/plate.jpg", "sha": "3fde93a84a78" },
+    "back": { "key": "animation/sets/codex-study/back.png", "sha": "5d553c691409" },
+    "floor": { "key": "animation/sets/codex-study/floor.jpg", "sha": "be89a15bbce6" },
+    "rug": { "key": "animation/sets/codex-study/rug.jpg", "sha": "e5f1b3ec06be" },
+    "wood": { "key": "animation/sets/codex-study/wood.jpg", "sha": "5f9954697a36" }
+  },
+  "reef-office": {
+    "plate": { "key": "animation/sets/reef-office/plate.jpg", "sha": "e804abd2df9a" },
+    "back": { "key": "animation/sets/reef-office/back.png", "sha": "d38c2481d2fa" },
+    "floor": { "key": "animation/sets/reef-office/floor.jpg", "sha": "7184f6b51089" },
+    "wood": { "key": "animation/sets/reef-office/wood.jpg", "sha": "09a7983a6b7e" },
+    "rock": { "key": "animation/sets/reef-office/rock.jpg", "sha": "30181b37113f" }
+  },
+  "open-water": {
+    "plate": { "key": "animation/sets/open-water/plate.jpg", "sha": "5f831c6ba79a" },
+    "back": { "key": "animation/sets/open-water/back.png", "sha": "7b427d00f125" },
+    "floor": { "key": "animation/sets/open-water/floor.jpg", "sha": "a8dc1718791c" },
+    "rock": { "key": "animation/sets/open-water/rock.jpg", "sha": "61b48c7b8c03" }
+  }
+}
