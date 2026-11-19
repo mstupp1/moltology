@@ -629,6 +629,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           }`}
         >
           <HeaderBrand
+            logoSize="lg"
             isCollapsed={isCollapsed}
             onClick={() => handleNavClick('/')}
           />
