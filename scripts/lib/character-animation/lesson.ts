@@ -22,7 +22,7 @@ export const MOVES: readonly CameraMove[] = ['cut', 'glide', 'push-in', 'pull-ou
 export const MARKS = ['left', 'center', 'right'] as const
 export type Mark = (typeof MARKS)[number]
 /** Where each mark stands on the floor, in world units. */
-const MARK_X: Record<Mark, number> = { left: -0.6, center: 0, right: 0.6 }
+const MARK_X: Record<Mark, number> = { left: -0.75, center: 0, right: 0.75 }
 /** The narrator: a voice with no body, so no mouth moves while it speaks. */
 export const NARRATOR = 'narrator'
 

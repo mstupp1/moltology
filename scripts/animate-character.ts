@@ -9,6 +9,7 @@
  * timeline.json, frames/, scene clips, preview stills, final.mp4 and draft.json. Queue the
  * inspected final.mp4 with `npm run reel:create -- --content-json <out>/draft.json --custom-video <out>/final.mp4`.
  */
+import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'

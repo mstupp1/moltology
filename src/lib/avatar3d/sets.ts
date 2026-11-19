@@ -6,7 +6,6 @@
  * back to plain colours and the compositor's drawn backdrop.
  */
 import {
-  BoxGeometry,
   CanvasTexture,
   CircleGeometry,
   Color,
@@ -115,20 +114,6 @@ function plateCard(paint: ReturnType<typeof artLoader>): Mesh | null {
   return mesh
 }
 
-/** A few books lying on the floor, off to the side of the cast. */
-function books(x: number, z: number): Group {
-  const g = new Group()
-  const colors = ['#7a2e2a', '#2f4f6e', '#6b5a2a', '#3d5c3a']
-  colors.forEach((color, i) => {
-    const b = new Mesh(new BoxGeometry(0.42 - i * 0.03, 0.07, 0.3), new MeshStandardMaterial({ color, roughness: 0.8 }))
-    b.position.set(x + (i % 2) * 0.02, 0.035 + i * 0.072, z)
-    b.rotation.y = (i - 1.5) * 0.12
-    b.castShadow = b.receiveShadow = true
-    g.add(b)
-  })
-  return g
-}
-
 export function buildSet(name: SetName, art: SetArt = {}): BuiltSet {
   const spec = SETS[name]
   const root = new Group()
@@ -145,7 +130,6 @@ export function buildSet(name: SetName, art: SetArt = {}): BuiltSet {
     rug.receiveShadow = true
     root.add(rug)
   }
-  if (name === 'codex-study') root.add(books(-1.25, -1.3), books(-1.0, -1.7))
   // A warm light where the painting's lamp glows, so the cast catches it too.
   let flicker: PointLight | null = null
   if (spec.lamp) {
