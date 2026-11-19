@@ -42,7 +42,9 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
         
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
+          aria-label="Close"
           className="absolute top-4 right-4 text-ink-muted hover:text-crimson-glow p-1 border border-line-subtle rounded-control"
         >
           <X className="w-4 h-4" />
