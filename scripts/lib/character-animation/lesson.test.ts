@@ -20,7 +20,7 @@ describe('animated lessons', () => {
     const bad = { ...example, hookHeadline: 'Something else entirely.', scenes: example.scenes.slice(0, 5) }
     const problems = lessonProblems(bad)
     expect(problems).toContain('a short has six to ten scenes')
-    expect(problems).toContain('hookHeadline must be the exact start of scene 1')
+    expect(problems).toContain('scene 1 must be exactly the hookHeadline (put the rest of the line in scene 2)')
     const wrongWord = { ...example, scenes: example.scenes.map((s, i) => (i === 0 ? { ...s, react: [{ kind: 'snap' as const, word: 40 }] } : s)) }
     expect(lessonProblems(wrongWord).some((p) => p.includes('reaction word 40'))).toBe(true)
   })
@@ -89,7 +89,8 @@ describe('animated lessons', () => {
   it('voices runs of lines by one speaker as one take, in their own voice', () => {
     const segments = segmentsOf(dialogue, 'BOOK RECORD REGULAR')
     expect(segments.map((s) => s.speaker)).toEqual(['junior-lobster', 'host-crab', 'junior-lobster', 'host-crab', 'junior-lobster', 'host-crab'])
-    expect(segments[3].scenes).toEqual([3, 4])
+    expect(segments[0].scenes).toEqual([0, 1]) // hook and the next line: one take
+    expect(segments[3].scenes).toEqual([4, 5])
     expect(segments[0].voice).toBe('Friendly Young Female')
     expect(segments[1].voice).toBe('BOOK RECORD REGULAR')
     const narrated = { ...dialogue, scenes: dialogue.scenes.map((s) => ({ ...s, speaker: 'narrator' })) }
@@ -104,12 +105,12 @@ describe('animated lessons', () => {
     expect(timeline.set).toBe('codex-study')
     const cameraAt = (t: number) => timeline.cues.find((c) => c.t === t && c.camera)!.camera!
     expect(cameraAt(windows[0].start).pan).toBe(0) // two-shot of both
-    expect(cameraAt(windows[1].start).pan).toBe(0.75) // the host speaking
-    expect(cameraAt(windows[2].start).pan).toBe(-0.75) // the junior speaking
-    // While the host speaks in scene 2, the junior (cast index 1) looks toward it, to the viewer's right.
-    const junior = timeline.cues.find((c) => c.t === windows[1].start && c.who === 1 && c.look)!
+    expect(cameraAt(windows[1].start).pan).toBe(-0.75) // the junior, still speaking
+    expect(cameraAt(windows[2].start).pan).toBe(0.75) // the host speaking
+    // While the host speaks in scene 3, the junior (cast index 1) looks toward it, to the viewer's right.
+    const junior = timeline.cues.find((c) => c.t === windows[2].start && c.who === 1 && c.look)!
     expect(junior.look!.x).toBeGreaterThan(0)
-    expect(timeline.cues.find((c) => c.t === windows[1].start && c.who === 1 && c.yaw !== undefined)!.yaw).toBeGreaterThan(0)
+    expect(timeline.cues.find((c) => c.t === windows[2].start && c.who === 1 && c.yaw !== undefined)!.yaw).toBeGreaterThan(0)
   })
 
   it('folds a longer dialogue into the six scene prompts reel:create stores', () => {

@@ -188,7 +188,9 @@ export function lessonProblems(lesson: Lesson): string[] {
     }
   })
   const first = scenes[0]?.line?.trim() ?? ''
-  if (lesson.hookHeadline && !first.startsWith(lesson.hookHeadline.trim())) problems.push('hookHeadline must be the exact start of scene 1')
+  // Scene 1 is the hook alone: its framing leaves room for the headline, and body subtitles would
+  // land on the cast in that framing.
+  if (lesson.hookHeadline && first.trim() !== lesson.hookHeadline.trim()) problems.push('scene 1 must be exactly the hookHeadline (put the rest of the line in scene 2)')
   if (lesson.hookHeadline && wordsOf(lesson.hookHeadline).length >= 14) problems.push('hookHeadline must be under 14 words')
   const words = wordsOf(narrationOf({ scenes })).length
   if (words < 40 || words > 80) problems.push(`narration is ${words} words; aim for 50 to 65 (up to 75 for a dialogue)`)

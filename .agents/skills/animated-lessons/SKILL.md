@@ -51,7 +51,7 @@ Pick a set: `codex-study` (bookshelves, lamp, rug: Codex lessons), `reef-office`
 
 A short is six to ten scenes (six for a solo host; a dialogue usually needs eight, one per line). Each scene is one or two spoken sentences plus its direction. House rules:
 
-- **Spoken hook.** Scene 1's line starts with `hookHeadline`: sentence case, under 14 words, concrete. It is shown big on screen while it is spoken; regular subtitles start after it.
+- **Spoken hook.** Scene 1's line is exactly `hookHeadline`: sentence case, under 14 words, concrete. It is shown big on screen while it is spoken, over a still opening shot framed low to leave room for it; the next scene cuts in with regular subtitles.
 - **Length.** 50 to 65 words in total (about 23 seconds with the narrator at +12%), up to 75 for a dialogue (each change of speaker adds a short pause), then the 2.5-second waving outro.
 - **Dialogue.** Each line is short and sounds like a person talking. The newcomer asks what a viewer would ask; the host never lectures for more than two lines in a row. Open on the `two` shot so viewers meet both characters, cut to the speaker for most lines, and come back to `two` for the payoff or a reaction. Give the listener something to do with `act` (a think pose, a nod via `snap`, a `poke` at the surprise).
 - **Payoff late.** The doable action lands in scenes 3 to 5. The host demonstrates it with a pose or reaction.

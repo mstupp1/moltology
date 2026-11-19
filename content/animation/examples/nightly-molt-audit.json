@@ -26,7 +26,7 @@
   "scenes": [
     {
       "speaker": "junior-lobster",
-      "line": "I try to fix my whole day every night. It never works.",
+      "line": "I try to fix my whole day every night.",
       "shot": "two",
       "pose": "shrug",
       "look": "camera",
@@ -36,7 +36,16 @@
           "look": "other"
         }
       },
-      "description": "The junior lobster shrugs at camera in the Codex study while the host crab listens, thinking."
+      "description": "The junior lobster confesses to camera in the Codex study while the host crab listens, thinking."
+    },
+    {
+      "speaker": "junior-lobster",
+      "line": "It never works.",
+      "shot": "close",
+      "move": "cut",
+      "pose": "shrug",
+      "look": "camera",
+      "description": "Close on the junior lobster, shrugging."
     },
     {
       "speaker": "host-crab",
