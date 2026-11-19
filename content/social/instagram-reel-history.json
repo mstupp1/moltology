@@ -2345,6 +2345,46 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-11-16T16:21:10.628Z"
+    },
+    {
+      "id": "reel-1795121986071",
+      "topic": "The Nightly Molt Audit (Codex SCR-032): release one thing a night, not the whole day",
+      "hookHeadline": "I try to fix my whole day every night.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "host-crab, junior-lobster (animated 3D cast)",
+      "narrationScript": "I try to fix my whole day every night. It never works. That's the problem. Shed one thing a night, not the whole day. Just one? One. Name three candidates: a thought that looped, an hour that vanished, a distraction. Then pick exactly one, write it down, and let it go. That's it? Four minutes? Small enough for bad nights, and those are the ones that count. Read the Nightly Molt Audit at moltology.org.",
+      "series": "Codex Lessons",
+      "episode": 2,
+      "format": "animated-lesson",
+      "archivePath": "Social Archive/2026/11/reel-67a0b808f797a4221a1577a0",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795121987407_36e84ba2f561fa76_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 33.6,
+      "status": "queued",
+      "scheduledFor": "2026-11-22T23:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6aff63453c1f0d555a5793c5",
+      "zernioYouTubePostId": "6aff63453c1f0d555a5793c5",
+      "zernioPostId": "6aff63453c1f0d555a5793c5",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "The full passage: https://moltology.org/codex/scr-032",
+      "caption": "I try to fix my whole day every night. It never works.\n\nThe Codex says shed one thing a night: name three candidates, pick one, write it down, let it go. Four minutes.\n\nRead the Nightly Molt Audit at moltology.org.",
+      "hashtags": [
+        "#nightroutine",
+        "#productivity"
+      ],
+      "ctaGoal": "codex",
+      "commentTriggerKeyword": "CODEX",
+      "commentTriggerUrl": "https://moltology.org/codex",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-19T20:59:51.478Z"
     }
   ]
 }
