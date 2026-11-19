@@ -1,7 +1,7 @@
 /**
  * Starter prompts for the Oracle's new-chat screen: the catalog and the rules for who sees
- * what. Browser safe. To add or change a prompt, edit STARTER_PROMPTS below; Admin >
- * Starter prompts previews what each kind of visitor gets today.
+ * what. Browser safe. To add or change a prompt, edit STARTER_PROMPTS below; the tests in
+ * oracle-starter-prompts.test.ts check who sees what.
  *
  * The screen shows four chips: a page prompt first when the chat is open over a page the
  * Oracle can read (a forum thread, an article, a Codex passage...), then one prompt from
