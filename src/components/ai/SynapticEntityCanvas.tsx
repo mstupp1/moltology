@@ -1499,6 +1499,15 @@ export function SynapticEntityCanvas({
         isCompact ? 0.4 : 0.5,
         0.78
       )
+      // Phones: the glow runs at half resolution. It is a blur, so it looks the same, and it was
+      // about a quarter of each frame's work at full size. The core itself stays full resolution.
+      const halfResBloom =
+        typeof window !== 'undefined' && window.matchMedia?.('(max-width: 767px), (pointer: coarse)').matches === true
+      if (halfResBloom) {
+        const setBloomSize = bloomPass.setSize.bind(bloomPass)
+        bloomPass.setSize = (width: number, height: number) =>
+          setBloomSize(Math.max(1, Math.round(width / 2)), Math.max(1, Math.round(height / 2)))
+      }
       composer.addPass(bloomPass)
       const outputPass = new ShaderPass(
         new THREE.ShaderMaterial({

@@ -37,8 +37,14 @@ export const BUBBLE_VENTS = [
 ]
 const VENT_SHARE = 0.65
 
+/**
+ * Bubble sprites. The glass bubble comes pre-lit three ways (scripts/brand/bake-bubble-light.py):
+ * `glassLit` in the light shafts, `glass` in open water, `glassShade` at the dark edges.
+ */
 export const BUBBLE_SPRITES = {
   glass: '/images/bubbles/glass.webp',
+  glassLit: '/images/bubbles/glass-lit.webp',
+  glassShade: '/images/bubbles/glass-shade.webp',
   soft: '/images/bubbles/glass-soft.webp',
   bead: '/images/bubbles/bead.webp',
 } as const
@@ -150,8 +156,11 @@ export function planBubbleRise(width: number, height: number, random: () => numb
   let size = roll < 0.4 ? 10 + random() * 10 : roll < 0.82 ? 22 + random() * 32 : 52 + random() * 50
   size *= (0.6 + z * 0.6) * (phone ? 0.85 : 1)
 
-  const sprite: BubbleRise['sprite'] = z < 0.3 || size > 70 ? 'soft' : size < 14 ? 'bead' : 'glass'
   const light = sceneLightAt(x, y * 0.5, width, height)
+  // A bubble rises straight up, so the shaft it starts in is the light it carries: pick the
+  // glass baked for that light once, here, and nothing changes while it moves.
+  const glass: BubbleRise['sprite'] = light > 0.55 ? 'glassLit' : light < 0.12 ? 'glassShade' : 'glass'
+  const sprite: BubbleRise['sprite'] = z < 0.3 || size > 70 ? 'soft' : size < 14 ? 'bead' : glass
   const opacity = Math.min(0.9, 0.36 + z * 0.42 + light * 0.35)
   const speed = (26 + size * 1.1 + random() * 20) * (0.55 + z * 0.6) // px per second
   const distance = y + size + 20

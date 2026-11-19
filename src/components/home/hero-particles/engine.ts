@@ -45,8 +45,9 @@ const FAMILIES = [
   [120, 190, 215], // 4 calm drift
   [150, 255, 215], // 5 firefly, sea green
   [255, 214, 140], // 6 firefly, amber
+  [226, 238, 246], // 7 shell, where the moon lights it
 ] as const
-const FAMILY_MAX_ALPHA = [0.85, 0.9, 1, 1, 0.62, 1, 1]
+const FAMILY_MAX_ALPHA = [0.85, 0.9, 1, 1, 0.62, 1, 1, 1]
 const LEVELS = 10
 const BUCKETS = FAMILIES.length * LEVELS
 
@@ -136,6 +137,8 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
   let drawW = new Float32Array(0)
   let drawH = new Float32Array(0)
   let shade = new Float32Array(0)
+  /** 0..1 share of each shell point's light that comes from the moon rather than the sea. */
+  let moonShare = new Float32Array(0)
   let bucketOf = new Uint8Array(0)
   let sorted = new Uint32Array(0)
   const bucketCount = new Uint32Array(BUCKETS)
@@ -230,6 +233,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
     drawW = new Float32Array(total)
     drawH = new Float32Array(total)
     shade = new Float32Array(total)
+    moonShare = new Float32Array(total)
     bucketOf = new Uint8Array(total)
     sorted = new Uint32Array(total)
     for (let i = 0; i < total; i++) {
@@ -320,16 +324,21 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
       drawX[i] = cx + X * s * scale
       drawY[i] = cy + Y * s * scale + bob
       drawW[i] = Z // -1 far .. 1 near
-      // Light from the upper left and slightly in front; points turned away fall into shadow.
+      // Lit like the scene around it: cool white from the moon (upper right, in front), cyan
+      // bounced up off the sea below, and the baked occlusion darkening seams and the underside.
       const ex = shell.nx[i], ey = shell.ny[i], ez = shell.nz[i]
-      if (ex === 0 && ey === 0 && ez === 0) shade[i] = 0.8
-      else {
+      if (ex === 0 && ey === 0 && ez === 0) {
+        shade[i] = 0.8
+        moonShare[i] = 0.5
+      } else {
         const NX = m00 * ex + m01 * ey + m02 * ez
         const NY = m10 * ex + m11 * ey + m12 * ez
         const NZ = m20 * ex + m21 * ey + m22 * ez
-        const facing = Math.max(0, NZ)
-        const diffuse = Math.max(0, -0.45 * NX - 0.6 * NY + 0.66 * NZ)
-        shade[i] = 0.12 + 0.5 * diffuse + 0.38 * facing
+        const open = shell.ao[i]
+        const moon = Math.max(0, 0.5 * NX - 0.62 * NY + 0.6 * NZ) * open * open
+        const sea = Math.max(0, 0.1 * NX + 0.9 * NY + 0.3 * NZ) * 0.85 * open
+        shade[i] = 0.1 + 0.95 * moon + sea + 0.15 * Math.max(0, NZ) * open
+        moonShare[i] = moon / (moon + sea + 0.05)
       }
     }
   }
@@ -474,7 +483,7 @@ export function startHeroParticles(opts: HeroParticlesOptions): HeroParticlesHan
         drawH[i] = size
         const glint = Math.exp(-((shell.along[i] - sweep) ** 2) / 0.006)
         let lum = (0.25 + 0.75 * lit) * (0.45 + 0.55 * near) * (0.25 + 0.95 * shade[i]) * (0.8 + 0.2 * Math.sin(time * 1.3 + seedPhase[i]))
-        let family = 2
+        let family = moonShare[i] > 0.62 ? 7 : 2
         const flare = flash * lit
         if (glint * lit > 0.35 || flare > 0.45) {
           family = 3

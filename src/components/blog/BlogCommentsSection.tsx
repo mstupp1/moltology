@@ -27,7 +27,7 @@ const MIN_CHAR_LIMIT = 3
 /** The count shows once a comment gets this close to the limit. */
 const COUNT_SHOWS_AT = MAX_CHAR_LIMIT - 200
 
-const CARD = 'rounded-card border border-line-subtle bg-surface-1 hud-sheen'
+const CARD = 'rounded-card border border-line-subtle bg-surface-1 lit-surface'
 const FOCUS =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 

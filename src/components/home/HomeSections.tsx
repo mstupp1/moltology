@@ -116,7 +116,7 @@ const ReadingCard: React.FC<{ reading: HomeReading }> = ({ reading }) => {
       ref={tilt.ref}
       onPointerMove={tilt.onPointerMove}
       onPointerLeave={tilt.onPointerLeave}
-      className="home-tilt group relative h-full overflow-hidden rounded-card border border-line-subtle bg-abyss shadow-[0_20px_60px_rgba(0,0,0,0.5)] hover:border-line-hover"
+      className="home-tilt group relative h-full overflow-hidden rounded-card border border-line-subtle bg-abyss lit-surface hover:border-line-hover"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <StoryImg
@@ -158,7 +158,7 @@ export const HomeIdea: React.FC = () => (
         </div>
         <Link
           to="/what-is-moltology/beliefs"
-          className="hud-ticks hud-sheen group relative flex min-h-12 items-center justify-between gap-6 self-start rounded-card border border-line-strong bg-surface-1 px-5 py-4 text-cyan-glow transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow lg:self-end"
+          className="hud-ticks lit-surface group relative flex min-h-12 items-center justify-between gap-6 self-start rounded-card border border-line-strong bg-surface-1 px-5 py-4 text-cyan-glow transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow lg:self-end"
         >
           <span>
             <span className="mb-1.5 flex items-center gap-2 font-mono text-2xs text-ink-muted">
@@ -201,7 +201,7 @@ const ScreenFrame: React.FC<{ step: HomeStep; onExpand: () => void; children: Re
       aria-label={`Expand screenshot: ${step.title}`}
       className="home-tilt group relative block w-full text-left cursor-zoom-in rounded-panel focus:outline-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
     >
-      <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-surface-1 shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-colors duration-500 group-hover:border-line-strong">
+      <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-surface-1 lit-surface transition-colors duration-500 group-hover:border-line-strong">
         <div className="flex items-center gap-3 px-3 sm:px-4 h-8 sm:h-9 border-b border-line-subtle bg-surface-2" aria-hidden="true">
           <div className="flex gap-1.5">
             <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-white/15" />
@@ -415,7 +415,7 @@ const VoicePost: React.FC<{ voice: (typeof HOME_VOICES)[number]; pinned: boolean
   const accent = VOICE_STAGE_ACCENTS[voice.stage]
   return (
     <figure
-      className={`home-voice-post relative flex h-full flex-col rounded-card border p-6 sm:p-7 ${pinned ? 'border-cyan-glow/30 lg:p-9' : 'border-line-subtle'}`}
+      className={`home-voice-post lit-surface relative flex h-full flex-col rounded-card border p-6 sm:p-7 ${pinned ? 'border-cyan-glow/30 lg:p-9' : 'border-line-subtle'}`}
     >
       {pinned && (
         <span className="absolute -top-3 right-5 inline-flex items-center gap-1 rounded-full border border-cyan-glow/40 bg-surface-1 px-2.5 py-1 text-2xs font-semibold text-cyan-glow">
@@ -525,7 +525,7 @@ export const HomeFaq: React.FC = () => (
         {HOME_FAQ.map((item) => (
           <details
             key={item.question}
-            className="group rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset px-5 sm:px-6 transition-colors hover:border-line open:border-line"
+            className="group rounded-card border border-line-subtle bg-surface-1 lit-surface px-5 sm:px-6 transition-colors hover:border-line open:border-line"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 sm:py-6 font-grotesk font-semibold text-lg sm:text-xl text-ink hover:text-cyan-glow transition-colors [&::-webkit-details-marker]:hidden focus:outline-hidden focus-visible:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow rounded-control">
               {item.question}
@@ -547,7 +547,7 @@ export const HomeFaq: React.FC = () => (
 export const HomeFinalCta: React.FC<HomeSectionProps> = ({ authReady, onNavigate, onOpenAuth }) => (
   <section aria-labelledby="home-final-title" className="relative px-5 sm:px-8 pb-24 sm:pb-32">
     <ScrollReveal animation="scale-up">
-      <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-cyan-glow/40 bg-gradient-to-br from-surface-2 via-abyss to-abyss grid md:grid-cols-[1.15fr_0.85fr] items-center">
+      <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-panel border border-cyan-glow/40 bg-gradient-to-br from-surface-2 via-abyss to-abyss lit-edge grid md:grid-cols-[1.15fr_0.85fr] items-center">
         {/* Separate desktop and portrait compositions cover the whole invitation. */}
         <div className="absolute inset-0 -z-10" aria-hidden="true">
           <StoryImg image={HOME_FINAL_IMAGE} className="home-final-art h-full w-full object-cover" />

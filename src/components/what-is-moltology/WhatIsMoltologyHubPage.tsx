@@ -169,7 +169,7 @@ const ProofSection: React.FC = () => {
         </ScrollReveal>
 
         <div className="relative">
-          <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-black shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+          <div className="relative overflow-hidden rounded-panel border border-line-subtle bg-black lit-edge">
             <StoryImg
               image={STORY_MEDIA.specimen}
               alt="An armored crustacean resting on the sea floor"
@@ -201,7 +201,7 @@ const MoltSection: React.FC = () => (
       <div className="mt-14 grid gap-5 md:grid-cols-3">
         {CARDINAL_METRICS.map((metric, index) => (
           <ScrollReveal key={metric.id} delayMs={index * 120}>
-            <article className="group relative isolate h-[30rem] sm:h-[34rem] overflow-hidden rounded-card border border-line-subtle bg-black">
+            <article className="group relative isolate h-[30rem] sm:h-[34rem] overflow-hidden rounded-card border border-line-subtle bg-black lit-edge">
               <StoryImg
                 image={metric.image}
                 className="absolute inset-0 -z-10 h-full w-full object-cover opacity-70 transition-transform duration-[1200ms] ease-out group-hover:scale-110"
@@ -366,7 +366,7 @@ const PathSection: React.FC = () => {
                 {stage.number}
               </span>
               <ScrollReveal animation="slide-right" delayMs={index * 60}>
-                <div className="rounded-card border border-line-subtle bg-abyss/90 hud-sheen backdrop-blur-md p-6 sm:p-7 hover:border-line-strong transition-colors">
+                <div className="rounded-card border border-line-subtle bg-abyss/90 lit-surface backdrop-blur-md p-6 sm:p-7 hover:border-line-strong transition-colors">
                   <p className="eyebrow" style={{ color: stage.accent }}>
                     Stage {stage.number} · {stage.title}
                   </p>
@@ -416,7 +416,7 @@ const ProductSection: React.FC = () => {
 
         <div ref={ref} className="relative mt-14 sm:mt-20" style={{ ['--p' as string]: 0.5 }}>
           <div
-            className="relative rounded-panel border border-line-subtle bg-surface-1 p-1.5 sm:p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.5)] will-change-transform"
+            className="relative rounded-panel border border-line-subtle bg-surface-1 lit-surface p-1.5 sm:p-2.5 will-change-transform"
             style={{ transform: 'perspective(1600px) rotateX(calc((0.5 - var(--p)) * 14deg))' }}
           >
             <div className="flex items-center gap-1.5 px-3 py-2" aria-hidden="true">
@@ -431,7 +431,7 @@ const ProductSection: React.FC = () => {
             />
           </div>
           <div
-            className="absolute -bottom-10 right-2 sm:right-10 w-[30%] max-w-[15rem] rounded-panel border border-line bg-black p-1.5 shadow-[0_20px_60px_rgba(0,0,0,0.5)] will-change-transform"
+            className="absolute -bottom-10 right-2 sm:right-10 w-[30%] max-w-[15rem] rounded-panel border border-line bg-black lit-edge p-1.5 will-change-transform"
             style={{ transform: 'translate3d(0, calc((0.5 - var(--p)) * 120px), 0)' }}
           >
             <StoryImg
@@ -460,7 +460,7 @@ const ProductSection: React.FC = () => {
 /* ── The community: warmth under the HUD ─────────────────────────────── */
 
 const VoiceCard: React.FC<{ voice: (typeof MEMBER_VOICES)[number] }> = ({ voice }) => (
-  <figure className="w-[19rem] sm:w-[24rem] shrink-0 rounded-card border border-line-subtle bg-surface-1/85 hud-sheen backdrop-blur-md p-6">
+  <figure className="w-[19rem] sm:w-[24rem] shrink-0 rounded-card border border-line-subtle bg-surface-1/85 lit-surface backdrop-blur-md p-6">
     <blockquote className="text-sm sm:text-md text-ink-body leading-relaxed">&ldquo;{voice.quote}&rdquo;</blockquote>
     <figcaption className="mt-5 flex items-center gap-3">
       <span className="h-2 w-2 rounded-full" style={{ background: VOICE_STAGE_ACCENTS[voice.stage] }} aria-hidden="true" />

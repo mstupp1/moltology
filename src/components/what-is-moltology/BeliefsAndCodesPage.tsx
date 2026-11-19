@@ -137,7 +137,7 @@ export const BeliefsAndCodesPage: React.FC = () => {
             {COMMUNITY_CODES.map((code, index) => (
               <ScrollReveal key={code.title} delayMs={index * 90}>
                 <article
-                  className={`h-full rounded-card border p-6 sm:p-7 transition-colors ${
+                  className={`lit-surface h-full rounded-card border p-6 sm:p-7 transition-colors ${
                     index === 1
                       ? 'border-cyan-glow/35 bg-gradient-to-br from-cyan-glow/10 to-transparent'
                       : 'border-line-subtle bg-surface-1 hud-sheen hover:border-line-strong'

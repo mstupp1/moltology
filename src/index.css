@@ -110,6 +110,28 @@
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 45%);
 }
 
+/* One light for the public pages: the hero's moon, upper right. Surfaces are shaded from it once,
+   with a fixed gradient and edges, so nothing is lit while the page runs: a faint lit face toward
+   the moon falling into shade away from it, a lit top edge, a darker bottom edge and a soft contact
+   shadow below. Surface light only, no glow. Where both are set it replaces hud-sheen.
+   lit-edge is the same without the face, for boxes that already paint a picture or gradient. */
+.lit-surface {
+  background-image: linear-gradient(205deg, rgba(214, 230, 242, 0.09) 0%, rgba(214, 230, 242, 0.025) 35%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.2) 100%);
+}
+.lit-surface,
+.lit-edge {
+  box-shadow:
+    inset 0 1px 0 rgba(230, 240, 248, 0.11),
+    inset -1px 0 0 rgba(230, 240, 248, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 28px 44px -28px rgba(0, 0, 0, 0.95);
+}
+.public-moonlight {
+  background:
+    radial-gradient(60% 1400px at 92% 0%, rgba(150, 190, 225, 0.07), transparent 70%),
+    linear-gradient(to bottom, rgba(150, 190, 225, 0.03), transparent 55%);
+}
+
 @layer components {
   /* Small uppercase section label: the one place UI text is uppercase and tracked. Colour and
      spacing come from the element (text-ink-muted by default). */
@@ -145,8 +167,30 @@
   0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.96); }
   50% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
 }
+/* GlowEmblem's mark: the baked 3D emblem turntable (src/lib/emblem-light.ts). The frames are a
+   little larger than the mark's box because the 3D emblem leaves a margin for its rocking. The
+   strip steps one frame at a time: 36 frames over 6s. */
+.emblem-turntable {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 112%;
+  height: 112%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+.emblem-turntable-strip {
+  display: block;
+  height: 100%;
+  max-width: none;
+  animation: emblem-turntable 6s steps(36) infinite;
+}
+@keyframes emblem-turntable {
+  to { transform: translateX(-100%); }
+}
 @media (prefers-reduced-motion: reduce) {
   .glow-emblem-breathe .glow-emblem-halo { animation: none; }
+  .emblem-turntable-strip { animation: none; }
 }
 
 /* Logo lockup: title over a tracked tagline stretched to the title's width (HeaderBrand).

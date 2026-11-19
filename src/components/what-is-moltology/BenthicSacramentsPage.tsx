@@ -42,7 +42,7 @@ const SacramentChapter: React.FC<{ sacrament: Sacrament; onActive: (id: string) 
           <p className="mt-3 font-grotesk text-xl sm:text-2xl text-ink-body">{sacrament.tagline}</p>
           <p className="mt-6 text-base sm:text-lg text-ink-body leading-relaxed">{sacrament.description}</p>
 
-          <div className="mt-8 rounded-card border border-line-subtle bg-surface-1/80 hud-sheen backdrop-blur-md p-6">
+          <div className="mt-8 rounded-card border border-line-subtle bg-surface-1/80 lit-surface backdrop-blur-md p-6">
             <p className="eyebrow">The rite</p>
             <ol className="mt-4 space-y-3">
               {sacrament.steps.map((step, index) => (

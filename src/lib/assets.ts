@@ -50,6 +50,8 @@ const LOCAL_ASSET_WHITELIST = new Set([
   'images/bubbles/glass.webp',
   'images/bubbles/glass-soft.webp',
   'images/bubbles/bead.webp',
+  'images/bubbles/glass-lit.webp',
+  'images/bubbles/glass-shade.webp',
   'images/marketing/dashboard_desktop_preview.webp',
   'images/marketing/dashboard_desktop_preview_sm.webp',
   'images/marketing/dashboard_mobile_preview.webp',

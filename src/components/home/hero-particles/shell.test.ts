@@ -59,3 +59,18 @@ describe('mulberry32', () => {
     }
   })
 })
+
+describe('baked occlusion', () => {
+  it('keeps every point between 0.3 and 1, leaves flat-lit points open, and darkens some seams', () => {
+    const shell = buildShell(2400)
+    let darker = 0
+    for (let i = 0; i < shell.count; i++) {
+      expect(shell.ao[i]).toBeGreaterThanOrEqual(0.3)
+      expect(shell.ao[i]).toBeLessThanOrEqual(1)
+      if (shell.nx[i] === 0 && shell.ny[i] === 0 && shell.nz[i] === 0) expect(shell.ao[i]).toBe(1)
+      if (shell.ao[i] < 0.85) darker++
+    }
+    expect(darker).toBeGreaterThan(shell.count * 0.03)
+    expect(darker).toBeLessThan(shell.count * 0.6)
+  })
+})

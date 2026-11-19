@@ -18,6 +18,11 @@ export interface ShellCloud {
   rim: Float32Array
   /** 0..1, position along the body, used for the light that sweeps head to tail. */
   along: Float32Array
+  /**
+   * 0..1 baked ambient occlusion: how open each point is. The seams where one plate tucks under
+   * the next and the underside fall darker. Worked out once here, so the frame loop only reads it.
+   */
+  ao: Float32Array
   /** Outward surface normal, or zero for the thin parts (antennae, legs, fan) that are lit flat. */
   nx: Float32Array
   ny: Float32Array
@@ -261,5 +266,58 @@ export function buildShell(count: number, seed = 7): ShellCloud {
     }
   }
 
-  return { count: n, x, y, z, order, rim, along, nx, ny, nz }
+  return { count: n, x, y, z, order, rim, along, nx, ny, nz, ao: bakeOcclusion(n, x, y, z, nx, ny, nz) }
+}
+
+const AO_RADIUS = 0.2
+
+/**
+ * Bakes ambient occlusion per point: the share of neighbours within AO_RADIUS that sit out in front
+ * of the point's normal, i.e. shell that blocks the open water above it. Points are bucketed into a
+ * grid of AO_RADIUS cells, so each one only checks the 27 cells around it. Flat-lit points stay 1.
+ */
+export function bakeOcclusion(
+  n: number,
+  x: Float32Array,
+  y: Float32Array,
+  z: Float32Array,
+  nx: Float32Array,
+  ny: Float32Array,
+  nz: Float32Array,
+): Float32Array {
+  const ao = new Float32Array(n).fill(1)
+  if (n === 0) return ao
+  const cells = new Map<number, number[]>()
+  const cell = (v: number) => Math.floor((v + 1.5) / AO_RADIUS)
+  const key = (cx: number, cy: number, cz: number) => (cx * 64 + cy) * 64 + cz
+  for (let i = 0; i < n; i++) {
+    const k = key(cell(x[i]), cell(y[i]), cell(z[i]))
+    const list = cells.get(k)
+    if (list) list.push(i)
+    else cells.set(k, [i])
+  }
+  const r2 = AO_RADIUS * AO_RADIUS
+  for (let i = 0; i < n; i++) {
+    const ex = nx[i], ey = ny[i], ez = nz[i]
+    if (ex === 0 && ey === 0 && ez === 0) continue
+    const cx = cell(x[i]), cy = cell(y[i]), cz = cell(z[i])
+    let blocked = 0
+    let near = 0
+    for (let a = -1; a <= 1; a++)
+      for (let b = -1; b <= 1; b++)
+        for (let c = -1; c <= 1; c++) {
+          const list = cells.get(key(cx + a, cy + b, cz + c))
+          if (!list) continue
+          for (const j of list) {
+            const dx = x[j] - x[i], dy = y[j] - y[i], dz = z[j] - z[i]
+            const d2 = dx * dx + dy * dy + dz * dz
+            if (d2 > r2 || d2 < 1e-8) continue
+            near++
+            const front = (dx * ex + dy * ey + dz * ez) / Math.sqrt(d2)
+            if (front > 0.25) blocked += front
+          }
+        }
+    if (near > 0) ao[i] = Math.max(0.3, 1 - (blocked / near) * 2.2)
+  }
+  return ao
 }

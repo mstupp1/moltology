@@ -55,7 +55,9 @@ export const LandingPage: React.FC = () => {
 
       <HomeHero {...sectionProps} />
 
-      <main className="flex-1 w-full relative">
+      <main className="flex-1 w-full relative isolate">
+        {/* The hero's moonlight carried down the page, fading with depth (one light, see .lit-surface). */}
+        <div aria-hidden="true" className="public-moonlight pointer-events-none absolute inset-0 -z-20" />
         <HomeMelt />
         <HomeIdea />
         <HomeHowItWorks onNavigate={onNavigate} />

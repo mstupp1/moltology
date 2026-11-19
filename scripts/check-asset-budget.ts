@@ -68,6 +68,8 @@ function isEssentialPublicAsset(relPath: string): boolean {
       relPath === 'public/images/scanline_pattern.png' ||
       relPath === 'public/images/scene-caustics.webp' ||
       relPath.startsWith('public/images/bubbles/') ||
+      // Baked 3D emblem light: two matcaps (~6 KB) and the turntable strip (~90 KB), npm run emblem:bake.
+      relPath.startsWith('public/images/emblem/') ||
       // Synaptic core launcher face (about 17 KB each), shown on every app page.
       relPath === 'public/images/oracle-core-a.webp' ||
       relPath === 'public/images/oracle-core-b.webp' ||
