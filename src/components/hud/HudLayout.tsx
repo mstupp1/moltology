@@ -5,7 +5,7 @@ import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
 import { setOracleCoreIntroBlocked } from '@/lib/ai/oracle-core-intro'
-import { UnderwaterBubblesCanvas, isLowPowerDevice, readDeviceHints } from '@/components/hud/UnderwaterBubblesCanvas'
+import { UnderwaterBubbles, isLowPowerDevice, readDeviceHints } from '@/components/hud/UnderwaterBubbles'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
@@ -173,10 +173,10 @@ function HudContent() {
             </div>
           )}
 
-          {/* Clear glass bubbles rising from the vents in the painting */}
+          {/* Clear glass bubbles rising from the vents in the painting, moved by the GPU */}
           {!isFullscreenRoute && (
-            <UnderwaterBubblesCanvas
-              bubbleCount={48}
+            <UnderwaterBubbles
+              bubbleCount={32}
               paused={backdropCovered}
               className="absolute inset-0 pointer-events-none z-[1]"
             />
