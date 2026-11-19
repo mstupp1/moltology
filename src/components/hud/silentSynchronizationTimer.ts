@@ -2,7 +2,6 @@ export const SILENT_SYNC_PRESETS = [1, 3, 5, 10] as const
 export type SilentSyncMinutes = number
 
 /** Lengths offered for a Reset your focus breather. */
-export const RESET_PRESETS = [1, 2, 3] as const
 
 /** Lengths offered for a deep work session. */
 export const DEEP_WORK_PRESETS = [15, 25, 45, 60] as const

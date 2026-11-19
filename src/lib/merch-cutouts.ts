@@ -7,32 +7,32 @@ export const MERCH_CUTOUTS: Record<string, { src: string; alt: string; backgroun
   'moltology-hoodie': {
     src: 'images/merch/dashboard/2026-11-04/moltology-hoodie-v1.png',
     alt: 'Black Moltology pullover hoodie with a small red left chest emblem',
-    background: 'bg-benthic-border',
+    background: 'bg-surface-3',
   },
   'moltology-tote': {
     src: 'images/merch/dashboard/2026-11-04/moltology-tote-v1.png',
     alt: 'Black Moltology tote with a red emblem and white wordmark',
-    background: 'bg-benthic-border',
+    background: 'bg-surface-3',
   },
   'moltology-hat': {
     src: 'images/merch/dashboard/2026-10-22/moltology-hat-v1.png',
     alt: 'Black Moltology dad hat with red embroidered emblem',
-    background: 'bg-benthic-border',
+    background: 'bg-surface-3',
   },
   'moltology-desk-mat': {
     src: 'images/merch/dashboard/2026-10-22/moltology-desk-mat-v1.png',
     alt: 'Dark Moltology desk mat with depth contours',
-    background: 'bg-benthic-border',
+    background: 'bg-surface-3',
   },
   'moltology-mug': {
     src: 'images/merch/dashboard/2026-10-21/moltology-mug-v2.png',
     alt: 'White Moltology mug with red emblem',
-    background: 'bg-benthic-border',
+    background: 'bg-surface-3',
   },
   'moltology-tee': {
     src: 'images/merch/dashboard/2026-10-21/moltology-tee-v2.png',
     alt: 'Black Moltology tee, front',
-    background: 'bg-benthic-border',
+    background: 'bg-surface-3',
   },
 }
 

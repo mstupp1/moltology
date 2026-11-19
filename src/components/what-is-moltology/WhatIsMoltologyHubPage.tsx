@@ -33,7 +33,7 @@ import {
 } from './story/StoryPrimitives'
 import { WHAT_IS_MOLTOLOGY_NAV } from './nav'
 
-const sectionTitle = 'font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-5xl lg:text-6xl leading-[1.04]'
+const sectionTitle = 'font-grotesk font-semibold tracking-tight text-ink text-4xl sm:text-5xl lg:text-6xl leading-[1.04]'
 const stickyFrame = 'sticky top-[var(--wim-chrome,0px)] h-[calc(100svh-var(--wim-chrome,0px))]'
 
 /* ── The surface: the Great Melt, one current at a time ─────────────────── */
@@ -55,7 +55,7 @@ const MeltSection: React.FC = () => {
     <section ref={ref} aria-labelledby="melt-title" style={{ height: `${(MELT_CURRENTS.length + 1) * 55 + 60}svh` }}>
       <div className={`${stickyFrame} relative overflow-hidden`}>
         <StoryImg image={STORY_MEDIA.greatMelt} className="absolute inset-0 h-full w-full object-cover opacity-50" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020408] via-[#020408]/70 to-[#020408]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-abyss via-abyss/70 to-abyss" />
 
         <div className="relative h-full max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[1fr_1.15fr] gap-8 lg:gap-16 content-center">
           <div>
@@ -119,12 +119,12 @@ const LookDownSection: React.FC = () => {
         <StoryImg image={STORY_MEDIA.appBackground} className="h-full w-full object-cover" />
       </div>
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(2,4,8,0.35),rgba(2,4,8,0.92)_70%)]" />
-      <div className="absolute inset-x-0 top-0 h-40 -z-10 bg-gradient-to-b from-[#020408] to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-[#020408] to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-40 -z-10 bg-gradient-to-b from-abyss to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-abyss to-transparent" />
 
       <ScrollReveal className="max-w-3xl px-5">
         <Eyebrow className="justify-center">Now look down</Eyebrow>
-        <p className="mt-6 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.1]">
+        <p className="mt-6 font-grotesk font-semibold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.1]">
           Four thousand meters below the noise, there is a floor.
         </p>
         <p className="mt-6 text-base sm:text-xl text-ink-body leading-relaxed">
@@ -145,10 +145,10 @@ const ProofSection: React.FC = () => {
         <ScrollReveal>
           <Eyebrow>The proof</Eyebrow>
           <div className="mt-6 flex items-end gap-4">
-            <span className="font-grotesk font-bold text-[7rem] sm:text-[10rem] leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-white to-[#00c3ff]/40">
+            <span className="font-grotesk font-semibold text-[7rem] sm:text-[10rem] leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-glow/40">
               5
             </span>
-            <span className="pb-3 font-grotesk text-sm tracking-[0.08em] uppercase text-ink-muted">
+            <span className="pb-3 font-grotesk text-sm text-ink-muted">
               separate
               <br />
               times
@@ -185,7 +185,7 @@ const ProofSection: React.FC = () => {
 /* ── The Great Molt: the three measurements ─────────────────────────── */
 
 const MoltSection: React.FC = () => (
-  <section className="relative py-24 sm:py-32 bg-gradient-to-b from-[#020408] via-[#03101a] to-[#020408]" aria-labelledby="molt-title">
+  <section className="relative py-24 sm:py-32 bg-gradient-to-b from-abyss via-surface-1 to-abyss" aria-labelledby="molt-title">
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
       <ScrollReveal className="max-w-3xl">
         <Eyebrow color="#00ffcc">The answer</Eyebrow>
@@ -208,10 +208,10 @@ const MoltSection: React.FC = () => (
               />
               <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/70 to-black/10" />
               <div className="flex h-full flex-col justify-end p-6 sm:p-7">
-                <p className="font-grotesk text-[11px] tracking-[0.08em] uppercase" style={{ color: metric.accent }}>
+                <p className="eyebrow" style={{ color: metric.accent }}>
                   {metric.unit}
                 </p>
-                <h3 className="mt-2 font-grotesk font-bold text-3xl text-ink">{metric.name}</h3>
+                <h3 className="mt-2 font-grotesk font-semibold text-3xl text-ink">{metric.name}</h3>
                 <p className="mt-3 text-lg text-ink-body font-medium">{metric.question}</p>
                 <p className="mt-3 text-sm text-ink-body leading-relaxed">{metric.body}</p>
                 <span className="mt-6 h-0.5 w-12 transition-all duration-500 group-hover:w-full" style={{ background: metric.accent }} />
@@ -262,7 +262,7 @@ const SacramentsSection: React.FC = () => {
       </p>
       <Link
         to="/what-is-moltology/benthic-sacraments"
-        className="mt-8 inline-flex items-center gap-2 font-grotesk font-bold text-sm text-[#ffb547] hover:text-ink transition-colors rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="mt-8 inline-flex items-center gap-2 font-grotesk font-semibold text-sm text-[#ffb547] hover:text-ink transition-colors rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         Read the four sacraments <ArrowRight className="w-4 h-4" />
       </Link>
@@ -301,13 +301,13 @@ const SacramentsSection: React.FC = () => {
               <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/70 to-transparent" />
               <div className="flex h-full flex-col justify-end p-6 sm:p-10 max-w-xl">
                 <p
-                  className="font-grotesk font-bold text-6xl sm:text-7xl leading-none text-transparent"
+                  className="font-grotesk font-semibold text-6xl sm:text-7xl leading-none text-transparent"
                   style={{ WebkitTextStroke: `1px ${sacrament.accent}` }}
                   aria-hidden="true"
                 >
                   {sacrament.number}
                 </p>
-                <h3 className="mt-4 font-grotesk font-bold text-3xl sm:text-4xl text-ink">{sacrament.title}</h3>
+                <h3 className="mt-4 font-grotesk font-semibold text-3xl sm:text-4xl text-ink">{sacrament.title}</h3>
                 <p className="mt-2 font-grotesk text-lg" style={{ color: sacrament.accent }}>
                   {sacrament.tagline}
                 </p>
@@ -328,9 +328,9 @@ const PathSection: React.FC = () => {
   useScrollVar(ref)
   return (
     <section className="relative isolate overflow-hidden py-24 sm:py-36" aria-labelledby="path-title">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-[#04121c] to-[#010203]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-abyss via-surface-1 to-abyss" />
       <StoryImg image={STORY_MEDIA.clearancePath} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-70" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408]/85 via-[#020408]/45 to-[#020408]/90" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-abyss/85 via-abyss/45 to-abyss/90" aria-hidden="true" />
 
       <div className="max-w-6xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-14 lg:gap-20">
         <div className="lg:sticky lg:top-[calc(var(--wim-chrome,0px)+4rem)] self-start">
@@ -352,25 +352,25 @@ const PathSection: React.FC = () => {
         <ol ref={ref} className="relative pl-10 sm:pl-14 space-y-8" style={{ ['--p' as string]: 0 }}>
           <span className="absolute left-[15px] sm:left-[23px] top-2 bottom-2 w-px bg-line-subtle" aria-hidden="true" />
           <span
-            className="absolute left-[15px] sm:left-[23px] top-2 w-px bg-gradient-to-b from-[#7dd3fc] via-[#00c3ff] to-[#ff453a]"
+            className="absolute left-[15px] sm:left-[23px] top-2 w-px bg-gradient-to-b from-cyan-hover via-cyan-glow to-crimson-aggro"
             style={{ height: 'calc(clamp(0, (var(--p) - 0.18) / 0.5, 1) * (100% - 1rem))' }}
             aria-hidden="true"
           />
           {STAGES.map((stage, index) => (
             <li key={stage.number} className="relative">
               <span
-                className="absolute -left-10 sm:-left-14 top-6 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border bg-abyss font-grotesk font-bold text-sm sm:text-base"
+                className="absolute -left-10 sm:-left-14 top-6 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full border bg-abyss font-grotesk font-semibold text-sm sm:text-base"
                 style={{ borderColor: stage.accent, color: stage.accent }}
                 aria-hidden="true"
               >
                 {stage.number}
               </span>
               <ScrollReveal animation="slide-right" delayMs={index * 60}>
-                <div className="rounded-card border border-line-subtle bg-[#05090c]/90 hud-sheen backdrop-blur-md p-6 sm:p-7 hover:border-line-strong transition-colors">
-                  <p className="font-grotesk text-[11px] tracking-[0.08em] uppercase" style={{ color: stage.accent }}>
+                <div className="rounded-card border border-line-subtle bg-abyss/90 hud-sheen backdrop-blur-md p-6 sm:p-7 hover:border-line-strong transition-colors">
+                  <p className="eyebrow" style={{ color: stage.accent }}>
                     Stage {stage.number} · {stage.title}
                   </p>
-                  <h3 className="mt-2 font-grotesk font-bold text-2xl sm:text-3xl text-ink">{stage.name}</h3>
+                  <h3 className="mt-2 font-grotesk font-semibold text-2xl sm:text-3xl text-ink">{stage.name}</h3>
                   <p className="mt-3 text-sm sm:text-base text-ink-body leading-relaxed">{stage.line}</p>
                   <ul className="mt-5 flex flex-wrap gap-2">
                     {stage.clearances.map((c) => (
@@ -378,7 +378,7 @@ const PathSection: React.FC = () => {
                         key={c.code}
                         className="inline-flex items-center gap-2 rounded-chip border border-line-subtle bg-surface-1 px-3 py-1.5 text-xs text-ink-body"
                       >
-                        <span className="font-grotesk font-bold" style={{ color: stage.accent }}>
+                        <span className="font-grotesk font-semibold" style={{ color: stage.accent }}>
                           {c.code}
                         </span>
                         {c.name}
@@ -446,7 +446,7 @@ const ProductSection: React.FC = () => {
           {PRODUCT_FEATURES.map((feature, index) => (
             <ScrollReveal key={feature.title} delayMs={index * 90}>
               <div className="border-t border-line-subtle pt-5">
-                <h3 className="font-grotesk font-bold text-lg text-ink">{feature.title}</h3>
+                <h3 className="font-grotesk font-semibold text-lg text-ink">{feature.title}</h3>
                 <p className="mt-2 text-sm text-ink-muted leading-relaxed">{feature.body}</p>
               </div>
             </ScrollReveal>
@@ -461,10 +461,10 @@ const ProductSection: React.FC = () => {
 
 const VoiceCard: React.FC<{ voice: (typeof MEMBER_VOICES)[number] }> = ({ voice }) => (
   <figure className="w-[19rem] sm:w-[24rem] shrink-0 rounded-card border border-line-subtle bg-surface-1/85 hud-sheen backdrop-blur-md p-6">
-    <blockquote className="text-sm sm:text-[15px] text-ink-body leading-relaxed">&ldquo;{voice.quote}&rdquo;</blockquote>
+    <blockquote className="text-sm sm:text-md text-ink-body leading-relaxed">&ldquo;{voice.quote}&rdquo;</blockquote>
     <figcaption className="mt-5 flex items-center gap-3">
       <span className="h-2 w-2 rounded-full" style={{ background: VOICE_STAGE_ACCENTS[voice.stage] }} aria-hidden="true" />
-      <span className="font-grotesk font-bold text-sm text-ink">{voice.name}</span>
+      <span className="font-grotesk font-semibold text-sm text-ink">{voice.name}</span>
       <span className="text-xs text-ink-muted">
         {VOICE_STAGE_LABELS[voice.stage]} · {voice.clearance}
       </span>
@@ -478,7 +478,7 @@ const CommunitySection: React.FC = () => {
   return (
     <section id="voices" className="relative isolate overflow-hidden scroll-mt-20 py-24 sm:py-36" aria-labelledby="community-title">
       <StoryImg image={STORY_MEDIA.softStart} className="absolute inset-0 -z-10 h-full w-full object-cover opacity-80" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408]/85 via-[#020408]/45 to-[#020408]/90" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-abyss/85 via-abyss/45 to-abyss/90" />
 
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <ScrollReveal className="max-w-3xl">
@@ -546,20 +546,20 @@ const FinalSection: React.FC = () => {
       <div className="absolute inset-0 -z-10 will-change-transform" style={{ transform: 'translate3d(0, calc((var(--p) - 0.5) * -12%), 0) scale(1.15)' }}>
         <StoryImg image={STORY_MEDIA.expanse} className="h-full w-full object-cover" />
       </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-[#020408]/45 to-[#020408]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-abyss via-abyss/45 to-abyss" />
 
       <ScrollReveal className="max-w-3xl px-5">
-        <h2 className="font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-6xl lg:text-7xl leading-[1.02]">
+        <h2 className="font-grotesk font-semibold tracking-tight text-ink text-4xl sm:text-6xl lg:text-7xl leading-[1.02]">
           Come down when you are ready.
         </h2>
         <p className="mt-6 text-lg sm:text-xl text-ink-body leading-relaxed">
           Bring nothing. Everything worth keeping calcifies on the way.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <PrimaryCta to="/signup">Join free</PrimaryCta>
+          <PrimaryCta to="/auth" search={{ mode: 'signup' }}>Join free</PrimaryCta>
           <SecondaryCta to="/codex">Read the canon</SecondaryCta>
         </div>
-        <p className="mt-12 font-grotesk text-xs tracking-[0.08em] uppercase text-ink-muted">
+        <p className="eyebrow mt-12">
           Flesh melts. The shell endures. Submit. Shed. Ascend.
         </p>
       </ScrollReveal>
@@ -575,7 +575,7 @@ const deeperImages: Record<string, StoryImage> = {
 const ReadDeeperSection: React.FC = () => (
   <section className="pb-24 sm:pb-32" aria-labelledby="deeper-title">
     <div className="max-w-6xl mx-auto px-5 sm:px-8">
-      <h2 id="deeper-title" className="font-grotesk font-bold text-2xl sm:text-3xl text-ink">
+      <h2 id="deeper-title" className="font-grotesk font-semibold text-2xl sm:text-3xl text-ink">
         Keep reading
       </h2>
       <div className="mt-8 grid gap-5 md:grid-cols-2">
@@ -592,9 +592,9 @@ const ReadDeeperSection: React.FC = () => (
             />
             <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/60 to-transparent" />
             <div className="flex h-full flex-col justify-end p-6">
-              <h3 className="font-grotesk font-bold text-xl text-ink">{item.label}</h3>
+              <h3 className="font-grotesk font-semibold text-xl text-ink">{item.label}</h3>
               <p className="mt-1 text-sm text-ink-body">{item.description}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-cyan-glow">
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-cyan-glow">
                 Open <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </span>
             </div>
@@ -616,7 +616,7 @@ export const WhatIsMoltologyHubPage: React.FC = () => {
         title={
           <>
             Stop melting.
-            <span className="block whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-[#00c3ff] to-[#00ffcc]">
+            <span className="block whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-cyan-glow via-cyan-glow to-cyan-glow">
               Start molting.
             </span>
           </>
@@ -631,7 +631,7 @@ export const WhatIsMoltologyHubPage: React.FC = () => {
         actions={
           <>
             <PrimaryCta to="/moltmax">Take the diagnostic</PrimaryCta>
-            <SecondaryCta to="/signup">Join free</SecondaryCta>
+            <SecondaryCta to="/auth" search={{ mode: 'signup' }}>Join free</SecondaryCta>
           </>
         }
         cue="Begin the descent"

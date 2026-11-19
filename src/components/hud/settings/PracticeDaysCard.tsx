@@ -94,7 +94,7 @@ export function PracticeDaysCard() {
               disabled={!streakReady || saving}
               data-testid={`practice-day-${weekday}`}
               className={cn(
-                'min-h-11 rounded-control border text-xs font-bold transition-colors touch-manipulation disabled:opacity-60',
+                'min-h-11 rounded-control border text-xs font-semibold transition-colors touch-manipulation disabled:opacity-60',
                 focusRing,
                 on
                   ? 'border-cyan-glow bg-cyan-glow/15 text-cyan-glow'

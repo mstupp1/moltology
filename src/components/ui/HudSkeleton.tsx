@@ -20,9 +20,9 @@ export const HudSkeleton = React.forwardRef<HTMLDivElement, HudSkeletonProps>(
     ref
   ) => {
     const variantStyles = {
-      cyan: 'bg-gradient-to-r from-[#0f1414] via-[#00c3ff]/20 to-[#0f1414] border border-[#00c3ff]/20 shadow-[0_0_8px_rgba(0,195,255,0.1)]',
-      crimson: 'bg-gradient-to-r from-[#0f1414] via-[#ff453a]/20 to-[#0f1414] border border-[#ff453a]/20 shadow-[0_0_8px_rgba(255,69,58,0.1)]',
-      neutral: 'bg-gradient-to-r from-[#0b0f0f] via-[#262b2b] to-[#0b0f0f] border border-[#3a4a49]/30',
+      cyan: 'bg-gradient-to-r from-surface-1 via-cyan-glow/20 to-surface-1 border border-cyan-glow/20 shadow-[0_0_8px_rgba(0,195,255,0.1)]',
+      crimson: 'bg-gradient-to-r from-surface-1 via-crimson-aggro/20 to-surface-1 border border-crimson-aggro/20 shadow-[0_0_8px_rgba(255,69,58,0.1)]',
+      neutral: 'bg-gradient-to-r from-surface-1 via-[#262b2b] to-surface-1 border border-line-subtle/30',
     }[variant]
 
     const inlineStyles: React.CSSProperties = {

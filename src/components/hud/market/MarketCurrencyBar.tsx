@@ -9,7 +9,7 @@ function formatBalance(value: number): string {
 /** A gem amount with its icon, for prices and balances. */
 export function GemAmount({ value, size = 'md' }: { value: number; size?: 'sm' | 'md' }) {
   return (
-    <span className={cn('inline-flex items-center gap-1 font-grotesk font-bold tabular-nums text-ink', size === 'sm' ? 'text-[12px]' : 'text-base')}>
+    <span className={cn('inline-flex items-center gap-1 font-grotesk font-semibold tabular-nums text-ink', size === 'sm' ? 'text-xs' : 'text-base')}>
       <img
         src={getAssetUrl('/images/chitin_gem.png')}
         alt=""
@@ -29,30 +29,31 @@ interface MarketCurrencyBarProps {
   className?: string
 }
 
+/**
+ * The wallet in the Shop's title row: one line, the same height as the buttons in other title
+ * rows, so the Shop band lines up with Customize and Progress.
+ */
 export function MarketCurrencyBar({ chitinGems, moltCredits, creditsLive, className }: MarketCurrencyBarProps) {
+  const credits = creditsLive || moltCredits > 0 ? formatBalance(moltCredits) : 'Soon'
   return (
-    <div className={cn('grid w-full grid-cols-2 gap-2 sm:w-auto sm:gap-3', className)}>
-      <div className="flex min-w-0 items-center gap-2 rounded-control bg-surface-2 px-3 py-2">
-        <img src={getAssetUrl('/images/chitin_gem.png')} alt="" className="w-6 h-6 object-contain shrink-0" />
-        <div className="flex flex-col leading-none min-w-0 gap-1">
-          <span className="whitespace-nowrap text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
-            Chitin Gems
-          </span>
-          <span className="font-grotesk text-base font-extrabold text-ink tabular-nums" data-testid="gem-balance">
-            {formatBalance(chitinGems)}
-          </span>
-        </div>
+    <div className={cn('flex items-center gap-2', className)}>
+      <div
+        className="flex h-8 items-center gap-1.5 rounded-control bg-surface-3 px-2.5"
+        title="Chitin Gems"
+      >
+        <img src={getAssetUrl('/images/chitin_gem.png')} alt="" className="w-4 h-4 object-contain shrink-0" />
+        <span className="font-grotesk text-ui font-semibold text-ink tabular-nums" data-testid="gem-balance">
+          {formatBalance(chitinGems)}
+        </span>
+        <span className="text-xs text-ink-muted whitespace-nowrap">Chitin Gems</span>
       </div>
-      <div className="flex min-w-0 items-center gap-2 rounded-control bg-surface-2 px-3 py-2">
-        <img src={getAssetUrl('/images/molt_credit.png')} alt="" className="w-6 h-6 object-contain shrink-0" />
-        <div className="flex flex-col leading-none min-w-0 gap-1">
-          <span className="whitespace-nowrap text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
-            Molt Credits
-          </span>
-          <span className="font-grotesk text-base font-extrabold text-ink tabular-nums">
-            {creditsLive || moltCredits > 0 ? formatBalance(moltCredits) : 'Soon'}
-          </span>
-        </div>
+      <div
+        className="flex h-8 items-center gap-1.5 rounded-control bg-surface-3 px-2.5"
+        title="Molt Credits"
+      >
+        <img src={getAssetUrl('/images/molt_credit.png')} alt="" className="w-4 h-4 object-contain shrink-0" />
+        <span className="font-grotesk text-ui font-semibold text-ink tabular-nums">{credits}</span>
+        <span className="text-xs text-ink-muted whitespace-nowrap">Molt Credits</span>
       </div>
     </div>
   )

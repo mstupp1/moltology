@@ -160,15 +160,15 @@ const EMPTY_CONTACT_FORM = {
   emailOptIn: false,
 }
 
-const sectionLabel = 'font-grotesk text-[11px] sm:text-xs font-bold tracking-[0.08em] uppercase text-cyan-glow'
-const sectionTitle = 'mt-3 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-4xl leading-tight [text-wrap:balance]'
+const sectionLabel = 'eyebrow'
+const sectionTitle = 'mt-3 font-grotesk font-semibold tracking-tight text-ink text-3xl sm:text-4xl leading-tight [text-wrap:balance]'
 const sectionLede = 'mt-4 text-base text-ink-muted leading-relaxed max-w-2xl [text-wrap:pretty]'
 const card = 'rounded-card border border-line-subtle bg-surface-1'
 const focusRing = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
-const tileBase = `inline-flex items-center justify-center gap-2 min-h-10 px-4 rounded-control font-grotesk font-bold text-xs uppercase tracking-wider transition-colors shrink-0 ${focusRing}`
+const tileBase = `inline-flex items-center justify-center gap-2 min-h-10 px-4 rounded-control font-grotesk font-semibold text-xs transition-colors shrink-0 ${focusRing}`
 const tileOn = 'bg-surface-3 shadow-nav-current text-ink'
 const tileOff = 'text-ink-muted hover:text-ink hover:bg-surface-2'
-const fieldLabel = 'block text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted mb-1.5'
+const fieldLabel = 'eyebrow block mb-1.5'
 const fieldClass =
   'w-full min-h-10 bg-surface-2 text-ink placeholder:text-ink-muted/70 text-sm rounded-control border border-line py-2 px-3 transition-[border-color,box-shadow] duration-200 outline-hidden hover:border-line-hover focus:border-cyan-glow focus:shadow-field-focus'
 
@@ -319,7 +319,7 @@ export const OrgPage: React.FC = () => {
 
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-8">
             <p className={sectionLabel}>The organization</p>
-            <h1 className="mt-4 max-w-3xl font-grotesk font-bold tracking-tight text-ink text-[2.5rem] leading-[1.04] sm:text-6xl [text-wrap:balance]">
+            <h1 className="mt-4 max-w-3xl font-grotesk font-semibold tracking-tight text-ink text-[2.5rem] leading-[1.04] sm:text-6xl [text-wrap:balance]">
               The people behind Moltology
             </h1>
             <p className="mt-5 max-w-xl text-base sm:text-lg text-ink-body leading-relaxed [text-wrap:pretty]">
@@ -378,7 +378,7 @@ export const OrgPage: React.FC = () => {
                   <ScrollReveal key={value.title} delayMs={index * 60}>
                     <div className={`${card} h-full p-5`}>
                       <value.icon className="w-5 h-5 text-cyan-glow" aria-hidden="true" />
-                      <h3 className="mt-4 font-grotesk font-bold text-lg text-ink">{value.title}</h3>
+                      <h3 className="mt-4 font-grotesk font-semibold text-lg text-ink">{value.title}</h3>
                       <p className="mt-1.5 text-sm text-ink-muted leading-relaxed">{value.copy}</p>
                     </div>
                   </ScrollReveal>
@@ -403,8 +403,8 @@ export const OrgPage: React.FC = () => {
                           <img src={leader.image} alt={leader.name} loading="lazy" className="w-full h-full object-cover" />
                         </div>
                         <div className="p-4 sm:p-5">
-                          <h3 className="font-grotesk font-bold text-base sm:text-lg text-ink">{leader.name}</h3>
-                          <p className="mt-0.5 text-xs font-bold uppercase tracking-[0.08em] text-cyan-glow">{leader.title}</p>
+                          <h3 className="font-grotesk font-semibold text-base sm:text-lg text-ink">{leader.name}</h3>
+                          <p className="eyebrow mt-0.5">{leader.title}</p>
                           <p className="mt-2 text-sm text-ink-muted leading-relaxed">{leader.bio}</p>
                         </div>
                       </article>
@@ -443,7 +443,7 @@ export const OrgPage: React.FC = () => {
                   <img key={place.id} src={place.image} alt={place.title} className="absolute inset-0 w-full h-full object-cover" />
                 </div>
                 <div className="lg:col-span-5 p-5 sm:p-7 flex flex-col">
-                  <h3 className="font-grotesk font-bold text-2xl text-ink">{place.title}</h3>
+                  <h3 className="font-grotesk font-semibold text-2xl text-ink">{place.title}</h3>
                   <p className="mt-3 text-sm sm:text-base text-ink-body leading-relaxed">{place.description}</p>
                   <ul className="mt-5 space-y-2.5">
                     {place.highlights.map((highlight) => (
@@ -486,8 +486,8 @@ export const OrgPage: React.FC = () => {
                     {milestones.map((item) => (
                       <li key={item.year} className="relative pl-6 sm:pl-8 pb-8 last:pb-0">
                         <span className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-cyan-glow" aria-hidden="true" />
-                        <p className="font-grotesk text-xs font-bold tracking-[0.08em] text-ink-muted">{item.year}</p>
-                        <h3 className="mt-1 font-grotesk font-bold text-lg text-ink">{item.title}</h3>
+                        <p className="font-grotesk text-xs font-semibold text-ink-muted">{item.year}</p>
+                        <h3 className="mt-1 font-grotesk font-semibold text-lg text-ink">{item.title}</h3>
                         <p className="mt-1.5 text-sm text-ink-muted leading-relaxed max-w-xl">{item.description}</p>
                       </li>
                     ))}
@@ -516,7 +516,7 @@ export const OrgPage: React.FC = () => {
                   <p className={fieldLabel}>Email</p>
                   <a
                     href={`mailto:${SUPPORT_INBOX}`}
-                    className={`text-cyan-glow font-bold hover:text-cyan-hover rounded-control ${focusRing}`}
+                    className={`text-cyan-glow font-semibold hover:text-cyan-hover rounded-control ${focusRing}`}
                   >
                     {SUPPORT_INBOX}
                   </a>
@@ -539,7 +539,7 @@ export const OrgPage: React.FC = () => {
                 {contactSentTo ? (
                   <div className="py-10 text-center" role="status">
                     <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" aria-hidden="true" />
-                    <h3 className="mt-4 font-grotesk font-bold text-xl text-ink">Message sent</h3>
+                    <h3 className="mt-4 font-grotesk font-semibold text-xl text-ink">Message sent</h3>
                     <p className="mt-2 text-sm text-ink-muted max-w-md mx-auto">
                       Thanks for reaching out. We'll reply to {contactSentTo} as soon as we can.
                     </p>

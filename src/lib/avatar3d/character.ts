@@ -3,10 +3,12 @@
  * overshoot, breathing, blinking, feet that step round as it turns, and springy antennae, tail,
  * claws and hats. Changing the look rebuilds the character; changing the pose only retargets bones.
  */
-import { Box3, BufferAttribute, Mesh, Quaternion, SkinnedMesh, Vector3, type Group, type Material, type Object3D } from 'three'
+import { Box3, BufferAttribute, Mesh, Quaternion, SkinnedMesh, Vector3, type Group, type Material, type Object3D, type WebGLRenderer } from 'three'
 import type { AvatarPose, AvatarTemperament } from '../avatar/traits'
 import { equipAll } from './equipment'
-import type { Avatar3DLook } from './look'
+import { shapeKey, type Avatar3DLook } from './look'
+import { loftDetail } from './loft'
+import { bakeOcclusion, prepareBake, type BakeOptions } from './bake'
 import { buildOccluders, buildSprings, type Spring } from './flex'
 import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
 import { arc, hops, jitter, MOODS, REACTION_SECONDS, type Mood, type Reaction } from './motion'
@@ -79,6 +81,12 @@ export interface Character3D {
   /** Advance the pose blend and idle motion. `time` is seconds; pass `idle = false` to hold still. */
   update: (dt: number, time: number, idle?: boolean) => void
   triangles: () => number
+  /**
+   * Bake the body's creases into its vertices in the pose it stands in now (bake.ts), and keep only
+   * the live shading that moving arms need. Returns the milliseconds taken, or null if this
+   * renderer cannot bake (the live shading then stays as it was).
+   */
+  bake: (renderer: WebGLRenderer, options?: BakeOptions) => number | null
   dispose: () => void
   /** Where the camera should look to feature one gear slot, or null for an unknown slot. */
   focusOf: (slot: string) => Focus3D | null
@@ -189,6 +197,7 @@ function applyStature(rig: Rig, heightScale: number, bodyHeight: number): { scal
 
 export function buildCharacter(look: Avatar3DLook): Character3D {
   const rig = new Rig()
+  const builtDetail = loftDetail()
   const built = look.race === 'crab' ? buildCrab(rig, look) : buildLobster(rig, look)
   const face: FaceRig = built.face
   const paint = (of: Avatar3DLook) => ({
@@ -223,6 +232,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   rig.finalizeSkinned(materials)
   const occluders = buildOccluders(rig)
   shadeWith(materials, occluders.spheres, occluders.count)
+  prepareBake(rig.root, rig.bones)
   const fan = TAIL_FAN.map((_, i) => `tailFan${i}`).filter((name) => rig.bones.has(name))
   const swimmerets = SWIMMERETS.flatMap((_, i) => [`swimmeret${i}L`, `swimmeret${i}R`]).filter((name) => rig.bones.has(name))
 
@@ -708,6 +718,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       return null
     },
     update,
+    bake(renderer, options) {
+      const ms = bakeOcclusion(renderer, rig.root, rig.bones, { key: `${shapeKey(character.look)}|${builtDetail}`, ...options })
+      if (ms !== null) shadeWith(materials, occluders.spheres, occluders.liveCount, true)
+      return ms
+    },
     triangles: () => rig.meshes.reduce((sum, m) => sum + (m.geometry.getIndex()?.count ?? 0) / 3, 0),
     dispose() {
       for (const mesh of rig.meshes) {

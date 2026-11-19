@@ -33,7 +33,7 @@ const howItWorks = [
     imageAlt: 'A friendly lobster at a reef workstation comparing small everyday scenarios',
     accent: '#22d3ee',
     underlay: 'pbr-underlay-chitin',
-    cardClass: 'border-cyan-500/35 from-[#0a1215]/95 via-[#070d0f]/95 to-[#04080a]/95 hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
+    cardClass: 'border-cyan-500/35 from-surface-1/95 via-surface-1/95 to-abyss/95 hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
   },
   {
     eyebrow: 'Measure',
@@ -44,7 +44,7 @@ const howItWorks = [
     imageAlt: 'A friendly lobster examining its shell through an illuminated lens',
     accent: '#fbbf24',
     underlay: 'pbr-underlay-circuit',
-    cardClass: 'border-[#ffd700]/35 from-[#121008]/95 via-[#0e0c07]/95 to-[#080704]/95 hover:border-[#ffd700] hover:shadow-[0_0_40px_rgba(255,215,0,0.2)]',
+    cardClass: 'border-[#ffd700]/35 from-surface-1/95 via-abyss/95 to-abyss/95 hover:border-[#ffd700] hover:shadow-[0_0_40px_rgba(255,215,0,0.2)]',
   },
   {
     eyebrow: 'Grow',
@@ -55,7 +55,7 @@ const howItWorks = [
     imageAlt: 'A friendly lobster taking a first step along a softly lit underwater path',
     accent: '#00ffcc',
     underlay: 'pbr-underlay-carbon',
-    cardClass: 'border-[#00ffcc]/35 from-[#081412]/95 via-[#060e0d]/95 to-[#030807]/95 hover:border-[#00ffcc] hover:shadow-[0_0_40px_rgba(0,255,204,0.22)]',
+    cardClass: 'border-cyan-glow/35 from-surface-1/95 via-surface-1/95 to-abyss/95 hover:border-cyan-glow hover:shadow-[0_0_40px_rgba(0,255,204,0.22)]',
   },
 ]
 
@@ -335,7 +335,7 @@ export const MoltMaxPage: React.FC = () => {
   const activeCard = fannedCards[fannedActive]
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#070b0b] font-sans text-[#dfe3e3] selection:bg-[#00c3ff]/30 selection:text-white relative">
+    <div className="min-h-screen overflow-x-clip bg-abyss font-sans text-ink selection:bg-cyan-glow/30 selection:text-white relative">
       {/* Ambient vignette, scanlines and glow, shared with the homepage */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-70" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -344,7 +344,7 @@ export const MoltMaxPage: React.FC = () => {
 
       <PublicHeader activePage="moltmax" onOpenAuth={(auth) => { setAuthMode(auth); setIsAuthModalOpen(true) }} />
       {mode === 'hero' && <main className="relative z-10">
-        <section className="relative w-full overflow-hidden border-b border-cyan-900/40 bg-[#030608] px-4 pt-24 pb-12 sm:px-8 sm:pt-32 sm:pb-16 lg:flex lg:min-h-[100svh] lg:items-center lg:px-12 lg:pt-28">
+        <section className="relative w-full overflow-hidden border-b border-cyan-900/40 bg-abyss px-4 pt-24 pb-12 sm:px-8 sm:pt-32 sm:pb-16 lg:flex lg:min-h-[100svh] lg:items-center lg:px-12 lg:pt-28">
           <HeroBackground
             leftWatermark="MOLTMAX · BIOMETRIC_SCANNER"
             rightWatermark="CARCINIZATION · CLEARANCE_AUDIT"
@@ -353,23 +353,23 @@ export const MoltMaxPage: React.FC = () => {
           <div className="relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-10 lg:grid-cols-[minmax(0,1fr)_440px] xl:grid-cols-[minmax(0,1fr)_520px] xl:gap-16">
             {/* Copy column */}
             <div className="min-w-0 text-left">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#00c3ff]/40 bg-[#00c3ff]/10 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#00c3ff] sm:text-xs">
-                <Sparkles className="h-3.5 w-3.5 text-[#00ffcc]" /> Official Moltmaxxing audit
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-glow/40 bg-cyan-glow/10 px-3.5 py-1.5 text-2xs font-semibold text-cyan-glow sm:text-xs">
+                <Sparkles className="h-3.5 w-3.5 text-cyan-glow" /> Official Moltmaxxing audit
               </div>
 
-              <h1 className="font-grotesk font-black uppercase text-white">
-                <span className="block text-xl font-extrabold tracking-tight text-[#dfe3e3] sm:text-3xl lg:text-4xl">
+              <h1 className="font-grotesk font-semibold text-white">
+                <span className="block text-xl font-semibold tracking-tight text-ink sm:text-3xl lg:text-4xl">
                   Measure the shell.
                 </span>
                 <span className="mt-1 block text-[clamp(2.5rem,calc((100vw_-_2rem)/7.4),5rem)] leading-[0.95] tracking-[-0.03em] lg:text-[clamp(2.75rem,calc((100vw_-_620px)/7),6rem)] xl:text-[clamp(2.75rem,calc((100vw_-_740px)/7),6.5rem)]">
                   <span className="block">Master</span>
-                  <span className="block bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text pb-1 text-transparent drop-shadow-[0_0_40px_rgba(0,195,255,0.35)]">
+                  <span className="block bg-gradient-to-r from-cyan-glow via-cyan-glow to-cyan-glow bg-clip-text pb-1 text-transparent drop-shadow-[0_0_40px_rgba(0,195,255,0.35)]">
                     Moltmaxxing
                   </span>
                 </span>
               </h1>
 
-              <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-[#b4c4c3] sm:text-base lg:text-lg">
+              <p className="mt-5 max-w-xl text-md leading-relaxed text-ink-body sm:text-base lg:text-lg">
                 Moltmaxxing is the practice of shedding old habits, hardening your boundaries, and finishing what you start. Fifteen quick scenarios show where your shell stands today, then hand you a score, a five-trait profile, and three next steps.
               </p>
 
@@ -377,7 +377,7 @@ export const MoltMaxPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={beginAudit}
-                  className="group inline-flex min-h-[52px] items-center justify-center gap-3 rounded-md bg-[#00c3ff] px-7 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_35px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] hover:shadow-[0_0_45px_rgba(0,255,204,0.45)] cursor-pointer"
+                  className="group inline-flex min-h-[52px] items-center justify-center gap-3 rounded-md bg-cyan-glow px-7 font-grotesk text-sm font-semibold text-abyss shadow-[0_0_35px_rgba(0,195,255,0.35)] transition-all hover:bg-cyan-glow hover:shadow-[0_0_45px_rgba(0,255,204,0.45)] cursor-pointer"
                 >
                   <span>Take the Moltmax Quiz</span>
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -386,17 +386,17 @@ export const MoltMaxPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate({ to: '/moltmaxxing' })}
-                  className="group inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-md border border-[#00c3ff]/40 bg-[#00c3ff]/[0.06] px-6 font-grotesk text-sm font-bold uppercase tracking-wider text-[#00ffcc] backdrop-blur-md transition-all hover:border-[#00ffcc] hover:bg-[#00ffcc]/15 cursor-pointer"
+                  className="group inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-md border border-cyan-glow/40 bg-cyan-glow/[0.06] px-6 font-grotesk text-sm font-semibold text-cyan-glow backdrop-blur-md transition-all hover:border-cyan-glow hover:bg-cyan-glow/15 cursor-pointer"
                 >
                   <BookOpen className="h-4 w-4" />
                   <span>Read Moltmaxxing Guide</span>
                 </button>
               </div>
 
-              <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#9ab0af] sm:text-sm">
-                <li className="flex items-center gap-2"><Clock className="h-4 w-4 text-[#00ffcc]" /> About 4 minutes</li>
-                <li className="flex items-center gap-2"><ListChecks className="h-4 w-4 text-[#00ffcc]" /> 15 questions</li>
-                <li className="flex items-center gap-2"><Lock className="h-4 w-4 text-[#00ffcc]" /> Free, no account needed</li>
+              <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-muted sm:text-sm">
+                <li className="flex items-center gap-2"><Clock className="h-4 w-4 text-cyan-glow" /> About 4 minutes</li>
+                <li className="flex items-center gap-2"><ListChecks className="h-4 w-4 text-cyan-glow" /> 15 questions</li>
+                <li className="flex items-center gap-2"><Lock className="h-4 w-4 text-cyan-glow" /> Free, no account needed</li>
               </ul>
 
               {/* Phone and tablet preview: one rotating scenario, tap to start */}
@@ -404,7 +404,7 @@ export const MoltMaxPage: React.FC = () => {
                 type="button"
                 onClick={beginAudit}
                 aria-label="Start the quiz"
-                className="group relative mt-9 block w-full overflow-hidden rounded-2xl border border-[#00c3ff]/40 bg-[#050c10] text-left shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_30px_rgba(0,195,255,0.12)] lg:hidden"
+                className="group relative mt-9 block w-full overflow-hidden rounded-2xl border border-cyan-glow/40 bg-surface-1 text-left shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_30px_rgba(0,195,255,0.12)] lg:hidden"
               >
                 <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[2/1]">
                   {fannedCards.map((card, idx) => (
@@ -416,17 +416,17 @@ export const MoltMaxPage: React.FC = () => {
                       className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${idx === fannedActive ? 'opacity-100' : 'opacity-0'}`}
                     />
                   ))}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050c10] via-[#050c10]/40 to-transparent" />
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-[#00c3ff]/40 bg-[#020608]/85 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
-                    Tap to begin <ArrowRight className="h-3.5 w-3.5 text-[#00c3ff]" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-surface-1/40 to-transparent" />
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-cyan-glow/40 bg-abyss/85 px-3 py-1.5 text-2xs font-semibold text-white backdrop-blur-md">
+                    Tap to begin <ArrowRight className="h-3.5 w-3.5 text-cyan-glow" />
                   </span>
                 </div>
                 <div className="relative -mt-14 px-4 pb-4">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#00c3ff]">{activeCard.trait}</div>
-                  <p className="mt-1 font-grotesk text-base font-bold leading-snug text-white sm:text-lg">{activeCard.prompt}</p>
+                  <div className="eyebrow">{activeCard.trait}</div>
+                  <p className="mt-1 font-grotesk text-base font-semibold leading-snug text-white sm:text-lg">{activeCard.prompt}</p>
                   <div className="mt-3 flex gap-1.5" aria-hidden="true">
                     {fannedCards.map((card, idx) => (
-                      <span key={card.id} className={`h-1 rounded-full transition-all duration-300 ${idx === fannedActive ? 'w-6 bg-[#00c3ff]' : 'w-1.5 bg-white/20'}`} />
+                      <span key={card.id} className={`h-1 rounded-full transition-all duration-300 ${idx === fannedActive ? 'w-6 bg-cyan-glow' : 'w-1.5 bg-white/20'}`} />
                     ))}
                   </div>
                 </div>
@@ -435,7 +435,7 @@ export const MoltMaxPage: React.FC = () => {
 
             {/* Desktop showcase: fanned scenario cards, click any to start */}
             <div className="relative hidden w-full items-center justify-center lg:flex">
-              <div className="absolute inset-4 rounded-full bg-[#00c3ff]/15 blur-[90px]" aria-hidden="true" />
+              <div className="absolute inset-4 rounded-full bg-cyan-glow/15 blur-[90px]" aria-hidden="true" />
 
               <div className="relative h-[600px] w-full xl:h-[660px]">
                 {fannedCards.map((card, idx) => {
@@ -459,22 +459,22 @@ export const MoltMaxPage: React.FC = () => {
                     >
                       <div className={`flex h-full flex-col overflow-hidden rounded-2xl border p-5 backdrop-blur-md transition-colors duration-300 ${
                         isActive
-                          ? 'border-[#00c3ff]/60 bg-[#050c10]/95 shadow-[0_25px_70px_rgba(0,0,0,0.85),0_0_40px_rgba(0,195,255,0.18)] group-hover:border-[#00ffcc]'
-                          : 'border-white/15 bg-[#071114]/95 shadow-[0_15px_40px_rgba(0,0,0,0.7)]'
+                          ? 'border-cyan-glow/60 bg-surface-1/95 shadow-[0_25px_70px_rgba(0,0,0,0.85),0_0_40px_rgba(0,195,255,0.18)] group-hover:border-cyan-glow'
+                          : 'border-white/15 bg-surface-1/95 shadow-[0_15px_40px_rgba(0,0,0,0.7)]'
                       }`}>
-                        <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-xl border border-[#00c3ff]/25 bg-[#020608]">
+                        <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-xl border border-cyan-glow/25 bg-abyss">
                           <img
                             src={card.image}
                             alt={card.imageAlt}
                             className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#050c10]/70 via-transparent to-transparent" />
-                          <span className="absolute left-3 top-3 rounded-full border border-white/15 bg-[#020608]/85 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#00ffcc] backdrop-blur-md">
+                          <div className="absolute inset-0 bg-gradient-to-t from-surface-1/70 via-transparent to-transparent" />
+                          <span className="absolute left-3 top-3 rounded-full border border-white/15 bg-abyss/85 px-3 py-1 text-2xs font-semibold text-cyan-glow backdrop-blur-md">
                             {card.trait}
                           </span>
                         </div>
 
-                        <h3 className="mt-4 font-grotesk text-base font-bold leading-snug text-white xl:text-lg">
+                        <h3 className="mt-4 font-grotesk text-base font-semibold leading-snug text-white xl:text-lg">
                           {card.prompt}
                         </h3>
 
@@ -483,21 +483,21 @@ export const MoltMaxPage: React.FC = () => {
                             {card.options.map((opt, optIdx) => (
                               <div
                                 key={opt.id}
-                                className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-[#071114]/80 p-2.5 transition-colors group-hover:border-[#00c3ff]/40"
+                                className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-surface-1/80 p-2.5 transition-colors group-hover:border-cyan-glow/40"
                               >
-                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-white/20 bg-white/5 text-[10px] font-bold text-[#9ab0af]">
+                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-white/20 bg-white/5 text-2xs font-semibold text-ink-muted">
                                   {['A', 'B', 'C', 'D'][optIdx]}
                                 </span>
-                                <span className="text-xs font-semibold leading-tight text-[#d0e6e6]">{opt.label}</span>
+                                <span className="text-xs font-semibold leading-tight text-ink">{opt.label}</span>
                               </div>
                             ))}
                           </div>
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#050c10] to-transparent" />
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-surface-1 to-transparent" />
                         </div>
 
                         <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3.5">
-                          <span className="text-xs text-[#9ab0af]">One of 15 scenarios</span>
-                          <span className="inline-flex items-center gap-2 rounded-md bg-[#00c3ff] px-4 py-2 font-grotesk text-xs font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_15px_rgba(0,195,255,0.3)] transition-all group-hover:bg-[#00ffcc]">
+                          <span className="text-xs text-ink-muted">One of 15 scenarios</span>
+                          <span className="inline-flex items-center gap-2 rounded-md bg-cyan-glow px-4 py-2 font-grotesk text-xs font-semibold text-abyss shadow-[0_0_15px_rgba(0,195,255,0.3)] transition-all group-hover:bg-cyan-glow">
                             Start <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                           </span>
                         </div>
@@ -518,7 +518,7 @@ export const MoltMaxPage: React.FC = () => {
                     >
                       <span className={`block h-1.5 rounded-full transition-all duration-300 ${
                         dotIdx === fannedActive
-                          ? 'w-8 bg-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.8)]'
+                          ? 'w-8 bg-cyan-glow shadow-[0_0_10px_rgba(0,195,255,0.8)]'
                           : 'w-2 bg-white/20 group-hover:bg-white/40'
                       }`} />
                     </button>
@@ -527,11 +527,11 @@ export const MoltMaxPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="pointer-events-none absolute bottom-5 left-1/2 hidden -translate-x-1/2 text-[#839493] lg:block"><ArrowDown className="h-5 w-5 animate-bounce" /></div>
+          <div className="pointer-events-none absolute bottom-5 left-1/2 hidden -translate-x-1/2 text-ink-muted lg:block"><ArrowDown className="h-5 w-5 animate-bounce" /></div>
         </section>
 
         {/* How it works: cinematic header band */}
-        <section className="relative w-full overflow-hidden border-b border-cyan-900/60 bg-[#030607] py-12 sm:py-16">
+        <section className="relative w-full overflow-hidden border-b border-cyan-900/60 bg-abyss py-12 sm:py-16">
           <div className="pbr-underlay pbr-underlay-basalt opacity-40 pointer-events-none" />
           <img
             src={getAssetUrl('/images/hero_widescreen_bg.jpg')}
@@ -539,20 +539,20 @@ export const MoltMaxPage: React.FC = () => {
             loading="lazy"
             className="pointer-events-none absolute inset-0 h-full w-full scale-105 object-cover opacity-20 mix-blend-luminosity blur-[8px]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#030608] via-[#030608]/75 to-[#030608] pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-abyss via-abyss/75 to-abyss pointer-events-none" />
           <div className="absolute inset-0 bg-sacred-grid opacity-25 pointer-events-none" />
 
           <div className="relative z-10 mx-auto max-w-3xl px-4 text-center sm:px-8">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-950/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300 sm:text-xs">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-950/80 px-3.5 py-1.5 text-2xs font-semibold text-cyan-300 sm:text-xs">
               <Terminal className="h-3.5 w-3.5 text-cyan-400" /> How it works
             </div>
-            <h2 className="font-grotesk text-3xl font-black uppercase tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Find your <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">next molt</span> in three steps
+            <h2 className="font-grotesk text-3xl font-semibold uppercase tracking-tight text-white sm:text-4xl lg:text-5xl">
+              Find your <span className="bg-gradient-to-r from-cyan-glow via-cyan-glow to-cyan-glow bg-clip-text text-transparent">next molt</span> in three steps
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-gray-300 sm:text-base">
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-ink-body sm:text-base">
               Discover where surface noise gets in, where your shell already holds, and what to strengthen next. Fifteen questions, about four minutes. No account needed.
             </p>
-            <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-gray-400 sm:text-sm">
+            <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-ink-muted sm:text-sm">
               Your answers stay on your device. Saving to your profile stores your results.
             </p>
           </div>
@@ -569,32 +569,32 @@ export const MoltMaxPage: React.FC = () => {
                 className={`chitin-card group relative flex flex-col overflow-hidden rounded-xl border bg-gradient-to-b transition-all duration-500 hover:-translate-y-1 ${step.cardClass}`}
               >
                 <div className={`pbr-underlay ${step.underlay} opacity-35 transition-opacity group-hover:opacity-55`} />
-                <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-white/10 bg-[#020608]">
+                <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-white/10 bg-abyss">
                   <img
                     src={getAssetUrl(step.image)}
                     alt={step.imageAlt}
                     loading="lazy"
                     className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#04080a] via-transparent to-transparent opacity-80" />
-                  <span className="absolute bottom-3 left-4 font-grotesk text-4xl font-black leading-none text-white/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+                  <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-transparent opacity-80" />
+                  <span className="absolute bottom-3 left-4 font-grotesk text-4xl font-semibold leading-none text-white/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
                     0{index + 1}
                   </span>
                 </div>
 
                 <div className="relative z-10 flex flex-1 flex-col p-5 sm:p-6">
-                  <div className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: step.accent }}>
+                  <div className="eyebrow" style={{ color: step.accent }}>
                     {step.eyebrow}
                   </div>
-                  <h3 className="mt-1.5 font-grotesk text-xl font-black uppercase tracking-wide text-white sm:text-2xl">
+                  <h3 className="mt-1.5 font-grotesk text-xl font-semibold uppercase tracking-wide text-white sm:text-2xl">
                     {step.title}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-gray-300">
+                  <p className="mt-3 text-sm leading-relaxed text-ink-body">
                     {step.description}
                   </p>
                   <ul className="mt-5 space-y-2 border-t border-white/10 pt-4">
                     {step.bullets.map((bullet) => (
-                      <li key={bullet} className="flex items-start gap-2 text-sm text-gray-200">
+                      <li key={bullet} className="flex items-start gap-2 text-sm text-ink">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: step.accent }} />
                         <span>{bullet}</span>
                       </li>
@@ -610,8 +610,8 @@ export const MoltMaxPage: React.FC = () => {
         <section className="relative border-y border-line-subtle bg-abyss py-14 sm:py-20">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-8 lg:px-12">
             <div className="max-w-2xl">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-glow sm:text-xs">What gets measured</div>
-              <h2 className="mt-3 font-grotesk text-3xl font-black uppercase tracking-tight text-ink sm:text-4xl lg:text-5xl">
+              <div className="eyebrow">What gets measured</div>
+              <h2 className="mt-3 font-grotesk text-3xl font-semibold uppercase tracking-tight text-ink sm:text-4xl lg:text-5xl">
                 The five vectors of carcinization
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-ink-body sm:text-base">
@@ -626,19 +626,19 @@ export const MoltMaxPage: React.FC = () => {
 
         {/* Closing call to action */}
         <section className="relative mx-auto max-w-[1440px] px-4 pb-16 pt-14 sm:px-8 sm:pt-20 lg:px-12">
-          <div className="relative overflow-hidden rounded-2xl border border-[#00c3ff]/35 bg-gradient-to-br from-[#06131a] via-[#050c10] to-[#04110f] px-6 py-10 text-center shadow-[0_0_60px_rgba(0,195,255,0.12)] sm:px-12 sm:py-14">
+          <div className="relative overflow-hidden rounded-2xl border border-cyan-glow/35 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-1 px-6 py-10 text-center shadow-[0_0_60px_rgba(0,195,255,0.12)] sm:px-12 sm:py-14">
             <div className="absolute inset-0 bg-sacred-grid opacity-20 pointer-events-none" />
             <div className="relative z-10">
-              <h2 className="font-grotesk text-2xl font-black uppercase tracking-tight text-white sm:text-4xl">
+              <h2 className="font-grotesk text-2xl font-semibold uppercase tracking-tight text-white sm:text-4xl">
                 Ready to measure your shell?
               </h2>
-              <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#b4c4c3] sm:text-base">
+              <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-ink-body sm:text-base">
                 Fifteen questions, about four minutes. No shell is final, so you can always come back and molt again.
               </p>
               <button
                 type="button"
                 onClick={beginAudit}
-                className="group mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-md bg-[#00c3ff] px-8 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_35px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] sm:w-auto cursor-pointer"
+                className="group mt-7 inline-flex min-h-[52px] w-full items-center justify-center gap-3 rounded-md bg-cyan-glow px-8 font-grotesk text-sm font-semibold text-abyss shadow-[0_0_35px_rgba(0,195,255,0.35)] transition-all hover:bg-cyan-glow sm:w-auto cursor-pointer"
               >
                 <span>Start the quiz</span>
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -660,7 +660,7 @@ export const MoltMaxPage: React.FC = () => {
             onBack={handleBack}
             onNext={handleNext}
           />
-          <div className="mx-auto mt-4 max-w-6xl xl:max-w-[1240px] text-center font-sans text-[10px] uppercase tracking-wider text-[#526363]">
+          <div className="eyebrow mx-auto mt-4 max-w-6xl xl:max-w-[1240px] text-center text-[#526363]">
             Your responses are private and calculated locally in your browser.
           </div>
         </main>

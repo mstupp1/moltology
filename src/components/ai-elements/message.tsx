@@ -91,7 +91,7 @@ export const Message: React.FC<MessageProps> = ({
         className={
           isUser
             ? 'sr-only'
-            : 'flex items-center gap-1.5 mb-1.5 text-[11px] text-ink-muted font-bold uppercase tracking-[0.08em]'
+            : 'eyebrow flex items-center gap-1.5 mb-1.5'
         }
       >
         {renderAvatar()}
@@ -123,7 +123,7 @@ export const Message: React.FC<MessageProps> = ({
 }
 
 const ACTION_BUTTON_CLASSES =
-  'inline-flex items-center gap-1 h-7 px-1.5 rounded-control text-[11px] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+  'inline-flex items-center gap-1 h-7 px-1.5 rounded-control text-2xs text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
 export const MessageCopyButton: React.FC<{ text: string }> = ({ text }) => {
   const [copied, setCopied] = useState(false)

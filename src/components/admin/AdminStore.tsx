@@ -81,7 +81,7 @@ export function AdminStore() {
   return (
     <div id="admin-store-settings" className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans scroll-mt-20" data-testid="admin-store-settings">
       <header className="space-y-1 pt-2">
-        <h2 className="font-grotesk text-lg font-bold text-ink">Store settings</h2>
+        <h2 className="font-grotesk text-lg font-semibold text-ink">Store settings</h2>
         <p className="text-xs text-ink-muted">Checkout switches, policies, promo codes, catalog availability and the email queue.</p>
       </header>
       {payload && settings ? (
@@ -111,7 +111,7 @@ export function AdminStore() {
               <label className="space-y-1">
                 <span className={ADMIN_LABEL}>Countries (review before enabling)</span>
                 <input
-                  className={cn(ADMIN_FIELD, 'w-full uppercase')}
+                  className={cn(ADMIN_FIELD, 'w-full')}
                   value={settings.enabledCountries.join(',')}
                   onChange={(e) =>
                     setSettings({ ...settings, enabledCountries: e.target.value.toUpperCase().split(',').map((v) => v.trim()) })

@@ -25,8 +25,9 @@ export type AlignmentTaskAction =
   | { kind: 'one-thing'; hint: string }
   | { kind: 'oracle'; label: string; hint: string; draft: string }
   | { kind: 'close-day'; hint: string }
+  | { kind: 'break'; label: string; hint: string }
 
-export type AlignmentPractice = 'silent' | 'deep-work' | 'reset'
+export type AlignmentPractice = 'silent' | 'deep-work'
 
 /** What each task offers when its row is opened. Tasks without an entry just tick. */
 export const ALIGNMENT_TASK_ACTIONS: Record<string, AlignmentTaskAction> = {
@@ -47,10 +48,9 @@ export const ALIGNMENT_TASK_ACTIONS: Record<string, AlignmentTaskAction> = {
     hint: 'Finish a lesson or pass a quiz and this checks off.',
   },
   'nutritional-efficiency-break': {
-    kind: 'timer',
-    practice: 'reset',
-    label: 'Start a breathing timer',
-    hint: 'Breathe slowly for a minute or two. Starting the timer checks this off.',
+    kind: 'break',
+    label: 'I took a break',
+    hint: 'Step away from the screen for a few minutes.',
   },
   'iterative-refinement': {
     kind: 'timer',

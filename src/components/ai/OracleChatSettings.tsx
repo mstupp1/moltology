@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
 
 type Status = { tone: 'ok' | 'error'; text: string } | null
 
-const sectionTitle = 'font-grotesk text-sm font-bold text-ink'
+const sectionTitle = 'font-grotesk text-sm font-semibold text-ink'
 const sectionHint = 'text-xs text-ink-muted mt-0.5'
 
 /**
@@ -246,7 +246,7 @@ export function OracleSettingsDialog({ open, onClose }: { open: boolean; onClose
         className="relative z-10 flex w-full flex-col bg-surface-1 text-ink shadow-menu pt-[env(safe-area-inset-top,0px)] sm:pt-0 sm:max-w-md sm:max-h-[85vh] sm:rounded-card sm:border sm:border-line"
       >
         <div className="flex shrink-0 items-center gap-2 border-b border-line-subtle px-4 py-3">
-          <h2 id={titleId} className="min-w-0 flex-1 font-grotesk text-base font-bold">Oracle settings</h2>
+          <h2 id={titleId} className="min-w-0 flex-1 font-grotesk text-base font-semibold">Oracle settings</h2>
           <button
             ref={closeRef}
             type="button"

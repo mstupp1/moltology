@@ -1,5 +1,22 @@
 {
-  "key": "images/email/moltology-lockup-dark-17db5c5189eb.png",
-  "width": 220,
-  "height": 215
+  "key": "images/email/moltology-emblem-dark-42ee9efea69b.png",
+  "width": 48,
+  "height": 48,
+  "footerLockup": {
+    "key": "images/email/moltology-lockup-muted-83326434bac1.png",
+    "width": 149,
+    "height": 38
+  },
+  "social": {
+    "youtube": {
+      "key": "images/email/social-youtube-muted-b0c708a7adb6.png",
+      "width": 20,
+      "height": 20
+    },
+    "instagram": {
+      "key": "images/email/social-instagram-muted-b60ebb1f500f.png",
+      "width": 20,
+      "height": 20
+    }
+  }
 }

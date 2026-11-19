@@ -18,7 +18,7 @@ Select this pair with `--only moltology-hat,moltology-desk-mat`; `--pilot` conti
 to select the original approved mug and tee. Production publication is a separate
 authorized release; the current `promote` command is limited to the mug and tee.
 
-The native store (`/store`) is private behind the admin-only `new-store` experiment until **Public
+The native store (`/store`) is admin-only until **Public
 browsing** is on in Store settings and `STORE_PUBLIC_LAUNCH_AUTHORIZED=true` is set. Ordering,
 indexing, live charges and automatic production are each gated separately. While the store is
 private, other visitors keep the Etsy link. Creation and operations use the
@@ -209,7 +209,7 @@ saving a new secret. Keep the listener running throughout checkout. Local CLI fo
 require a dashboard webhook endpoint. For a hosted preview, configure its HTTPS endpoint in Stripe
 test mode and use that endpoint's own signing secret in the preview environment.
 
-Sign in as an admin with `new-store` enabled. Enter delivery details and obtain a current shipping
+Sign in as an admin. Enter delivery details and obtain a current shipping
 quote in the app before continuing to Stripe. Buy either pilot item with Stripe
 test card details and a valid shipping address. For another run, confirm a single unconfirmed order appears in the
 Manual/API store and that its database state is `printful_draft`. Replay the same Stripe event and

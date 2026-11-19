@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAvatarStillSync } from '@/hooks/useAvatarStillSync'
 import { createPortal } from 'react-dom'
-import { ChevronRight, LogOut, Settings, X } from 'lucide-react'
+import { ChevronRight, Coffee, ExternalLink, LogOut, Settings, X } from 'lucide-react'
+import { TIP_JAR_COPY, TIP_JAR_URL } from '@/lib/tip-jar'
 import { usePanelPresence } from '@/hooks/usePanelPresence'
 import { useModalPanelFocus } from '@/hooks/useModalPanelFocus'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
@@ -292,10 +293,10 @@ export function AccountHub({
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className={`font-bold font-grotesk text-ink truncate ${isPhone ? 'text-lg' : 'text-sm'}`}>{displayName}</span>
+          <span className={`font-semibold font-grotesk text-ink truncate ${isPhone ? 'text-lg' : 'text-sm'}`}>{displayName}</span>
           <RankCrest userId={user.id} />
           {effectiveRole === 'admin' && (
-            <span className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
+            <span className="text-2xs font-sans font-semibold px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
               Admin
             </span>
           )}
@@ -305,7 +306,7 @@ export function AccountHub({
           {pendingFriendRequests > 0 && (
             <span
               data-testid="account-hub-requests"
-              className="text-[11px] font-bold px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow tabular-nums"
+              className="text-2xs font-semibold px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow tabular-nums"
             >
               {pendingFriendRequests > 99 ? '99+' : pendingFriendRequests}{' '}
               {pendingFriendRequests === 1 ? 'request' : 'requests'}
@@ -327,7 +328,7 @@ export function AccountHub({
         className={`block w-full text-left hover:bg-surface-3 transition-colors p-3 group focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow`}
       >
         <div className="flex items-baseline justify-between gap-2 text-xs">
-          <span className="font-bold text-ink truncate">
+          <span className="font-semibold text-ink truncate">
             {progress.code} · {progress.shortTitle}
           </span>
           <span className="shrink-0 text-ink-muted tabular-nums">
@@ -344,7 +345,7 @@ export function AccountHub({
             style={{ width: `${alignment.xpReady ? Math.round(progress.ratio * 100) : 0}%` }}
           />
         </div>
-        <div className="flex items-center justify-between gap-2 text-[11px] text-ink-muted">
+        <div className="flex items-center justify-between gap-2 text-2xs text-ink-muted">
           <span className="truncate">
             {progress.next
               ? `${progress.xpToNext.toLocaleString()} XP to ${progress.next.code} · ${progress.next.shortTitle}`
@@ -381,14 +382,34 @@ export function AccountHub({
     </div>
   )
 
+  // Tip jar: a small link beside Sign out on desktop, a plain row above it on phone.
+  const coffeeLink = (
+    <a
+      href={TIP_JAR_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-testid="account-hub-coffee"
+      className={
+        isPhone
+          ? `w-full min-h-12 px-3 rounded-control flex items-center gap-3 text-sm font-semibold text-ink hover:bg-surface-2 transition-colors ${focusRing}`
+          : `min-h-11 mt-2 px-3 rounded-control text-sm font-semibold whitespace-nowrap flex items-center gap-2 text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors ${focusRing}`
+      }
+    >
+      <Coffee className={isPhone ? 'w-5 h-5 text-ink-muted' : 'w-4 h-4'} aria-hidden="true" />
+      <span className={isPhone ? 'flex-1 text-left' : undefined}>{TIP_JAR_COPY.supportCta}</span>
+      <ExternalLink className={isPhone ? 'w-4 h-4 text-ink-muted' : 'w-3 h-3 opacity-70'} aria-hidden="true" />
+    </a>
+  )
+
   // Quiet row at the very end. On phone it signs out on tap only, so a scroll that starts on it cannot.
   const signOutRow = (
-    <div className="pt-1 border-t border-line-subtle">
+    <div className={`pt-1 border-t border-line-subtle ${isPhone ? '' : 'flex items-center justify-between gap-2'}`}>
+      {!isPhone && coffeeLink}
       <button
         {...signOutButtonProps}
         {...(isPhone ? { onPointerDown: undefined } : {})}
         data-testid="account-hub-sign-out"
-        className={`w-full min-h-11 mt-2 px-3 rounded-control text-sm font-semibold flex items-center justify-center gap-2 text-crimson-text hover:bg-crimson-soft transition-colors ${focusRing}`}
+        className={`${isPhone ? 'w-full' : 'whitespace-nowrap'} min-h-11 mt-2 px-3 rounded-control text-sm font-semibold flex items-center justify-center gap-2 text-crimson-text hover:bg-crimson-soft transition-colors ${focusRing}`}
       >
         <LogOut className="w-4 h-4" aria-hidden="true" />
         Sign out
@@ -449,7 +470,7 @@ export function AccountHub({
             key={gain.id}
             aria-hidden="true"
             data-testid="xp-gain"
-            className="xp-gain-float absolute inset-x-0 top-[22%] text-center text-sm font-extrabold tabular-nums text-emerald-300 whitespace-nowrap pointer-events-none [text-shadow:0_1px_2px_rgba(0,0,0,0.9),0_0_8px_rgba(0,0,0,0.8)]"
+            className="xp-gain-float absolute inset-x-0 top-[22%] text-center text-sm font-semibold tabular-nums text-emerald-300 whitespace-nowrap pointer-events-none [text-shadow:0_1px_2px_rgba(0,0,0,0.9),0_0_8px_rgba(0,0,0,0.8)]"
           >
             +{gain.amount}
           </span>
@@ -482,6 +503,7 @@ export function AccountHub({
           {statusCard}
           {tasksList}
           {settingsRow}
+          {coffeeLink}
           {signOutRow}
         </AccountScreen>
       )}
@@ -571,7 +593,7 @@ function AccountScreen({
       >
         {/* Balances the close button so the title stays centred; close sits top right like every other close. */}
         <span aria-hidden className="shrink-0 w-11 h-11" />
-        <h2 className="flex-1 text-center font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">Account</h2>
+        <h2 className="flex-1 text-center font-grotesk text-sm font-semibold text-ink">Account</h2>
         <button
           type="button"
           onClick={onClose}
@@ -597,7 +619,7 @@ function WalletAmount({ icon, value, unit }: { icon: string; value: string | nul
   return (
     <span className="inline-flex items-center gap-1.5 min-w-0" aria-hidden="true">
       <img src={getAssetUrl(icon)} alt="" className="w-4 h-4 object-contain shrink-0" />
-      {value !== null && <span className="font-grotesk font-bold tabular-nums text-ink">{value}</span>}
+      {value !== null && <span className="font-grotesk font-semibold tabular-nums text-ink">{value}</span>}
       <span className="text-ink-muted">{unit}</span>
     </span>
   )
@@ -655,8 +677,8 @@ function StageReachedCard({
           </span>
           <span className="relative w-[104px] h-[104px] rounded-full overflow-hidden">{portrait}</span>
         </div>
-        <div className="mt-5 text-[11px] font-bold tracking-[0.16em] uppercase text-cyan-glow">Stage {stageNum} reached</div>
-        <h2 id="stage-reached-title" className="mt-1.5 text-2xl font-bold font-grotesk text-ink">
+        <div className="eyebrow mt-5">Stage {stageNum} reached</div>
+        <h2 id="stage-reached-title" className="mt-1.5 text-2xl font-semibold font-grotesk text-ink">
           {titleCase(stage.title)}
         </h2>
         {info?.subtitle && <p className="mt-2 text-sm text-ink-body leading-relaxed">{info.subtitle}</p>}
@@ -667,7 +689,7 @@ function StageReachedCard({
             onClose()
             onNavigate(PROGRESS_PATH)
           }}
-          className={`mt-5 min-h-11 px-5 rounded-control bg-cyan-glow text-abyss text-xs font-bold tracking-[0.1em] uppercase hover:bg-cyan-hover transition-colors ${focusRing}`}
+          className={`mt-5 min-h-11 px-5 rounded-control bg-cyan-glow text-abyss text-xs font-semibold hover:bg-cyan-hover transition-colors ${focusRing}`}
         >
           See your progress
         </button>

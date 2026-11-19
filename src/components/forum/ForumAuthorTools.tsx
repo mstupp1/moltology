@@ -28,7 +28,7 @@ export function ForumRevisedMark({
 }) {
   if (!isForumEntryRevised({ createdAt, updatedAt, deletedAt }) || !updatedAt) return null
   return (
-    <span className="text-[11px] text-ink-muted" data-testid="forum-revised-mark">
+    <span className="text-2xs text-ink-muted" data-testid="forum-revised-mark">
       Edited <LocalTime value={updatedAt} format={relativeTime} />
     </span>
   )
@@ -52,7 +52,7 @@ export function ForumAuthorTools({
   if (confirmingWithdraw) {
     return (
       <div
-        className="flex flex-wrap items-center justify-end gap-2 text-[11px]"
+        className="flex flex-wrap items-center justify-end gap-2 text-2xs"
         data-testid="forum-withdraw-confirm"
       >
         <span className="text-ink-muted">
@@ -62,7 +62,7 @@ export function ForumAuthorTools({
           type="button"
           onClick={onCancelWithdraw}
           disabled={busy}
-          className="px-2 py-1 font-bold uppercase tracking-[0.08em] rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className="px-2 py-1 font-semibold rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           Keep it
         </button>
@@ -70,7 +70,7 @@ export function ForumAuthorTools({
           type="button"
           onClick={onConfirmWithdraw}
           disabled={busy}
-          className="px-2 py-1 font-bold uppercase tracking-[0.08em] rounded-control text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className="px-2 py-1 font-semibold rounded-control text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           data-testid="forum-withdraw-confirm-btn"
         >
           {busy ? 'Withdrawing...' : 'Withdraw'}
@@ -85,7 +85,7 @@ export function ForumAuthorTools({
         type="button"
         onClick={onRevise}
         disabled={busy}
-        className="inline-flex items-center gap-1 px-2 min-h-8 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="inline-flex items-center gap-1 px-2 min-h-8 text-2xs font-semibold rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         data-testid="forum-revise"
       >
         <Pencil className="w-3 h-3" />
@@ -95,7 +95,7 @@ export function ForumAuthorTools({
         type="button"
         onClick={onStartWithdraw}
         disabled={busy}
-        className="inline-flex items-center gap-1 px-2 min-h-8 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control text-ink-muted hover:text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="inline-flex items-center gap-1 px-2 min-h-8 text-2xs font-semibold rounded-control text-ink-muted hover:text-crimson-text hover:bg-crimson-soft transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         data-testid="forum-withdraw"
       >
         <Undo2 className="w-3 h-3" />

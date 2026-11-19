@@ -120,7 +120,7 @@ export const MoltNationBannerBg: React.FC = () => {
 
       {/* Dark Vignette Overlay for Center Contrast */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_10%,#030608_85%)]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#030608] via-transparent to-[#030608] opacity-80" />
+      <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-abyss opacity-80" />
     </div>
   )
 }

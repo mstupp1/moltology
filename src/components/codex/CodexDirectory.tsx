@@ -88,7 +88,7 @@ export function CodexDirectory({
         </div>
 
         <div role="group" aria-label="Filter by stage" className="flex items-center gap-1">
-          <span aria-hidden="true" className="mr-1 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+          <span aria-hidden="true" className="eyebrow mr-1">
             Stage
           </span>
           {STAGE_FILTERS.map((value) => {
@@ -101,7 +101,7 @@ export function CodexDirectory({
                 aria-label={value === 'all' ? 'All stages' : `Stage ${value}`}
                 onClick={() => onStageChange(value)}
                 className={cn(
-                  'min-h-8 min-w-8 px-2 rounded-control border text-[11px] font-bold uppercase tracking-[0.08em] tabular-nums transition-colors',
+                  'min-h-8 min-w-8 px-2 rounded-control border text-2xs font-semibold tabular-nums transition-colors',
                   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
                   selected
                     ? 'border-line-strong bg-surface-3 text-ink'
@@ -112,7 +112,7 @@ export function CodexDirectory({
               </button>
             )
           })}
-          <span className="ml-auto pl-2 text-[11px] text-ink-muted tabular-nums whitespace-nowrap" aria-live="polite">
+          <span className="ml-auto pl-2 text-2xs text-ink-muted tabular-nums whitespace-nowrap" aria-live="polite">
             {filtered ? `${scriptures.length} of ${totalCount}` : ''}
           </span>
         </div>
@@ -125,7 +125,7 @@ export function CodexDirectory({
             <button
               type="button"
               onClick={onClearFilters}
-              className="min-h-8 px-3 rounded-control border border-line text-xs font-bold uppercase tracking-[0.08em] text-ink hover:bg-surface-2 hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="min-h-8 px-3 rounded-control border border-line text-xs font-semibold text-ink hover:bg-surface-2 hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Clear filters
             </button>
@@ -140,7 +140,7 @@ export function CodexDirectory({
               return (
                 <li key={s.id}>
                   {showGroup && (
-                    <div className="sticky top-0 z-[1] px-4 pt-3 pb-1.5 bg-surface-1 text-[11px] font-bold uppercase tracking-[0.12em] text-ink-muted">
+                    <div className="sticky top-0 z-[1] px-4 pt-3 pb-1.5 bg-surface-1 text-2xs font-semibold text-ink-muted">
                       {s.volumeName}
                     </div>
                   )}
@@ -165,7 +165,7 @@ export function CodexDirectory({
                     >
                       {s.title}
                     </span>
-                    <span className="shrink-0 text-[11px] text-ink-muted tabular-nums">
+                    <span className="shrink-0 text-2xs text-ink-muted tabular-nums">
                       {hits ? `${hits} ${hits === 1 ? 'match' : 'matches'}` : s.id}
                     </span>
                   </button>
@@ -180,7 +180,7 @@ export function CodexDirectory({
                               onClick={() => onSelectVerse?.(verse.verseNumber)}
                               aria-current={current ? 'location' : undefined}
                               className={cn(
-                                'w-full text-left pl-7 pr-4 py-1.5 min-h-8 text-[13px] leading-snug transition-colors',
+                                'w-full text-left pl-7 pr-4 py-1.5 min-h-8 text-ui leading-snug transition-colors',
                                 'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
                                 current ? 'text-ink font-medium' : 'text-ink-muted hover:text-ink'
                               )}

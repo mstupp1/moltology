@@ -50,12 +50,21 @@ export const DEFAULT_PROMPT_SHORTCUTS: PromptShortcut[] = [
   },
 ]
 
+/** One tab of the "More ideas" list. */
+export interface PromptIdeaGroup {
+  id: string
+  label: string
+  prompts: PromptShortcut[]
+}
+
 export interface NewChatScreenProps {
   isGuest?: boolean
   /** Sends a suggestion straight away. */
   onSubmit: (data: { text: string }) => void
   onOpenAuthModal?: () => void
   shortcuts?: PromptShortcut[]
+  /** Every starter prompt the visitor can use, by group. Empty hides the Suggested · More ideas switch. */
+  moreIdeas?: PromptIdeaGroup[]
   /**
    * The prompt box, rendered under the greeting on wide panels. Leave it out on narrow
    * panels (phones, popout, sidebar), where the panel docks the same box at the bottom.
@@ -75,6 +84,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   onSubmit,
   onOpenAuthModal,
   shortcuts = DEFAULT_PROMPT_SHORTCUTS,
+  moreIdeas = [],
   composer,
   recentChats = [],
   onOpenChat,
@@ -83,9 +93,16 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   className = '',
 }) => {
   const isCentered = Boolean(composer)
-  const showRecents = recentChats.length > 0 && Boolean(onOpenChat)
+  const [view, setView] = React.useState<'suggested' | 'ideas'>('suggested')
+  const [ideaTab, setIdeaTab] = React.useState(0)
+  const ideaGroup = moreIdeas[Math.min(ideaTab, moreIdeas.length - 1)]
+  const showIdeas = view === 'ideas' && Boolean(ideaGroup)
+  // More ideas takes the whole space: recent chats step aside while it shows.
+  const showRecents = !showIdeas && recentChats.length > 0 && Boolean(onOpenChat)
   // Narrow panels trim suggestions while recents show, so the empty screen keeps its height.
   const visibleShortcuts = showRecents && !isCentered ? shortcuts.slice(0, 2) : shortcuts
+  const focus = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+  const fadeIn = 'animate-in fade-in duration-200 motion-reduce:animate-none'
 
   const greeting = (
     <div className={`flex flex-col gap-2 ${isCentered ? 'items-center text-center' : 'items-start'}`}>
@@ -96,10 +113,72 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
     </div>
   )
 
-  const suggestions = visibleShortcuts.length > 0 && (
+  // Two views of the same spot, switched like a segmented control: today's picks, or every idea.
+  const viewSwitch = moreIdeas.length > 0 && (
+    <div
+      role="tablist"
+      aria-label="Prompt views"
+      className={`flex items-center gap-1 text-xs ${isCentered ? 'justify-center' : '-ml-2'}`}
+    >
+      {([['suggested', 'Suggested'], ['ideas', 'More ideas']] as const).map(([id, label], i) => (
+        <React.Fragment key={id}>
+          {i > 0 && <span aria-hidden="true" className="text-ink-muted/60">·</span>}
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === id}
+            onClick={() => setView(id)}
+            className={`rounded-control px-2 py-1 font-semibold transition-colors cursor-pointer ${focus} ${
+              view === id ? 'text-ink' : 'text-ink-muted hover:text-ink'
+            }`}
+          >
+            {label}
+          </button>
+        </React.Fragment>
+      ))}
+    </div>
+  )
+
+  const ideas = showIdeas && ideaGroup && (
+    <section aria-label="More ideas" className={`w-full flex flex-col gap-2 text-left ${fadeIn}`} data-testid="oracle-more-ideas">
+      <div role="tablist" aria-label="Idea groups" className={`flex gap-1 overflow-x-auto no-scrollbar ${isCentered ? 'justify-center' : ''}`}>
+        {moreIdeas.map((g, i) => (
+          <button
+            key={g.id}
+            type="button"
+            role="tab"
+            aria-selected={g.id === ideaGroup.id}
+            onClick={() => setIdeaTab(i)}
+            className={`shrink-0 rounded-chip px-3 py-1 text-xs font-semibold transition-colors cursor-pointer ${focus} ${
+              g.id === ideaGroup.id ? 'bg-cyan-soft text-cyan-glow' : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+            }`}
+          >
+            {g.label}
+          </button>
+        ))}
+      </div>
+      <ul role="tabpanel" aria-label={ideaGroup.label} className="-mx-2 flex flex-col">
+        {ideaGroup.prompts.map((s) => (
+          <li key={s.label}>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => onSubmit({ text: s.prompt })}
+              className={`group w-full flex items-center justify-between gap-2 rounded-control px-2 py-2 text-left text-sm text-ink-body hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${focus}`}
+            >
+              <span className="min-w-0">{s.label}</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-ink-muted group-hover:text-cyan-glow shrink-0 transition-colors" aria-hidden="true" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+
+  const chips = visibleShortcuts.length > 0 && (
     <ul
       aria-label="Suggested questions"
-      className={isCentered ? 'flex flex-wrap justify-center gap-2' : 'flex flex-col gap-1.5 w-full'}
+      className={`${isCentered ? 'flex flex-wrap justify-center gap-2' : 'flex flex-col gap-1.5 w-full'} ${moreIdeas.length > 0 ? fadeIn : ''}`}
     >
       {visibleShortcuts.map((s) => (
         <li key={s.label} className={isCentered ? '' : 'w-full'}>
@@ -107,7 +186,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
             type="button"
             disabled={disabled}
             onClick={() => onSubmit({ text: s.prompt })}
-            className={`group inline-flex items-center gap-1.5 rounded-control border border-line-subtle bg-surface-1/70 hover:bg-surface-2 hover:border-line text-sm text-ink-body hover:text-ink transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+            className={`group inline-flex items-center gap-1.5 rounded-control border border-line-subtle bg-surface-1/70 hover:bg-surface-2 hover:border-line text-sm text-ink-body hover:text-ink transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${focus} ${
               isCentered ? 'px-3 py-1.5' : 'w-full justify-between px-3 py-2.5 text-left'
             }`}
           >
@@ -119,10 +198,26 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
     </ul>
   )
 
+  const body = ideas || chips
+  const suggestions = (viewSwitch || body) && (
+    <div
+      className="w-full flex flex-col gap-2"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && view === 'ideas') {
+          e.stopPropagation()
+          setView('suggested')
+        }
+      }}
+    >
+      {viewSwitch}
+      {body}
+    </div>
+  )
+
   const recents = showRecents && (
     <section aria-labelledby="oracle-recent-chats" className="-mx-2 flex flex-col gap-1 text-left">
       <div className="flex items-center justify-between pl-2 pr-1">
-        <h3 id="oracle-recent-chats" className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+        <h3 id="oracle-recent-chats" className="eyebrow">
           Recent
         </h3>
         {onShowAllChats && (
@@ -162,11 +257,11 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   const guestBanner = isGuest && (
     <div className="p-3 bg-surface-1 hud-sheen border border-line-subtle rounded-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full text-left">
       <div className="space-y-0.5">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-ink">
           <Shield className="w-3.5 h-3.5 text-cyan-glow" />
           <span>You're exploring as a guest</span>
         </div>
-        <p className="text-[11px] text-ink-muted">
+        <p className="text-2xs text-ink-muted">
           Guests get {ORACLE_GUEST_LIMITS.perDay} messages a day, and chats aren't saved. Sign up free for more.
         </p>
       </div>
@@ -177,7 +272,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
           onClick={onOpenAuthModal}
           className="shrink-0 w-full sm:w-auto !py-1 !px-3"
         >
-          <span className="flex items-center justify-center gap-1.5 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
+          <span className="eyebrow flex items-center justify-center gap-1.5">
             <UserPlus className="w-3.5 h-3.5" />
             <span>Sign Up</span>
           </span>

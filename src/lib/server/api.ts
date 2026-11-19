@@ -474,7 +474,8 @@ export const getForumRepliesFn = createServerFn({ method: 'POST' })
   }) =>
     z
       .object({
-        topicId: z.string().uuid(),
+        // Seeded topics use ids such as 20000000-0000-0000-0000-000000000003, which strict uuid() rejects.
+        topicId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
         sort: z.enum(['oldest', 'newest', 'top']).optional(),
         offset: z.number().int().min(0).max(100_000).optional(),
         limit: z.number().int().min(1).max(100).optional(),
@@ -1399,4 +1400,34 @@ export const getRankHonorsFn = createServerFn({ method: 'POST' })
   .handler(async () => {
     const { getRankHonors } = await import('./leaderboard')
     return getRankHonors()
+  })
+
+const oracleCardRefList = z.array(z.string().regex(/^[A-Za-z0-9][A-Za-z0-9-]{0,199}(?:#\d{1,4})?$/)).max(16)
+
+/** Card data for what an Oracle reply read (public content only). */
+export const getOracleCardsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    forum?: string[]
+    news?: string[]
+    changelog?: string[]
+    academy?: string[]
+    codex?: string[]
+    token?: string
+  }) =>
+    z
+      .object({
+        forum: oracleCardRefList.default([]),
+        news: oracleCardRefList.default([]),
+        changelog: oracleCardRefList.default([]),
+        academy: oracleCardRefList.default([]),
+        codex: oracleCardRefList.default([]),
+        token: z.string().optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { getOracleCardsHandler } = await import('./oracle-content-source')
+    const { token, ...refs } = data
+    return getOracleCardsHandler(refs, token)
   })

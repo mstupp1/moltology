@@ -1,5 +1,6 @@
 import { ORACLE_THREAD_ID_HEADER } from './oracle-chat'
 import { ORACLE_SKILL_HEADER } from '../oracle-skills'
+import { decodeReadsHeader, ORACLE_READS_HEADER, type OracleReadItem } from '../oracle-reads'
 import { getAuthJWTToken, jwtAuthHeaders } from '../jwt'
 
 export interface StreamOracleChatParams {
@@ -9,6 +10,8 @@ export interface StreamOracleChatParams {
   model?: string
   /** A skill the member turned on in the chat box. */
   skillId?: string | null
+  /** Path of the page open behind the chat, so "summarize this" can find it. */
+  page?: string | null
   /**
    * Compact JWT for `Authorization: Bearer`. When omitted, mint one with a short
    * timeout. Pass `null` to skip (guest / tests). Same-origin cookies are never
@@ -20,6 +23,8 @@ export interface StreamOracleChatParams {
   onChunk?: (fullText: string) => void
   /** The skill that shaped this reply, as soon as the reply starts. */
   onSkill?: (skillId: string) => void
+  /** What the Oracle looked up on the site before answering. */
+  onReads?: (reads: OracleReadItem[]) => void
 }
 
 export interface StreamOracleChatResult {
@@ -28,6 +33,8 @@ export interface StreamOracleChatResult {
   isGuest?: boolean
   /** The skill that shaped the reply, when one did. */
   skillId?: string | null
+  /** Site content the Oracle read before answering. */
+  reads?: OracleReadItem[]
 }
 
 async function resolveOracleToken(token: string | null | undefined): Promise<string | null> {
@@ -60,6 +67,7 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
       threadId: params.threadId || undefined,
       model: params.model,
       skillId: params.skillId || undefined,
+      page: params.page || undefined,
     }),
   })
 
@@ -95,6 +103,8 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
   }
   const skillId = res.headers.get(ORACLE_SKILL_HEADER)
   if (skillId) params.onSkill?.(skillId)
+  const reads = decodeReadsHeader(res.headers.get(ORACLE_READS_HEADER))
+  if (reads.length) params.onReads?.(reads)
 
   if (!res.body) {
     throw new Error('Empty response from chat server.')
@@ -121,5 +131,6 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
     text: fullText,
     threadId: headerThreadId,
     skillId,
+    reads,
   }
 }

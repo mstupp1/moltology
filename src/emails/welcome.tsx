@@ -44,19 +44,19 @@ export function WelcomeEmail() {
         fontWeight: 600, textAlign: 'center', margin: '0 0 16px' }}>
         {WELCOME_MAIL.heading}
       </Heading>
-      <Text style={{ color: EMAIL_THEME.text, fontSize: '16px', lineHeight: '24px', textAlign: 'center', margin: '0 0 24px' }}>
+      <Text className="molt-email-lead" style={{ color: EMAIL_THEME.text, fontSize: '16px', lineHeight: '24px', textAlign: 'center', margin: '0 0 24px' }}>
         {WELCOME_MAIL.body}
       </Text>
       <ol style={{ color: EMAIL_THEME.text, padding: '0', margin: '0', textAlign: 'left', listStyleType: 'none' }}>
         {WELCOME_MAIL.steps.map((step) => (
-          <li key={step.url} style={{ listStyleType: 'none', marginBottom: '20px', padding: '0' }}>
+          <li key={step.url} className="molt-email-step" style={{ listStyleType: 'none', marginBottom: '20px', padding: '0' }}>
             <Section style={{ border: `1px solid ${EMAIL_THEME.border}`, borderRadius: '8px',
               borderCollapse: 'separate', backgroundColor: '#101a1c' }}>
               <Link href={step.url} style={{ textDecoration: 'none' }}>
                 <Img src={step.imageUrl} alt={step.imageAlt} width={428} height={214}
                   style={{ display: 'block', width: '100%', maxWidth: '428px', height: 'auto', borderRadius: '7px 7px 0 0' }} />
               </Link>
-              <Section style={{ padding: '18px' }}>
+              <Section className="molt-email-card-body" style={{ padding: '18px' }}>
                 <Heading as="h2" style={{ fontSize: '18px', lineHeight: '26px', fontWeight: 600, margin: '0 0 8px' }}>
                   <Link href={step.url} style={{ color: EMAIL_THEME.text, textDecoration: 'none' }}>{step.title}</Link>
                 </Heading>
@@ -66,7 +66,7 @@ export function WelcomeEmail() {
           </li>
         ))}
       </ol>
-      <Section style={{ textAlign: 'center', marginTop: '24px' }}>
+      <Section className="molt-email-cta-wrap" style={{ textAlign: 'center', marginTop: '24px' }}>
         <TransactionalButton href={WELCOME_MAIL.dashboardUrl}>{WELCOME_MAIL.button}</TransactionalButton>
       </Section>
     </TransactionalLayout>

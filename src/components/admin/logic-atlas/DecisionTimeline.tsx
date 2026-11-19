@@ -56,8 +56,8 @@ function DecisionRhythm({
   return (
     <div className="hud-sheen rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4" aria-label="Decisions over time">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Decision rhythm</p>
-        <p className="text-[11px] text-ink-muted">
+        <p className="eyebrow">Decision rhythm</p>
+        <p className="text-2xs text-ink-muted">
           {shortDate(decisions[0].date)} to {shortDate(decisions[decisions.length - 1].date)}
         </p>
       </div>
@@ -132,12 +132,12 @@ function DecisionCard({
         className="flex w-full items-start gap-3 rounded-card px-3.5 py-3 text-left sm:px-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+          <p className="eyebrow">
             {shortDate(decision.date)}
             {decision.status === 'superseded' ? <span className="ml-2 text-amber-400">Superseded</span> : null}
           </p>
-          <h3 className="mt-0.5 font-grotesk text-[15px] font-bold leading-snug text-ink">{decision.title}</h3>
-          <p className="mt-1 text-[13px] leading-snug text-ink-muted">{decision.summary}</p>
+          <h3 className="mt-0.5 font-grotesk text-md font-semibold leading-snug text-ink">{decision.title}</h3>
+          <p className="mt-1 text-ui leading-snug text-ink-muted">{decision.summary}</p>
         </div>
         <ChevronDown
           className={`mt-1 h-4 w-4 shrink-0 text-ink-muted transition-transform ${expanded ? 'rotate-180' : ''}`}
@@ -158,7 +158,7 @@ function DecisionCard({
               href={source.url}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-[30px] items-center gap-1 rounded-control border border-line-subtle px-2 text-[11px] font-semibold text-ink-muted transition-colors hover:border-line-strong hover:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="inline-flex min-h-[30px] items-center gap-1 rounded-control border border-line-subtle px-2 text-2xs font-semibold text-ink-muted transition-colors hover:border-line-strong hover:text-cyan-glow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Icon className="h-3 w-3" />
               {source.label}
@@ -173,14 +173,14 @@ function DecisionCard({
           <div className="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-2">
             {decision.sections.map((section) => (
               <section key={section.heading}>
-                <h4 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">{section.heading}</h4>
+                <h4 className="eyebrow">{section.heading}</h4>
                 <div className="atlas-prose mt-1.5" dangerouslySetInnerHTML={{ __html: section.html }} />
               </section>
             ))}
           </div>
           {decision.rules.length > 0 ? (
             <div className="mt-4">
-              <h4 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">Rules this shaped</h4>
+              <h4 className="eyebrow">Rules this shaped</h4>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {decision.rules.map((id) => {
                   const rule = ruleTitles.get(id)
@@ -190,7 +190,7 @@ function DecisionCard({
                       key={id}
                       type="button"
                       onClick={() => onOpenRule(id)}
-                      className="inline-flex min-h-[30px] items-center gap-1.5 rounded-control border border-line-subtle bg-surface-1 px-2 text-[11px] text-ink-body transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                      className="inline-flex min-h-[30px] items-center gap-1.5 rounded-control border border-line-subtle bg-surface-1 px-2 text-2xs text-ink-body transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     >
                       <span className="h-1.5 w-1.5 rotate-45" style={{ background: colors.get(rule.domain) }} aria-hidden />
                       {rule.title}
@@ -228,10 +228,10 @@ export function DecisionTimeline({ atlas, filter, selectedDecisionId, onSelectDe
             <section key={month.key} className="pb-6 last:pb-0" aria-label={month.label}>
               <h2 className="-ml-5 mb-3 flex items-center gap-2 sm:-ml-6">
                 <span className="-ml-[5px] h-2.5 w-2.5 rounded-chip border border-line bg-surface-1" aria-hidden />
-                <span className="font-grotesk text-xs font-bold uppercase tracking-[0.08em] text-ink-muted">
+                <span className="eyebrow">
                   {month.label}
                 </span>
-                <span className="text-[11px] text-ink-muted">{month.decisions.length}</span>
+                <span className="text-2xs text-ink-muted">{month.decisions.length}</span>
               </h2>
               <div className="space-y-2.5">
                 {month.decisions.map((decision) => (

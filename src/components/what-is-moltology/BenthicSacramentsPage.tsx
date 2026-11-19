@@ -21,34 +21,34 @@ const SacramentChapter: React.FC<{ sacrament: Sacrament; onActive: (id: string) 
       className="relative isolate overflow-hidden min-h-[100svh] flex items-center scroll-mt-[var(--wim-chrome,0px)]"
     >
       <InViewVideo video={sacrament.video} className="absolute inset-0 -z-10 h-full w-full object-cover" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408] via-[#020408]/80 to-[#020408]/20" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#020408] via-transparent to-[#020408]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-abyss via-abyss/80 to-abyss/20" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-abyss via-transparent to-abyss" />
 
       <div className="w-full max-w-6xl mx-auto px-5 sm:px-8 py-24 lg:pl-48">
         <ScrollReveal className="max-w-xl">
           <p
-            className="font-grotesk font-bold text-7xl sm:text-8xl leading-none text-transparent"
+            className="font-grotesk font-semibold text-7xl sm:text-8xl leading-none text-transparent"
             style={{ WebkitTextStroke: `1px ${sacrament.accent}` }}
             aria-hidden="true"
           >
             {sacrament.number}
           </p>
-          <p className="mt-6 font-grotesk text-xs tracking-[0.08em] uppercase" style={{ color: sacrament.accent }}>
+          <p className="eyebrow mt-6" style={{ color: sacrament.accent }}>
             Sacrament {Number(sacrament.number)} of 4
           </p>
-          <h2 id={`${sacrament.id}-title`} className="mt-2 font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-6xl leading-[1.02]">
+          <h2 id={`${sacrament.id}-title`} className="mt-2 font-grotesk font-semibold tracking-tight text-ink text-4xl sm:text-6xl leading-[1.02]">
             {sacrament.title}
           </h2>
           <p className="mt-3 font-grotesk text-xl sm:text-2xl text-ink-body">{sacrament.tagline}</p>
           <p className="mt-6 text-base sm:text-lg text-ink-body leading-relaxed">{sacrament.description}</p>
 
           <div className="mt-8 rounded-card border border-line-subtle bg-surface-1/80 hud-sheen backdrop-blur-md p-6">
-            <p className="font-grotesk text-xs tracking-[0.08em] uppercase text-ink-muted">The rite</p>
+            <p className="eyebrow">The rite</p>
             <ol className="mt-4 space-y-3">
               {sacrament.steps.map((step, index) => (
                 <li key={step} className="flex gap-3 text-sm sm:text-base text-ink-body leading-relaxed">
                   <span
-                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-grotesk font-bold text-xs text-abyss"
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-grotesk font-semibold text-xs text-abyss"
                     style={{ background: sacrament.accent }}
                     aria-hidden="true"
                   >
@@ -129,7 +129,7 @@ export const BenthicSacramentsPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
           <ScrollReveal>
             <Eyebrow className="justify-center">Begin</Eyebrow>
-            <h2 className="mt-4 font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-5xl leading-[1.05]">
+            <h2 className="mt-4 font-grotesk font-semibold tracking-tight text-ink text-4xl sm:text-5xl leading-[1.05]">
               Start with the first one.
             </h2>
             <p className="mt-5 text-base sm:text-lg text-ink-muted leading-relaxed">

@@ -32,17 +32,17 @@ export const GearTooltip: React.FC<GearTooltipProps> = ({ catalog, className = '
   return (
     <div
       className={`
-        font-sans text-left bg-[#070b0b]/95 border-2 ${rarity.border} ${rarity.glow}
-        chamfer-corner shadow-2xl overflow-hidden
+        font-sans text-left bg-abyss/95 border-2 ${rarity.border} ${rarity.glow}
+        rounded-card shadow-2xl overflow-hidden
         ${className}
       `}
       data-testid="gear-tooltip"
     >
       <div className={`px-3 py-2 ${rarity.bar} border-b ${rarity.border}`}>
-        <h3 className={`text-sm sm:text-base font-bold tracking-wide ${rarity.text}`}>
+        <h3 className={`text-sm sm:text-base font-semibold ${rarity.text}`}>
           {catalog.name}
         </h3>
-        <p className="text-[10px] sm:text-xs text-[#839493] uppercase tracking-widest mt-0.5">
+        <p className="eyebrow mt-0.5">
           {RARITY_LABELS[catalog.rarity]} · {CATEGORY_LABELS[catalog.category]}
           {isCosmetic(catalog) ? ' · Cosmetic' : ''}
           {!isCosmetic(catalog) && catalog.visualType && catalog.visualType !== SLOT_DEFAULT_VISUAL[catalog.category]
@@ -61,13 +61,13 @@ export const GearTooltip: React.FC<GearTooltipProps> = ({ catalog, className = '
       )}
 
       {power && (
-        <div className={`mx-3 mb-2 px-2 py-2 border ${rarity.border} ${rarity.bar} chamfer-corner`}>
-          <p className={`text-xs sm:text-sm font-bold tracking-wide ${rarity.text}`}>Item lore · {power.name}</p>
-          <p className="text-[11px] sm:text-xs text-[#dfe3e3] leading-relaxed mt-1">{power.description}</p>
+        <div className={`mx-3 mb-2 px-2 py-2 border ${rarity.border} ${rarity.bar} rounded-control`}>
+          <p className={`text-xs sm:text-sm font-semibold ${rarity.text}`}>Item lore · {power.name}</p>
+          <p className="text-2xs sm:text-xs text-ink leading-relaxed mt-1">{power.description}</p>
         </div>
       )}
 
-      <p className="px-3 pb-3 text-xs sm:text-sm italic text-[#9aa8a7] leading-relaxed">
+      <p className="px-3 pb-3 text-xs sm:text-sm italic text-ink-muted leading-relaxed">
         {catalog.flavorText}
       </p>
     </div>

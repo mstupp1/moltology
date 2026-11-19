@@ -19,15 +19,16 @@ import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { seo } from '@/lib/seo'
-import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
-import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { MAX_PAGE_SIZE, PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
+import { AutoLoadMore } from '@/components/ui/AutoLoadMore'
 import { useAppQuery, useAppQueryClient } from '@/lib/query/account'
 import { FRESH, forumKeys } from '@/lib/query/content'
 import { useForgetForumReads } from '@/hooks/useForgetForumReads'
 
 const TOPIC_PAGE = PAGE_SIZES.forumTopics
 
-type BoardRead = { items: ForumTopicEntry[]; hasMore: boolean; category: ForumCategoryEntry | null }
+/** One board view. After scrolling it holds every page loaded so far, so Back lands on the same spot. */
+type BoardRead = { items: ForumTopicEntry[]; hasMore: boolean; category: ForumCategoryEntry | null; offset?: number }
 
 /** The board list a member is looking at, as a cache key. */
 function boardView(board: string, sortBy: string, query: string, userId: string | null | undefined) {
@@ -97,10 +98,13 @@ function ForumBoardPage() {
   const userId = session.userId
   const queryClient = useAppQueryClient()
   const forgetForumReads = useForgetForumReads()
-  // A revisit paints the member's saved board, not the guest version from the loader.
-  const saved = userId
-    ? queryClient.getQueryData<BoardRead>(forumKeys.topics(boardView(categorySlug, 'hot', '', userId)))
-    : undefined
+  // A revisit paints the saved board (every page scrolled through), not the loader's first page.
+  const savedRaw = queryClient.getQueryData<BoardRead>(forumKeys.topics(boardView(categorySlug, 'hot', '', userId)))
+  // Guests only keep a saved list that still starts with the loader's topics.
+  const saved =
+    userId || (savedRaw && (loader.topics || []).every((t) => savedRaw.items.some((s) => s.id === t.id)))
+      ? savedRaw
+      : undefined
   const [category, setCategory] = useState<ForumCategoryEntry | null>(saved?.category ?? loader.category)
   const [topics, setTopics] = useState<ForumTopicEntry[]>(saved?.items ?? (loader.topics || []))
   const [sortBy, setSortBy] = useState<SortKey>('hot')
@@ -108,7 +112,7 @@ function ForumBoardPage() {
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [hasMore, setHasMore] = useState(saved?.hasMore ?? Boolean(loader.hasMore))
   const [loadingMore, setLoadingMore] = useState(false)
-  const [serverOffset, setServerOffset] = useState(saved?.items.length ?? (loader.topics || []).length)
+  const [serverOffset, setServerOffset] = useState(saved?.offset ?? saved?.items.length ?? (loader.topics || []).length)
   const composerRef = useRef<InlineTopicComposerHandle>(null)
   const staffAccess = useHiddenPageAccess()
   const canStartTopic = !isForumStaffBoard(category?.slug ?? categorySlug) || staffAccess.canView
@@ -127,9 +131,13 @@ function ForumBoardPage() {
   // Guests on the default view already have the loader's topics; everything else asks the
   // server once and keeps the first page for revisits.
   const usesServerList = Boolean(userId) || sortBy !== 'hot' || Boolean(debouncedQuery)
+  const listKey = forumKeys.topics(boardView(categorySlug, sortBy, debouncedQuery, userId))
   const board = useAppQuery<BoardRead>({
-    queryKey: forumKeys.topics(boardView(categorySlug, sortBy, debouncedQuery, userId)),
+    queryKey: listKey,
     queryFn: async () => {
+      // A refresh reloads as many rows as were scrolled through, so the list does not shrink under the reader.
+      const shown = queryClient.getQueryData<BoardRead>(listKey)?.items.length ?? 0
+      const limit = Math.min(Math.max(TOPIC_PAGE, shown), MAX_PAGE_SIZE)
       const token = userId ? await getAuthJWTToken() : null
       const auth = userId ? { userId, token: token ?? undefined } : {}
       const [res, nextCategory] = await Promise.all([
@@ -138,13 +146,13 @@ function ForumBoardPage() {
             categorySlug,
             query: debouncedQuery || undefined,
             sortBy,
-            limit: TOPIC_PAGE + 1,
+            limit: limit + 1,
             ...auth,
           },
         }),
         userId ? getForumCategoryBySlugFn({ data: { slug: categorySlug, ...auth } }) : Promise.resolve(null),
       ])
-      const page = takePage(res || [], TOPIC_PAGE)
+      const page = takePage(res || [], limit)
       if (userId) syncForumVotesFromServer(userId, page.items)
       return { ...page, category: nextCategory }
     },
@@ -155,10 +163,14 @@ function ForumBoardPage() {
 
   useEffect(() => {
     if (!usesServerList) {
+      // Guests keep what they scrolled through until the loader list changes.
+      const first = loader.topics || []
+      const kept = queryClient.getQueryData<BoardRead>(listKey)
+      const keep = kept && kept.items.length > first.length && first.every((t) => kept.items.some((s) => s.id === t.id))
       setCategory(loader.category)
-      setTopics(loader.topics || [])
-      setHasMore(Boolean(loader.hasMore))
-      setServerOffset((loader.topics || []).length)
+      setTopics(keep ? kept.items : first)
+      setHasMore(keep ? kept.hasMore : Boolean(loader.hasMore))
+      setServerOffset(keep ? (kept.offset ?? kept.items.length) : first.length)
       return
     }
     if (board.isError && !board.data) {
@@ -170,11 +182,12 @@ function ForumBoardPage() {
     if (!page) return
     setTopics(page.items)
     setHasMore(page.hasMore)
-    setServerOffset(page.items.length)
+    setServerOffset(page.offset ?? page.items.length)
     setCategory(page.category ?? loader.category)
   }, [usesServerList, board.data, board.isError, loader])
 
   const loadMoreTopics = async () => {
+    if (loadingMore) return
     setLoadingMore(true)
     try {
       const token = userId ? await getAuthJWTToken() : null
@@ -191,12 +204,14 @@ function ForumBoardPage() {
       })
       const page = takePage(res || [], TOPIC_PAGE)
       if (userId) syncForumVotesFromServer(userId, page.items)
-      setTopics((prev) => mergeById(prev, page.items))
+      const merged = mergeById(topics, page.items)
+      const offset = serverOffset + page.items.length
+      setTopics(merged)
       setHasMore(page.hasMore)
-      setServerOffset((n) => n + page.items.length)
-    } catch {
-      // Leave the button so the member can try again.
+      setServerOffset(offset)
+      queryClient.setQueryData<BoardRead>(listKey, { items: merged, hasMore: page.hasMore, offset, category })
     } finally {
+      // A failure reaches AutoLoadMore, which offers "Try again".
       setLoadingMore(false)
     }
   }
@@ -246,7 +261,7 @@ function ForumBoardPage() {
               ) : undefined
             }
           >
-            <div className="flex flex-wrap items-center gap-3 text-[11px] text-ink-muted tabular-nums">
+            <div className="flex flex-wrap items-center gap-3 text-2xs text-ink-muted tabular-nums">
               <span>{formatForumTopicCount(category.topicCount)}</span>
               {typeof category.unreadCount === 'number' && category.unreadCount > 0 ? (
                 <ForumUnreadMark label={formatForumUnreadCount(category.unreadCount)} />
@@ -309,7 +324,7 @@ function ForumBoardPage() {
               ) : topics.length === 0 ? (
                 <div className="p-8 text-center rounded-card border border-line-subtle bg-surface-1 space-y-3" data-testid="forum-empty">
                   <MessageSquare className="w-6 h-6 text-ink-muted mx-auto" aria-hidden="true" />
-                  <p className="text-sm font-bold text-ink">{searchQuery ? 'No posts match' : 'No posts yet'}</p>
+                  <p className="text-sm font-semibold text-ink">{searchQuery ? 'No posts match' : 'No posts yet'}</p>
                   <p className="text-xs text-ink-muted">
                     {searchQuery ? 'Try other words.' : 'Start the first conversation on this board.'}
                   </p>
@@ -328,12 +343,12 @@ function ForumBoardPage() {
                   {topics.map((topic) => (
                     <ForumTopicRow key={topic.id} topic={topic} showCategory={false} />
                   ))}
-                  {hasMore && (
-                    <LoadMoreButton
+                  {hasMore && !loading && (
+                    <AutoLoadMore
                       label="Load more posts"
                       loading={loadingMore}
                       testId="forum-topics-load-more"
-                      onClick={() => void loadMoreTopics()}
+                      onLoad={loadMoreTopics}
                     />
                   )}
                 </div>

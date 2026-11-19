@@ -37,7 +37,7 @@ export const HudSelect = React.forwardRef<HTMLSelectElement, HudSelectProps>(
     return (
       <div className={cn('flex flex-col gap-1.5 font-sans', fullWidth && 'w-full')}>
         {label && (
-          <label htmlFor={selectId} className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+          <label htmlFor={selectId} className="eyebrow">
             {label}
           </label>
         )}

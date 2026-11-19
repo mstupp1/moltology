@@ -5,7 +5,7 @@ import { HudTitleBandTop } from '@/components/hud/HudTitlePanel'
 import { cn } from '@/lib/utils'
 
 const CRUMB =
-  'inline-flex min-h-9 items-center gap-1.5 whitespace-nowrap rounded-control px-2.5 text-[11px] uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow'
+  'inline-flex min-h-9 items-center gap-1.5 whitespace-nowrap rounded-control px-2.5 text-2xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow'
 
 /**
  * Top row of the forum's header band: Forum › Board, in the same quiet style as the
@@ -35,7 +35,7 @@ export function ForumBandCrumbs({
             <li className="flex min-w-0 items-center">
               <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-muted/60" aria-hidden="true" />
               {current ? (
-                <span aria-current="page" className={cn(CRUMB, 'min-w-0 font-bold text-ink')}>
+                <span aria-current="page" className={cn(CRUMB, 'min-w-0 font-semibold text-ink')}>
                   <BoardDot color={board.color} />
                   <span className="truncate">{board.name}</span>
                 </span>
@@ -55,7 +55,7 @@ export function ForumBandCrumbs({
           {page ? (
             <li className="flex min-w-0 items-center">
               <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-muted/60" aria-hidden="true" />
-              <span aria-current="page" className={cn(CRUMB, 'min-w-0 font-bold text-ink')}>
+              <span aria-current="page" className={cn(CRUMB, 'min-w-0 font-semibold text-ink')}>
                 <span className="truncate">{page}</span>
               </span>
             </li>

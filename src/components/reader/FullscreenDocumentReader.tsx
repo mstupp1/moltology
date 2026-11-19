@@ -300,7 +300,7 @@ export function FullscreenDocumentReader({
             <div className="hidden md:flex flex-col min-w-0">
               <span className="text-sm font-garamond font-semibold text-ink truncate">{activeItem?.title}</span>
               {activeItem?.subtitle && (
-                <span className="text-[11px] font-sans text-ink-muted truncate">{activeItem.subtitle}</span>
+                <span className="text-2xs font-sans text-ink-muted truncate">{activeItem.subtitle}</span>
               )}
             </div>
           </div>
@@ -317,7 +317,7 @@ export function FullscreenDocumentReader({
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-1 text-xs font-bold text-ink tabular-nums whitespace-nowrap">
+              <span className="px-1 text-xs font-semibold text-ink tabular-nums whitespace-nowrap">
                 {activeIndex + 1} / {items.length}
               </span>
               <button
@@ -399,7 +399,7 @@ export function FullscreenDocumentReader({
                   return (
                     <li key={item.id}>
                       {showGroup && (
-                        <div className="px-4 pt-3 pb-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink-muted">
+                        <div className="px-4 pt-3 pb-1.5 text-2xs font-semibold text-ink-muted">
                           {item.group}
                         </div>
                       )}
@@ -417,7 +417,7 @@ export function FullscreenDocumentReader({
                       >
                         {isActive && <span aria-hidden="true" className="absolute left-0 inset-y-0 w-[2px] bg-cyan-glow" />}
                         <span className="block font-garamond text-base leading-snug">{item.title}</span>
-                        <span className="block text-[11px] text-ink-muted tabular-nums">{item.id}</span>
+                        <span className="block text-2xs text-ink-muted tabular-nums">{item.id}</span>
                       </button>
                     </li>
                   )
@@ -454,10 +454,10 @@ export function FullscreenDocumentReader({
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="text-center min-w-0">
-            <div className="text-xs font-bold text-ink tabular-nums">
+            <div className="text-xs font-semibold text-ink tabular-nums">
               {activeIndex + 1} of {items.length}
             </div>
-            <div className="text-[11px] text-ink-muted truncate">{mobileHint}</div>
+            <div className="text-2xs text-ink-muted truncate">{mobileHint}</div>
           </div>
           <button
             type="button"

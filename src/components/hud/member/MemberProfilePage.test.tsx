@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemberProfilePage } from './MemberProfilePage'
 
 const mockNavigate = vi.fn()
@@ -24,6 +24,24 @@ const mockGetMemberLoadout = vi.fn()
 vi.mock('@/lib/server/api', () => ({
   getPublicProfileFn: (...args: any[]) => mockGetPublicProfile(...args),
   getMemberLoadoutFn: (...args: any[]) => mockGetMemberLoadout(...args),
+}))
+
+const signedIn = {
+  user: { id: 'viewer-1' },
+  userId: 'viewer-1',
+  isPending: false,
+  isGuest: false,
+  isAuthenticated: true,
+}
+const guest = { user: null, userId: null, isPending: false, isGuest: true, isAuthenticated: false }
+let mockSession: Record<string, unknown> = signedIn
+
+vi.mock('@/hooks/useAuthSession', () => ({
+  useAuthSession: () => mockSession,
+}))
+
+vi.mock('@/components/AuthModal', () => ({
+  AuthModal: () => null,
 }))
 
 vi.mock('./FriendRequestButton', () => ({
@@ -53,6 +71,7 @@ describe('MemberProfilePage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSession = signedIn
     mockGetMemberLoadout.mockResolvedValue({ catalog: [], items: [], totals: {} })
   })
 
@@ -84,6 +103,24 @@ describe('MemberProfilePage', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('premium-badge')).not.toBeInTheDocument()
     })
+  })
+
+  it('shows the dossier to a signed-out visitor with a sign-up prompt instead of friend actions', async () => {
+    mockSession = guest
+    mockGetPublicProfile.mockResolvedValue(claimedProfile)
+
+    render(<MemberProfilePage profileId="member-a" canonicalizePath />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'claw_lord' })).toBeInTheDocument()
+    })
+    expect(mockGetPublicProfile).toHaveBeenCalledWith({ data: expect.objectContaining({ profileId: 'member-a' }) })
+    expect(mockGetMemberLoadout).toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: /sign up to add friend/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Request' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /build your own/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/character' })
   })
 
   it('shows a workspace ghost while the dossier hydrates', () => {

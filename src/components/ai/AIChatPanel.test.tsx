@@ -7,6 +7,17 @@ import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { buildOracleUsageSnapshot } from '@/lib/ai/usage-limits'
 import { authClient } from '@/lib/auth-client'
 
+// Starter chips rotate daily; pin the old fixed set so these tests stay about the panel.
+vi.mock('@/lib/oracle-starter-prompts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/oracle-starter-prompts')>()
+  const fixed = ['what-is-moltology', 'start-moltmaxxing', 'melt-vs-molt', 'top-posts-today']
+  return {
+    ...actual,
+    pickStarterChips: () => fixed.map((id) => actual.STARTER_PROMPTS.find((p) => p.id === id)!),
+  }
+})
+
+
 vi.mock('@/hooks/useOracleUsage', () => ({
   useOracleUsage: vi.fn(() => ({ snapshot: null, unavailable: false, blocked: false, refresh: vi.fn() })),
 }))
@@ -693,7 +704,7 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.getByText('Synaptic Oracle')).toBeInTheDocument()
     expect(screen.getAllByText(/GUEST MODE/i).length).toBeGreaterThan(0)
     expect(screen.getByText(/Guest chats aren't saved/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /SIGN UP FREE/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Sign up free/i })).toBeInTheDocument()
   })
 
   it('does not paint guest chrome while the session is pending', () => {
@@ -702,7 +713,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Sign up free/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
 
@@ -712,7 +723,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're exploring as a guest/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Sign up free/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
 })

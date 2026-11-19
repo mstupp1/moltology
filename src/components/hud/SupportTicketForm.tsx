@@ -50,7 +50,7 @@ export default function SupportTicketForm() {
       <div className="space-y-4" data-testid="support-ticket-guest">
         <div className="bg-surface-2 border border-line-subtle p-6 rounded-card text-center space-y-3">
           <Mail className="w-8 h-8 text-ink-muted mx-auto" aria-hidden="true" />
-          <h3 className="font-grotesk text-sm font-bold text-ink uppercase tracking-wider">
+          <h3 className="font-grotesk text-sm font-semibold text-ink">
             {SUPPORT_TICKET_COPY.guestTitle}
           </h3>
           <p className="text-xs text-ink-muted max-w-md mx-auto leading-relaxed">
@@ -140,7 +140,7 @@ export default function SupportTicketForm() {
         data-testid="support-ticket-success"
       >
         <CheckCircle2 className="w-10 h-10 text-cyan-glow mx-auto" />
-        <h3 className="font-grotesk text-sm font-bold text-ink uppercase">
+        <h3 className="font-grotesk text-sm font-semibold text-ink">
           {SUPPORT_TICKET_COPY.successTitle}
         </h3>
         <p className="text-xs text-ink-muted leading-relaxed max-w-md mx-auto">
@@ -149,7 +149,7 @@ export default function SupportTicketForm() {
             : SUPPORT_TICKET_COPY.successTitle}
         </p>
         {ticketReference ? (
-          <p className="font-grotesk text-xs font-bold text-cyan-glow tracking-wider" data-testid="support-ticket-reference">
+          <p className="font-grotesk text-xs font-semibold text-cyan-glow" data-testid="support-ticket-reference">
             {ticketReference}
           </p>
         ) : null}
@@ -162,7 +162,7 @@ export default function SupportTicketForm() {
       <p className="text-xs text-ink-muted leading-relaxed">{SUPPORT_TICKET_COPY.formHint}</p>
 
       <div className="space-y-2">
-        <label className="text-xs text-ink-muted font-bold block" htmlFor="support-ticket-body">
+        <label className="text-xs text-ink-muted font-semibold block" htmlFor="support-ticket-body">
           {SUPPORT_TICKET_COPY.bodyLabel}
         </label>
         <textarea
@@ -174,11 +174,11 @@ export default function SupportTicketForm() {
           placeholder={SUPPORT_TICKET_COPY.bodyPlaceholder}
           value={body}
           onChange={(event) => setBody(event.target.value)}
-          className={`${fieldClass} resize-y`}
+          className={`${fieldClass} resize-y lg:min-h-[15rem]`}
         />
         <p
           id="support-ticket-counter"
-          className={`text-right text-[11px] tabular-nums ${body.length >= SUPPORT_TICKET_BODY_MAX ? 'text-crimson-text' : 'text-ink-muted'}`}
+          className={`text-right text-2xs tabular-nums ${body.length >= SUPPORT_TICKET_BODY_MAX ? 'text-crimson-text' : 'text-ink-muted'}`}
           data-testid="support-ticket-counter"
         >
           {SUPPORT_TICKET_COPY.counter(body.length, SUPPORT_TICKET_BODY_MAX)}

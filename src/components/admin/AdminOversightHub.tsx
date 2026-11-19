@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, FlaskConical, Search, ShieldCheck } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
@@ -81,27 +80,26 @@ export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
   const flags = telemetry?.pendingFlags ?? null
   return (
     <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans" data-testid="admin-oversight-hub">
-      <div>
-        <AdminSectionNav current={tab} />
-        <HudTitlePanel
-          treatment="band"
-          joined
-          title="Admin"
-          actions={
-            <div className="flex items-end gap-5 sm:gap-6" data-testid="admin-telemetry" aria-label="System status" role="group">
-              <BandStat label="Pending flags" value={flags === null ? '—' : String(flags)} tone={flags ? 'amber' : 'ink'} />
-              <BandStat label="Sessions" value={telemetry ? String(telemetry.activeSessions) : '—'} />
-              <BandStat
-                label="Health"
-                value={telemetryError ? 'Unavailable' : telemetry?.healthy ? 'Healthy' : '—'}
-                tone={telemetryError ? 'amber' : 'cyan'}
-              />
-            </div>
-          }
-        >
-          <AdminToolLinks />
-        </HudTitlePanel>
-      </div>
+      <HudTitlePanel
+        treatment="band"
+        title="Admin"
+        sections={<AdminSectionNav current={tab} />}
+        sectionsBelow
+        actionsBelowOnPhone
+        actions={
+          <div className="flex items-end gap-5 sm:gap-6" data-testid="admin-telemetry" aria-label="System status" role="group">
+            <BandStat label="Pending flags" value={flags === null ? '—' : String(flags)} tone={flags ? 'amber' : 'ink'} />
+            <BandStat label="Sessions" value={telemetry ? String(telemetry.activeSessions) : '—'} />
+            <BandStat
+              label="Health"
+              value={telemetryError ? 'Unavailable' : telemetry?.healthy ? 'Healthy' : '—'}
+              tone={telemetryError ? 'amber' : 'cyan'}
+            />
+          </div>
+        }
+      >
+        <AdminToolLinks />
+      </HudTitlePanel>
       {telemetryError ? (
         <p className="text-xs text-amber-400" data-testid="admin-telemetry-error">
           {telemetryError}
@@ -132,11 +130,10 @@ const TOOLS = [
 
 /** Pages outside the admin tabs, as a quiet link row under the title. */
 function AdminToolLinks() {
-  const premiumAccess = useHiddenPageAccess('premium')
   return (
     <nav aria-label="Admin tools" data-testid="admin-sectors" className="pt-1">
       <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        {TOOLS.filter((tool) => tool.to !== '/max' || (!premiumAccess.pending && premiumAccess.canView)).map((tool) => (
+        {TOOLS.map((tool) => (
           <li key={tool.to}>
             <Link
               to={tool.to}
@@ -283,10 +280,10 @@ function MemberDirectory({
                 className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 py-2.5 md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-x-6"
               >
                 <div className="min-w-0">
-                  <p className="flex items-center gap-2 text-sm font-bold text-ink">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-ink">
                     <span className="truncate">{name}</span>
                     {member.role === 'admin' ? (
-                      <span className="shrink-0 rounded-chip bg-amber-500/15 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-amber-400">
+                      <span className="shrink-0 rounded-chip bg-amber-500/15 px-1.5 py-0.5 text-2xs font-semibold text-amber-400">
                         Admin
                       </span>
                     ) : null}
@@ -410,7 +407,7 @@ function PurchaseLedger({ userId }: { userId: string | null }) {
         <ul className="divide-y divide-line-subtle border-y border-line-subtle" data-testid="admin-purchase-list">
           {rows.map((row) => (
             <li key={row.id} className="space-y-0.5 py-2.5">
-              <p className="text-sm font-bold text-ink">{memberName(row.handle, row.larvaId)}</p>
+              <p className="text-sm font-semibold text-ink">{memberName(row.handle, row.larvaId)}</p>
               <p className="text-xs text-ink-muted">{row.email ?? 'No email'}</p>
               <p className="text-xs text-ink-body">
                 {row.isPremium ? 'Oracle MAX active' : 'Oracle MAX inactive'}
@@ -498,7 +495,7 @@ function ExperimentSwitches({ userId }: { userId: string | null }) {
           {rows.map((row) => (
             <li key={row.id} className="flex items-start justify-between gap-4 py-3">
               <div className="space-y-1">
-                <p className="text-sm font-bold text-ink">{row.title}</p>
+                <p className="text-sm font-semibold text-ink">{row.title}</p>
                 <p className="text-xs text-ink-muted">{row.description}</p>
               </div>
               <AdminSwitch

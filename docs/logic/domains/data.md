@@ -6,13 +6,17 @@ color: '#c9d36a'
 summary: The app runs inside Neon Free and Vercel Hobby limits. Retention windows, polling rules, and the asset budget keep it there.
 rules:
   - id: data.member-share-previews
-    title: Public profile link previews
+    title: Public member profiles and link previews
     kind: permission
-    statement: Link-preview crawlers can resolve a member's public handle or larva unit without signing in. Preview lookups exclude auth names, email, bio, stats, and inventory. The dossier and friend requests still require sign-in. Missing members or failed lookups use generic metadata rather than treating an account id as a public name.
+    statement: Anyone can open a member profile without signing in. It shows name, stage, avatar, join date, Moltmax rating, bio, traits, bonds, and equipped gear, never auth names, email, settings, or unequipped inventory. Friend requests and member search still require sign-in. Link previews show only the name and portrait, with generic metadata for missing members.
     anchors:
       - file: src/lib/server/member-share-data.ts
         symbol: getMemberShareIdentity
-    tests: [src/lib/server/member-share-data.test.ts, src/routes/_hud/member/-share.test.ts]
+      - file: src/lib/server/db-services.ts
+        symbol: getPublicProfileHandler
+      - file: src/lib/server/db-services.ts
+        symbol: getMemberLoadoutHandler
+    tests: [src/lib/server/member-share-data.test.ts, src/routes/_hud/member/-share.test.ts, src/lib/server/member-dossier.test.ts, src/components/hud/member/MemberProfilePage.test.tsx]
   - id: data.neon-compute-budget
     title: Let Neon compute sleep
     kind: invariant

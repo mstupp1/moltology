@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowDown, ArrowUpRight, Check, LockKeyhole } from "lucide-react";
+import { ArrowUpRight, Check } from "lucide-react";
 import { useHiddenPageAccess } from "@/hooks/useHiddenPageAccess";
-import { getAssetUrl } from "@/lib/assets";
 import {
   ORACLE_FREE_LIMITS,
+  ORACLE_GUEST_LIMITS,
   ORACLE_PREMIUM_LIMITS,
+  PREMIUM_LIMIT_MULTIPLIER,
 } from "@/lib/ai/usage-limits";
 import { HudTitlePanel } from "@/components/hud/HudTitlePanel";
 import { HudButton } from "@/components/ui/HudButton";
@@ -24,6 +25,53 @@ import {
   getPremiumOfferFn,
   setPremiumAccessFn,
 } from "@/lib/server/premium-api";
+
+/** Splits "$5.99 per month" into the amount and its billing period. */
+export function splitPriceLabel(label: string | null): {
+  amount: string;
+  period: string | null;
+} | null {
+  if (!label) return null;
+  const at = label.indexOf(" per ");
+  if (at < 0) return { amount: label, period: null };
+  return { amount: label.slice(0, at), period: label.slice(at + 1) };
+}
+
+const linkButtonClass =
+  "inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-control border border-line-subtle bg-surface-2/70 px-4 text-ui font-medium text-ink transition-colors hover:border-line hover:bg-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow";
+
+function PlanFeatures({
+  lead,
+  items,
+}: {
+  lead?: string;
+  items: string[];
+}) {
+  return (
+    <div className="border-t border-line-subtle pt-4">
+      {lead ? <p className="mb-3 text-ui font-medium text-ink">{lead}</p> : null}
+      <ul className="space-y-2.5">
+        {items.map((item) => (
+          <li key={item} className="flex items-start gap-2.5 text-sm text-ink-body">
+            <Check
+              className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted"
+              aria-hidden="true"
+            />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function CurrentPlanBadge() {
+  return (
+    <span className="rounded-chip bg-cyan-soft px-1.5 py-0.5 text-2xs font-semibold text-cyan-glow">
+      Your plan
+    </span>
+  );
+}
 
 export function PremiumOfferPanel({
   offer,
@@ -44,137 +92,229 @@ export function PremiumOfferPanel({
   onActivate: () => void;
   onCancel: () => void;
 }) {
-  const rows = [
+  const fmt = (n: number) => n.toLocaleString("en-US");
+  const rows: Array<[string, string, string]> = [
+    ["Model", "Oracle Lite", "Oracle MAX"],
     [
       "Messages per 5 hours",
-      String(ORACLE_FREE_LIMITS.perFiveHours),
-      String(ORACLE_PREMIUM_LIMITS.perFiveHours),
+      fmt(ORACLE_FREE_LIMITS.perFiveHours),
+      fmt(ORACLE_PREMIUM_LIMITS.perFiveHours),
     ],
     [
       "Messages per 7 days",
-      String(ORACLE_FREE_LIMITS.perWeek),
-      ORACLE_PREMIUM_LIMITS.perWeek.toLocaleString("en-US"),
+      fmt(ORACLE_FREE_LIMITS.perWeek),
+      fmt(ORACLE_PREMIUM_LIMITS.perWeek),
+    ],
+    [
+      "Messages per minute",
+      fmt(ORACLE_FREE_LIMITS.perMinute),
+      fmt(ORACLE_PREMIUM_LIMITS.perMinute),
     ],
   ];
+  const price = splitPriceLabel(offer.priceLabel);
+  const onMax = !preview && offer.isPremium;
+  const onLite = !preview && !offer.isPremium;
+
   return (
     <div
       data-testid="premium-page"
-      className="oracle-max-page space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative"
+      className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative"
     >
-      <section className="oracle-max-hero relative isolate overflow-hidden rounded-card border border-line-subtle bg-abyss">
-        <img
-          className="oracle-max-art absolute inset-0 h-full w-full object-cover"
-          src={getAssetUrl("images/oracle/oracle-max-synaptic-core-v1.png")}
-          alt="The Synaptic Core: precision titanium rings surrounding a luminous cyan nucleus in the deep ocean"
-          fetchPriority="high"
-        />
-        <div className="oracle-max-shade absolute inset-0" aria-hidden="true" />
-        <HudTitlePanel
-          treatment="hero"
-          className="oracle-max-title relative z-10 rounded-none border-0 bg-transparent p-6 sm:p-10 lg:p-12"
-          title={
-            <>
-              Oracle <span className="text-cyan-glow">MAX</span>
-            </>
-          }
-          eyebrow="Oracle membership"
-          description="Deeper reasoning. More room to think."
+      <HudTitlePanel
+        treatment="band"
+        title="Oracle MAX"
+        description={`Our advanced model for complex questions, with ${PREMIUM_LIMIT_MULTIPLIER}× the free message allowance.`}
+      />
+
+      {!preview &&
+      (checkout ||
+        offer.configMessage ||
+        (offer.hasPurchasedPremium && !offer.isPremium)) ? (
+        <div
+          role="status"
+          className="space-y-1 rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 text-sm"
         >
-          <p className="oracle-max-intro text-sm text-ink-body leading-relaxed">
-            Meet Oracle MAX, our advanced model for complex questions. Get 10×
-            the free message allowance to keep the conversation going.
-          </p>
-          <a
-            href="#oracle-max-compare"
-            className="oracle-max-compare-link inline-flex min-h-11 items-center gap-3 rounded-control text-sm font-medium text-cyan-glow hover:text-cyan-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow transition-colors"
-          >
-            Compare the models{" "}
-            <ArrowDown className="w-4 h-4" aria-hidden="true" />
-          </a>
-        </HudTitlePanel>
-      </section>
+          {checkout === "success" && (
+            <p data-testid="premium-checkout-success" className="text-ink">
+              {PREMIUM_PAGE_COPY.checkoutSuccess}
+            </p>
+          )}
+          {checkout === "cancel" && (
+            <p data-testid="premium-checkout-cancel" className="text-ink">
+              {PREMIUM_PAGE_COPY.checkoutCancel}
+            </p>
+          )}
+          {offer.hasPurchasedPremium && !offer.isPremium && (
+            <p className="text-ink-muted">{premiumStatusMessage(offer)}</p>
+          )}
+          {offer.configMessage && (
+            <p
+              data-testid="premium-config-message"
+              className="text-crimson-text"
+            >
+              {offer.configMessage}
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      <div className="grid items-stretch gap-3 sm:gap-4 lg:gap-5 md:grid-cols-2">
+        <section
+          aria-labelledby="oracle-plan-lite"
+          className="flex flex-col gap-5 rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 lg:p-6"
+        >
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <h2
+                id="oracle-plan-lite"
+                className="font-grotesk text-lg font-semibold text-ink"
+              >
+                Oracle Lite
+              </h2>
+              {onLite && <CurrentPlanBadge />}
+            </div>
+            <p className="text-sm text-ink-muted">For everyday guidance</p>
+          </div>
+          <div className="flex min-h-14 items-baseline gap-2">
+            <span className="font-grotesk text-2xl font-semibold tracking-tight text-ink">
+              Free
+            </span>
+            <span className="text-sm text-ink-muted">with an account</span>
+          </div>
+          <Link to="/oracle" className={linkButtonClass}>
+            {preview ? "Try Oracle Lite" : "Open the Oracle"}
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+          <PlanFeatures
+            items={[
+              "Help with a routine, a distraction, or your next small step",
+              `${fmt(ORACLE_FREE_LIMITS.perFiveHours)} messages every 5 hours`,
+              `${fmt(ORACLE_FREE_LIMITS.perWeek)} messages every 7 days`,
+            ]}
+          />
+        </section>
+
+        <section
+          aria-labelledby="oracle-plan-max"
+          className="flex flex-col gap-5 rounded-card border border-line-strong bg-surface-1 p-4 sm:p-5 lg:p-6"
+        >
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <h2
+                id="oracle-plan-max"
+                className="font-grotesk text-lg font-semibold text-ink"
+              >
+                Oracle MAX
+              </h2>
+              {onMax && <CurrentPlanBadge />}
+            </div>
+            <p className="text-sm text-ink-muted">
+              For complex questions and bigger plans
+            </p>
+          </div>
+          <div className="flex min-h-14 flex-col justify-center">
+            {preview ? (
+              <>
+                <span className="font-grotesk text-2xl font-semibold tracking-tight text-ink">
+                  Coming soon
+                </span>
+                <span className="text-sm text-ink-muted">
+                  Sign-ups aren't open yet.
+                </span>
+              </>
+            ) : price ? (
+              <div className="flex items-baseline gap-2">
+                <span className="font-grotesk text-2xl font-semibold tracking-tight text-ink">
+                  {price.amount}
+                </span>
+                {price.period && (
+                  <span className="text-sm text-ink-muted">{price.period}</span>
+                )}
+              </div>
+            ) : (
+              <span className="text-sm text-ink-muted">
+                {PREMIUM_PAGE_COPY.pricePending}
+              </span>
+            )}
+          </div>
+          {preview ? (
+            <HudButton type="button" variant="secondary" fullWidth disabled>
+              Not open yet
+            </HudButton>
+          ) : offer.isPremium ? (
+            <HudButton
+              type="button"
+              variant="secondary"
+              fullWidth
+              onClick={onManage}
+              disabled={!offer.canManage || busy !== null}
+            >
+              {busy === "portal"
+                ? "Opening membership"
+                : PREMIUM_PAGE_COPY.manage}
+            </HudButton>
+          ) : (
+            <HudButton
+              type="button"
+              fullWidth
+              onClick={onSubscribe}
+              disabled={!offer.configured || busy !== null}
+            >
+              {busy === "checkout"
+                ? "Starting checkout"
+                : PREMIUM_PAGE_COPY.subscribe}
+            </HudButton>
+          )}
+          <PlanFeatures
+            lead="Everything in Lite, plus:"
+            items={[
+              "Our advanced model for careful reasoning and plans with more moving parts",
+              `${fmt(ORACLE_PREMIUM_LIMITS.perFiveHours)} messages every 5 hours`,
+              `${fmt(ORACLE_PREMIUM_LIMITS.perWeek)} messages every 7 days`,
+            ]}
+          />
+        </section>
+      </div>
 
       <section
         id="oracle-max-compare"
-        className="oracle-max-comparison scroll-mt-6 rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-8 lg:p-10"
+        aria-labelledby="oracle-max-compare-title"
+        className="rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 lg:p-6"
       >
-        <div className="oracle-max-comparison-header flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
-          <div>
-            <p className="text-xs text-cyan-glow mb-2">
-              Model access and usage
-            </p>
-            <h2 className="text-xl sm:text-2xl font-grotesk font-bold text-ink">
-              Compare your options.
-            </h2>
-          </div>
-          <p className="text-xs text-ink-muted max-w-xs">
-            The free allowance starts when you sign in. Guests can try a few
-            messages a day.
-          </p>
-        </div>
-        <div className="oracle-max-models grid sm:grid-cols-2 gap-6 sm:gap-10 mb-7">
-          <div className="border-t border-line-subtle pt-5 pb-1">
-            <p className="text-xs text-ink-muted mb-2">
-              Included with your free account
-            </p>
-            <h3 className="text-xl font-grotesk font-bold text-ink">
-              Oracle Lite
-            </h3>
-            <p className="mt-2 text-sm text-ink-body">
-              Everyday guidance for a routine, a distraction, or your next small
-              step.
-            </p>
-          </div>
-          <div className="border-t border-cyan-glow pt-5 pb-1">
-            <p className="text-xs text-cyan-glow mb-2">
-              Included with Oracle MAX
-            </p>
-            <h3 className="text-xl font-grotesk font-bold text-ink">
-              Oracle MAX
-            </h3>
-            <p className="mt-2 text-sm text-ink-body">
-              Our advanced model for complex questions, careful reasoning, and
-              plans with more moving parts.
-            </p>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
+        <h2
+          id="oracle-max-compare-title"
+          className="font-grotesk text-lg font-semibold text-ink"
+        >
+          Compare plans
+        </h2>
+        <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <caption className="sr-only">
-              Free and Oracle MAX model access and rolling message allowances
+              Oracle Lite and Oracle MAX model access and message allowances
             </caption>
             <thead>
               <tr className="border-b border-line-subtle">
-                <th
-                  scope="col"
-                  className="w-2/5 py-3 font-medium text-ink-muted"
-                >
-                  Included
+                <th scope="col" className="w-2/5 py-3 font-medium text-ink-muted">
+                  Models and usage
                 </th>
-                <th
-                  scope="col"
-                  className="w-[30%] py-3 px-3 text-right font-medium text-ink"
-                >
-                  Free
+                <th scope="col" className="w-[30%] px-3 py-3 text-right font-medium text-ink">
+                  Lite
                 </th>
-                <th
-                  scope="col"
-                  className="w-[30%] py-3 pl-3 text-right font-medium text-cyan-glow"
-                >
-                  Oracle MAX
+                <th scope="col" className="w-[30%] py-3 pl-3 text-right font-medium text-ink">
+                  MAX
                 </th>
               </tr>
             </thead>
             <tbody>
-              {rows.map(([label, free, max]) => (
-                <tr key={label} className="border-b border-line-subtle">
-                  <th scope="row" className="py-4 font-normal text-ink-body">
+              {rows.map(([label, lite, max]) => (
+                <tr key={label} className="border-b border-line-subtle last:border-b-0">
+                  <th scope="row" className="py-3 font-normal text-ink-body">
                     {label}
                   </th>
-                  <td className="py-4 px-3 text-right tabular-nums text-ink-body">
-                    {free}
+                  <td className="px-3 py-3 text-right tabular-nums text-ink-body">
+                    {lite}
                   </td>
-                  <td className="py-4 pl-3 text-right tabular-nums text-ink font-semibold">
+                  <td className="py-3 pl-3 text-right font-medium tabular-nums text-ink">
                     {max}
                   </td>
                 </tr>
@@ -182,128 +322,66 @@ export function PremiumOfferPanel({
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-xs text-ink-muted">
-          Both rolling limits apply across all your conversations. Messages
-          return as earlier messages age out. Short-term sending limits also
-          apply.
-        </p>
+        <ul className="mt-4 space-y-1.5 border-t border-line-subtle pt-4 text-xs text-ink-muted">
+          <li>
+            Limits roll across all your conversations. Messages come back as
+            earlier ones age out.
+          </li>
+          <li>
+            Guests can try {ORACLE_GUEST_LIMITS.perDay} messages a day before
+            signing in.
+          </li>
+          <li>
+            Oracle MAX does not change your rank, clearance, stage, or forum
+            authority. Signup stays free.
+          </li>
+        </ul>
       </section>
 
-      <section className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-8 lg:p-10 space-y-4">
-        <div className="flex items-start gap-3">
-          <span className="text-cyan-glow pt-1">
-            {preview ? (
-              <LockKeyhole size={20} aria-hidden="true" />
-            ) : (
-              <Check size={20} aria-hidden="true" />
-            )}
-          </span>
-          <div>
-            <h2 className="font-grotesk text-xl font-bold text-ink">
-              {preview
-                ? "Oracle MAX is in early access."
-                : "Your Oracle MAX membership"}
-            </h2>
-            <p className="text-sm text-ink-muted mt-2">
-              {preview
-                ? "Explore the models now. Subscriptions are not open to everyone yet."
-                : premiumStatusMessage(offer)}
-            </p>
-          </div>
-        </div>
-        {preview ? (
-          <Link
-            to="/oracle"
-            className="inline-flex items-center gap-2 min-h-11 text-sm text-cyan-glow hover:text-cyan-bright transition-colors"
-          >
-            Try Oracle Lite{" "}
-            <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-          </Link>
-        ) : (
-          <>
-            {checkout === "success" && (
-              <p
-                data-testid="premium-checkout-success"
-                className="text-sm text-ink"
-              >
-                {PREMIUM_PAGE_COPY.checkoutSuccess}
-              </p>
-            )}
-            {checkout === "cancel" && (
-              <p
-                data-testid="premium-checkout-cancel"
-                className="text-sm text-ink"
-              >
-                {PREMIUM_PAGE_COPY.checkoutCancel}
-              </p>
-            )}
-            <p className="text-sm text-ink">
-              {offer.priceLabel ?? PREMIUM_PAGE_COPY.pricePending}
-            </p>
-            {offer.configMessage && (
-              <p
-                data-testid="premium-config-message"
-                className="text-sm text-crimson-text"
-              >
-                {offer.configMessage}
-              </p>
-            )}
-            <div className="flex flex-wrap gap-2">
-              {!offer.isPremium && (
-                <HudButton
-                  type="button"
-                  onClick={onSubscribe}
-                  disabled={!offer.configured || busy !== null}
-                >
-                  {busy === "checkout"
-                    ? "Starting checkout"
-                    : PREMIUM_PAGE_COPY.subscribe}
-                </HudButton>
-              )}
-              {!offer.isPremium ? (
-                <HudButton
-                  type="button"
-                  variant="dark"
-                  onClick={onActivate}
-                  disabled={busy !== null}
-                >
-                  {busy === "grant" ? "Activating" : PREMIUM_PAGE_COPY.activate}
-                </HudButton>
-              ) : (
-                <HudButton
-                  type="button"
-                  variant="danger"
-                  onClick={onCancel}
-                  disabled={busy !== null}
-                >
-                  {busy === "cancel" ? "Canceling" : PREMIUM_PAGE_COPY.cancel}
-                </HudButton>
-              )}
-              {offer.canManage && (
-                <HudButton
-                  type="button"
-                  variant="ghost"
-                  onClick={onManage}
-                  disabled={busy !== null}
-                >
-                  {busy === "portal"
-                    ? "Opening membership"
-                    : PREMIUM_PAGE_COPY.manage}
-                </HudButton>
-              )}
-            </div>
-            {!offer.isPremium && (
-              <p className="text-xs text-ink-muted">
-                {PREMIUM_PAGE_COPY.activateHint}
-              </p>
-            )}
-          </>
-        )}
-        <p className="text-xs text-ink-muted border-t border-line-subtle pt-4">
-          Oracle MAX does not change your rank, clearance, stage, or forum
-          authority. Signup stays free.
-        </p>
-      </section>
+      {!preview && (
+        <section
+          aria-label="Membership tools"
+          className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4"
+        >
+          <p className="mr-auto text-xs text-ink-muted">
+            {offer.isPremium
+              ? PREMIUM_PAGE_COPY.active
+              : `Admin testing. ${PREMIUM_PAGE_COPY.activateHint}`}
+          </p>
+          {!offer.isPremium && offer.canManage && (
+            <HudButton
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onManage}
+              disabled={busy !== null}
+            >
+              {busy === "portal" ? "Opening membership" : PREMIUM_PAGE_COPY.manage}
+            </HudButton>
+          )}
+          {offer.isPremium ? (
+            <HudButton
+              type="button"
+              variant="danger"
+              size="sm"
+              onClick={onCancel}
+              disabled={busy !== null}
+            >
+              {busy === "cancel" ? "Canceling" : PREMIUM_PAGE_COPY.cancel}
+            </HudButton>
+          ) : (
+            <HudButton
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={onActivate}
+              disabled={busy !== null}
+            >
+              {busy === "grant" ? "Activating" : PREMIUM_PAGE_COPY.activate}
+            </HudButton>
+          )}
+        </section>
+      )}
     </div>
   );
 }

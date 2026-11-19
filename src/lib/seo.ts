@@ -417,7 +417,9 @@ export interface SitemapUrlEntry {
 
 export function generateSitemapXml(
   posts: ArticleSeoData[] = [],
-  baseUrl = 'https://moltology.org'
+  baseUrl = 'https://moltology.org',
+  /** More public pages, such as forum boards and topics. */
+  extraEntries: SitemapUrlEntry[] = [],
 ): string {
   const staticRoutes: SitemapUrlEntry[] = [
     { loc: `${baseUrl}/`, priority: 1.0, changefreq: 'daily' },
@@ -446,7 +448,7 @@ export function generateSitemapXml(
     priority: 0.8,
   }))
 
-  const allEntries = [...staticRoutes, ...postRoutes]
+  const allEntries = [...staticRoutes, ...postRoutes, ...extraEntries]
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

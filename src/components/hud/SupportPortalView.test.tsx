@@ -46,6 +46,20 @@ describe('SupportPortalView chrome', () => {
     expect(screen.queryByRole('link', { name: /buy us a coffee/i })).not.toBeInTheDocument()
   })
 
+  it('lists the three latest updates beside the form', () => {
+    const entry = (n: number) => ({
+      version: `1.0.${n}`, title: `Update ${n}`, summary: 's', content: 'c', category: 'Feature',
+      tags: [], releasedAt: `2026-11-0${n}T12:00:00Z`, slug: `u-${n}`,
+    })
+    render(<SupportPortalView loaderData={{ changelogs: [entry(1), entry(4), entry(2), entry(3)] }} />)
+
+    expect(screen.getByText('Update 4')).toBeInTheDocument()
+    expect(screen.getByText('Update 2')).toBeInTheDocument()
+    expect(screen.queryByText('Update 1')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /all updates/i }))
+    expect(screen.getByRole('tab', { name: new RegExp(SUPPORT_PAGE_COPY.tabChangelog, 'i') })).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('switches between contact and changelog without lore', () => {
     renderPortal()
 

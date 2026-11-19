@@ -44,7 +44,7 @@ export function DesignationField({
       />
       <p
         id={`${id}-hint`}
-        className={`text-[11px] font-sans leading-snug ${
+        className={`text-2xs font-sans leading-snug ${
           value && parsed && !parsed.ok ? 'text-crimson-text' : 'text-ink-muted'
         }`}
       >

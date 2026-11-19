@@ -498,6 +498,8 @@ export const getAIMessagesHandler = async ({ data, context }: ServerFnArgs<GetAI
       userId: m.userId,
       role: m.role,
       content: m.content,
+      // Skill labels and read cards live in parts; without them a reloaded reply loses both.
+      parts: m.parts ?? null,
       createdAt: m.createdAt,
     }))
   } catch (err) {
@@ -1302,6 +1304,8 @@ export interface GetForumTopicsInput {
   userId?: string
   /** Neon Auth JWT so vote state can hydrate for the current initiate. */
   token?: string
+  /** Only these topics (the Oracle's reply cards). Order is up to the caller. */
+  slugs?: string[]
 }
 
 /**
@@ -1357,6 +1361,10 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
     if (query && query.trim() !== '') {
       const q = `%${escapeLikePattern(query.trim())}%`
       conditions.push(or(ilike(forumTopics.title, q), ilike(forumTopics.content, q)))
+    }
+    if (data?.slugs) {
+      if (!data.slugs.length) return []
+      conditions.push(inArray(forumTopics.slug, data.slugs))
     }
 
     let finalQuery = queryBuilder
@@ -4538,25 +4546,25 @@ export const getPublicProfileHandler = async ({
   data,
   context,
 }: ServerFnArgs<{ profileId: string; token?: string; userId?: string }>): Promise<PublicProfileView | null> => {
-  const auth = await resolveWriteAuth({ data, context })
-  if (!auth) throw new Error('Unauthenticated: Authentication required to view member profiles.')
+  // Dossiers are public (docs/logic data.member-share-previews). A signed-in
+  // viewer only adds their friend relationship to the result.
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
   if (!data?.profileId) throw new Error('Missing profile id.')
+  const dbClient: Db = auth?.dbClient ?? context?.db ?? getDb()
 
-  const profile = await findMemberProfileByRouteKey(auth.dbClient, data.profileId)
+  const profile = await findMemberProfileByRouteKey(dbClient, data.profileId)
 
   if (!profile) return null
 
-  const [stats] = await auth.dbClient
+  const [stats] = await dbClient
     .select()
     .from(userStats)
     .where(eq(userStats.userId, profile.id))
     .limit(1)
 
-  const { relationship, pendingRequestId } = await resolveRelationship(
-    auth.dbClient,
-    auth.userId,
-    profile.id
-  )
+  const { relationship, pendingRequestId } = auth
+    ? await resolveRelationship(dbClient, auth.userId, profile.id)
+    : { relationship: 'none' as const, pendingRequestId: null }
 
   const displayName = resolveMemberPublicName({
     userId: profile.id,
@@ -4566,7 +4574,7 @@ export const getPublicProfileHandler = async ({
 
   let referredBy: PublicProfileView['referredBy'] = null
   if (profile.referredByUserId) {
-    const [sponsor] = await auth.dbClient
+    const [sponsor] = await dbClient
       .select({
         id: profiles.id,
         handle: profiles.handle,
@@ -4593,7 +4601,7 @@ export const getPublicProfileHandler = async ({
     referredBy?.displayName || profile.simulatedPersona?.referredByHandle
   )
 
-  const bondRows = await auth.dbClient
+  const bondRows = await dbClient
     .select({
       fromUserId: memberBonds.fromUserId,
       toUserId: memberBonds.toUserId,
@@ -4608,7 +4616,7 @@ export const getPublicProfileHandler = async ({
   )]
   const counterpartRows =
     counterpartIds.length > 0
-      ? await auth.dbClient
+      ? await dbClient
           .select({
             id: profiles.id,
             handle: profiles.handle,
@@ -4676,14 +4684,14 @@ export const getMemberLoadoutHandler = async ({
   data,
   context,
 }: ServerFnArgs<{ profileId: string; token?: string; userId?: string }>) => {
-  const auth = await resolveWriteAuth({ data, context })
-  if (!auth) throw new Error('Unauthenticated: Authentication required to view member loadouts.')
+  // Equipped gear is part of the public dossier; the rest of the inventory stays private.
   if (!data?.profileId) throw new Error('Missing profile id.')
+  const dbClient: Db = context?.db ?? getDb()
 
-  const exists = await findMemberProfileByRouteKey(auth.dbClient, data.profileId)
+  const exists = await findMemberProfileByRouteKey(dbClient, data.profileId)
   if (!exists) throw new Error('Member profile not found.')
 
-  return loadMemberEquippedLoadout(auth.dbClient, exists.id)
+  return loadMemberEquippedLoadout(dbClient, exists.id)
 }
 
 

@@ -7,7 +7,7 @@ import { PAGE_ART } from './story/page-art'
 import { useScrollVar } from './story/motion'
 import { Eyebrow, PrimaryCta, SecondaryCta, StoryHero, StoryImg } from './story/StoryPrimitives'
 
-const sectionTitle = 'font-grotesk font-bold tracking-tight text-ink text-4xl sm:text-5xl leading-[1.05]'
+const sectionTitle = 'font-grotesk font-semibold tracking-tight text-ink text-4xl sm:text-5xl leading-[1.05]'
 
 const TruthBand: React.FC<{ truth: (typeof THREE_TRUTHS)[number]; index: number }> = ({ truth, index }) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -25,7 +25,7 @@ const TruthBand: React.FC<{ truth: (typeof THREE_TRUTHS)[number]; index: number 
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <span
-          className="absolute left-6 bottom-4 font-grotesk font-bold text-[7rem] sm:text-[9rem] leading-none text-transparent"
+          className="absolute left-6 bottom-4 font-grotesk font-semibold text-[7rem] sm:text-[9rem] leading-none text-transparent"
           style={{ WebkitTextStroke: '1px rgba(255,255,255,0.55)' }}
           aria-hidden="true"
         >
@@ -33,8 +33,8 @@ const TruthBand: React.FC<{ truth: (typeof THREE_TRUTHS)[number]; index: number 
         </span>
       </div>
       <ScrollReveal animation={flipped ? 'slide-left' : 'slide-right'}>
-        <p className="font-grotesk text-xs tracking-[0.08em] uppercase text-cyan-glow">Truth {index + 1} of 3</p>
-        <h3 className="mt-3 font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-4xl leading-[1.1]">
+        <p className="eyebrow">Truth {index + 1} of 3</p>
+        <h3 className="mt-3 font-grotesk font-semibold tracking-tight text-ink text-3xl sm:text-4xl leading-[1.1]">
           {truth.title}
         </h3>
         <p className="mt-5 text-base sm:text-lg text-ink-body leading-relaxed">{truth.body}</p>
@@ -92,7 +92,7 @@ export const BeliefsAndCodesPage: React.FC = () => {
 
           <ol className="relative mt-16 grid gap-10 lg:grid-cols-4 lg:gap-6">
             <span
-              className="absolute left-[7px] top-2 bottom-2 w-px lg:left-0 lg:right-0 lg:top-[7px] lg:bottom-auto lg:h-px lg:w-auto bg-gradient-to-b lg:bg-gradient-to-r from-[#ffd36e] via-[#00c3ff] to-[#3b1f8f]"
+              className="absolute left-[7px] top-2 bottom-2 w-px lg:left-0 lg:right-0 lg:top-[7px] lg:bottom-auto lg:h-px lg:w-auto bg-gradient-to-b lg:bg-gradient-to-r from-[#ffd36e] via-cyan-glow to-[#3b1f8f]"
               aria-hidden="true"
             />
             {DAILY_PRACTICES.map((practice, index) => (
@@ -102,8 +102,8 @@ export const BeliefsAndCodesPage: React.FC = () => {
                   aria-hidden="true"
                 />
                 <ScrollReveal delayMs={index * 100}>
-                  <p className="font-grotesk text-xs tracking-[0.08em] uppercase text-[#00ffcc]">{practice.time}</p>
-                  <h3 className="mt-2 font-grotesk font-bold text-xl text-ink">{practice.title}</h3>
+                  <p className="eyebrow">{practice.time}</p>
+                  <h3 className="mt-2 font-grotesk font-semibold text-xl text-ink">{practice.title}</h3>
                   <p className="mt-3 text-sm text-ink-muted leading-relaxed">{practice.body}</p>
                 </ScrollReveal>
               </li>
@@ -139,12 +139,12 @@ export const BeliefsAndCodesPage: React.FC = () => {
                 <article
                   className={`h-full rounded-card border p-6 sm:p-7 transition-colors ${
                     index === 1
-                      ? 'border-[#00ffcc]/35 bg-gradient-to-br from-[#00ffcc]/10 to-transparent'
+                      ? 'border-cyan-glow/35 bg-gradient-to-br from-cyan-glow/10 to-transparent'
                       : 'border-line-subtle bg-surface-1 hud-sheen hover:border-line-strong'
                   }`}
                 >
-                  <p className="font-grotesk font-bold text-sm text-ink-muted">0{index + 1}</p>
-                  <h3 className="mt-3 font-grotesk font-bold text-xl text-ink">{code.title}</h3>
+                  <p className="font-grotesk font-semibold text-sm text-ink-muted">0{index + 1}</p>
+                  <h3 className="mt-3 font-grotesk font-semibold text-xl text-ink">{code.title}</h3>
                   <p className="mt-3 text-sm text-ink-body leading-relaxed">{code.body}</p>
                 </article>
               </ScrollReveal>
@@ -157,8 +157,8 @@ export const BeliefsAndCodesPage: React.FC = () => {
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div className="relative isolate overflow-hidden rounded-panel border border-line-subtle px-6 py-14 sm:px-14 sm:py-20">
             <StoryImg image={PAGE_ART.firstRite} className="absolute inset-0 -z-10 h-full w-full object-cover object-right md:object-center opacity-70" />
-            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#020408] via-[#020408]/80 to-transparent" />
-            <h2 className="max-w-xl font-grotesk font-bold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.05]">
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-abyss via-abyss/80 to-transparent" />
+            <h2 className="max-w-xl font-grotesk font-semibold tracking-tight text-ink text-3xl sm:text-5xl leading-[1.05]">
               Belief is easier with a first rite.
             </h2>
             <p className="mt-4 max-w-lg text-base sm:text-lg text-ink-body">

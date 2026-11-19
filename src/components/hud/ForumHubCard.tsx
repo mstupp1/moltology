@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils'
 import { useAppQuery } from '@/lib/query/account'
 import { FRESH, forumKeys } from '@/lib/query/content'
 
-export const FORUM_HUB_TITLE = 'COMMUNITY'
+export const FORUM_HUB_TITLE = 'Community'
 export const FORUM_HUB_CTA = 'Open boards'
 export const FORUM_HUB_EMPTY_COPY = {
   title: 'The boards are quiet',
@@ -182,7 +182,7 @@ export function ForumHubCard() {
                   to="/forum/$categorySlug"
                   params={{ categorySlug: board.slug }}
                   className={cn(
-                    'inline-flex items-center gap-1.5 min-h-8 px-2.5 text-xs font-bold text-ink rounded-control border border-line-subtle shrink-0 bg-surface-1 hover:bg-surface-3 hover:border-line transition-colors',
+                    'inline-flex items-center gap-1.5 min-h-8 px-2.5 text-xs font-semibold text-ink rounded-control border border-line-subtle shrink-0 bg-surface-1 hover:bg-surface-3 hover:border-line transition-colors',
                     DASHBOARD_FOCUS,
                   )}
                 >
@@ -256,13 +256,13 @@ function HubThreadRow({ thread }: { thread: ForumHubThreadView }) {
           {thread.isPinned && (
             <Pin className="w-3 h-3 shrink-0 text-crimson-text" aria-label="Pinned" role="img" />
           )}
-          <h3 className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
+          <h3 className="text-sm font-semibold text-ink group-hover:text-cyan-glow transition-colors truncate leading-snug">
             {thread.title}
           </h3>
         </Link>
         {thread.preview ? <p className="text-xs text-ink-muted truncate leading-relaxed">{thread.preview}</p> : null}
-        <div className="flex items-center gap-x-2 text-[11px] text-ink-muted min-w-0">
-          <span className="inline-flex items-center gap-1 min-w-0 font-bold" style={{ color: thread.categoryColor }}>
+        <div className="flex items-center gap-x-2 text-2xs text-ink-muted min-w-0">
+          <span className="inline-flex items-center gap-1 min-w-0 font-semibold" style={{ color: thread.categoryColor }}>
             <span className="truncate">{thread.categoryName}</span>
           </span>
           <span aria-hidden="true">·</span>

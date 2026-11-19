@@ -13,13 +13,13 @@ export function PremiumBanner({ hasPurchasedPremium }: { hasPurchasedPremium: bo
       <div className="flex items-start gap-3">
         <Sparkles className="w-4 h-4 text-cyan-glow mt-0.5 shrink-0" aria-hidden="true" />
         <div className="space-y-1">
-          <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">{copy.title}</h2>
+          <h2 className="font-grotesk text-sm font-semibold text-ink">{copy.title}</h2>
           <p className="text-xs text-ink-body leading-relaxed">{copy.body}</p>
         </div>
       </div>
       <a
         href="/max"
-        className="inline-flex min-h-[38px] items-center justify-center rounded-control border border-line bg-surface-1 hud-sheen px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        className="inline-flex min-h-[38px] items-center justify-center rounded-control border border-line bg-surface-1 hud-sheen px-4 py-2 text-xs font-semibold text-ink hover:bg-surface-2 hover:border-line-strong transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
       >
         {copy.action}
       </a>

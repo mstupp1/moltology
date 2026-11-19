@@ -19,8 +19,8 @@ export interface HudTabsProps<T extends string = string> {
 }
 
 /**
- * Section tabs for the top row of a header band (`HudTitleBandTop`), matching `BandSectionNav`:
- * plain labels, the current one in full ink, no underline. Use this when the sections are
+ * Section tabs for a header band (`HudTitlePanel` `sections`), matching `BandSectionNav`:
+ * the current one is a lit tile, no underline. Use this when the sections are
  * in-page state; use `BandSectionNav` when each section has its own URL.
  * Arrow keys move between tabs; Home and End jump to the ends.
  */
@@ -74,10 +74,12 @@ export function HudTabs<T extends string = string>({
             onClick={() => onValueChange(item.value)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(
-              'inline-flex min-h-9 items-center whitespace-nowrap rounded-control px-2.5 text-[11px] uppercase tracking-[0.08em] transition-colors',
+              'inline-flex min-h-9 items-center whitespace-nowrap rounded-control px-2.5 text-ui font-medium transition-colors',
               'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
               'disabled:cursor-not-allowed disabled:opacity-50',
-              selected ? 'font-bold text-ink' : 'font-semibold text-ink-muted hover:text-ink'
+              selected
+                ? 'bg-surface-3 shadow-nav-current text-ink'
+                : 'text-ink-muted hover:text-ink hover:bg-surface-3/60'
             )}
           >
             {item.label}

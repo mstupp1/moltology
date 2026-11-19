@@ -290,7 +290,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           {collapsed ? (
             <>
               {icon}
-              <span className={`text-[11px] font-sans font-bold leading-none tabular-nums ${countReady ? countTone : 'text-ink-muted'}`}>
+              <span className={`text-2xs font-sans font-semibold leading-none tabular-nums ${countReady ? countTone : 'text-ink-muted'}`}>
                 {countReady ? liturgyCountText : '–'}
               </span>
             </>
@@ -298,17 +298,17 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             <>
               {icon}
               <span className="flex flex-col min-w-0 flex-1 leading-tight">
-                <span className="text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase text-ink-body group-hover/align:text-ink">
+                <span className="text-xs md:text-ui font-sans font-medium text-ink-body group-hover/align:text-ink">
                   Daily alignment
                 </span>
                 {countReady && !allTasksCompleted && nextTask?.title && (
-                  <span data-testid="header-next" className="text-[11px] font-sans text-ink-muted truncate mt-0.5">
+                  <span data-testid="header-next" className="text-2xs font-sans text-ink-muted truncate mt-0.5">
                     Next: {nextTask.title}
                   </span>
                 )}
               </span>
               {countReady ? (
-                <span className={`shrink-0 text-xs font-bold tabular-nums ${countTone}`}>
+                <span className={`shrink-0 text-xs font-semibold tabular-nums ${countTone}`}>
                   {allTasksCompleted ? 'Done' : liturgyCountText}
                 </span>
               ) : (
@@ -401,21 +401,21 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       <div className="flex flex-wrap items-center justify-between border-b border-line-subtle pb-3 gap-2">
         <div className="flex items-center space-x-2">
           <Clock className="w-4 h-4 text-cyan-glow animate-pulse" />
-          <span className="font-grotesk text-xs sm:text-sm font-bold tracking-[0.08em] text-ink uppercase">
+          <span className="eyebrow sm:text-sm">
             BENTHIC CHRONOMETER
           </span>
-          <span className="text-[11px] text-ink-muted hidden xs:inline">• {label}</span>
+          <span className="text-2xs text-ink-muted hidden xs:inline">• {label}</span>
         </div>
 
         {/* Timezone Switcher Tabs & Resync */}
-        <div className="flex items-center space-x-1 sm:space-x-1.5 text-[11px]">
+        <div className="flex items-center space-x-1 sm:space-x-1.5 text-2xs">
           {(['LOCAL', 'UTC', 'BENTHIC', 'STARDATE'] as TimezoneMode[]).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
               className={`px-2 py-0.5 rounded-control font-sans font-semibold border border-line transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                 mode === m
-                  ? 'bg-surface-2 text-ink font-bold shadow-[inset_0_-2px_0_theme(colors.cyan.glow)]'
+                  ? 'bg-surface-2 text-ink font-semibold shadow-[inset_0_-2px_0_theme(colors.cyan.glow)]'
                   : 'bg-surface-1 text-ink-muted hover:text-ink hover:bg-surface-2'
               }`}
             >
@@ -426,7 +426,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           {/* 12H / 24H Toggle */}
           <button
             onClick={() => setIs24Hour(!is24Hour)}
-            className="px-1.5 py-0.5 rounded-control bg-surface-1 text-ink-muted hover:text-ink hover:bg-surface-2 border border-line font-sans font-semibold text-[11px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className="px-1.5 py-0.5 rounded-control bg-surface-1 text-ink-muted hover:text-ink hover:bg-surface-2 border border-line font-sans font-semibold text-2xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             title="Toggle 12h/24h format"
           >
             {is24Hour ? '24H' : '12H'}
@@ -449,10 +449,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         <div className="flex items-baseline space-x-1 sm:space-x-2 select-none">
           {/* Hours */}
           <div className="flex flex-col items-center">
-            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-cyan-glow">
+            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-cyan-glow">
               {hours}
             </span>
-            <span className="text-[11px] text-ink-muted font-sans">HOURS</span>
+            <span className="text-2xs text-ink-muted font-sans">HOURS</span>
           </div>
 
           {/* Colon Separator (Blinking) */}
@@ -462,10 +462,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
           {/* Minutes */}
           <div className="flex flex-col items-center">
-            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-cyan-glow">
+            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-cyan-glow">
               {minutes}
             </span>
-            <span className="text-[11px] text-ink-muted font-sans">MINUTES</span>
+            <span className="text-2xs text-ink-muted font-sans">Minutes</span>
           </div>
 
           {/* Colon Separator */}
@@ -475,24 +475,24 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
           {/* Seconds */}
           <div className="flex flex-col items-center">
-            <span className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-cyan-glow">
+            <span className="font-mono text-3xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-cyan-glow">
               {seconds}
             </span>
-            <span className="text-[11px] text-ink-muted font-sans">SECONDS</span>
+            <span className="text-2xs text-ink-muted font-sans">Seconds</span>
           </div>
 
           {/* Milliseconds (Tactical Hud Accent) */}
           <div className="flex flex-col items-center hidden sm:flex">
-            <span className="font-mono text-lg sm:text-2xl font-bold text-crimson-text">
+            <span className="font-mono text-lg sm:text-2xl font-semibold text-crimson-text">
               .{millis}
             </span>
-            <span className="text-[11px] text-ink-muted font-sans">MS</span>
+            <span className="text-2xs text-ink-muted font-sans">MS</span>
           </div>
 
           {/* AM/PM or Mode Badge */}
           {ampm && (
             <div className="self-start ml-1 mt-1">
-              <span className="font-mono text-xs sm:text-sm font-bold text-amber-400 bg-amber-500/15 border border-amber-500/40 px-1.5 py-0.5 rounded-chip">
+              <span className="font-mono text-xs sm:text-sm font-semibold text-amber-400 bg-amber-500/15 border border-amber-500/40 px-1.5 py-0.5 rounded-chip">
                 {ampm}
               </span>
             </div>
@@ -521,7 +521,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs text-ink-muted">
                 <Sparkles className="w-3.5 h-3.5 text-crimson-text animate-pulse" />
-                <span className="font-bold text-cyan-glow uppercase tracking-[0.08em]">
+                <span className="font-semibold text-cyan-glow">
                   NEXT UPCOMING ALIGNMENT TASK
                 </span>
               </div>
@@ -531,19 +531,19 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             </div>
 
             {allTasksCompleted ? (
-              <div className="text-xs sm:text-sm font-bold text-emerald-400 flex items-center gap-2 pt-1">
+              <div className="text-xs sm:text-sm font-semibold text-emerald-400 flex items-center gap-2 pt-1">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>ALL DAILY ALIGNMENT LITURGIES VERIFIED FOR TODAY!</span>
               </div>
             ) : (
               <div className="flex items-baseline gap-2 flex-wrap pt-0.5">
-                <span className="text-xs sm:text-sm font-bold text-crimson-text font-sans">
+                <span className="text-xs sm:text-sm font-semibold text-crimson-text font-sans">
                   [{nextTask.time}]
                 </span>
-                <span className="text-xs sm:text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors truncate">
+                <span className="text-xs sm:text-sm font-semibold text-ink group-hover:text-cyan-glow transition-colors truncate">
                   {nextTask.title}
                 </span>
-                <span className="text-[11px] text-ink-muted underline decoration-dotted">
+                <span className="text-2xs text-ink-muted underline decoration-dotted">
                   (Click to view full day schedule)
                 </span>
               </div>
@@ -557,10 +557,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 e.stopPropagation()
                 handleToggleTask(nextTask.id)
               }}
-              className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-cyan-glow hover:bg-cyan-hover hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.45)] text-abyss font-bold text-xs uppercase tracking-[0.08em] rounded-control transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-cyan-glow hover:bg-cyan-hover text-abyss font-semibold text-xs rounded-control transition-all active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>COMPLETE ALIGNMENT</span>
+              <span>Complete alignment</span>
             </button>
           )}
         </div>
@@ -572,9 +572,9 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
             <div className="flex items-center justify-between text-xs text-ink-muted font-sans px-1">
               <div className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-cyan-glow" />
-                <span className="font-bold text-ink uppercase">FULL DAY LITURGY SCHEDULE</span>
+                <span className="font-semibold text-ink">Full day liturgy schedule</span>
               </div>
-              <div className="text-[11px] text-cyan-glow font-sans">
+              <div className="text-2xs text-cyan-glow font-sans">
                 {countReady ? (
                   `${completedCount} of ${localTasks.length} COMPLETED`
                 ) : (
@@ -629,11 +629,11 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                         )}
                       </button>
 
-                      <span className={`text-xs font-sans font-bold ${isNext ? 'text-crimson-text' : 'text-ink-muted'}`}>
+                      <span className={`text-xs font-sans font-semibold ${isNext ? 'text-crimson-text' : 'text-ink-muted'}`}>
                         [{t.time}]
                       </span>
 
-                      <span className={`text-xs font-sans font-bold truncate ${
+                      <span className={`text-xs font-sans font-semibold truncate ${
                         t.completed ? 'line-through text-ink-muted' : 'text-ink'
                       }`}>
                         {t.title}
@@ -641,7 +641,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[11px] font-bold text-cyan-glow bg-cyan-soft border border-line-subtle px-1.5 py-0.5 rounded-chip font-sans">
+                      <span className="text-2xs font-semibold text-cyan-glow bg-cyan-soft border border-line-subtle px-1.5 py-0.5 rounded-chip font-sans">
                         {t.completed ? 'COMPLETE' : 'PENDING'}
                       </span>
                     </div>
@@ -687,7 +687,7 @@ function AlignmentRing({ done, total, label, complete }: { done: number; total: 
       {label ? (
         <span
           data-testid="header-count"
-          className={`relative text-[11px] font-bold leading-none tabular-nums ${complete ? 'text-emerald-500' : 'text-ink'}`}
+          className={`relative text-2xs font-semibold leading-none tabular-nums ${complete ? 'text-emerald-500' : 'text-ink'}`}
         >
           {label}
         </span>

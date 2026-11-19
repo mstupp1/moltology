@@ -30,7 +30,7 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { relativeTime, buildForumPostTree, type ForumReplySort } from '@/lib/forum-utils'
 import { mergeById } from '@/lib/pagination'
-import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
+import { AutoLoadMore } from '@/components/ui/AutoLoadMore'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useAppQueryClient } from '@/lib/query/account'
 import { FRESH, forumKeys } from '@/lib/query/content'
@@ -224,9 +224,12 @@ function ForumThreadPage() {
   const topic = detail?.topic
   const nextReplyOffset = detail?.nextReplyOffset ?? null
 
-  /** Loads the next page of replies, or (on a sort change while partial) the first page in the new order. */
+  /**
+   * Loads the next page of replies, or (on a sort change while partial) the first page
+   * in the new order. A failed next page rejects so the scroll loader can offer "Try again".
+   */
   const loadReplies = async (sort: ForumReplySort, offset: number) => {
-    if (!detail) return
+    if (!detail || repliesLoading) return
     setRepliesLoading(true)
     try {
       const token = userId ? await getAuthJWTToken() : null
@@ -248,12 +251,29 @@ function ForumThreadPage() {
             }
           : current,
       )
-    } catch {
-      toast?.toast.error('Could not load more replies. Try again.')
+    } catch (err) {
+      if (offset > 0) throw err
+      toast?.toast.error('Could not load replies. Try again.')
     } finally {
       setRepliesLoading(false)
     }
   }
+
+  // A shared link to a reply further down keeps loading pages until that reply is on screen.
+  const [linkedPostId] = useState(() =>
+    typeof window !== 'undefined' && window.location.hash.startsWith('#post-') ? window.location.hash.slice(6) : null,
+  )
+  const linkedFoundRef = useRef(false)
+  useEffect(() => {
+    if (!linkedPostId || linkedFoundRef.current || repliesLoading) return
+    if (posts.some((p) => p.id === linkedPostId)) {
+      linkedFoundRef.current = true
+      requestAnimationFrame(() => document.getElementById(`post-${linkedPostId}`)?.scrollIntoView({ block: 'center' }))
+      return
+    }
+    if (nextReplyOffset !== null) void loadReplies(replySort, nextReplyOffset).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkedPostId, posts, nextReplyOffset, repliesLoading])
 
   const changeReplySort = (sort: ForumReplySort) => {
     if (sort === replySort) return
@@ -272,11 +292,11 @@ function ForumThreadPage() {
     return (
       <ForumShell>
         <div className="max-w-2xl mx-auto w-full py-16 text-center font-sans space-y-3">
-          <h1 className="font-grotesk font-bold text-xl text-ink">Post not found</h1>
+          <h1 className="font-grotesk font-semibold text-xl text-ink">Post not found</h1>
           <p className="text-xs text-ink-muted">This post does not exist or was removed.</p>
           <Link
             to="/forum"
-            className="inline-flex min-h-8 items-center gap-2 px-3 text-[11px] font-bold uppercase tracking-[0.08em] rounded-control border border-line bg-surface-2 text-ink hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className="inline-flex min-h-8 items-center gap-2 px-3 text-2xs font-semibold rounded-control border border-line bg-surface-2 text-ink hover:bg-surface-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Back to the forum
@@ -481,16 +501,16 @@ function ForumThreadPage() {
                       <Link
                         to="/member/$profileId"
                         params={authorParams}
-                        className="text-ink font-bold text-sm sm:text-base truncate hover:text-cyan-glow transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                        className="text-ink font-semibold text-sm sm:text-base truncate hover:text-cyan-glow transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                       >
                         {topic.authorName}
                       </Link>
                     ) : (
-                      <span className="text-ink font-bold text-sm sm:text-base truncate">{topic.authorName}</span>
+                      <span className="text-ink font-semibold text-sm sm:text-base truncate">{topic.authorName}</span>
                     )}
                     <StageBadge stage={topic.authorStage} />
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-1.5 text-[11px] text-ink-muted">
+                  <div className="flex flex-wrap items-center gap-x-1.5 text-2xs text-ink-muted">
                     {handle ? <span className="hidden sm:inline truncate">@{handle}</span> : null}
                     {handle ? <span className="hidden sm:inline" aria-hidden="true">·</span> : null}
                     <LocalTime value={topic.createdAt} format={relativeTime} titleFormat={formatDayTime} />
@@ -514,7 +534,7 @@ function ForumThreadPage() {
                       <span>{topicError}</span>
                     </div>
                   )}
-                  <p className="text-[11px] text-ink-muted">{topicTitleDraft.trim().length} / {FORUM_TITLE_MAX_CHARS} title characters</p>
+                  <p className="text-2xs text-ink-muted">{topicTitleDraft.trim().length} / {FORUM_TITLE_MAX_CHARS} title characters</p>
                   <input
                     maxLength={FORUM_TITLE_MAX_CHARS}
                     type="text"
@@ -556,7 +576,7 @@ function ForumThreadPage() {
                   </div>
                 </form>
               ) : (
-                <ForumPostBody content={topic.content} className="space-y-2.5 text-sm sm:text-[15px] text-ink-body leading-relaxed" />
+                <ForumPostBody content={topic.content} className="space-y-2.5 text-sm sm:text-md text-ink-body leading-relaxed" />
               )}
 
               <div className="-ml-2 flex flex-wrap items-center gap-1">
@@ -573,7 +593,7 @@ function ForumThreadPage() {
                   <button
                     type="button"
                     onClick={handleQuoteTopic}
-                    className="inline-flex min-h-8 items-center gap-1.5 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                    className="inline-flex min-h-8 items-center gap-1.5 px-2 text-2xs font-semibold text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                     data-testid="forum-quote-topic"
                   >
                     <Quote className="w-3.5 h-3.5" />
@@ -620,7 +640,7 @@ function ForumThreadPage() {
               >
                 <Lock className="w-4 h-4 text-ink-muted shrink-0 mt-0.5" aria-hidden="true" />
                 <div className="space-y-0.5">
-                  <p className="text-xs text-ink font-bold">Thread locked</p>
+                  <p className="text-xs text-ink font-semibold">Thread locked</p>
                   <p className="text-xs text-ink-muted">{FORUM_LOCKED_ERROR}</p>
                 </div>
               </div>
@@ -630,7 +650,7 @@ function ForumThreadPage() {
 
             <section className="space-y-2.5 sm:space-y-3" aria-labelledby="forum-replies-heading">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 id="forum-replies-heading" className="font-grotesk text-base font-bold text-ink">
+                <h2 id="forum-replies-heading" className="font-grotesk text-base font-semibold text-ink">
                   {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
                 </h2>
                 {posts.length > 1 && (
@@ -683,11 +703,11 @@ function ForumThreadPage() {
                     />
                   ))}
                   {nextReplyOffset !== null && (
-                    <LoadMoreButton
+                    <AutoLoadMore
                       label="Load more replies"
                       loading={repliesLoading}
                       testId="forum-replies-load-more"
-                      onClick={() => void loadReplies(replySort, nextReplyOffset)}
+                      onLoad={() => loadReplies(replySort, nextReplyOffset)}
                     />
                   )}
                 </div>

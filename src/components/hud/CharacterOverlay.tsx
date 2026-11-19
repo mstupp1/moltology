@@ -56,7 +56,7 @@ export function CharacterOverlay({ isOpen, onClose, config, name }: CharacterOve
         className={`relative flex w-full flex-col bg-surface-1 sm:w-[min(560px,92vw)] sm:rounded-card sm:border sm:border-line-subtle sm:shadow-2xl transition-transform duration-200 ${visible ? 'scale-100' : 'scale-[0.98]'}`}
       >
         <div className="flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),12px)] pb-2 sm:pt-3">
-          <h2 className="font-grotesk text-base font-bold text-ink truncate">{name}</h2>
+          <h2 className="font-grotesk text-base font-semibold text-ink truncate">{name}</h2>
           <button
             type="button"
             onClick={onClose}

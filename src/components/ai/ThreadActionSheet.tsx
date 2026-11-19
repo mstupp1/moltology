@@ -41,7 +41,7 @@ export const ThreadActionSheet: React.FC<ThreadActionSheetProps> = ({
       ariaLabel={`Options for ${thread.title || 'Untitled Consultation'}`}
       className="max-w-md mx-auto"
     >
-      <p className="text-[11px] text-ink-muted tracking-[0.08em] uppercase font-bold px-3 pb-1 truncate">
+      <p className="text-2xs text-ink-muted font-semibold px-3 pb-1 truncate">
         {thread.title || 'Untitled Consultation'}
       </p>
 

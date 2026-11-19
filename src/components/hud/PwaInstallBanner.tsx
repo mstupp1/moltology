@@ -22,7 +22,7 @@ export function PwaInstallBanner() {
           <Download className="h-4 w-4" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-grotesk text-xs font-bold uppercase tracking-[0.08em] text-ink">
+          <p className="eyebrow">
             Install Command Hub
           </p>
           <p className="mt-0.5 text-xs text-ink-body font-sans leading-snug">
@@ -34,14 +34,14 @@ export function PwaInstallBanner() {
               onClick={() => {
                 void install()
               }}
-              className="px-3 py-1.5 min-h-8 rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss font-grotesk font-bold text-[11px] uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3 py-1.5 min-h-8 rounded-control bg-cyan-glow hover:bg-cyan-hover text-abyss font-grotesk font-semibold text-2xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Install
             </button>
             <button
               type="button"
               onClick={dismissBanner}
-              className="px-3 py-1.5 min-h-8 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 font-grotesk font-bold text-[11px] uppercase tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="px-3 py-1.5 min-h-8 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 font-grotesk font-semibold text-2xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               Not now
             </button>

@@ -29,7 +29,7 @@ export function MemberSearchRow({
 }) {
   return (
     <li
-      className={`chitin-card-inset border border-[#3a4a49] flex items-center gap-3 chamfer-corner ${
+      className={`chitin-card-inset border border-line-subtle flex items-center gap-3 rounded-card ${
         compact ? 'p-2.5' : 'p-3'
       }`}
     >
@@ -42,11 +42,11 @@ export function MemberSearchRow({
         <Link
           to="/member/$profileId"
           params={{ profileId: resolveMemberPublicParam(member) }}
-          className={`font-bold text-[#dfe3e3] hover:text-[#00c3ff] truncate block ${compact ? 'text-xs' : 'text-sm'}`}
+          className={`font-semibold text-ink hover:text-cyan-glow truncate block ${compact ? 'text-xs' : 'text-sm'}`}
         >
           {member.displayName}
         </Link>
-        <div className="text-[10px] uppercase tracking-wider text-[#839493]">
+        <div className="eyebrow">
           Stage {member.stage} · {member.stageLabel}
           {caption ? ` · ${caption}` : ''}
         </div>
@@ -64,7 +64,7 @@ export function MemberSearchRow({
           type="button"
           onClick={onDismiss}
           aria-label={SYNAPTIC_NEARBY_DISMISS_LABEL}
-          className="shrink-0 p-1.5 text-[#839493] hover:text-[#dfe3e3] hover:border-[#3a4a49] border border-transparent chamfer-corner transition-colors"
+          className="shrink-0 p-1.5 text-ink-muted hover:text-ink hover:border-line-subtle border border-transparent rounded-control transition-colors"
         >
           <X className={compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
         </button>

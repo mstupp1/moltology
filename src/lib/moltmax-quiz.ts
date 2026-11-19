@@ -309,13 +309,13 @@ export function computeMoltmaxResult(answers: QuizAnswers): MoltmaxResult {
   const tier = score >= 88
     ? {
         tierName: 'Apex Benthic Dreadnought', tierLevel: 'STAGE IV · TRANSCENDENT', archetype: 'Titan Carapace',
-        badgeColor: 'text-[#00ffcc] border-[#00ffcc]/40 bg-[#00ffcc]/10',
+        badgeColor: 'text-cyan-glow border-cyan-glow/40 bg-cyan-glow/10',
         prescription: ['Maintain a protected deep-focus cycle before every major descent.', 'Use decisive closure to turn pressure into forward motion.', 'Transmit one useful shell-building practice to a larval initiate.'],
       }
     : score >= 72
       ? {
           tierName: 'Abyssal Chitin Vanguard', tierLevel: 'STAGE III · HIGH ASCENDANT', archetype: 'Hardened Exoshell',
-          badgeColor: 'text-[#00c3ff] border-[#00c3ff]/40 bg-[#00c3ff]/10',
+          badgeColor: 'text-cyan-glow border-cyan-glow/40 bg-cyan-glow/10',
           prescription: ['Increase the weight of one meaningful commitment this cycle.', 'Schedule a deliberate weekly ecdysis for obsolete patterns.', 'Hold your boundaries without sealing the useful doors.'],
         }
       : score >= 50
@@ -326,7 +326,7 @@ export function computeMoltmaxResult(answers: QuizAnswers): MoltmaxResult {
           }
         : {
             tierName: 'Sub-Surface Moltlet', tierLevel: 'STAGE I · LARVAL DRIFT', archetype: 'Softshell Larva',
-            badgeColor: 'text-[#ff453a] border-[#ff453a]/40 bg-[#ff453a]/10',
+            badgeColor: 'text-crimson-aggro border-crimson-aggro/40 bg-crimson-aggro/10',
             prescription: ['Begin with one gentle, achievable shell-building action.', 'Name the signal that deserves your attention and let the rest pass.', 'Treat recovery as part of the ascent, never as a failure of it.'],
           }
 

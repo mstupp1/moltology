@@ -45,7 +45,7 @@ export function MarketEarnPanel({ wallet, guest = false }: { wallet: GemWallet; 
           <Row
             label={`Streak milestones (${streaks})`}
             value={
-              <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[12px] text-ink-muted">
+              <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs text-ink-muted">
                 <GemAmount value={GEM_STREAK_MILESTONES[0].gems} size="sm" /> to{' '}
                 <GemAmount value={GEM_STREAK_MILESTONES[GEM_STREAK_MILESTONES.length - 1].gems} size="sm" />
               </span>
@@ -75,13 +75,13 @@ export function MarketEarnPanel({ wallet, guest = false }: { wallet: GemWallet; 
               <li key={h.id} className="flex items-center justify-between gap-3 py-2 border-b border-line-subtle last:border-b-0">
                 <span className="min-w-0">
                   <span className="block text-sm text-ink-body truncate">{h.description}</span>
-                  <span className="block text-[11px] text-ink-muted">
+                  <span className="block text-2xs text-ink-muted">
                     <LocalTime value={h.createdAt} />
                   </span>
                 </span>
                 <span
                   className={cn(
-                    'font-grotesk font-bold tabular-nums text-sm',
+                    'font-grotesk font-semibold tabular-nums text-sm',
                     h.amount >= 0 ? 'text-emerald-300' : 'text-ink-muted',
                   )}
                 >

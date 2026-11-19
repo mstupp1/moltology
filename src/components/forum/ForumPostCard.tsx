@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { formatDayTime } from '@/lib/dates'
 import { forumVisibleLength } from '@/lib/forum-markdown'
@@ -30,6 +30,14 @@ import {
   HudDropdownMenuItem,
   HudDropdownMenuSeparator,
 } from '@/components/ui/HudDropdownMenu'
+
+/** A reply with more direct replies than this shows the first few and a "Show more replies" link. */
+const CHILD_PREVIEW_MAX = 5
+const CHILD_PREVIEW_SHOWN = 3
+
+function subtreeHas(nodes: ForumPostTreeNode[], postId: string): boolean {
+  return nodes.some((node) => node.post.id === postId || subtreeHas(node.children, postId))
+}
 
 export interface ForumPostCardProps {
   node: ForumPostTreeNode<ForumPostEntry>
@@ -75,6 +83,19 @@ export function ForumPostCard({
   const indent = forumReplyIndentDepth(depth)
   const isReplying = replyingToId === post.id
   const childCount = children.length
+  const childrenFolded = childCount > CHILD_PREVIEW_MAX
+  // A shared link to a reply inside the folded part opens it straight away.
+  const [showAllChildren, setShowAllChildren] = useState(() => {
+    if (!childrenFolded || typeof window === 'undefined') return false
+    const hash = window.location.hash
+    return hash.startsWith('#post-') && subtreeHas(children.slice(CHILD_PREVIEW_SHOWN), hash.slice(6))
+  })
+  // Replying here opens every reply, so the new one is not tucked away.
+  useEffect(() => {
+    if (isReplying) setShowAllChildren(true)
+  }, [isReplying])
+  const shownChildren = childrenFolded && !showAllChildren ? children.slice(0, CHILD_PREVIEW_SHOWN) : children
+  const hiddenChildCount = childCount - shownChildren.length
   const isOp = Boolean(topicAuthorId && post.userId && post.userId === topicAuthorId)
   const withdrawn = isForumQuoteSourceWithdrawn(post)
   const canAuthor = Boolean(userId && post.userId && userId === post.userId && !withdrawn)
@@ -155,7 +176,7 @@ export function ForumPostCard({
   const childrenNest = forumReplyIndentDepth(depth + 1) > indent
   const avatarSize = isRoot ? 'w-9 h-9' : 'w-7 h-7 sm:w-8 sm:h-8'
   const actionClass =
-    'inline-flex min-h-8 items-center gap-1.5 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+    'inline-flex min-h-8 items-center gap-1.5 px-2 text-2xs font-semibold text-ink-muted hover:text-ink hover:bg-surface-2 rounded-control transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
   const authorLinkParams = post.userId
     ? { profileId: resolveMemberPublicParam({ id: post.userId, handle: post.authorHandle }) }
     : null
@@ -203,24 +224,24 @@ export function ForumPostCard({
             />
           )}
 
-          <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-ink-muted">
+          <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-2xs text-ink-muted">
             {authorLinkParams ? (
               <Link
                 to="/member/$profileId"
                 params={authorLinkParams}
-                className="text-ink font-bold text-xs sm:text-sm truncate max-w-[60vw] sm:max-w-none hover:text-cyan-glow transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="text-ink font-semibold text-xs sm:text-sm truncate max-w-[60vw] sm:max-w-none hover:text-cyan-glow transition-colors rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 {post.authorName}
               </Link>
             ) : (
-              <span className="text-ink font-bold text-xs sm:text-sm truncate">{post.authorName}</span>
+              <span className="text-ink font-semibold text-xs sm:text-sm truncate">{post.authorName}</span>
             )}
             {post.authorHandle && (
               <span className="hidden sm:inline truncate">@{post.authorHandle.replace(/^@/, '')}</span>
             )}
             {isOp && (
               <span
-                className="px-1.5 text-[11px] font-sans font-bold uppercase tracking-[0.08em] bg-cyan-soft text-cyan-glow rounded-chip"
+                className="px-1.5 text-2xs font-sans font-semibold bg-cyan-soft text-cyan-glow rounded-chip"
                 title="Started this post"
               >
                 OP
@@ -478,7 +499,7 @@ export function ForumPostCard({
               : 'mt-3 space-y-3'
           }
         >
-          {children.map((child) => (
+          {shownChildren.map((child) => (
             <ForumPostCard
               key={child.post.id}
               node={child}
@@ -495,6 +516,19 @@ export function ForumPostCard({
               quoteDraft={quoteDraft}
             />
           ))}
+          {hiddenChildCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAllChildren(true)}
+              className={`${actionClass} normal-case tracking-normal text-xs`}
+              data-testid="forum-show-more-replies"
+            >
+              <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>
+                Show {hiddenChildCount} more {hiddenChildCount === 1 ? 'reply' : 'replies'}
+              </span>
+            </button>
+          )}
         </div>
       )}
     </div>

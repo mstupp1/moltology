@@ -28,6 +28,7 @@ export const ACADEMY_COPY = {
   emptyTracks: 'No tracks yet. A track groups courses into a path you take in order.',
   emptyCertificates: 'No certifications are published yet. Each course and track will list its own.',
   emptyFilter: 'No courses match that search. Clear a filter and look again.',
+  emptyCertificatesGuest: 'Certifications open with the first courses. Sign up and you can start earning them then.',
   emptyEarned: 'You have not earned a certification yet. Finish a course and it will be issued here.',
   enrollSuccess: 'You are enrolled. Start with the first lesson whenever you are ready.',
   enrollError: 'Could not enroll you. Please try again.',
@@ -40,10 +41,19 @@ export const ACADEMY_COPY = {
   missingTrack: 'This track is not in the catalog.',
   missingCertificate: 'This certification could not be found.',
   lessonLocked: 'Enroll in this course to open the lesson.',
+  lessonLockedGuest: 'Accounts are free. Sign up to start this lesson, keep your place and earn the certificate.',
+  guestStartLesson: 'Sign up to start',
+  lessonSaveMember: 'Enroll to keep your place, notes and quiz scores, and to earn the certificate.',
+  lessonSaveGuest: 'Accounts are free. Sign up to keep your place, notes and quiz scores, and to earn the certificate.',
+  guestSaveProgress: 'Sign up to save your progress',
+  guestSubmitQuiz: 'Sign up to submit',
+  guestEarnCertificate: 'Sign up to earn this',
+  guestEarnedCertificates: 'Sign up to earn certificates. Each one gets a credential page you can share.',
   videoWaiting: 'The video for this lecture is not up yet. Read the summary, then mark it complete or come back later.',
   guestLock: 'Lessons and certificates need a free account. Sign up to enroll and keep your progress.',
   guestEnroll: 'Sign up to enroll',
-  guestEnrollNote: 'Accounts are free. Enrolling opens every lesson and keeps your place.',
+  guestSignUp: 'Sign up free',
+  guestEnrollNote: 'Accounts are free. Sign up to start the lessons, keep your place and earn the certificate.',
 } as const
 
 export interface AcademyTrackRow {
@@ -467,7 +477,13 @@ export function gradeQuiz(
 ): QuizGradeResult {
   const total = questions.length
   if (total === 0) {
-    return { scorePercent: 0, correctCount: 0, total: 0, passed: false, results: [] }
+    return {
+      scorePercent: 0,
+      correctCount: 0,
+      total: 0,
+      passed: false,
+      results: [],
+    }
   }
   const results = questions.map((question) => {
     const selectedIndex = Number.isInteger(answers[question.id]) ? answers[question.id] : null
@@ -860,6 +876,8 @@ export function assembleLessonDetail(input: {
 }): AcademyLessonDetail {
   const refs = lessonRefs(input.lessons, input.modules)
   const neighbors = adjacentLessonSlugs(refs, input.lesson.slug)
+  // Anyone can see what a lesson covers; the material itself opens on enrolling, which needs
+  // an account. One preview lesson per course stays open (decision 2026-11-18-public-profiles-and-lessons).
   const locked = !input.lesson.isPreview && !input.enrolled
   const done = completedLessonIdSet(input.progressRows)
   const currentProgress = input.progressRows.find((row) => row.lessonId === input.lesson.id) ?? null

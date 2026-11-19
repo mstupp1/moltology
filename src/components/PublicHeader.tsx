@@ -4,7 +4,7 @@
  * Shared navigation bar across top-level public pages (Landing / Org).
  * Features a rounded card tab bar: the current page is a lit tile and a faint lens follows hover and focus.
  * Phones get the app's top bar (faint pill, XP-ring portrait) and a full-screen menu like the app's Account screen.
- * The new-store experiment switches opted-in admins from Etsy to /store.
+ * Store links go to /store once the store is public (admins always); otherwise Etsy.
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'
@@ -352,7 +352,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const renderNavTab = (tab: NavTab) => {
     const isCurrent = currentTab === tab.id
     const isPreviewed = targetTab === tab.id
-    const cls = `relative z-10 px-3 2xl:px-3.5 py-2 rounded-control text-[13px] leading-none font-grotesk font-semibold tracking-[0.03em] transition-[color,background-color,box-shadow] duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isCurrent, isPreviewed)} ${tabFocusCls} ${
+    const cls = `relative z-10 px-3 2xl:px-3.5 py-2 rounded-control text-ui leading-none font-grotesk font-semibold transition-[color,background-color,box-shadow] duration-300 flex items-center justify-center group select-none whitespace-nowrap shrink-0 ${tabTextCls(tab.id, isCurrent, isPreviewed)} ${tabFocusCls} ${
       isCurrent ? currentTabCls : ''
     }`
     const inner = (
@@ -417,7 +417,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   const renderOverflowItem = (tab: NavTab) => {
     const isActive = currentTab === tab.id
-    const itemCls = `relative w-full flex items-center gap-3 px-4 py-2.5 rounded-control text-[13px] font-grotesk font-semibold tracking-[0.03em] transition-colors whitespace-nowrap ${tabFocusCls} ${
+    const itemCls = `relative w-full flex items-center gap-3 px-4 py-2.5 rounded-control text-ui font-grotesk font-semibold transition-colors whitespace-nowrap ${tabFocusCls} ${
       isActive
         ? `text-ink bg-surface-3 ${activeEdgeCls}`
         : tab.id === 'store'
@@ -542,7 +542,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     </button>
   )
 
-  // Full-screen phone menu, shaped like the app's Account screen: X · MENU bar, rows, account at the foot.
+  // Full-screen phone menu, shaped like the app's Account screen: Menu title with the close X top right, rows, account at the foot.
   const mobileMenu =
     portalReady && menuPresence.mounted
       ? createPortal(
@@ -558,6 +558,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             className="lg:hidden fixed inset-0 z-[99980] flex flex-col bg-surface-1 font-sans transition-transform duration-250 ease-out motion-reduce:transition-none"
           >
             <div className="shrink-0 h-14 px-2 pt-[env(safe-area-inset-top)] box-content flex items-center gap-2 border-b border-line-subtle">
+              {/* Balances the close button so the title stays centred; close sits top right, under the menu button. */}
+              <span className="w-11 shrink-0" aria-hidden="true" />
+              <h2 className="flex-1 text-center font-grotesk text-sm font-semibold text-ink">Menu</h2>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
@@ -566,8 +569,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
-              <h2 className="flex-1 text-center font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">Menu</h2>
-              <span className="w-11 shrink-0" aria-hidden="true" />
             </div>
             <nav aria-label="Mobile Navigation" className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
               <div className="max-w-xl mx-auto">{navTabs.map(renderMobileItem)}</div>
@@ -685,7 +686,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   onClick={() => setOverflowOpen((open) => !open)}
                   onMouseEnter={() => setPreviewTab(null)}
                   onFocus={() => setPreviewTab(null)}
-                  className={`relative z-10 px-3 2xl:px-3.5 py-2 rounded-control text-[13px] leading-none font-grotesk font-semibold tracking-[0.03em] transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${tabFocusCls} ${
+                  className={`relative z-10 px-3 2xl:px-3.5 py-2 rounded-control text-ui leading-none font-grotesk font-semibold transition-colors duration-300 flex items-center justify-center select-none whitespace-nowrap shrink-0 ${tabFocusCls} ${
                     overflowOpen
                       ? 'text-ink bg-surface-2'
                       : 'text-ink-muted hover:text-ink hover:bg-surface-2'

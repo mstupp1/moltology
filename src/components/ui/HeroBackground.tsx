@@ -42,7 +42,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
             data-testid="hero-artwork"
           />
         </picture>
-        <div className="absolute inset-0 bg-[#020608]/30 md:bg-[#020608]/15" />
+        <div className="absolute inset-0 bg-abyss/30 md:bg-abyss/15" />
         {/* Keep the architectural depth open while feathering the frame into page chrome. */}
         <div
           className="absolute inset-0"
@@ -73,7 +73,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
       />
 
       {/* Layer 2A: Deep Benthic Base Layer */}
-      <div className="absolute inset-0 bg-[#020608]/50 z-0 pointer-events-none backdrop-blur-[2px]" />
+      <div className="absolute inset-0 bg-abyss/50 z-0 pointer-events-none backdrop-blur-[2px]" />
 
       {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.20)_0%,transparent_65%)] pointer-events-none z-0" />
@@ -98,12 +98,12 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
 
       {/* Layer 2D: Sacred Grid & Balanced Mid-Tone Vignettes */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(2,6,8,0.85)_95%)] opacity-72 z-0 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-60" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-abyss z-0 pointer-events-none opacity-60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-abyss via-transparent to-abyss z-0 pointer-events-none opacity-50" />
       <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
 
       {/* Layer 2E: Top Header Offset Vignette Gradient */}
-      <div className="absolute top-0 left-0 right-0 h-36 sm:h-60 bg-gradient-to-b from-[#020608]/95 via-[#020608]/75 via-45% to-transparent z-[1] pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-36 sm:h-60 bg-gradient-to-b from-abyss/95 via-abyss/75 via-45% to-transparent z-[1] pointer-events-none" />
 
       {/* Layer 3: Technical HUD Watermark Accent */}
       {showWatermarks && (
@@ -111,10 +111,10 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
           className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex"
           aria-hidden="true"
         >
-          <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-cyan-400 rotate-90 origin-left">
+          <div className="eyebrow font-mono text-cyan-400 rotate-90 origin-left">
             {leftWatermark}
           </div>
-          <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-cyan-400 -rotate-90 origin-right">
+          <div className="eyebrow font-mono text-cyan-400 -rotate-90 origin-right">
             {rightWatermark}
           </div>
         </div>

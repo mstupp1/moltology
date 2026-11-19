@@ -63,12 +63,12 @@ export function DashboardNewsPanel() {
                   ) : null}
                 </span>
                 <span className="min-w-0 flex-1 flex flex-col gap-0.5">
-                  <span className="block text-[11px] text-ink-muted truncate">
-                    <span className="text-cyan-glow font-bold">{post.category}</span>
+                  <span className="block text-2xs text-ink-muted truncate">
+                    <span className="text-cyan-glow font-semibold">{post.category}</span>
                     <span aria-hidden="true"> · </span>
                     {post.readTimeMinutes} min read
                   </span>
-                  <span className="text-sm font-bold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-2">
+                  <span className="text-sm font-semibold text-ink group-hover:text-cyan-glow transition-colors leading-snug line-clamp-2">
                     {formatNewsTitle(post.title).headline}
                   </span>
                 </span>

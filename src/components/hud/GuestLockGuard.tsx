@@ -72,16 +72,16 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
           </div>
 
           {/* Status Badge */}
-          <div className="inline-block px-3 py-1 rounded-chip bg-crimson-soft border border-crimson-aggro/40 text-crimson-text text-[11px] font-bold tracking-[0.08em] uppercase">
+          <div className="inline-block px-3 py-1 rounded-chip bg-crimson-soft border border-crimson-aggro/40 text-crimson-text text-2xs font-semibold">
             RESTRICTED ACCESS
           </div>
 
           {/* Header Title & Concise Message */}
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-grotesk font-extrabold text-ink uppercase tracking-wider">
+            <h2 className="text-xl sm:text-2xl font-grotesk font-semibold text-ink uppercase tracking-wider">
               {displayTitle}
             </h2>
-            <p className="text-xs sm:text-[13px] text-ink-body leading-relaxed max-w-sm mx-auto font-sans">
+            <p className="text-xs sm:text-ui text-ink-body leading-relaxed max-w-sm mx-auto font-sans">
               {displayMessage}
             </p>
           </div>
@@ -103,7 +103,7 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
               <button
                 type="button"
                 onClick={() => handleOpenAuth('login')}
-                className="rounded-control text-xs text-cyan-glow hover:text-ink underline underline-offset-4 tracking-wider uppercase font-sans transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                className="rounded-control text-xs text-cyan-glow hover:text-ink underline underline-offset-4 font-sans transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>Already have an account? Sign In</span>

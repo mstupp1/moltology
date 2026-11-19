@@ -1,33 +1,42 @@
 {
+  "src/components/AuthModal.tsx": {
+    "tracking": 1,
+    "uppercase": 1
+  },
   "src/components/HomeHero.tsx": {
-    "hex-color": 7,
     "off-scale-radius": 1
   },
   "src/components/LandingAuthCtaSkeleton.tsx": {
     "off-scale-radius": 2
   },
-  "src/components/LandingPage.tsx": {
-    "hex-color": 1
-  },
   "src/components/MoltMaxPage.tsx": {
-    "hex-color": 86,
-    "tiny-text": 2,
+    "hex-color": 3,
+    "tracking": 1,
+    "uppercase": 4,
+    "glow": 11,
     "off-scale-radius": 10
   },
-  "src/components/PrivacyPolicyPage.tsx": {
-    "hex-color": 2,
-    "tiny-text": 3
-  },
-  "src/components/TermsOfServicePage.tsx": {
-    "hex-color": 2,
-    "tiny-text": 3
-  },
-  "src/components/UserAvatar.tsx": {
-    "hex-color": 7,
-    "tiny-text": 2
+  "src/components/academy/AcademyChrome.tsx": {
+    "tracking": 1
   },
   "src/components/auth/AuthView.tsx": {
-    "hex-color": 8
+    "tracking": 1,
+    "uppercase": 1
+  },
+  "src/components/blog/BlogTopSlider.tsx": {
+    "uppercase": 1
+  },
+  "src/components/codex/CodexDocumentSheet.tsx": {
+    "tracking": 1
+  },
+  "src/components/composite/BlogSchematicCard.tsx": {
+    "heavy-weight": 1
+  },
+  "src/components/composite/CompositeKit.tsx": {
+    "ui-text-size": 1,
+    "tracking": 2,
+    "uppercase": 2,
+    "heavy-weight": 6
   },
   "src/components/composite/CompositeRenderView.tsx": {
     "hex-color": 2
@@ -35,182 +44,182 @@
   "src/components/composite/CompositeStudioUI.tsx": {
     "hex-color": 31,
     "tiny-text": 18,
+    "ui-text-size": 3,
+    "tracking": 12,
+    "uppercase": 10,
+    "heavy-weight": 22,
+    "default-grey": 52,
+    "glow": 2,
     "off-scale-radius": 10
+  },
+  "src/components/composite/LayoutSlide.tsx": {
+    "ui-text-size": 1,
+    "uppercase": 6,
+    "heavy-weight": 2
+  },
+  "src/components/composite/SocialDirectivesSlide.tsx": {
+    "heavy-weight": 2
   },
   "src/components/composite/SocialMarketingSlide.tsx": {
     "hex-color": 34,
+    "ui-text-size": 4,
+    "tracking": 3,
+    "uppercase": 4,
+    "heavy-weight": 7,
+    "default-grey": 1,
+    "glow": 2,
     "off-scale-radius": 4
   },
-  "src/components/guide/MoltmaxGuideCard.tsx": {
-    "hex-color": 14
+  "src/components/composite/SocialPromptVaultSlide.tsx": {
+    "ui-text-size": 1,
+    "heavy-weight": 3
+  },
+  "src/components/composite/SocialSpecShowdownSlide.tsx": {
+    "heavy-weight": 2
+  },
+  "src/components/composite/layout-spec.ts": {
+    "uppercase": 2
   },
   "src/components/guide/MoltmaxGuideFloatingPill.tsx": {
-    "hex-color": 9,
-    "tiny-text": 1,
     "off-scale-radius": 4
   },
   "src/components/guide/MoltmaxGuideModal.tsx": {
-    "hex-color": 48,
+    "glow": 4,
     "off-scale-radius": 9
   },
   "src/components/guide/MoltmaxGuidePage.tsx": {
-    "hex-color": 52,
+    "hex-color": 1,
+    "tracking": 1,
+    "uppercase": 1,
+    "glow": 2,
     "off-scale-radius": 4
   },
   "src/components/home/DevicePreviewCarousel.tsx": {
-    "hex-color": 5,
+    "hex-color": 3,
     "off-scale-radius": 2
   },
   "src/components/home/HomeSections.tsx": {
-    "hex-color": 21
+    "hex-color": 1
+  },
+  "src/components/hud/AccountHub.tsx": {
+    "glow": 1
   },
   "src/components/hud/CommandCatalogIcon.tsx": {
-    "hex-color": 13
+    "hex-color": 2
+  },
+  "src/components/hud/GlassLens.tsx": {
+    "glow": 4
+  },
+  "src/components/hud/GuestLockGuard.tsx": {
+    "tracking": 1,
+    "uppercase": 1
   },
   "src/components/hud/HiddenPageGuard.tsx": {
-    "hex-color": 6
-  },
-  "src/components/hud/HudLayout.tsx": {
     "hex-color": 1
   },
   "src/components/hud/LobsterAvatarFullBody.tsx": {
-    "hex-color": 1,
     "off-scale-radius": 1
   },
   "src/components/hud/LobsterAvatarPortrait.tsx": {
-    "hex-color": 1
+    "glow": 3
   },
   "src/components/hud/PremiumBadge.tsx": {
-    "hex-color": 3,
-    "chamfer": 1,
-    "tiny-text": 1
+    "hex-color": 3
   },
   "src/components/hud/RitualGateModal.tsx": {
-    "hex-color": 57,
-    "chamfer": 10,
-    "tiny-text": 3
+    "glow": 1
   },
   "src/components/hud/chassis/ChassisStatusPage.tsx": {
-    "chamfer": 1,
-    "tiny-text": 1
-  },
-  "src/components/hud/chassis/GearItemCard.tsx": {
-    "hex-color": 5,
-    "tiny-text": 4,
-    "off-scale-radius": 1
-  },
-  "src/components/hud/chassis/GearTooltip.tsx": {
-    "hex-color": 4,
-    "chamfer": 2,
-    "tiny-text": 1
-  },
-  "src/components/hud/chassis/VaultGrid.tsx": {
-    "hex-color": 5,
-    "tiny-text": 1,
-    "off-scale-radius": 1
-  },
-  "src/components/hud/connections/ConnectionsPage.tsx": {
-    "hex-color": 28,
-    "chamfer": 4,
-    "tiny-text": 4
-  },
-  "src/components/hud/connections/MemberSearchRow.tsx": {
-    "hex-color": 7,
-    "chamfer": 2,
-    "tiny-text": 1
-  },
-  "src/components/hud/connections/SynapticNearbyStrip.tsx": {
-    "hex-color": 4,
     "chamfer": 1
   },
-  "src/components/hud/search/SearchPage.tsx": {
-    "hex-color": 21,
-    "chamfer": 5,
-    "tiny-text": 2
+  "src/components/hud/chassis/GearItemCard.tsx": {
+    "off-scale-radius": 1
+  },
+  "src/components/hud/chassis/VaultGrid.tsx": {
+    "hex-color": 1,
+    "off-scale-radius": 1
+  },
+  "src/components/hud/member/MemberProfilePage.tsx": {
+    "glow": 1
   },
   "src/components/moltmax/QuizProgressHUD.tsx": {
-    "hex-color": 6
+    "glow": 1
   },
   "src/components/moltmax/QuizQuestionCard.tsx": {
-    "hex-color": 43,
+    "glow": 5,
     "off-scale-radius": 8
   },
   "src/components/moltmax/QuizResultsReveal.tsx": {
-    "hex-color": 57,
-    "tiny-text": 1,
+    "hex-color": 6,
+    "tracking": 1,
+    "uppercase": 3,
+    "glow": 2,
     "off-scale-radius": 13
   },
-  "src/components/news/MoltNationBannerBg.tsx": {
-    "hex-color": 2
-  },
-  "src/components/news/NewsIndexPage.tsx": {
-    "hex-color": 5
+  "src/components/news/NewsArticleBody.tsx": {
+    "ui-text-size": 2,
+    "tracking": 1,
+    "heavy-weight": 1
   },
   "src/components/news/NewsPostDetail.tsx": {
-    "hex-color": 2
+    "uppercase": 1
   },
   "src/components/ui/BrandMark.tsx": {
     "hex-color": 1
   },
   "src/components/ui/ChromaElement.tsx": {
-    "hex-color": 3,
+    "hex-color": 1,
+    "glow": 2,
     "off-scale-radius": 2
   },
-  "src/components/ui/HUDSpinner.tsx": {
-    "hex-color": 1
-  },
-  "src/components/ui/HeroBackground.tsx": {
-    "hex-color": 9,
-    "tiny-text": 2
-  },
   "src/components/ui/HudBottomSheet.tsx": {
-    "hex-color": 5,
+    "hex-color": 1,
+    "glow": 1,
     "off-scale-radius": 1
   },
   "src/components/ui/HudButton.tsx": {
     "off-scale-radius": 1
   },
+  "src/components/ui/HudCard.tsx": {
+    "glow": 2
+  },
   "src/components/ui/HudGhostLoader.tsx": {
-    "hex-color": 18,
-    "chamfer": 1,
     "off-scale-radius": 3
   },
   "src/components/ui/HudSkeleton.tsx": {
-    "hex-color": 12
-  },
-  "src/components/ui/ImageLightbox.tsx": {
-    "hex-color": 6,
-    "chamfer": 3
-  },
-  "src/components/ui/MarkdownRenderer.tsx": {
-    "hex-color": 3,
-    "chamfer": 1
+    "hex-color": 1,
+    "glow": 2
   },
   "src/components/ui/magicui/iphone-15-pro.tsx": {
     "hex-color": 16,
+    "default-grey": 1,
+    "glow": 1,
     "off-scale-radius": 10
   },
   "src/components/ui/magicui/safari.tsx": {
     "hex-color": 14,
     "tiny-text": 1,
+    "tracking": 1,
+    "default-grey": 1,
+    "glow": 1,
     "off-scale-radius": 4
   },
   "src/components/ui/slider.tsx": {
-    "hex-color": 4
+    "glow": 2
   },
   "src/components/what-is-moltology/BeliefsAndCodesPage.tsx": {
-    "hex-color": 8
-  },
-  "src/components/what-is-moltology/BenthicSacramentsPage.tsx": {
-    "hex-color": 5
+    "hex-color": 2
   },
   "src/components/what-is-moltology/WhatIsMoltologyHubPage.tsx": {
-    "hex-color": 29
+    "hex-color": 1
   },
-  "src/components/what-is-moltology/story/StoryPrimitives.tsx": {
-    "hex-color": 8
+  "src/lib/chassis-loadout.ts": {
+    "hex-color": 15
   },
-  "src/routes/__root.tsx": {
-    "hex-color": 2
+  "src/lib/codexStages.ts": {
+    "hex-color": 6
+  },
+  "src/lib/moltmax-quiz.ts": {
+    "hex-color": 3
   }
 }

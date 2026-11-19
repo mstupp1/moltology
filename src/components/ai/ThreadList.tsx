@@ -13,7 +13,7 @@ const pinnedAtMs = (value?: string | Date | null) => {
 }
 
 const SECTION_LABEL =
-  'flex items-center gap-1.5 px-1 py-1 text-[11px] font-bold tracking-[0.08em] uppercase text-ink-muted select-none'
+  'flex items-center gap-1.5 px-1 py-1 text-2xs font-semibold text-ink-muted select-none'
 
 export interface ThreadListProps {
   threads: ManagedThread[]

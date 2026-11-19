@@ -1,6 +1,7 @@
 import { BandStat } from '@/components/hud/BandSectionNav'
 import React, { useState } from 'react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexStages'
 import { PIPELINE_CLEARANCES, clearanceIndexForXp } from '@/lib/pipeline-explorer'
@@ -24,9 +25,10 @@ export default function PipelineView() {
     <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans">
       <HudTitlePanel
         treatment="band"
-        joined
         accent="cyan"
-        title="Progress"
+        title="Character"
+        sections={<CharacterSectionNav current="progress" />}
+        actionsBelowOnPhone
         actions={
           <div className="flex items-center gap-5">
             <BandStat label="Your XP" value={formatXp(xp)} />
@@ -47,7 +49,7 @@ export default function PipelineView() {
       </div>
 
       <aside aria-labelledby="pipeline-readings-title" className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5">
-        <h2 id="pipeline-readings-title" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+        <h2 id="pipeline-readings-title" className="eyebrow">
           About the readings
         </h2>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-ink-body">
@@ -56,7 +58,7 @@ export default function PipelineView() {
         <dl className="mt-3 grid gap-2 sm:grid-cols-3">
           {READINGS.map((reading) => (
             <div key={reading.label}>
-              <dt className="text-xs font-bold text-ink">{reading.label}</dt>
+              <dt className="text-xs font-semibold text-ink">{reading.label}</dt>
               <dd className="text-xs text-ink-muted">{reading.meaning}</dd>
             </div>
           ))}

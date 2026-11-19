@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Check, Moon, X } from 'lucide-react'
+import { Check, ChevronDown, Moon, X } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
 import { alignmentTaskCodex } from '@/lib/alignment-tasks'
 import {
@@ -42,6 +42,42 @@ const rowFocus =
   'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow'
 const listFrame = 'rounded-control border border-line-subtle divide-y divide-line-subtle overflow-hidden'
 
+const COLLAPSE_MS = 220
+
+/** Slides a row's panel open and folded shut; the panel only stays mounted while open or folding. */
+function AlignmentRowCollapse({ open, children }: { open: boolean; children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(open)
+  const [expanded, setExpanded] = useState(open)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (timer.current) clearTimeout(timer.current)
+    if (open) {
+      setMounted(true)
+      // Let the closed state paint first so the height change animates.
+      const frame = requestAnimationFrame(() => requestAnimationFrame(() => setExpanded(true)))
+      return () => cancelAnimationFrame(frame)
+    }
+    setExpanded(false)
+    timer.current = setTimeout(() => setMounted(false), COLLAPSE_MS)
+    return () => {
+      if (timer.current) clearTimeout(timer.current)
+    }
+  }, [open])
+  if (!mounted) return null
+  return (
+    <div
+      className={`grid transition-[grid-template-rows,opacity] ease-out motion-reduce:transition-none ${
+        expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+      }`}
+      style={{ transitionDuration: `${COLLAPSE_MS}ms` }}
+      inert={!open}
+      data-testid="alignment-task-collapse"
+    >
+      <div className="min-h-0 overflow-hidden">{children}</div>
+    </div>
+  )
+}
+
 /** Today's eight alignment tasks: heading, done count, progress line and the tickable list. */
 export function AlignmentTodayList({
   tasks,
@@ -79,7 +115,7 @@ export function AlignmentTodayList({
     <>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-baseline gap-2 min-w-0">
-          <span className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Today</span>
+          <span className="font-grotesk text-sm font-semibold text-ink">Today</span>
           {todayLabel && <span className="text-xs text-ink-muted truncate">{todayLabel}</span>}
         </div>
         {showClose && <button
@@ -97,7 +133,7 @@ export function AlignmentTodayList({
           <div className="flex items-start gap-3">
             <Moon className="w-5 h-5 mt-0.5 shrink-0 text-cyan-glow" aria-hidden="true" />
             <div className="min-w-0 space-y-1">
-              <p className="text-sm font-bold text-ink">Rest day</p>
+              <p className="text-sm font-semibold text-ink">Rest day</p>
               <p className="text-xs leading-relaxed text-ink-muted">
                 Today isn't one of your practice days, so there's nothing to do and your
                 {streakDays > 0 ? ` ${streakDays}-day` : ''} streak is safe.
@@ -133,7 +169,7 @@ export function AlignmentTodayList({
       <div className="space-y-2.5">
           <div className="flex items-center justify-between gap-2">
             {countReady ? (
-              <span className={`text-xs ${allTasksCompleted ? 'text-emerald-500 font-bold' : 'text-ink-muted'}`}>
+              <span className={`text-xs ${allTasksCompleted ? 'text-emerald-500 font-semibold' : 'text-ink-muted'}`}>
                 {allTasksCompleted ? 'All eight done for today' : `${completedCount} of ${tasks.length} done`}
                 {actions && isOffDay && (
                   <span className="text-ink-muted font-normal" data-testid="alignment-off-day-note"> · Off day, so this is a bonus</span>
@@ -171,31 +207,57 @@ export function AlignmentTodayList({
               const body = (
                 <>
                   <span
-                    className={`block ${roomy ? 'text-sm' : 'text-[13px]'} ${roomy ? 'line-clamp-2' : 'truncate'} ${
-                      t.completed ? 'text-ink-muted' : 'text-ink font-bold'
+                    className={`block ${roomy ? 'text-sm' : 'text-ui'} ${roomy ? 'line-clamp-2' : 'truncate'} ${
+                      t.completed ? 'text-ink-muted' : 'text-ink font-semibold'
                     }`}
                   >
                     {t.title}
                   </span>
-                  <span className={`block truncate text-[11px] ${isNext ? 'text-cyan-glow' : 'text-ink-muted'}`}>
+                  <span className={`block truncate text-2xs ${isNext ? 'text-cyan-glow' : 'text-ink-muted'}`}>
                     {name ? `${name} · ${t.time}` : t.time}
                     {detail && <span data-testid="alignment-one-thing-line"> · {detail}</span>}
                   </span>
                 </>
               )
               return (
-                <li key={t.id} className={isNext ? 'bg-surface-3 shadow-nav-current' : isOpen ? 'bg-surface-2' : ''}>
-                  <div className="flex items-stretch">
+                <li key={t.id} className={`transition-colors duration-200 ${isNext ? 'bg-surface-3 shadow-nav-current' : isOpen ? 'bg-surface-2' : ''}`}>
+                  <div className="relative">
+                    {opens ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setOpenKey(isOpen ? null : key)
+                        }}
+                        aria-expanded={isOpen}
+                        aria-controls={`alignment-task-${key}`}
+                        data-testid="alignment-task-row"
+                        className={`w-full ${rowPad} pl-[42px] pr-3 flex items-center gap-2 text-left transition-colors touch-manipulation group/row ${rowFocus} ${
+                          isNext ? '' : 'hover:bg-surface-2'
+                        }`}
+                      >
+                        <span className="flex-1 min-w-0 flex flex-col justify-center">{body}</span>
+                        <ChevronDown
+                          aria-hidden="true"
+                          data-testid="alignment-task-chevron"
+                          className={`w-4 h-4 shrink-0 text-ink-muted group-hover/row:text-ink transition-transform duration-200 motion-reduce:transition-none ${
+                            isOpen ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                    ) : (
+                      <div className={`${rowPad} pl-[42px] pr-3 flex flex-col justify-center`} data-testid="alignment-task-row">
+                        {body}
+                      </div>
+                    )}
                     {t.completed ? (
                       <span
                         role="img"
                         aria-label={`${t.title} done`}
                         data-testid="alignment-task-done"
-                        className={`shrink-0 ${rowPad} pl-3 pr-3 flex items-center`}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] rounded-chip bg-emerald-500 text-abyss flex items-center justify-center"
                       >
-                        <span className="w-[18px] h-[18px] rounded-chip bg-emerald-500 text-abyss flex items-center justify-center">
-                          <Check className="w-3 h-3" strokeWidth={3} aria-hidden="true" />
-                        </span>
+                        <Check className="w-3 h-3" strokeWidth={3} aria-hidden="true" />
                       </span>
                     ) : (
                       <button
@@ -207,48 +269,29 @@ export function AlignmentTodayList({
                         }}
                         aria-label={`Mark ${t.title} done`}
                         data-testid="alignment-task-check"
-                        className={`shrink-0 ${rowPad} pl-3 pr-3 flex items-center touch-manipulation group hover:bg-surface-2 transition-colors ${rowFocus}`}
+                        className={`absolute left-[3px] top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-control touch-manipulation group/check ${focusRing}`}
                       >
                         <span
                           aria-hidden="true"
-                          className="w-[18px] h-[18px] rounded-chip border border-line-strong group-hover:border-cyan-glow transition-colors"
+                          className="w-[18px] h-[18px] rounded-chip border border-line-strong bg-surface-1/40 group-hover/check:border-cyan-glow group-hover/check:bg-cyan-soft transition-colors"
                         />
                       </button>
                     )}
-                    {t.completed ? (
-                      <div className={`flex-1 min-w-0 ${rowPad} pr-3 flex flex-col justify-center`} data-testid="alignment-task-row">
-                        {body}
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          if (opens) setOpenKey(isOpen ? null : key)
-                          else onToggle(t.id)
-                        }}
-                        {...(opens ? { 'aria-expanded': isOpen, 'aria-controls': `alignment-task-${key}` } : {})}
-                        data-testid="alignment-task-row"
-                        className={`flex-1 min-w-0 ${rowPad} pr-3 flex flex-col justify-center text-left transition-colors touch-manipulation ${rowFocus} ${
-                          isNext ? '' : 'hover:bg-surface-2'
-                        }`}
-                      >
-                        {body}
-                      </button>
-                    )}
                   </div>
-                  {isOpen && (
-                    <AlignmentTaskActionPanel
-                      id={`alignment-task-${key}`}
-                      taskKey={key}
-                      taskTitle={t.title}
-                      action={action}
-                      codex={codex}
-                      oneThing={oneThing}
-                      onSaveOneThing={saveTodaysOneThing}
-                      onClose={onClose}
-                      onDone={() => setOpenKey(null)}
-                    />
+                  {(action || codex) && (
+                    <AlignmentRowCollapse open={isOpen}>
+                      <AlignmentTaskActionPanel
+                        id={`alignment-task-${key}`}
+                        taskKey={key}
+                        taskTitle={t.title}
+                        action={action}
+                        codex={codex}
+                        oneThing={oneThing}
+                        onSaveOneThing={saveTodaysOneThing}
+                        onClose={onClose}
+                        onDone={() => setOpenKey(null)}
+                      />
+                    </AlignmentRowCollapse>
                   )}
                 </li>
               )

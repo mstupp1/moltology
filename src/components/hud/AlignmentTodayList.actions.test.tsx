@@ -70,14 +70,33 @@ describe('AlignmentTodayList task shortcuts', () => {
     expect(onToggle).not.toHaveBeenCalled()
   })
 
-  it('starts the deep work and breathing timers', () => {
+  it('starts the deep work timer', () => {
     renderList()
     fireEvent.click(row('Do deep work'))
     fireEvent.click(screen.getByRole('button', { name: 'Start a focus timer' }))
     expect(alignment.openPractice).toHaveBeenCalledWith('deep-work')
+  })
+
+  it('treats Reset your focus as a plain break, not a timer', () => {
+    renderList()
     fireEvent.click(row('Reset your focus'))
-    fireEvent.click(screen.getByRole('button', { name: 'Start a breathing timer' }))
-    expect(alignment.openPractice).toHaveBeenCalledWith('reset')
+    expect(screen.getByText('Step away from the screen for a few minutes.')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'I took a break' }))
+    expect(alignment.setTaskCompleted).toHaveBeenCalledWith('nutritional-efficiency-break', true)
+    expect(alignment.openPractice).not.toHaveBeenCalled()
+  })
+
+  it('only the checkbox ticks; the row opens and folds its panel', () => {
+    const { onToggle } = renderList()
+    const r = row('Help a member')
+    expect(r).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(r)
+    expect(r).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByTestId('alignment-task-panel')).toBeInTheDocument()
+    fireEvent.click(r)
+    expect(r).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByTestId('alignment-task-collapse')).toHaveAttribute('inert')
+    expect(onToggle).not.toHaveBeenCalled()
   })
 
   it('saves the one thing, ticks the task and shows it on Close the day', () => {

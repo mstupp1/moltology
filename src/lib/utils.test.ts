@@ -9,6 +9,12 @@ describe('utils.ts', () => {
       expect(cn('shadow-sheen-inset', 'shadow-none')).toBe('shadow-none')
     })
 
+    it('keeps custom font sizes next to text colours', () => {
+      expect(cn('text-ui text-ink')).toBe('text-ui text-ink')
+      expect(cn('text-2xs text-cyan-glow')).toBe('text-2xs text-cyan-glow')
+      expect(cn('text-xs text-ui')).toBe('text-ui')
+    })
+
     it('merges class names correctly', () => {
       const result = cn('bg-red-500', 'text-white', { 'p-4': true, 'm-2': false })
       expect(result).toBe('bg-red-500 text-white p-4')

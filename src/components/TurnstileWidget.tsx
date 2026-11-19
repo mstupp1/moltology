@@ -219,7 +219,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetRef, TurnstileWidgetPro
             <button
               type="button"
               onClick={reset}
-              className="ml-1 inline-flex items-center gap-1 text-[11px] underline hover:text-rose-300 cursor-pointer"
+              className="ml-1 inline-flex items-center gap-1 text-2xs underline hover:text-rose-300 cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" /> Retry
             </button>
@@ -233,7 +233,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetRef, TurnstileWidgetPro
             <button
               type="button"
               onClick={reset}
-              className="ml-1 inline-flex items-center gap-1 text-[11px] underline hover:text-amber-300 cursor-pointer"
+              className="ml-1 inline-flex items-center gap-1 text-2xs underline hover:text-amber-300 cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" /> Refresh
             </button>

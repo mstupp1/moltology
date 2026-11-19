@@ -9,16 +9,13 @@ import { isAdmin } from './permissions'
 
 export const EXPERIMENTS = {
   premium: {
-    title: 'Oracle MAX',
-    description: 'Show Oracle MAX membership, settings, and dashboard offers for your account.',
+    title: 'Oracle MAX checkout',
+    description:
+      'Subscribe to or activate Oracle MAX on your account, with the Settings card and dashboard offer. Everyone else sees Oracle MAX as coming soon.',
   },
   'molt-credits': {
     title: 'Molt Credits',
     description: 'Buy Molt Credit packs in the market with Stripe. Members see them as coming soon.',
-  },
-  'new-store': {
-    title: 'New store',
-    description: 'Open the on-site store and checkout. Store links use Etsy while this is off.',
   },
 } as const satisfies Record<string, { title: string; description: string }>
 

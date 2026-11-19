@@ -44,8 +44,8 @@ export function HUDNotFound() {
       <main className="flex-1 flex items-center justify-center px-4 py-16 sm:py-24">
         <div className="w-full max-w-md text-center">
           <GlowEmblem size={72} className="mb-8" />
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-ink-muted mb-2">Error 404</p>
-          <h1 className="font-grotesk font-bold text-3xl sm:text-4xl text-ink mb-3">Page not found</h1>
+          <p className="eyebrow mb-2">Error 404</p>
+          <h1 className="font-grotesk font-semibold text-3xl sm:text-4xl text-ink mb-3">Page not found</h1>
           <p className="text-sm sm:text-base text-ink-body leading-relaxed">
             We couldn&rsquo;t find that page. It may have moved, or the link may be mistyped.
           </p>

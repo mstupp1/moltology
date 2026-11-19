@@ -174,7 +174,7 @@ export function ProductDetail({ slug }: { slug: string }) {
         </div>
 
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <p className="font-grotesk text-xs font-bold tracking-[0.12em] text-ink-muted">{product.category.toUpperCase()}</p>
+          <p className="eyebrow">{product.category}</p>
           <h1 className="mt-2 font-grotesk text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{product.title}</h1>
           <p className="mt-2 text-xl text-ink">{priceLabel}</p>
           <p className="mt-5 text-base leading-relaxed text-ink-body">{product.description}</p>
@@ -238,7 +238,7 @@ export function ProductDetail({ slug }: { slug: string }) {
                         }`}
                       >
                         {name}
-                        {extra ? <span className="text-[11px] text-ink-muted">+{formatMerchPrice(variant.priceCents - lowestPrice)}</span> : null}
+                        {extra ? <span className="text-2xs text-ink-muted">+{formatMerchPrice(variant.priceCents - lowestPrice)}</span> : null}
                       </button>
                     )
                   })}

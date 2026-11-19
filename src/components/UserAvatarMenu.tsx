@@ -213,17 +213,17 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             />
             <div className="flex flex-col min-w-0 text-left">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink group-hover:text-cyan-glow">
+                <span className="text-xs font-semibold truncate font-grotesk flex items-center gap-1.5 text-ink group-hover:text-cyan-glow">
                   {displayName}
                 </span>
                 {effectiveRole === 'admin' && (
-                  <span className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
+                  <span className="text-2xs font-sans font-semibold px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
                     ADMIN
                   </span>
                 )}
               </div>
               {user.email && (
-                <span className="text-[11px] truncate mt-0.5 font-sans text-ink-muted">
+                <span className="text-2xs truncate mt-0.5 font-sans text-ink-muted">
                   {user.email}
                 </span>
               )}
@@ -251,29 +251,29 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 <button
                   type="button"
                   onClick={handleOpenProfile}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold font-grotesk transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <CircleUser className="w-4 h-4 shrink-0" />
-                  <span>PROFILE</span>
+                  <span>Profile</span>
                 </button>
 
                 {/* Settings Link */}
                 <button
                   type="button"
                   onClick={handleOpenSettings}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold font-grotesk transition-all cursor-pointer text-ink-body hover:text-ink bg-surface-1 hover:bg-surface-2 border border-line-subtle hover:border-line focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <Settings className="w-4 h-4 shrink-0" />
-                  <span>SETTINGS</span>
+                  <span>Settings</span>
                 </button>
 
                 {/* Sign Out Action Button */}
                 <button
                   {...signOutButtonProps}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-control text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-control text-xs font-semibold font-grotesk transition-all cursor-pointer active:scale-[0.99] text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>SIGN OUT</span>
+                  <span>Sign out</span>
                 </button>
               </div>
             </div>
@@ -307,11 +307,11 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             />
           </span>
           <span className="flex flex-col min-w-0 flex-1">
-            <span className="text-[13px] font-sans font-semibold text-ink truncate leading-tight">
+            <span className="text-ui font-sans font-semibold text-ink truncate leading-tight">
               {displayName}
             </span>
             {subtitle && (
-              <span className="text-[11px] font-sans text-ink-muted truncate leading-tight mt-0.5">
+              <span className="text-2xs font-sans text-ink-muted truncate leading-tight mt-0.5">
                 {subtitle}
               </span>
             )}
@@ -367,17 +367,17 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             />
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold truncate font-grotesk flex items-center gap-1.5 text-ink">
+                <span className="text-xs font-semibold truncate font-grotesk flex items-center gap-1.5 text-ink">
                   {displayName}
                 </span>
                 {effectiveRole === 'admin' && (
-                  <span className="text-[11px] font-sans font-extrabold tracking-[0.08em] uppercase px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
+                  <span className="text-2xs font-sans font-semibold px-1.5 py-0.5 rounded-chip shrink-0 bg-cyan-soft border border-cyan-glow/40 text-cyan-glow">
                     ADMIN
                   </span>
                 )}
               </div>
               {user.email && (
-                <span className="text-[11px] truncate mt-0.5 font-sans text-ink-muted">
+                <span className="text-2xs truncate mt-0.5 font-sans text-ink-muted">
                   {user.email}
                 </span>
               )}
@@ -389,27 +389,27 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             <button
               type="button"
               onClick={handleOpenProfile}
-              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="w-full text-left px-3 py-2 rounded-control text-xs font-semibold font-grotesk flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <CircleUser className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
-              <span>PROFILE</span>
+              <span>Profile</span>
             </button>
             <button
               type="button"
               onClick={handleOpenSettings}
-              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="w-full text-left px-3 py-2 rounded-control text-xs font-semibold font-grotesk flex items-center gap-2.5 transition-all group cursor-pointer text-ink-body hover:text-ink hover:bg-surface-3 border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <Settings className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" />
-              <span>SETTINGS</span>
+              <span>Settings</span>
             </button>
 
             {/* Sign Out Action Button */}
             <button
               {...signOutButtonProps}
-              className="w-full text-left px-3 py-2 rounded-control text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+              className="w-full text-left px-3 py-2 rounded-control text-xs font-semibold font-grotesk flex items-center gap-2.5 transition-all group cursor-pointer text-crimson-text border border-crimson-aggro/55 hover:bg-crimson-soft hover:border-crimson-aggro focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <LogOut className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 text-crimson-text" />
-              <span>SIGN OUT</span>
+              <span>Sign out</span>
             </button>
           </div>
         </div>

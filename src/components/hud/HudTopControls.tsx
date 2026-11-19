@@ -8,9 +8,8 @@ import { xpRingGeometry } from './XpRing'
 import { HUDTaskBar } from './HUDTaskBar'
 import { NotificationsBell } from './NotificationsBell'
 
-/** Frosted pill shared by the phone top bar and the desktop top-right controls. */
-export const HUD_GLASS_PILL =
-  'rounded-full bg-surface-1/85 backdrop-blur-xl backdrop-saturate-150 border border-line-subtle shadow-menu'
+/** Solid pill shared by the phone top bar and the desktop top-right controls (no see-through). */
+export const HUD_GLASS_PILL = 'rounded-full bg-surface-1 border border-line-subtle shadow-menu'
 
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
@@ -72,17 +71,21 @@ export function HudTopControls({
       onClick={onSignUp}
       aria-label="Sign up"
       title="Sign up"
-      className={`h-9 px-3 mx-1 inline-flex items-center gap-1.5 rounded-full bg-cyan-glow text-abyss text-xs font-bold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
+      className={`h-9 px-3 mx-1 inline-flex items-center gap-1.5 rounded-full bg-cyan-glow text-abyss text-xs font-semibold hover:bg-cyan-hover transition-colors active:scale-95 ${focusRing}`}
     >
       <UserPlus className="w-4 h-4" aria-hidden="true" />
       <span>Sign up</span>
     </button>
   )
 
-  // The portrait medallion sits beside the pill as its own piece; its rings stay see-through.
+  // The portrait medallion sits beside the pill as its own piece, on a solid disc like the pill,
+  // so the page never shows through its rings.
   const medallion = Boolean(user) || isSessionPending
   const medallionLayer = medallion ? (
-    <span data-testid="top-controls-medallion" className="relative shrink-0 flex">
+    <span
+      data-testid="top-controls-medallion"
+      className="relative shrink-0 flex rounded-full bg-surface-1 border border-line-subtle shadow-menu"
+    >
       {account}
     </span>
   ) : null
@@ -122,13 +125,14 @@ export function HudTopControls({
         onClick={() => onNavigate('/')}
         aria-label="Moltology home"
         title="Moltology home"
-        className={`w-10 h-10 -ml-1 shrink-0 inline-flex items-center justify-center rounded-full hover:bg-surface-2 transition-colors active:scale-95 ${focusRing}`}
+        className={`w-11 h-11 shrink-0 inline-flex items-center justify-center rounded-full hover:bg-surface-2 transition-colors active:scale-95 ${focusRing}`}
       >
-        <BrandIcon className="w-7 h-7" />
+        {/* Same 36px emblem, same 16px edge as the public site header */}
+        <BrandIcon className="w-9 h-9" />
       </button>
       {/* A faint, low pill: echoes the desktop pill without the glass bulk */}
       <div className="flex items-center gap-1.5 shrink-0 -mr-1.5">
-        <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2/50 border border-line-subtle">
+        <div className="flex items-center h-11 px-0.5 shrink-0 rounded-full bg-surface-2 border border-line-subtle">
           {controls}
         </div>
         {medallionLayer}

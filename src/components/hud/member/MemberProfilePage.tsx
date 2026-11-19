@@ -3,7 +3,7 @@ import { GearIcon } from '../avatar3d/GearIcon'
 import { gearStill } from '@/lib/avatar3d-gear-icon'
 import { LocalTime } from '@/components/ui/LocalTime'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Calendar } from 'lucide-react'
+import { Calendar, Shell, UserPlus } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { CharacterOverlay } from '@/components/hud/CharacterOverlay'
 import { BonusList, VectorSheetPanel } from '@/components/hud/chassis/VectorSheetPanel'
@@ -11,8 +11,11 @@ import { PremiumBadge } from '@/components/hud/PremiumBadge'
 import { RankCrest, RankRecordChip } from '@/components/leaderboard/RankCrest'
 import { FriendRequestButton } from './FriendRequestButton'
 import { ProfileLinkButton } from './ProfileLinkButton'
+import { AuthModal } from '@/components/AuthModal'
+import { HudButton } from '@/components/ui/HudButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { cn } from '@/lib/utils'
 import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
 import type { PublicProfileView } from '@/lib/connections'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -39,6 +42,10 @@ export interface MemberProfilePageProps {
   profileId: string
   /** Public `/member/$profileId` only. `/profile` stays the signed-in self dossier. */
   canonicalizePath?: boolean
+  /** The profile opens the page (no header band above it), so its hero becomes the band. */
+  opensPage?: boolean
+  /** Sits right under a header band (your own Overview tab), so its hero joins that band. */
+  joinsBand?: boolean
 }
 
 type MemberLoadout = {
@@ -51,6 +58,8 @@ type MemberLoadout = {
 export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   profileId,
   canonicalizePath = false,
+  opensPage = false,
+  joinsBand = false,
 }) => {
   const navigate = useNavigate()
   const session = useAuthSession()
@@ -68,6 +77,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
       if (!nextProfile) throw new Error('Member not found.')
       return { profile: nextProfile, loadout: nextLoadout }
     },
+    // Dossiers are public; a signed-in viewer's token only adds the friend relationship.
     enabled: !session.isPending,
     staleTime: FRESH.panel,
     retry: false,
@@ -84,6 +94,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     })
   }
   const [showCharacter, setShowCharacter] = useState(false)
+  const [authOpen, setAuthOpen] = useState(false)
   const closeCharacter = useCallback(() => setShowCharacter(false), [])
 
   useEffect(() => {
@@ -124,7 +135,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     return (
       <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
         <div className="rounded-card p-5 border border-crimson-aggro/40 bg-surface-crimson hud-sheen text-crimson-text">
-          <h1 className="font-grotesk text-sm font-bold uppercase tracking-[0.08em]">Profile unavailable</h1>
+          <h1 className="font-grotesk text-sm font-semibold">Profile unavailable</h1>
           <p className="text-xs mt-2 text-ink-muted">{error || 'Member not found.'}</p>
           <Link to="/profile" search={{ tab: 'friends' }} className="inline-block mt-4 text-xs text-cyan-glow underline rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow">
             Back to friends
@@ -144,10 +155,14 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   const auditTaken = sheet.source === 'audit' && profile.moltmax?.score != null
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
+    <div className={cn('space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative', opensPage && 'hud-page-hero-top')}>
       <section
         aria-labelledby="member-name"
-        className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset"
+        className={cn(
+          (opensPage || joinsBand) && 'hud-band-hero',
+          joinsBand && 'hud-band-hero-joined',
+          'relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset',
+        )}
       >
         {/* Quiet depth light behind the portrait; no motion. */}
         <div
@@ -170,6 +185,9 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                 interactive
               />
             </button>
+            {session.isGuest && (
+              <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode="signup" />
+            )}
             <CharacterOverlay
               isOpen={showCharacter}
               onClose={closeCharacter}
@@ -177,44 +195,25 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
               name={profile.displayName}
             />
             <div className="min-w-0 flex-1 w-full space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div>
                 <div className="min-w-0 space-y-1.5">
                   <h1
                     id="member-name"
-                    className="font-grotesk text-2xl sm:text-3xl font-extrabold text-ink tracking-tight break-words"
+                    className="font-grotesk text-2xl sm:text-3xl font-semibold text-ink tracking-tight break-words"
                   >
                     {profile.displayName}
                   </h1>
                   {profile.handle && profile.displayName !== profile.larvaId && (
-                    <p className="text-xs text-ink-muted font-mono tracking-wider">{profile.larvaId}</p>
+                    <p className="text-xs text-ink-muted font-mono">{profile.larvaId}</p>
                   )}
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-0.5">
-                    <span className="px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] border border-cyan-glow/40 text-cyan-glow bg-cyan-soft rounded-chip">
+                    <span className="px-2 py-0.5 text-2xs font-semibold border border-cyan-glow/40 text-cyan-glow bg-cyan-soft rounded-chip">
                       Stage {profile.stage} · {profile.stageLabel}
                     </span>
                     {profile.isPremium ? <PremiumBadge /> : null}
                     <RankCrest userId={profile.id} variant="chip" />
                     <RankRecordChip userId={profile.id} />
                   </div>
-                </div>
-                <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 shrink-0 max-sm:[&>*]:flex-1">
-                  {isSelf && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
-                  <FriendRequestButton
-                    profileId={profile.id}
-                    relationship={profile.relationship}
-                    pendingRequestId={profile.pendingRequestId}
-                    onRelationshipChange={(next) =>
-                      setProfile((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              relationship: next.relationship,
-                              pendingRequestId: next.pendingRequestId,
-                            }
-                          : prev
-                      )
-                    }
-                  />
                 </div>
               </div>
               {profile.bio && (
@@ -225,13 +224,60 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                   {(profile.traits ?? []).map((trait) => (
                     <li
                       key={trait.id}
-                      className="px-2 py-0.5 text-[11px] font-medium tracking-wide text-ink border border-line-subtle bg-surface-2 rounded-chip"
+                      className="px-2 py-0.5 text-2xs font-medium text-ink border border-line-subtle bg-surface-2 rounded-chip"
                     >
                       {trait.label}
                     </li>
                   ))}
                 </ul>
               )}
+              {/* Actions follow the profile text instead of the top-right corner, where the
+                  floating search pill sits on desktop. */}
+              <div
+                className="flex flex-wrap justify-center sm:justify-start items-center gap-2 pt-1 max-sm:[&>*]:flex-1"
+              >
+                {isSelf && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
+                {session.isGuest ? (
+                  <>
+                    {/* Guests can already dress a starter character, so this is the shortest path to sign-up. */}
+                    <HudButton
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => void navigate({ to: '/character' })}
+                      icon={<Shell className="w-3.5 h-3.5" />}
+                    >
+                      Build your own
+                    </HudButton>
+                    <HudButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setAuthOpen(true)}
+                      icon={<UserPlus className="w-3.5 h-3.5" />}
+                    >
+                      Sign up to add friend
+                    </HudButton>
+                  </>
+                ) : (
+                <FriendRequestButton
+                  profileId={profile.id}
+                  relationship={profile.relationship}
+                  pendingRequestId={profile.pendingRequestId}
+                  onRelationshipChange={(next) =>
+                    setProfile((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            relationship: next.relationship,
+                            pendingRequestId: next.pendingRequestId,
+                          }
+                        : prev
+                    )
+                  }
+                />
+                )}
+              </div>
             </div>
           </div>
 
@@ -302,7 +348,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
         <VectorSheetPanel sheet={sheet} self={isSelf} bare hideRating />
         <div className="space-y-3 min-w-0 lg:border-l lg:border-line-subtle lg:pl-8 max-lg:border-t max-lg:border-line-subtle max-lg:pt-4">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="font-grotesk text-sm font-bold text-ink tracking-[0.08em] uppercase">Equipped gear</h2>
+            <h2 className="font-grotesk text-sm font-semibold text-ink">Equipped gear</h2>
             {isSelf && (
               <Link to="/character" className="text-xs text-cyan-glow hover:text-ink">
                 Change gear
@@ -329,8 +375,8 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
 function HeroStat({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="rounded-control border border-line-subtle bg-abyss/40 px-3 py-2.5 min-w-0">
-      <dt className="text-[11px] uppercase tracking-[0.08em] text-ink-muted truncate">{label}</dt>
-      <dd className="mt-1 font-grotesk text-xl font-bold tabular-nums leading-none truncate">{children}</dd>
+      <dt className="eyebrow truncate">{label}</dt>
+      <dd className="mt-1 font-grotesk text-xl font-semibold tabular-nums leading-none truncate">{children}</dd>
     </div>
   )
 }
@@ -347,16 +393,16 @@ function GearRow({ slot, catalog }: { slot: EquipSlotId; catalog?: CatalogRef })
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[11px] uppercase tracking-[0.08em] text-ink-muted">{EQUIP_SLOT_LABELS[slot]}</span>
+        <span className="eyebrow block">{EQUIP_SLOT_LABELS[slot]}</span>
         {catalog ? (
-          <span className={`block text-[13px] font-semibold truncate ${RARITY_STYLES[catalog.rarity].text}`}>
+          <span className={`block text-ui font-semibold truncate ${RARITY_STYLES[catalog.rarity].text}`}>
             {catalog.name}
           </span>
         ) : (
-          <span className="block text-[13px] text-ink-muted">Empty</span>
+          <span className="block text-ui text-ink-muted">Empty</span>
         )}
       </span>
-      {catalog && <BonusList bonuses={gearBonuses(catalog)} className="shrink-0 text-[12px] text-ink-body text-right" />}
+      {catalog && <BonusList bonuses={gearBonuses(catalog)} className="shrink-0 text-xs text-ink-body text-right" />}
     </li>
   )
 }

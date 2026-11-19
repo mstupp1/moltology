@@ -218,15 +218,15 @@ export function CompositeCta({
   className?: string
 }) {
   const sizes = {
-    md: 'px-8 py-4 text-[24px] [--hud-cut:14px]',
-    lg: 'px-10 py-5 text-[30px] [--hud-cut:18px]',
-    xl: 'px-12 py-7 text-[44px] [--hud-cut:24px]',
+    md: 'px-8 py-4 text-[24px]',
+    lg: 'px-10 py-5 text-[30px]',
+    xl: 'px-12 py-7 text-[44px]',
   }[size]
   return (
     <div className={cn('relative inline-flex', className)}>
       <div
         className={cn(
-          'hud-cut inline-flex w-full items-center justify-center gap-4 rounded-control bg-cyan-glow font-bold tracking-[-0.01em] text-abyss',
+          'inline-flex w-full items-center justify-center gap-4 rounded-control bg-cyan-glow font-bold tracking-[-0.01em] text-abyss',
           sizes
         )}
         style={{ boxShadow: '0 0 40px rgba(0, 195, 255, 0.25)' }}

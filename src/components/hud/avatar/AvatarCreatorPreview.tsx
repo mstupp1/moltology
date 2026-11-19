@@ -33,7 +33,7 @@ export const AvatarCreatorPreview: React.FC<AvatarCreatorPreviewProps> = ({ conf
       }`}
     >
       <LobsterAvatarPortrait config={config} size={128} alt="Your portrait" className="w-14 h-14 sm:w-16 sm:h-16" />
-      <span className="text-[11px] font-sans text-ink-muted">Portrait</span>
+      <span className="text-2xs font-sans text-ink-muted">Portrait</span>
     </div>
   </div>
 )

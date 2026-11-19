@@ -21,14 +21,14 @@ export function LeaderboardRailCard({ className }: { className?: string }) {
       <div className="flex items-center justify-between gap-2">
         <h2
           id="leaderboard-rail-heading"
-          className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted flex items-center gap-1.5"
+          className="eyebrow flex items-center gap-1.5"
         >
           <Trophy className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
           Top members this week
         </h2>
         <Link
           to="/forum/leaderboard"
-          className="inline-flex items-center gap-0.5 text-[11px] font-bold text-ink-muted hover:text-cyan-glow rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+          className="inline-flex items-center gap-0.5 text-2xs font-semibold text-ink-muted hover:text-cyan-glow rounded-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
         >
           See all
           <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />

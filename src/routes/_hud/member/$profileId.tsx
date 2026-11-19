@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { memberProfileSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { getMemberShareIdentityFn } from '@/lib/server/member-share'
@@ -11,15 +10,11 @@ const LazyMemberProfilePage = lazy(() =>
 
 function MemberProfileRoute() {
   const { profileId } = Route.useParams()
+  // Public: signed-out visitors can read dossiers; friend requests ask them to sign up.
   return (
-    <GuestLockGuard
-      featureName="Member Profiles"
-      message="Member profiles, loadouts, and friend requests require a signed-in account."
-    >
-      <Suspense fallback={<HudWorkspaceGhost />}>
-        <LazyMemberProfilePage profileId={profileId} canonicalizePath />
-      </Suspense>
-    </GuestLockGuard>
+    <Suspense fallback={<HudWorkspaceGhost />}>
+      <LazyMemberProfilePage profileId={profileId} canonicalizePath opensPage />
+    </Suspense>
   )
 }
 

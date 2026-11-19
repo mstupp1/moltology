@@ -1,3 +1,4 @@
+import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
 import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { EquipmentCategory, EquipmentRarity } from '@/db/schema'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
@@ -127,7 +128,7 @@ function LitTile({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        'min-h-9 shrink-0 rounded-control px-3 text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
+        'min-h-9 shrink-0 rounded-control px-3 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
         active ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
         className,
       )}
@@ -422,12 +423,14 @@ export function MarketShopPage() {
     ) : null
 
   return (
-    <div className="space-y-3 sm:space-y-4 font-sans pb-2">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans pb-2">
       <HudTitlePanel
         treatment="band"
-        joined
         accent="cyan"
-        title="Shop"
+        title="Character"
+        sections={<CharacterSectionNav current="shop" />}
+        actionsBelowOnPhone
+        hideDescriptionOnPhone
         description={
           tab === 'skills'
             ? 'Methods the Oracle can walk you through. Pick one in the chat box, or let the Oracle reach for it.'
@@ -448,7 +451,7 @@ export function MarketShopPage() {
                 aria-selected={tab === t.id}
                 onClick={() => chooseTab(t.id)}
                 className={cn(
-                  'flex-1 sm:flex-none min-h-9 rounded-control px-4 text-[11px] font-semibold tracking-[0.08em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
+                  'flex-1 sm:flex-none min-h-9 rounded-control px-4 text-2xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
                   tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
                 )}
               >
@@ -477,14 +480,14 @@ export function MarketShopPage() {
               <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
                 <HudSelect
                   aria-label="Rarity"
-                  className="min-h-9 text-[13px] sm:w-40"
+                  className="min-h-9 text-ui sm:w-40"
                   value={rarity ?? ''}
                   onChange={(e) => pickRarity((e.target.value || null) as EquipmentRarity | null)}
                   options={[{ value: '', label: 'Any rarity' }, ...RARITY_ORDER.map((r) => ({ value: r, label: RARITY_LABELS[r] }))]}
                 />
                 <HudSelect
                   aria-label="Sort"
-                  className="min-h-9 text-[13px] sm:w-48"
+                  className="min-h-9 text-ui sm:w-48"
                   value={sort}
                   onChange={(e) => updateFilters({ sort: e.target.value as Sort })}
                   options={SORTS}

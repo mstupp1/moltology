@@ -30,10 +30,10 @@ export const HudGhostSkeleton = React.forwardRef<HTMLDivElement, HudGhostSkeleto
   ) => {
     // Subtle color variant styles
     const variantStyles = {
-      cyan: 'bg-[#0b1619] border border-[#00c3ff]/20 text-[#00c3ff]',
-      crimson: 'bg-[#180d0d] border border-[#ff453a]/20 text-[#ff453a]',
-      teal: 'bg-[#0b1916] border border-[#00ffd5]/20 text-[#00ffd5]',
-      neutral: 'bg-[#101515] border border-[#3a4a49]/30 text-[#839493]',
+      cyan: 'bg-surface-2 border border-cyan-glow/20 text-cyan-glow',
+      crimson: 'bg-surface-crimson border border-crimson-aggro/20 text-crimson-aggro',
+      teal: 'bg-surface-2 border border-cyan-glow/20 text-cyan-glow',
+      neutral: 'bg-surface-1 border border-line-subtle/30 text-ink-muted',
     }[variant]
 
     // Preset dimensions
@@ -62,7 +62,7 @@ export const HudGhostSkeleton = React.forwardRef<HTMLDivElement, HudGhostSkeleto
         style={inlineStyles}
         className={cn(
           'relative overflow-hidden select-none animate-pulse',
-          cornerCut && preset !== 'avatar' ? 'chamfer-corner' : (currentPreset.rounded || 'rounded-sm'),
+          cornerCut && preset !== 'avatar' ? 'rounded-control' : (currentPreset.rounded || 'rounded-sm'),
           variantStyles,
           className
         )}
@@ -97,13 +97,13 @@ export function HudGhostCard({
   return (
     <div
       className={cn(
-        'bg-[#080d0e]/80 border border-[#3a4a49]/60 p-4 rounded-sm space-y-4 shadow-sm',
+        'bg-surface-1/80 border border-line-subtle/60 p-4 rounded-sm space-y-4 shadow-sm',
         className
       )}
       {...props}
     >
       {hasHeader && (
-        <div className="flex items-center justify-between gap-4 pb-3 border-b border-[#3a4a49]/40">
+        <div className="flex items-center justify-between gap-4 pb-3 border-b border-line-subtle/40">
           <div className="flex items-center gap-2.5 flex-1">
             <HudGhostSkeleton variant={variant} preset="avatar" width={24} height={24} />
             <HudGhostSkeleton variant={variant} preset="heading" width="40%" height={16} />
@@ -137,7 +137,7 @@ export function HudGhostStatBox({ variant = 'neutral', className = '', ...props 
   return (
     <div
       className={cn(
-        'bg-[#080d0e]/80 border border-[#3a4a49]/60 p-3 rounded-sm space-y-2 relative',
+        'bg-surface-1/80 border border-line-subtle/60 p-3 rounded-sm space-y-2 relative',
         className
       )}
       {...props}
@@ -147,7 +147,7 @@ export function HudGhostStatBox({ variant = 'neutral', className = '', ...props 
         <HudGhostSkeleton variant={variant} width={14} height={14} cornerCut={false} />
       </div>
       <HudGhostSkeleton variant={variant} preset="heading" width="75%" height={22} />
-      <div className="flex items-center justify-between pt-1 border-t border-[#3a4a49]/30">
+      <div className="flex items-center justify-between pt-1 border-t border-line-subtle/30">
         <HudGhostSkeleton variant="neutral" preset="text" width="35%" height={10} />
         <HudGhostSkeleton variant={variant} preset="badge" width={45} height={14} />
       </div>

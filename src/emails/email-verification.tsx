@@ -37,7 +37,7 @@ export function EmailVerificationEmail({ url }: EmailVerificationEmailProps) {
       <Text style={{ color: EMAIL_THEME.text, fontSize: '16px', lineHeight: '24px', textAlign: 'center', margin: '0' }}>
         {EMAIL_VERIFICATION_MAIL.body}
       </Text>
-      <Section style={{ textAlign: 'center', marginTop: '24px', marginBottom: '16px' }}>
+      <Section className="molt-email-cta-wrap" style={{ textAlign: 'center', marginTop: '24px', marginBottom: '16px' }}>
         <TransactionalButton href={url}>{EMAIL_VERIFICATION_MAIL.button}</TransactionalButton>
       </Section>
       <Text style={{ color: EMAIL_THEME.muted, fontSize: '14px', lineHeight: '22px', textAlign: 'center', margin: '0 0 24px' }}>

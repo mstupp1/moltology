@@ -8,21 +8,26 @@ import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useForumAuth } from './ForumShell'
 import { reportAlignmentAction } from '@/lib/alignment-actions'
 
-const STAGE_COLORS: Record<number, string> = {
-  4: 'bg-cyan-soft text-cyan-glow border-line-subtle',
-  3: 'bg-emerald-500/15 text-emerald-400 border-line-subtle',
-  2: 'bg-amber-500/15 text-amber-400 border-line-subtle',
-  1: 'bg-crimson-soft text-crimson-text border-line-subtle',
-}
-
-export function StageBadge({ stage }: { stage: number }) {
-  const normalized = Math.max(1, Math.min(4, stage))
-  const cls = STAGE_COLORS[normalized] || STAGE_COLORS[1]
+/**
+ * A member's stage as a neutral chip in sentence case ("Stage 2"). `compact` shows "S2" on
+ * phones, where it shares a row with the author name, time and counts.
+ */
+export function StageBadge({ stage, compact = false }: { stage: number; compact?: boolean }) {
+  const normalized = Math.max(1, Math.min(4, Math.round(stage) || 1))
+  const label = `Stage ${normalized}`
   return (
     <span
-      className={`inline-block text-[11px] font-sans font-bold uppercase tracking-[0.08em] px-1.5 py-0.2 rounded-chip border ${cls}`}
+      className="inline-flex shrink-0 items-center text-2xs font-sans font-medium px-1.5 py-0.2 rounded-chip border border-line-subtle bg-surface-2 text-ink-body"
+      title={label}
     >
-      STAGE {normalized}
+      {compact ? (
+        <>
+          <span className="sm:hidden" aria-hidden="true">S{normalized}</span>
+          <span className="sr-only sm:not-sr-only">{label}</span>
+        </>
+      ) : (
+        label
+      )}
     </span>
   )
 }
@@ -48,8 +53,8 @@ export function CategoryIcon({ icon, color }: { icon: string; color?: string }) 
 
 export function PinBadge() {
   return (
-    <span className="text-[11px] font-sans bg-crimson-soft text-crimson-text border border-line-subtle px-1.5 py-0.2 font-bold tracking-[0.08em] rounded-chip flex items-center gap-1">
-      <Pin className="w-2.5 h-2.5" /> PINNED
+    <span className="text-2xs font-sans bg-crimson-soft text-crimson-text border border-line-subtle px-1.5 py-0.2 font-semibold rounded-chip flex items-center gap-1">
+      <Pin className="w-2.5 h-2.5" /> Pinned
     </span>
   )
 }
@@ -57,7 +62,7 @@ export function PinBadge() {
 export function LockBadge() {
   return (
     <span
-      className="text-[11px] font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-bold rounded-chip flex items-center gap-1"
+      className="text-2xs font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-semibold rounded-chip flex items-center gap-1"
       data-testid="forum-lock-badge"
     >
       <Lock className="w-2.5 h-2.5" /> Locked
@@ -68,7 +73,7 @@ export function LockBadge() {
 export function WithdrawnBadge() {
   return (
     <span
-      className="text-[11px] font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-bold rounded-chip"
+      className="text-2xs font-sans bg-surface-2 text-ink-muted border border-line-subtle px-1.5 py-0.2 font-semibold rounded-chip"
       data-testid="forum-withdrawn-badge"
     >
       Withdrawn
@@ -83,7 +88,7 @@ export function ForumUnreadMark({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-1 text-[11px] font-sans font-bold text-cyan-glow"
+      className="inline-flex items-center gap-1 text-2xs font-sans font-semibold text-cyan-glow"
       data-testid="forum-unread-mark"
     >
       <span
@@ -204,7 +209,7 @@ export function VoteButton({
             active ? 'text-cyan-glow fill-cyan-glow' : 'text-ink-muted group-hover:text-ink'
           }`}
         />
-        <span className="font-sans font-bold text-xs tabular-nums leading-none">
+        <span className="font-sans font-semibold text-xs tabular-nums leading-none">
           {local.count}
         </span>
       </button>
@@ -233,8 +238,8 @@ export function VoteButton({
         } ${active ? 'text-cyan-glow fill-cyan-glow' : 'text-ink-muted group-hover:text-ink'}`}
       />
       <span
-        className={`font-sans font-bold tabular-nums leading-none ${
-          size === 'sm' ? 'text-[11px]' : 'text-xs'
+        className={`font-sans font-semibold tabular-nums leading-none ${
+          size === 'sm' ? 'text-2xs' : 'text-xs'
         } ${active ? 'text-cyan-glow' : 'text-ink'}`}
       >
         {local.count}

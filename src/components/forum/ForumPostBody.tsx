@@ -22,17 +22,17 @@ const PARAGRAPH_CLASS = 'text-xs sm:text-sm text-ink-body leading-relaxed whites
 
 function QuoteAttribution({ attribution }: { attribution: ForumQuoteAttribution }) {
   return (
-    <p className="text-[11px] text-ink-muted" data-testid="forum-quote-attribution">
+    <p className="text-2xs text-ink-muted" data-testid="forum-quote-attribution">
       {attribution.handle ? (
         <Link
           to="/member/$profileId"
           params={{ profileId: attribution.handle }}
-          className="text-cyan-glow font-bold hover:text-cyan-hover transition-colors"
+          className="text-cyan-glow font-semibold hover:text-cyan-hover transition-colors"
         >
           @{attribution.handle}
         </Link>
       ) : (
-        <span className="text-ink font-bold">{attribution.name}</span>
+        <span className="text-ink font-semibold">{attribution.name}</span>
       )}
       <span> held</span>
     </p>
@@ -51,7 +51,7 @@ function MentionText({ text, keyPrefix }: { text: string; keyPrefix: string }) {
             key={`${keyPrefix}-m${index}`}
             to="/member/$profileId"
             params={{ profileId: part.handle }}
-            className="text-cyan-glow font-bold hover:text-cyan-hover transition-colors"
+            className="text-cyan-glow font-semibold hover:text-cyan-hover transition-colors"
             data-testid="forum-mention-link"
           >
             @{part.handle}
@@ -76,7 +76,7 @@ function renderInline(tokens: Token[] | undefined, keyPrefix: string, inLink = f
         return <React.Fragment key={key}>{(token as Tokens.Escape).text}</React.Fragment>
       case 'strong':
         return (
-          <strong key={key} className="font-bold text-ink">
+          <strong key={key} className="font-semibold text-ink">
             {renderInline((token as Tokens.Strong).tokens, key, inLink)}
           </strong>
         )
@@ -96,7 +96,7 @@ function renderInline(tokens: Token[] | undefined, keyPrefix: string, inLink = f
         return (
           <code
             key={key}
-            className="bg-abyss border border-line-subtle text-ink px-1.5 py-0.5 rounded-chip font-mono text-[11px] sm:text-xs"
+            className="bg-abyss border border-line-subtle text-ink px-1.5 py-0.5 rounded-chip font-mono text-2xs sm:text-xs"
           >
             {(token as Tokens.Codespan).text}
           </code>
@@ -180,7 +180,7 @@ function ForumBlocks({ tokens, depth, keyPrefix }: { tokens: Token[]; depth: num
           }
           case 'heading':
             return (
-              <p key={key} className={`${PARAGRAPH_CLASS} font-bold text-ink`}>
+              <p key={key} className={`${PARAGRAPH_CLASS} font-semibold text-ink`}>
                 {renderInline((token as Tokens.Heading).tokens, key)}
               </p>
             )
@@ -188,7 +188,7 @@ function ForumBlocks({ tokens, depth, keyPrefix }: { tokens: Token[]; depth: num
             return (
               <pre
                 key={key}
-                className="bg-abyss border border-line-subtle rounded-control p-3 overflow-x-auto text-[11px] sm:text-xs leading-relaxed font-mono text-ink"
+                className="bg-abyss border border-line-subtle rounded-control p-3 overflow-x-auto text-2xs sm:text-xs leading-relaxed font-mono text-ink"
               >
                 <code>{(token as Tokens.Code).text}</code>
               </pre>

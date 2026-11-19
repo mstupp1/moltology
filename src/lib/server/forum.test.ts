@@ -240,7 +240,7 @@ describe('Forum Server Handlers', () => {
       context: { user: { sub: 'test-user-id' }, db: mockDb as any },
     })
 
-    expect(stored?.title).toBe('Best Practices for Shell Hardness')
+    expect(stored?.title).toBe('Best practices for shell hardness')
   })
 
   it('creates a topic and returns the mapped entry', async () => {

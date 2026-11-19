@@ -2,9 +2,10 @@
 /**
  * UI Token Guard
  *
- * Blocks new styling that bypasses the shared UI tokens (docs/design/ui-tokens.md):
- * arbitrary hex colour classes, chamfer corners, text under 11px and radii off the
- * chip/control/card/panel scale. Existing hits are recorded per file in
+ * Blocks new styling that bypasses the shared UI tokens (docs/design/ui-tokens.md) and the
+ * Moltology design lock (docs/design/DESIGN.md): arbitrary hex colours, cut corners, one-off
+ * font sizes, positive tracking, uppercase UI text, heavy weights, Tailwind greys, legacy
+ * colours, glows and radii off the chip/control/card/panel scale. Existing hits are recorded per file in
  * scripts/ui-token-baseline.json; a file may only go down, never up.
  *
  * Run: npm run ui:check
@@ -25,9 +26,9 @@ import {
 const BASELINE_PATH = 'scripts/ui-token-baseline.json'
 
 function listSourceFiles(): string[] {
-  return execSync('git ls-files -- "src/*.tsx"', { encoding: 'utf8' })
+  return execSync('git ls-files -- "src/*.tsx" "src/*.ts"', { encoding: 'utf8' })
     .split('\n')
-    .filter((file) => file && !/\.test\.tsx$/.test(file) && fs.existsSync(file))
+    .filter((file) => file && !/\.test\.tsx?$/.test(file) && !/\.d\.ts$/.test(file) && fs.existsSync(file))
 }
 
 function scan(): UiTokenBaseline {

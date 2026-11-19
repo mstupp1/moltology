@@ -6,7 +6,13 @@ import {
   renderEmailVerificationEmailHtml,
   renderEmailVerificationEmailText,
 } from './email-verification'
-import { EMAIL_THEME, TRANSACTIONAL_EMAIL_BRAND_URL, TRANSACTIONAL_EMAIL_FOOTER } from './components/transactional'
+import {
+  EMAIL_THEME,
+  TRANSACTIONAL_EMAIL_BRAND_URL,
+  TRANSACTIONAL_EMAIL_FOOTER,
+  TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL,
+  TRANSACTIONAL_EMAIL_SOCIAL,
+} from './components/transactional'
 
 const url = 'https://moltology.org/api/auth/verify-email?token=abc&next=/dashboard'
 
@@ -20,10 +26,17 @@ describe('email verification React template', () => {
     expect(document.querySelector('h1')?.textContent).toBe(EMAIL_VERIFICATION_MAIL.heading)
     const logo = document.querySelector('img')!
     expect(logo.src).toBe(TRANSACTIONAL_EMAIL_BRAND_URL)
-    expect(logo.alt).toBe('Moltology — The Synaptic Path')
-    expect(logo.width).toBe(110)
-    expect(logo.height).toBe(108)
+    expect(logo.alt).toBe('Moltology')
+    expect(logo.width).toBe(48)
+    expect(logo.height).toBe(48)
     expect(logo.closest('a')?.href).toBe('https://moltology.org/')
+    const images = Array.from(document.querySelectorAll('img'))
+    expect(images.map((img) => img.src)).toEqual([
+      TRANSACTIONAL_EMAIL_BRAND_URL,
+      TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL,
+      TRANSACTIONAL_EMAIL_SOCIAL.youtube.iconUrl,
+      TRANSACTIONAL_EMAIL_SOCIAL.instagram.iconUrl,
+    ])
     expect(html).toContain(`background-color:${EMAIL_THEME.background}`)
     expect(html).toContain(`background-color:${EMAIL_THEME.surface}`)
     const action = Array.from(document.querySelectorAll('a')).find((link) => link.textContent === EMAIL_VERIFICATION_MAIL.button)!
@@ -50,7 +63,12 @@ describe('email verification React template', () => {
     }
     expect(EMAIL_VERIFICATION_EXPIRES_IN_SECONDS).toBe(3600)
     expect(EMAIL_VERIFICATION_MAIL.expiration).toBe('This link expires in 1 hour.')
-    for (const destination of [TRANSACTIONAL_EMAIL_FOOTER.privacyUrl, TRANSACTIONAL_EMAIL_FOOTER.termsUrl]) {
+    for (const destination of [
+      TRANSACTIONAL_EMAIL_FOOTER.privacyUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.termsUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.youtubeUrl,
+      TRANSACTIONAL_EMAIL_FOOTER.instagramUrl,
+    ]) {
       expect(document.querySelector(`a[href="${destination}"]`)).not.toBeNull()
       expect(text).toContain(destination)
     }
@@ -72,8 +90,9 @@ describe('email verification React template', () => {
     expect(renderEmailVerificationEmailText(specialUrl)).toContain(specialUrl)
   })
 
-  it('serves the full PNG logo through the public CDN and preserves the legacy emblem export', () => {
-    expect(TRANSACTIONAL_EMAIL_BRAND_URL).toMatch(/^https:\/\/moltology\.org\/media\/images\/email\/moltology-lockup-dark-[a-f0-9]{12}\.png$/)
+  it('serves the header icon and footer PNG lockup through the public CDN and preserves the legacy emblem export', () => {
+    expect(TRANSACTIONAL_EMAIL_BRAND_URL).toMatch(/^https:\/\/moltology\.org\/media\/images\/email\/moltology-emblem-dark-[a-f0-9]{12}\.png$/)
+    expect(TRANSACTIONAL_EMAIL_FOOTER_LOCKUP_URL).toMatch(/^https:\/\/moltology\.org\/media\/images\/email\/moltology-lockup-muted-[a-f0-9]{12}\.png$/)
     expect(EMAIL_VERIFICATION_EMBLEM_URL).toBe('https://moltology.org/images/order_emblem.png')
   })
 })

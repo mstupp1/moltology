@@ -81,8 +81,10 @@ async function main() {
   if (args.includes('--verify')) {
     await verifyManifest(current)
     const brand = JSON.parse(await fs.readFile(path.join(root, 'src/emails/components/brand-asset.json'), 'utf8'))
-    // Brand manifest dimensions are logical; build-email-brand exports a 3x PNG.
-    await verifyImage({ ...brand, width: brand.width * 3, height: brand.height * 3 })
+    // Brand manifest dimensions are logical; build-email-brand exports 3x PNGs.
+    for (const asset of [brand, brand.footerLockup, brand.social?.youtube, brand.social?.instagram].filter(Boolean)) {
+      await verifyImage({ ...asset, width: asset.width * 3, height: asset.height * 3 })
+    }
     return
   }
   const candidate = await buildImages()

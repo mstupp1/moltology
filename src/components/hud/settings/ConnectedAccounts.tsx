@@ -140,7 +140,7 @@ export function ConnectedAccounts({ oauthError }: { oauthError?: string }) {
   return (
     <div className="space-y-2.5">
       <div>
-        <h3 className="text-xs font-grotesk font-bold text-ink-body">Sign-in methods</h3>
+        <h3 className="text-xs font-grotesk font-semibold text-ink-body">Sign-in methods</h3>
         <p className="text-xs text-ink-muted font-sans mt-0.5">
           Use Google or email and password to sign in to this account.
         </p>

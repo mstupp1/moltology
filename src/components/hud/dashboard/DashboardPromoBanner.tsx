@@ -79,15 +79,15 @@ export function DashboardPromoBanner({ promos = DASHBOARD_PROMOS }: { promos?: D
 
       <div className="p-4 lg:p-5 flex flex-col justify-center gap-3 min-w-0" aria-live="polite">
         <div className="space-y-1 min-w-0">
-          <p className="text-[11px] font-bold tracking-[0.08em] uppercase text-cyan-glow">{promo.eyebrow}</p>
-          <h2 className="font-grotesk text-lg font-bold text-ink leading-snug">{promo.title}</h2>
+          <p className="eyebrow">{promo.eyebrow}</p>
+          <h2 className="font-grotesk text-lg font-semibold text-ink leading-snug">{promo.title}</h2>
           <p className="text-xs text-ink-body leading-relaxed">{promo.description}</p>
         </div>
         <div className="flex items-center justify-between gap-3">
           <Link
             to={promo.to}
             className={cn(
-              'inline-flex items-center gap-2 min-h-8 px-3 rounded-control border border-line bg-surface-1 hud-sheen text-ink font-grotesk text-[11px] font-bold uppercase tracking-[0.08em] hover:bg-surface-2 hover:border-line-strong transition-colors',
+              'inline-flex items-center gap-2 min-h-8 px-3 rounded-control border border-line bg-surface-1 hud-sheen text-ink font-grotesk text-2xs font-semibold hover:bg-surface-2 hover:border-line-strong transition-colors',
               DASHBOARD_FOCUS,
             )}
           >
@@ -99,7 +99,7 @@ export function DashboardPromoBanner({ promos = DASHBOARD_PROMOS }: { promos?: D
               <button type="button" className={NAV_BUTTON} onClick={() => step(-1)} aria-label="Previous feature">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-[11px] text-ink-muted tabular-nums min-w-[2.25rem] text-center" data-testid="dashboard-promo-position">
+              <span className="text-2xs text-ink-muted tabular-nums min-w-[2.25rem] text-center" data-testid="dashboard-promo-position">
                 {index + 1} / {promos.length}
               </span>
               <button type="button" className={NAV_BUTTON} onClick={() => step(1)} aria-label="Next feature">

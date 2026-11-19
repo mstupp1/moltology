@@ -23,9 +23,9 @@ const Section: React.FC<{ id: string; icon: React.ReactNode; title: string; chil
   <section id={id} className="mb-12 scroll-mt-24">
     <div className="flex items-center gap-3 mb-4 pb-3 border-b border-cyan-900/40">
       <div className="text-cyan-400">{icon}</div>
-      <h2 className="text-sm font-bold text-cyan-300 tracking-widest uppercase">{title}</h2>
+      <h2 className="text-sm font-semibold text-cyan-300">{title}</h2>
     </div>
-    <div className="text-sm text-gray-400 leading-relaxed space-y-3">{children}</div>
+    <div className="text-sm text-ink-muted leading-relaxed space-y-3">{children}</div>
   </section>
 )
 
@@ -37,20 +37,20 @@ export const TermsOfServicePage: React.FC = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#0a0f0f] text-[#dfe3e3] font-sans">
+    <div className="min-h-screen bg-surface-1 text-ink font-sans">
       <PublicHeader />
 
       {/* Hero */}
       <div className="relative pt-28 pb-12 px-6 text-center border-b border-cyan-950/60">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,255,255,0.06)_0%,transparent_70%)] pointer-events-none" />
-        <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 text-[10px] text-cyan-400 tracking-widest uppercase mb-6">
+        <div className="inline-flex items-center gap-2 bg-cyan-950/40 border border-cyan-800/40 rounded-full px-4 py-1.5 text-2xs text-cyan-400 mb-6">
           <Gavel className="w-3 h-3" />
           <span>Binding Initiation Covenant</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">
+        <h1 className="text-2xl md:text-3xl font-semibold text-white mb-3 tracking-tight">
           TERMS OF SERVICE
         </h1>
-        <p className="text-xs text-gray-500 max-w-xl mx-auto">
+        <p className="text-xs text-ink-muted max-w-xl mx-auto">
           Moltology System Inc. &nbsp;|&nbsp; Effective: January 1, {CURRENT_YEAR}
         </p>
       </div>
@@ -59,8 +59,8 @@ export const TermsOfServicePage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-10">
         {/* Sticky sidebar TOC */}
         <aside className="hidden md:block w-52 shrink-0">
-          <div className="sticky top-24 space-y-1 text-[10px] text-gray-500 tracking-widest uppercase">
-            <p className="text-cyan-500 font-bold mb-3">Contents</p>
+          <div className="eyebrow sticky top-24 space-y-1">
+            <p className="text-cyan-500 font-semibold mb-3">Contents</p>
             {[
               ['#acceptance', 'Acceptance'],
               ['#eligibility', 'Eligibility'],
@@ -88,7 +88,7 @@ export const TermsOfServicePage: React.FC = () => {
 
         {/* Body */}
         <article className="flex-1 min-w-0">
-          <p className="text-xs text-gray-500 mb-10 leading-relaxed">
+          <p className="text-xs text-ink-muted mb-10 leading-relaxed">
             These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "Initiate," or "you")
             and Moltology System Inc. ("Moltology," "we," "us," or "our") governing your access to and use of the
             Moltology platform, website, and all related services (collectively, the "Services"). Please read these
@@ -183,7 +183,7 @@ export const TermsOfServicePage: React.FC = () => {
           </Section>
 
           <Section id="disclaimer" icon={<AlertTriangle className="w-4 h-4" />} title="Disclaimer of Warranties">
-            <p className="uppercase text-[11px] tracking-wider">
+            <p className="eyebrow">
               THE SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS
               OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
               PURPOSE, TITLE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICES WILL BE UNINTERRUPTED,
@@ -196,7 +196,7 @@ export const TermsOfServicePage: React.FC = () => {
           </Section>
 
           <Section id="liability" icon={<XCircle className="w-4 h-4" />} title="Limitation of Liability">
-            <p className="uppercase text-[11px] tracking-wider">
+            <p className="eyebrow">
               TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, MOLTOLOGY SYSTEM INC. AND ITS OFFICERS, DIRECTORS,
               EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR
               PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR IN CONNECTION
@@ -250,7 +250,7 @@ export const TermsOfServicePage: React.FC = () => {
           <Section id="contact" icon={<Gavel className="w-4 h-4" />} title="Contact">
             <p>Questions about these Terms? Contact us:</p>
             <div className="mt-3 p-4 bg-cyan-950/20 border border-cyan-900/40 rounded space-y-1">
-              <p className="text-white font-bold">Moltology System Inc.</p>
+              <p className="text-white font-semibold">Moltology System Inc.</p>
               <p>
                 Email:{' '}
                 <a href="mailto:support@moltology.org" className="text-cyan-400 hover:underline">
@@ -260,7 +260,7 @@ export const TermsOfServicePage: React.FC = () => {
             </div>
           </Section>
 
-          <div className="mt-4 pt-6 border-t border-cyan-950/60 text-[10px] text-gray-600">
+          <div className="mt-4 pt-6 border-t border-cyan-950/60 text-2xs text-ink-muted/70">
             © {CURRENT_YEAR} Moltology System Inc. All rights reserved. — Effective January 1, {CURRENT_YEAR}
           </div>
         </article>

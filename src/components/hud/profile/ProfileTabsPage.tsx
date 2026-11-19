@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { HudTitleBandTop, HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { BandSectionNav, type BandSection } from '@/components/hud/BandSectionNav'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { usePendingFriendRequests } from '@/hooks/usePendingFriendRequests'
@@ -17,29 +17,14 @@ const LazyConnectionsPage = lazy(() =>
 
 /** Each section and the tab its link opens, so the address always names a real tab. */
 const SECTIONS: Array<{ id: ProfilePageSection; label: string; tab: ProfilePageTab | undefined }> = [
-  { id: 'profile', label: 'Profile', tab: undefined },
+  { id: 'profile', label: 'Overview', tab: undefined },
   { id: 'activity', label: 'Activity', tab: 'activity' },
   { id: 'friends', label: 'Friends', tab: 'friends' },
   { id: 'requests', label: 'Requests', tab: 'requests' },
 ]
 
-const SECTION_TITLES: Record<Exclude<ProfilePageSection, 'profile'>, string> = {
-  activity: 'Activity',
-  friends: 'Friends',
-  requests: 'Requests',
-}
-
-/** First row of the profile's header band: Profile, Activity, Friends, Requests. */
-export function ProfileSectionNav({
-  current,
-  requestCount = 0,
-  alone = false,
-}: {
-  current: ProfilePageSection
-  requestCount?: number
-  /** No title row follows, so this row closes the band itself. */
-  alone?: boolean
-}) {
+/** The profile area's section tabs (pass as the band's `sections`): Overview, Activity, Friends, Requests. */
+export function ProfileSectionNav({ current, requestCount = 0 }: { current: ProfilePageSection; requestCount?: number }) {
   const sections: BandSection<ProfilePageSection>[] = SECTIONS.map((section) => ({
     id: section.id,
     label: section.label,
@@ -48,11 +33,7 @@ export function ProfileSectionNav({
     replace: true,
     badge: section.id === 'requests' ? requestCount : 0,
   }))
-  return (
-    <HudTitleBandTop className={alone ? 'border-b border-line-subtle pb-2' : undefined}>
-      <BandSectionNav label="Profile sections" sections={sections} current={current} />
-    </HudTitleBandTop>
-  )
+  return <BandSectionNav label="Profile sections" sections={sections} current={current} />
 }
 
 /**
@@ -73,15 +54,16 @@ export function ProfileTabsPage({
 
   return (
     <div className="space-y-3 sm:space-y-4 lg:space-y-5">
-      <div>
-        {/* The profile card below carries the member's name as the page heading, so that
-            tab's band is the section row alone. */}
-        <ProfileSectionNav current={section} requestCount={requestCount} alone={section === 'profile'} />
-        {section !== 'profile' && <HudTitlePanel treatment="band" joined title={SECTION_TITLES[section]} />}
-      </div>
+      {/* On the overview the profile card below carries the member's name as the page heading. */}
+      <HudTitlePanel
+        treatment="band"
+        title="Profile"
+        titleAs={section === 'profile' ? 'p' : 'h1'}
+        sections={<ProfileSectionNav current={section} requestCount={requestCount} />}
+      />
       <Suspense fallback={<HudWorkspaceGhost />}>
         {section === 'profile' ? (
-          <LazyMemberProfilePage profileId={profileId} />
+          <LazyMemberProfilePage profileId={profileId} joinsBand />
         ) : section === 'activity' ? (
           <LazyActivityStreamPage />
         ) : section === 'friends' ? (

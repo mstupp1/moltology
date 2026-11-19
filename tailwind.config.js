@@ -58,24 +58,36 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Space Grotesk', 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        // UI and reading text. Titles and the brand use font-grotesk (docs/design/ui-tokens.md "Type").
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         grotesk: ['Space Grotesk', 'sans-serif'],
         mono: ['Space Grotesk', 'ui-sans-serif', 'sans-serif'],
         spacemono: ['Space Grotesk', 'sans-serif'],
         cinzel: ['Cinzel', 'Trajan Pro', 'Georgia', 'serif'],
         garamond: ['EB Garamond', 'Georgia', 'serif'],
       },
+      // The UI type scale (docs/design/ui-tokens.md "Type"). Rem, so it follows the root size step on
+      // larger screens like the rest of Tailwind's scale. Use these instead of text-[Npx].
+      fontSize: {
+        '2xs': ['0.6875rem', { lineHeight: '1rem' }],
+        ui: ['0.8125rem', { lineHeight: '1.25rem' }],
+        md: ['0.9375rem', { lineHeight: '1.5rem' }]
+      },
+      letterSpacing: {
+        // The only positive tracking: small uppercase section labels (.eyebrow).
+        eyebrow: '0.08em'
+      },
       borderRadius: {
         chip: '2px',
-        control: '4px',
+        control: '6px',
         card: '8px',
         panel: '12px'
       },
       boxShadow: {
         menu: '0 12px 32px rgba(0, 0, 0, 0.55)',
         'sheen-inset': 'inset 0 1px 0 rgba(255, 255, 255, 0.03)',
-        // Current page in the public header nav: thin cyan edge and a soft glow.
-        'nav-current': 'inset 0 0 0 1px rgba(0, 195, 255, 0.35), 0 0 18px -6px rgba(0, 195, 255, 0.55)',
+        // Current tab or page: a faint light edge on a surface-3 fill. No glow.
+        'nav-current': 'inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
         'field-focus': '0 0 0 3px rgba(0, 195, 255, 0.18)',
         'field-error': '0 0 0 3px rgba(255, 69, 58, 0.18)',
         'hud-cyan': '0 0 15px rgba(0, 195, 255, 0.4), inset 0 0 10px rgba(0, 195, 255, 0.2)',

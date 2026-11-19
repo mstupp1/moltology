@@ -23,7 +23,15 @@ import {
 import { useIsPhone, useKeyboardInset } from '../../hooks/useChatViewport'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { ORACLE_DRAFT_EVENT, reportAlignmentAction, takeOracleDraft } from '@/lib/alignment-actions'
-import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS, pickLatestChat, pickRecentChats } from './NewChatScreen'
+import { NewChatScreen, pickLatestChat, pickRecentChats, type PromptIdeaGroup, type PromptShortcut } from './NewChatScreen'
+import {
+  localDay,
+  pickStarterChips,
+  starterPageKind,
+  starterPromptText,
+  starterPromptsByGroup,
+  type StarterContext,
+} from '@/lib/oracle-starter-prompts'
 import { OracleChatsPanel } from './OracleChatsPanel'
 import {
   OracleEntityModeToggle,
@@ -60,6 +68,9 @@ import { useOracleUsage } from '@/hooks/useOracleUsage'
 import { isAdmin } from '@/lib/permissions'
 import { CHAT_LIMIT, getChatLimitError } from '@/lib/ai/chat-retention'
 import { readSkillPart, usableSkills } from '@/lib/oracle-skills'
+import { readReadsPart, type OracleReadItem } from '@/lib/oracle-reads'
+import { OracleReadCards } from './OracleReadCards'
+import { useHydrated } from '@/hooks/useHydrated'
 import { useOracleSkills } from '@/hooks/useOracleSkills'
 
 const INLINE_COMPOSER_MIN_WIDTH = 640
@@ -108,6 +119,8 @@ interface ChatMessage {
   stopped?: boolean
   /** The skill that shaped an assistant reply. */
   skill?: { id: string; name: string }
+  /** Site content the Oracle read for an assistant reply. */
+  reads?: OracleReadItem[]
 }
 
 /** Distance from the bottom (px) that still counts as reading the latest turn. */
@@ -119,11 +132,13 @@ const isAbortError = (err: unknown) =>
 
 function toChatMessage(r: any, isMounted: boolean): ChatMessage {
   const skill = r.role === 'assistant' ? readSkillPart(r.parts) : null
+  const reads = r.role === 'assistant' ? readReadsPart(r.parts) : []
   return {
     id: r.id,
     role: r.role,
     content: r.content,
     ...(skill ? { skill: { id: skill.id, name: skill.name } } : {}),
+    ...(reads.length ? { reads } : {}),
     timestamp:
       r.createdAt && isMounted
         ? new Date(r.createdAt).toLocaleTimeString([], {
@@ -433,6 +448,27 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const accessTier: OracleAccessTier = !userId ? 'guest' : usage.snapshot?.isPremium ? 'premium' : 'free'
+
+  // Starter prompts for this visitor and the page behind the chat (the full Oracle page has none).
+  // Day and page are only read after hydration, so server and first client render match.
+  const hydrated = useHydrated()
+  const pathname = hydrated ? window.location.pathname : ''
+  const memberSince = (user as { createdAt?: string | Date } | null | undefined)?.createdAt
+  const { starterChips, starterIdeas } = useMemo(() => {
+    const memberDays = memberSince ? Math.floor((Date.now() - new Date(memberSince).getTime()) / 86_400_000) : undefined
+    const ctx: StarterContext = {
+      audience: accessTier === 'guest' ? 'guest' : accessTier === 'premium' ? 'max' : 'member',
+      memberDays: Number.isFinite(memberDays) ? memberDays : undefined,
+      page: pathname.startsWith('/oracle') ? null : starterPageKind(pathname),
+      today: hydrated ? localDay() : '',
+      seed: userId ?? 'guest',
+    }
+    const toShortcut = (p: { label: string; prompt?: string }): PromptShortcut => ({ label: p.label, prompt: starterPromptText(p) })
+    return {
+      starterChips: pickStarterChips(ctx).map(toShortcut),
+      starterIdeas: starterPromptsByGroup(ctx).map((g): PromptIdeaGroup => ({ id: g.group, label: g.label, prompts: g.prompts.map(toShortcut) })),
+    }
+  }, [accessTier, memberSince, userId, pathname, hydrated])
   const requestedModel = selectedModelId ? getOracleModel(selectedModelId) : null
   const selectedModel = requestedModel && canUseOracleChatModel(requestedModel, accessTier)
     ? requestedModel : getOracleModel(getOracleDefaultModelId(accessTier))
@@ -739,6 +775,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         onThreadId: applyThreadId,
         onChunk: queueStreamText,
         onSkill: labelReply,
+        onReads: (reads) => {
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, reads } : m)))
+        },
+        // The page behind the chat, so "summarize this" means that page. The full
+        // Oracle page has nothing behind it.
+        page: typeof window !== 'undefined' && !window.location.pathname.startsWith('/oracle')
+          ? window.location.pathname
+          : undefined,
       })
 
       if (res.threadId) {
@@ -1086,7 +1130,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Error Alert */}
             {errorMessage && (
-              <div className="bg-crimson-soft border-b border-crimson-aggro/40 px-3 py-1.5 text-[11px] text-crimson-text flex items-center justify-between shrink-0">
+              <div className="bg-crimson-soft border-b border-crimson-aggro/40 px-3 py-1.5 text-2xs text-crimson-text flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-1.5">
                   <AlertCircle className="w-3.5 h-3.5 text-crimson-text shrink-0" />
                   <span>{errorMessage}</span>
@@ -1107,7 +1151,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 isGuest={isGuest}
                 isPhone={isPhone}
                 isCompact={isCompact}
-                shortcuts={DEFAULT_PROMPT_SHORTCUTS}
+                shortcuts={starterChips}
                 onSubmitShortcut={handlePromptSubmit}
                 onRetryFailed={handleRetryFailed}
                 onEditFailed={handleEditFailed}
@@ -1129,7 +1173,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                       onSubmit={handlePromptSubmit}
                       disabled={isSending || usage.blocked}
                       onOpenAuthModal={() => setIsAuthModalOpen(true)}
-                      shortcuts={DEFAULT_PROMPT_SHORTCUTS}
+                      shortcuts={starterChips}
+                      moreIdeas={starterIdeas}
                       composer={isNarrow ? undefined : composer('inline')}
                       recentChats={recentChats}
                       onOpenChat={handleSelectThread}
@@ -1166,7 +1211,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleEditFailed(msg.id)}
-                                className="inline-flex items-center h-7 px-1.5 rounded-control text-[11px] text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                                className="inline-flex items-center h-7 px-1.5 rounded-control text-2xs text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                               >
                                 Edit
                               </button>
@@ -1198,7 +1243,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                   <Link
                                     to="/character/shop"
                                     search={{ tab: 'skills', skill: msg.skill.id } as never}
-                                    className="mb-1 inline-flex items-center gap-1 rounded-chip text-[11px] font-medium text-ink-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                                    className="mb-1 inline-flex items-center gap-1 rounded-chip text-2xs font-medium text-ink-muted hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
                                     title="About this skill"
                                   >
                                     <ScrollText className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
@@ -1215,13 +1260,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                   <MessageThinkingDots />
                                 )}
                                 {msg.stopped && (
-                                  <p className="text-[11px] text-ink-muted">
+                                  <p className="text-2xs text-ink-muted">
                                     {msg.content ? 'Stopped.' : 'Stopped before a reply came through.'}
                                   </p>
                                 )}
+                                {isAssistant && msg.reads?.length ? (
+                                  <OracleReadCards reads={msg.reads} signedIn={Boolean(userId)} />
+                                ) : null}
                                 {showGuestNudge && (
                                   <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-surface-2 px-3 py-2 rounded-control border border-line-subtle">
-                                    <div className="text-[11px] text-ink-body font-sans flex items-center gap-1.5 min-w-0">
+                                    <div className="text-2xs text-ink-body font-sans flex items-center gap-1.5 min-w-0">
                                       <Shield className="w-3 h-3 text-cyan-glow shrink-0" />
                                       <span>Sign up free to save this chat and keep asking.</span>
                                     </div>
@@ -1231,7 +1279,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                       onClick={() => setIsAuthModalOpen(true)}
                                       className="w-full sm:w-auto shrink-0 !min-h-0 !py-0.5 !px-2.5"
                                     >
-                                      <span className="flex items-center justify-center gap-1 text-[11px] font-bold font-grotesk tracking-[0.08em] uppercase">
+                                      <span className="eyebrow flex items-center justify-center gap-1">
                                         <UserPlus className="w-3 h-3" />
                                         <span>Sign Up</span>
                                       </span>
@@ -1240,7 +1288,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                                 )}
                               </MessageContent>
                               {msg.failedError && (
-                                <p role="alert" className="mt-1.5 flex items-center gap-1.5 text-[11px] text-crimson-text">
+                                <p role="alert" className="mt-1.5 flex items-center gap-1.5 text-2xs text-crimson-text">
                                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                   <span>{msg.failedError}</span>
                                 </p>

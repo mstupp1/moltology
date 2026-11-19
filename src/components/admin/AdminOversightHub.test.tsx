@@ -58,10 +58,10 @@ vi.mock('@/lib/server/api', () => ({
   setAdminMemberRoleFn: vi.fn(),
   listAdminPurchasesFn: vi.fn().mockResolvedValue([]),
   getMyExperimentsFn: vi.fn().mockResolvedValue([
-    { id: 'new-store', title: 'New store', description: 'Try the new store.', on: false },
+    { id: 'molt-credits', title: 'Molt Credits', description: 'Try Molt Credits.', on: false },
   ]),
   setExperimentFn: vi.fn().mockResolvedValue([
-    { id: 'new-store', title: 'New store', description: 'Try the new store.', on: true },
+    { id: 'molt-credits', title: 'Molt Credits', description: 'Try Molt Credits.', on: true },
   ]),
 }))
 
@@ -117,12 +117,12 @@ describe('Admin access and oversight hub', () => {
     access.canView = true
     const api = await import('@/lib/server/api')
     render(<AdminOversightHub tab="experiments" />)
-    const toggle = await screen.findByRole('switch', { name: 'New store' })
+    const toggle = await screen.findByRole('switch', { name: 'Molt Credits' })
     expect(toggle).toHaveAttribute('aria-checked', 'false')
     fireEvent.click(toggle)
     await waitFor(() => expect(toggle).toHaveAttribute('aria-checked', 'true'))
     expect(api.setExperimentFn).toHaveBeenCalledWith({
-      data: { userId: 'staff-1', token: 'token', id: 'new-store', on: true },
+      data: { userId: 'staff-1', token: 'token', id: 'molt-credits', on: true },
     })
   })
 

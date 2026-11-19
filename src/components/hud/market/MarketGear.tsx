@@ -70,18 +70,18 @@ export function MarketPieceCard({
           imgClassName="transition-[opacity,transform] duration-200 group-hover:scale-105"
         />
         {shown.owned ? (
-          <span className="absolute top-1.5 right-1.5 inline-flex items-center gap-1 rounded-chip bg-surface-3 px-1 sm:px-1.5 py-0.5 text-[11px] font-semibold text-ink">
+          <span className="absolute top-1.5 right-1.5 inline-flex items-center gap-1 rounded-chip bg-surface-3 px-1 sm:px-1.5 py-0.5 text-2xs font-semibold text-ink">
             <Check className="w-3 h-3" aria-hidden="true" />
             <span className="sr-only sm:not-sr-only">Owned</span>
           </span>
         ) : null}
       </span>
-      <span className="text-[12px] sm:text-[13px] leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">{piece.name}</span>
-      <span className="text-[11px] font-semibold text-cyan-glow tabular-nums">
+      <span className="text-xs sm:text-ui leading-tight text-ink font-semibold line-clamp-2 min-h-[2lh]">{piece.name}</span>
+      <span className="text-2xs font-semibold text-cyan-glow tabular-nums">
         {primaryStatLine({ category: piece.category, primaryStat: shown.primaryStat })}
       </span>
       <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
-        <span className={cn('text-[11px] font-semibold', style.text)}>{RARITY_LABELS[shown.rarity]}</span>
+        <span className={cn('text-2xs font-semibold', style.text)}>{RARITY_LABELS[shown.rarity]}</span>
         {shown.owned ? null : <GemAmount value={shown.price} size="sm" />}
       </span>
       <RarityLadder piece={piece} current={shown.rarity} />
@@ -182,7 +182,7 @@ export function MarketPieceDetail({
               aria-pressed={compare === o.id}
               onClick={() => setCompare(o.id)}
               className={cn(
-                'flex-1 min-h-8 rounded-chip text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
+                'flex-1 min-h-8 rounded-chip text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
                 compare === o.id ? 'bg-surface-3 text-ink shadow-nav-current' : 'text-ink-muted hover:text-ink',
               )}
             >
@@ -218,10 +218,10 @@ export function MarketPieceDetail({
             >
               <span className="flex items-center gap-2">
                 <span className={cn('w-2 h-2 rounded-full', s.dot)} aria-hidden="true" />
-                <span className={cn('text-[13px] font-semibold', s.text)}>{RARITY_LABELS[v.rarity]}</span>
+                <span className={cn('text-ui font-semibold', s.text)}>{RARITY_LABELS[v.rarity]}</span>
               </span>
               {v.owned ? (
-                <span className="text-[12px] font-semibold text-ink-muted">Owned</span>
+                <span className="text-xs font-semibold text-ink-muted">Owned</span>
               ) : (
                 <GemAmount value={v.price} size="sm" />
               )}
@@ -230,7 +230,7 @@ export function MarketPieceDetail({
         })}
       </div>
       {statChange ? (
-        <p className="text-[13px] text-ink-muted">
+        <p className="text-ui text-ink-muted">
           <span className="text-ink font-semibold">If you wear it: </span>
           <BonusChange from={statChange.from} to={statChange.to} />
         </p>
@@ -248,10 +248,10 @@ export function MarketPieceDetail({
       {shown.uniquePower ? (
         <div className={cn('rounded-card border bg-surface-2 p-3', style.frame.split(' ')[0])}>
           <p className={cn('text-sm font-semibold', style.text)}>{shown.uniquePower.name}</p>
-          <p className="text-[13px] text-ink-body leading-relaxed mt-1">{shown.uniquePower.description}</p>
+          <p className="text-ui text-ink-body leading-relaxed mt-1">{shown.uniquePower.description}</p>
         </div>
       ) : null}
-      <p className="text-[13px] italic text-ink-muted leading-relaxed">{piece.flavorText}</p>
+      <p className="text-ui italic text-ink-muted leading-relaxed">{piece.flavorText}</p>
       {shown.owned && guest ? (
         <p className="text-sm text-ink-body text-center">Every new account starts with this piece.</p>
       ) : shown.owned ? (
@@ -294,7 +294,7 @@ export function MarketPieceDetail({
           ) : null}
         </>
       )}
-      <p className="text-[11px] text-ink-muted">Stats are character flavor. They don't change activities or progression.</p>
+      <p className="text-2xs text-ink-muted">Stats are character flavor. They don't change activities or progression.</p>
     </div>
   )
 }

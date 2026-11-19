@@ -22,7 +22,7 @@ const ACCESS_NOTE: Record<NonNullable<OracleSkillCard['access']>, string> = {
 function SkillStatus({ skill }: { skill: OracleSkillCard }) {
   if (skill.access) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-chip bg-surface-3 px-1.5 py-0.5 text-[11px] font-semibold text-ink">
+      <span className="inline-flex items-center gap-1 rounded-chip bg-surface-3 px-1.5 py-0.5 text-2xs font-semibold text-ink">
         <Check className="w-3 h-3" aria-hidden="true" />
         {{ max: 'MAX', starter: 'Free', admin: 'Admin', owned: 'Owned' }[skill.access]}
       </span>
@@ -43,11 +43,11 @@ function SkillCardButton({ skill, selected, onSelect }: { skill: OracleSkillCard
       )}
     >
       <span className="flex min-h-6 items-center justify-between gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{skill.category}</span>
+        <span className="eyebrow">{skill.category}</span>
         <SkillStatus skill={skill} />
       </span>
-      <span className="text-[14px] font-semibold leading-tight text-ink">{skill.name}</span>
-      <span className="text-[13px] leading-snug text-ink-muted line-clamp-2">{skill.summary}</span>
+      <span className="text-sm font-semibold leading-tight text-ink">{skill.name}</span>
+      <span className="text-ui leading-snug text-ink-muted line-clamp-2">{skill.summary}</span>
     </button>
   )
 }
@@ -73,7 +73,7 @@ function SkillDetail({
   return (
     <div className="flex flex-col gap-3" data-testid="skill-detail">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{skill.category}</p>
+        <p className="eyebrow">{skill.category}</p>
         <h2 className="text-lg font-semibold text-ink leading-tight">{skill.name}</h2>
         <p className="mt-1 text-sm text-ink-body leading-relaxed">{skill.summary}</p>
       </div>
@@ -82,7 +82,7 @@ function SkillDetail({
         <h3 className="text-xs font-semibold text-ink-muted mb-1.5">Try saying</h3>
         <ul className="flex flex-col gap-1">
           {skill.examples.map((example) => (
-            <li key={example} className="rounded-control bg-surface-2 px-2.5 py-1.5 text-[13px] text-ink-body">
+            <li key={example} className="rounded-control bg-surface-2 px-2.5 py-1.5 text-ui text-ink-body">
               “{example}”
             </li>
           ))}
@@ -90,9 +90,9 @@ function SkillDetail({
       </div>
 
       <div className="rounded-card border border-line-subtle bg-abyss/40 p-3 flex flex-col gap-2" aria-label="Sample exchange">
-        <p className="self-end max-w-[85%] rounded-control bg-surface-3 px-2.5 py-1.5 text-[13px] text-ink">{skill.preview.member}</p>
-        <p className="max-w-[92%] text-[13px] leading-relaxed text-ink-body">
-          <span className="block text-[11px] font-semibold text-cyan-glow mb-0.5">Oracle</span>
+        <p className="self-end max-w-[85%] rounded-control bg-surface-3 px-2.5 py-1.5 text-ui text-ink">{skill.preview.member}</p>
+        <p className="max-w-[92%] text-ui leading-relaxed text-ink-body">
+          <span className="block text-2xs font-semibold text-cyan-glow mb-0.5">Oracle</span>
           {skill.preview.oracle}
         </p>
       </div>
@@ -104,7 +104,7 @@ function SkillDetail({
             Use in Oracle
           </HudButton>
           <div className="flex items-center justify-between gap-3 rounded-control border border-line-subtle px-3 py-2">
-            <span id={switchLabel} className="text-[13px] text-ink-body">
+            <span id={switchLabel} className="text-ui text-ink-body">
               The Oracle can pick this on its own
             </span>
             <HudSwitch

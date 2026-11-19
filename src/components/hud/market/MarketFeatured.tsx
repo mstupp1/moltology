@@ -37,7 +37,7 @@ const focusRing =
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex w-fit items-center rounded-chip bg-surface-3 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink">
+    <span className="inline-flex w-fit items-center rounded-chip bg-surface-3 px-2 py-0.5 text-2xs font-semibold text-ink">
       {children}
     </span>
   )
@@ -73,7 +73,7 @@ function BundlePrice({ bundle }: { bundle: MarketBundle }) {
   return (
     <span className="flex items-center gap-2">
       <GemAmount value={price} size="sm" />
-      <s className="text-[12px] text-ink-muted tabular-nums">
+      <s className="text-xs text-ink-muted tabular-nums">
         {full.toLocaleString('en-US')}
         <span className="sr-only"> gems separately</span>
       </s>
@@ -142,7 +142,7 @@ export function MarketFeatured({
                 {hero.blurb ? <span className="text-sm text-ink-body leading-relaxed line-clamp-3">{hero.blurb}</span> : null}
                 <span className="mt-1">
                   {hero.resolved.variant.owned ? (
-                    <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-ink-muted">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-ink-muted">
                       <Check className="w-3.5 h-3.5" aria-hidden="true" /> Owned
                     </span>
                   ) : (
@@ -179,9 +179,9 @@ export function MarketFeatured({
                     </span>
                     <span className="flex flex-col gap-1 min-w-0">
                       <Tag>{slot.tag}</Tag>
-                      <span className="text-[13px] font-semibold text-ink leading-tight line-clamp-2">{slot.resolved.piece.name}</span>
+                      <span className="text-ui font-semibold text-ink leading-tight line-clamp-2">{slot.resolved.piece.name}</span>
                       <span className="flex items-center gap-2">
-                        <span className={cn('text-[11px] font-semibold', RARITY_FRAME[slot.resolved.variant.rarity].text)}>
+                        <span className={cn('text-2xs font-semibold', RARITY_FRAME[slot.resolved.variant.rarity].text)}>
                           {RARITY_LABELS[slot.resolved.variant.rarity]}
                         </span>
                         {slot.resolved.variant.owned ? null : <GemAmount value={slot.resolved.variant.price} size="sm" />}
@@ -199,7 +199,7 @@ export function MarketFeatured({
 
       {bundles.length ? (
         <div className="space-y-2">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted px-1">Bundles</h2>
+          <h2 className="text-2xs font-semibold text-ink-muted px-1">Bundles</h2>
           <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 snap-x">
             {bundles.map(({ bundle, items }) => (
               <BundleTile key={bundle.id} bundle={bundle} items={items} onOpen={onOpenBundle} className="w-64 shrink-0 snap-start" />
@@ -242,8 +242,8 @@ function BundleTile({
         <BundleStack items={items} size={large ? 'lg' : 'sm'} />
         {tag ? <Tag>{tag}</Tag> : null}
       </span>
-      <span className={cn('font-semibold text-ink leading-tight', large ? 'text-xl' : 'text-[13px]')}>{bundle.name}</span>
-      <span className="text-[12px] text-ink-muted leading-snug line-clamp-2">{bundle.blurb}</span>
+      <span className={cn('font-semibold text-ink leading-tight', large ? 'text-xl' : 'text-ui')}>{bundle.name}</span>
+      <span className="text-xs text-ink-muted leading-snug line-clamp-2">{bundle.blurb}</span>
       <span className="flex items-center justify-between gap-2 mt-auto">
         <BundlePrice bundle={bundle} />
         <HudBadge variant="neutral">
@@ -271,7 +271,7 @@ export function MarketBundleDetail({
       <BundleStack items={items} size="lg" />
       <div>
         <h2 className="text-lg font-semibold text-ink leading-tight">{bundle.name}</h2>
-        <p className="text-[13px] text-ink-body leading-relaxed mt-1">{bundle.blurb}</p>
+        <p className="text-ui text-ink-body leading-relaxed mt-1">{bundle.blurb}</p>
       </div>
       <ul className="flex flex-col gap-1">
         {items.map(({ piece, variant }) => (
@@ -288,13 +288,13 @@ export function MarketBundleDetail({
                 <Icon variant={variant} className="w-4/5 h-4/5" />
               </span>
               <span className="flex flex-col min-w-0 flex-1">
-                <span className="text-[13px] font-semibold text-ink truncate">{piece.name}</span>
-                <span className={cn('text-[11px] font-semibold', RARITY_FRAME[variant.rarity].text)}>
+                <span className="text-ui font-semibold text-ink truncate">{piece.name}</span>
+                <span className={cn('text-2xs font-semibold', RARITY_FRAME[variant.rarity].text)}>
                   {RARITY_LABELS[variant.rarity]} · {CATEGORY_LABELS[piece.category]}
                 </span>
               </span>
               {variant.owned ? (
-                <span className="text-[12px] font-semibold text-ink-muted">Owned</span>
+                <span className="text-xs font-semibold text-ink-muted">Owned</span>
               ) : (
                 <GemAmount value={variant.price} size="sm" />
               )}
@@ -306,7 +306,7 @@ export function MarketBundleDetail({
         <span className="text-sm text-ink-muted">Bundle price</span>
         <span className="flex items-center gap-2">
           <GemAmount value={price} />
-          <s className="text-[12px] text-ink-muted tabular-nums">{full.toLocaleString('en-US')}</s>
+          <s className="text-xs text-ink-muted tabular-nums">{full.toLocaleString('en-US')}</s>
         </span>
       </div>
       <p className="text-xs text-ink-muted text-center">

@@ -66,16 +66,16 @@ export function StageStrata({ currentIndex, selectedStage, onSelectStage }: Stag
             />
             <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-abyss via-abyss/60 to-transparent" />
             <span className="absolute inset-x-0 top-0 h-20 -z-10 bg-gradient-to-b from-abyss/70 to-transparent" aria-hidden="true" />
-            <span className={cn('absolute left-4 right-4 top-4 text-[11px] font-bold uppercase tracking-[0.08em]', accent.text)}>
+            <span className={cn('eyebrow absolute left-4 right-4 top-4', accent.text)}>
               Stage {stage.stageNum}
               {current ? <span className="text-ink-muted"> · Yours</span> : null}
             </span>
             <span className="block w-full p-4">
-              <span className="block max-w-48 font-grotesk text-lg font-bold uppercase leading-tight tracking-[0.04em] text-ink">
+              <span className="block max-w-48 font-grotesk text-lg font-semibold leading-tight text-ink">
                 {stageName(stage.stageTitle)}
               </span>
               <span className="mt-3 flex items-center justify-between gap-2">
-                <span className="text-[11px] text-ink-body">{xpRangeLabel(stage.stageNum)}</span>
+                <span className="text-2xs text-ink-body">{xpRangeLabel(stage.stageNum)}</span>
                 <span aria-hidden="true" className="flex gap-1">
                   {clearances.map((c) => (
                     <span

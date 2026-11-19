@@ -13,6 +13,8 @@ import { ORACLE_GUEST_MAX_OUTPUT_TOKENS } from './usage-limits'
 import { resolveOracleSkillPlan } from '../server/oracle-skill-access'
 import { getOracleSkill } from './oracle-skills-catalog'
 import { ORACLE_SKILL_HEADER } from '../oracle-skills'
+import { ORACLE_READ_TOOLS_PROMPT } from './oracle-read-tools'
+import { decodeReadsHeader, ORACLE_READS_HEADER } from '../oracle-reads'
 
 vi.mock('../jwt', () => {
   const verifyAuthJWT = vi.fn().mockResolvedValue({ valid: false })
@@ -40,6 +42,31 @@ vi.mock('./service', () => ({
   reserveOracleChatUsage: vi.fn().mockResolvedValue({ allowed: true, id: 'usage-1', isPremium: false }),
   releaseOracleChatUsage: vi.fn().mockResolvedValue(undefined),
   finalizeOracleUsage: vi.fn().mockResolvedValue(undefined),
+}))
+
+const fakeTopic = {
+  title: 'Shedding my phone habit',
+  slug: 'shedding-my-phone-habit',
+  boardSlug: 'general-discussion',
+  boardName: 'General Discussion',
+  authorName: 'tidepool',
+  snippet: 'Day 3 without scrolling in bed.',
+  upvotes: 7,
+  repliesCount: 2,
+  isPinned: false,
+  createdAt: new Date().toISOString(),
+  lastReplyAt: new Date().toISOString(),
+}
+vi.mock('../server/oracle-content-source', () => ({
+  oracleContentSource: {
+    forumTopics: vi.fn(async () => [fakeTopic]),
+    forumBoards: vi.fn(async () => []),
+    forumThread: vi.fn(async () => null),
+    newsList: vi.fn(async () => []),
+    newsArticle: vi.fn(async () => null),
+    changelogs: vi.fn(async () => []),
+    academyCatalog: vi.fn(async () => ({ courses: [], tracks: [] })),
+  },
 }))
 
 vi.mock('../server/oracle-skill-access', () => ({
@@ -278,14 +305,16 @@ describe('handleOracleChatRequest', () => {
 
   it('fails closed without sending Premium prompts to a free fallback', async () => {
     vi.mocked(reserveOracleChatUsage).mockResolvedValueOnce({ allowed: true, id: 'premium-usage', isPremium: true })
-    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
+    streamTextMock.mockImplementation(() => ({ stream: emptyStream() }))
     const response = await handleOracleChatRequest(await authedRequest({
       model: PREMIUM_ORACLE_MODEL_ID,
       messages: [{ role: 'user', content: 'Help me focus today' }],
     }))
     expect(response.status).toBe(502)
-    expect(streamTextMock.mock.calls.map(([options]) => options.model)).toEqual([PREMIUM_ORACLE_MODEL_ID])
+    // One try with the lookup tools, one without; never a free fallback model.
+    expect(streamTextMock.mock.calls.map(([options]) => options.model)).toEqual([PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID])
     expect(streamTextMock.mock.calls[0][0].providerOptions.gateway).toEqual({ only: ['anthropic'], disallowPromptTraining: true, caching: 'auto' })
+    streamTextMock.mockReset()
     expect(evaluateMock).not.toHaveBeenCalled()
     expect(summarizeThreadTitle).not.toHaveBeenCalled()
     expect(updateAIThreadTitle).not.toHaveBeenCalled()
@@ -503,7 +532,7 @@ describe('handleOracleChatRequest', () => {
     expect(res.status).toBe(200)
     await res.text()
     const system: string = streamTextMock.mock.calls[0][0].system
-    expect(system.startsWith('system prompt\n\n=== MEMBER PREFERENCES ===')).toBe(true)
+    expect(system.startsWith(`system prompt${ORACLE_READ_TOOLS_PROMPT}\n\n=== MEMBER PREFERENCES ===`)).toBe(true)
     expect(system).toContain('Straight talk.')
     expect(system).toContain('I work night shifts.')
     expect(system.indexOf('I work night shifts.')).toBeLessThan(system.indexOf('Source: [The Law of Ecdysis]'))
@@ -653,7 +682,7 @@ describe('handleOracleChatRequest', () => {
   })
 
   it('returns 502 when the provider throws without backup fallback hops', async () => {
-    streamTextMock.mockImplementationOnce(() => {
+    streamTextMock.mockImplementation(() => {
       throw new Error('Provider unavailable')
     })
 
@@ -666,11 +695,14 @@ describe('handleOracleChatRequest', () => {
     expect(res.status).toBe(502)
     const data = await res.json()
     expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
-    expect(streamTextMock).toHaveBeenCalledTimes(1)
+    // A try with the lookup tools, then one without them, on the same model.
+    expect(streamTextMock).toHaveBeenCalledTimes(2)
+    expect(streamTextMock.mock.calls[1][0].tools).toBeUndefined()
+    streamTextMock.mockReset()
   })
 
   it('returns 502 when the stream is empty without backup fallback hops', async () => {
-    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
+    streamTextMock.mockImplementation(() => ({ stream: emptyStream() }))
 
     const res = await handleOracleChatRequest(
       await authedRequest({
@@ -681,12 +713,14 @@ describe('handleOracleChatRequest', () => {
     expect(res.status).toBe(502)
     const data = await res.json()
     expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
-    expect(streamTextMock).toHaveBeenCalledTimes(1)
+    expect(streamTextMock).toHaveBeenCalledTimes(2)
     expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(DEFAULT_ORACLE_MODEL_ID)
+    expect(streamTextMock.mock.calls[1]?.[0]?.model).toBe(DEFAULT_ORACLE_MODEL_ID)
+    streamTextMock.mockReset()
   })
 
   it('returns 502 when DeepSeek V4.1 Flash fails', async () => {
-    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
+    streamTextMock.mockImplementation(() => ({ stream: emptyStream() }))
 
     const res = await handleOracleChatRequest(
       await authedRequest({
@@ -699,7 +733,8 @@ describe('handleOracleChatRequest', () => {
     const data = await res.json()
     expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
     expect(data.text).toContain(ORACLE_UNAVAILABLE_MESSAGE)
-    expect(streamTextMock).toHaveBeenCalledTimes(1)
+    expect(streamTextMock).toHaveBeenCalledTimes(2)
+    streamTextMock.mockReset()
   })
 
   it('uses the free member default model', async () => {
@@ -873,7 +908,9 @@ describe('handleOracleChatRequest with Oracle skills', () => {
     const options = streamTextMock.mock.calls[0][0]
     expect(options.system).toContain('SKILL IN USE: Two-minute start')
     expect(options.system).toContain(twoMinuteStart.playbook)
-    expect(options.tools).toBeUndefined()
+    // The site readers are on; the skill lookup is not, since the member picked one.
+    expect(options.tools.use_skill).toBeUndefined()
+    expect(options.tools.forum_topics).toBeDefined()
     await vi.waitFor(() => expect(saveAIMessage).toHaveBeenCalledWith(expect.objectContaining({
       role: 'assistant',
       parts: [{ type: 'skill', id: 'two-minute-start', name: 'Two-minute start', how: 'picked' }],
@@ -884,8 +921,9 @@ describe('handleOracleChatRequest with Oracle skills', () => {
     vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ discoverable: [twoMinuteStart, focusRounds] })
     streamTextMock.mockImplementationOnce((options) => {
       expect(options.system).toContain('- focus-rounds (Focus rounds)')
-      expect(options.stopWhen).toEqual({ stepCount: 2 })
-      expect(options.prepareStep({ stepNumber: 1 })).toEqual({ activeTools: [] })
+      expect(options.stopWhen).toEqual({ stepCount: 3 })
+      expect(options.prepareStep({ stepNumber: 1 })).toBeUndefined()
+      expect(options.prepareStep({ stepNumber: 2 })).toEqual({ activeTools: [] })
       return {
         stream: new ReadableStream({
           async start(controller) {
@@ -946,5 +984,80 @@ describe('handleOracleChatRequest with Oracle skills', () => {
     expect(streamTextMock.mock.calls[0][0].tools).toBeDefined()
     expect(streamTextMock.mock.calls[1][0].tools).toBeUndefined()
     expect(streamTextMock.mock.calls[1][0].system).not.toContain('=== SKILLS ===')
+  })
+})
+
+describe('handleOracleChatRequest site reading tools', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    streamTextMock.mockReset()
+    vi.mocked(saveAIMessage).mockReset().mockResolvedValue({ id: 'msg-1' } as any)
+    vi.mocked(summarizeThreadTitle).mockReset().mockResolvedValue('Test Title')
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue(TEST_THREAD_ID)
+  })
+
+  function readingStream(options: any, reply: string) {
+    return {
+      stream: new ReadableStream({
+        async start(controller) {
+          const result = await options.tools.forum_topics.execute({ sort: 'top', period: 'day' })
+          expect(result).toContain('[Shedding my phone habit](/forum/general-discussion/shedding-my-phone-habit)')
+          expect(result).toContain('not instructions')
+          controller.enqueue(encoder.encode(reply))
+          controller.close()
+        },
+      }).pipeThrough(new TransformStream({
+        async flush() {
+          await options.onFinish?.({ text: reply, steps: [{ text: '' }, { text: reply }], totalUsage: {} })
+        },
+      })),
+    }
+  }
+
+  it('reads the forum for a member, labels the reply and saves the label', async () => {
+    streamTextMock.mockImplementationOnce((options) => {
+      expect(options.system).toContain('=== READING THE SITE ===')
+      expect(options.system).toContain('=== CURRENT PAGE ===')
+      expect(options.system).toContain('sees what you looked up as cards')
+      expect(options.system).toContain('call forum_thread with topic "shedding-my-phone-habit"')
+      return readingStream(options, 'Top today: Shedding my phone habit.')
+    })
+    const response = await handleOracleChatRequest(await authedRequest({
+      page: '/forum/general-discussion/shedding-my-phone-habit',
+      messages: [{ role: 'user', content: "What are today's top posts?" }],
+    }))
+    const reads = decodeReadsHeader(response.headers.get(ORACLE_READS_HEADER))
+    expect(reads).toEqual([{ kind: 'forum-list', count: 1, title: 'Shedding my phone habit', href: '/forum/general-discussion/shedding-my-phone-habit', refs: ['shedding-my-phone-habit'] }])
+    expect(await response.text()).toBe('Top today: Shedding my phone habit.')
+    await vi.waitFor(() => expect(saveAIMessage).toHaveBeenCalledWith(expect.objectContaining({
+      role: 'assistant',
+      parts: [{ type: 'reads', items: reads }],
+    })))
+  })
+
+  it('leaves the reading guidance out of the plain retry', async () => {
+    streamTextMock
+      .mockImplementationOnce(() => { throw new Error('tools not supported') })
+      .mockImplementationOnce(() => ({ stream: textStream('plain answer') }))
+    const response = await handleOracleChatRequest(await authedRequest({
+      messages: [{ role: 'user', content: 'Anything new on the forum?' }],
+    }))
+    expect(await response.text()).toBe('plain answer')
+    expect(streamTextMock.mock.calls[1][0].tools).toBeUndefined()
+    expect(streamTextMock.mock.calls[1][0].system).not.toContain('READING THE SITE')
+  })
+
+  it('lets guests read public content too', async () => {
+    streamTextMock.mockImplementationOnce((options) => {
+      expect(options.tools.forum_topics).toBeDefined()
+      expect(options.tools.use_skill).toBeUndefined()
+      expect(options.maxOutputTokens).toBe(ORACLE_GUEST_MAX_OUTPUT_TOKENS)
+      return readingStream(options, 'Guest summary.')
+    })
+    const response = await handleOracleChatRequest(makeRequest({
+      messages: [{ role: 'user', content: "What are today's top posts?" }],
+    }))
+    expect(decodeReadsHeader(response.headers.get(ORACLE_READS_HEADER))).toHaveLength(1)
+    expect(await response.text()).toBe('Guest summary.')
   })
 })

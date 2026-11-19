@@ -13,8 +13,8 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
         <div className="bg-surface-2 border-b border-line-subtle p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-cyan-glow" />
-            <h2 className="text-xs text-ink font-bold tracking-[0.08em] uppercase">
-              COMMUNITY RULES
+            <h2 className="font-grotesk text-sm font-semibold text-ink">
+              Community rules
             </h2>
           </div>
           <button
@@ -37,11 +37,11 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
               className="p-3.5 border border-line-subtle bg-surface-2 rounded-card space-y-1"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-grotesk font-bold text-xs text-ink uppercase">
+                <span className="eyebrow">
                   {rule.id}. {rule.title}
                 </span>
                 <span
-                  className={`text-[11px] font-sans px-1.5 py-0.2 font-bold uppercase tracking-[0.08em] shrink-0 rounded-chip border border-line-subtle ${
+                  className={`text-2xs font-sans px-1.5 py-0.2 font-semibold shrink-0 rounded-chip border border-line-subtle ${
                     rule.severity === 'CRITICAL'
                       ? 'bg-crimson-soft text-crimson-text'
                       : rule.severity === 'HIGH'
@@ -62,7 +62,7 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
           <span>5 RULES ACTIVE</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-bold text-xs transition-colors uppercase tracking-[0.08em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            className="px-4 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-semibold text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
           >
             Understood
           </button>

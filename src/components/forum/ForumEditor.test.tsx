@@ -72,7 +72,7 @@ describe('ForumEditor', () => {
 
   it('uses a 16px font on phones so iOS does not zoom', async () => {
     render(<Harness />)
-    expect((await screen.findByTestId('forum-editor-input')).className).toContain('text-[16px]')
+    expect((await screen.findByTestId('forum-editor-input')).className).toContain('text-base')
   })
 
   it('is a labelled textbox with a formatting toolbar', async () => {

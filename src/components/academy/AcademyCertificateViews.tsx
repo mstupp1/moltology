@@ -20,29 +20,39 @@ import {
   AcademyEmpty,
   AcademyNav,
   AcademySectionHeading,
+  useAcademyGuestEnroll,
 } from './AcademyChrome'
+import { HudButton } from '@/components/ui/HudButton'
 
 export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) {
   const earned = data.certificates.filter((certificate) => certificate.earned)
   const available = data.certificates.filter((certificate) => !certificate.earned)
+  // The list is public; signed-out visitors get sign-up prompts where earning would start.
+  const guest = useAcademyGuestEnroll()
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div>
-        <AcademyNav current="certificates" />
-        <HudTitlePanel
-          treatment="band"
-          joined
-          title="Certificates"
-          description="Finish every lesson for a course certificate, or every required course on a track for its certificate."
-        />
-      </div>
+      <HudTitlePanel
+        treatment="band"
+        title="Academy"
+        sections={<AcademyNav current="certificates" />}
+        description="Finish every lesson for a course certificate, or every required course on a track for its certificate."
+      />
       <section className="space-y-3" aria-labelledby="earned-heading">
         <AcademySectionHeading
           id="earned-heading"
           title="Earned"
           subtitle={earned.length > 0 ? `${earned.length} issued in your name.` : undefined}
         />
-        {earned.length === 0 ? (
+        {guest.isGuest && data.certificates.length === 0 ? (
+          <AcademyEmpty>{ACADEMY_COPY.emptyCertificatesGuest}</AcademyEmpty>
+        ) : guest.isGuest ? (
+          <div className={cn(ACADEMY_CARD, 'p-4 flex flex-col sm:flex-row sm:items-center gap-3')}>
+            <p className="text-sm text-ink-body flex-1">{ACADEMY_COPY.guestEarnedCertificates}</p>
+            <HudButton type="button" variant="primary" size="sm" onClick={guest.promptSignUp}>
+              {ACADEMY_COPY.guestSignUp}
+            </HudButton>
+          </div>
+        ) : earned.length === 0 ? (
           <AcademyEmpty>{ACADEMY_COPY.emptyEarned}</AcademyEmpty>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -59,11 +69,16 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
         ) : (
           <ul className={cn(ACADEMY_CARD, 'divide-y divide-line-subtle')}>
             {available.map((certificate) => (
-              <AvailableRow key={certificate.slug} certificate={certificate} />
+              <AvailableRow
+                key={certificate.slug}
+                certificate={certificate}
+                onSignUp={guest.isGuest ? guest.promptSignUp : undefined}
+              />
             ))}
           </ul>
         )}
       </section>
+      {guest.modal}
     </div>
   )
 }
@@ -80,18 +95,18 @@ function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
           <Award className="w-5 h-5" aria-hidden="true" />
         </span>
         {certificate.issuedAt ? (
-          <span className="text-[11px] text-ink-muted">Issued {formatIssuedDate(certificate.issuedAt)}</span>
+          <span className="text-2xs text-ink-muted">Issued {formatIssuedDate(certificate.issuedAt)}</span>
         ) : null}
       </div>
       <div className="space-y-1">
-        <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">{scopeLabel(certificate)}</p>
-        <h3 className="font-grotesk font-bold text-lg text-ink leading-snug">{certificate.title}</h3>
+        <p className="eyebrow">{scopeLabel(certificate)}</p>
+        <h3 className="font-grotesk font-semibold text-lg text-ink leading-snug">{certificate.title}</h3>
         {certificate.subjectTitle ? <p className="text-xs text-ink-body">For {certificate.subjectTitle}</p> : null}
       </div>
       {certificate.credentialId ? (
         <p className="mt-auto flex items-center justify-between gap-3 pt-2 border-t border-line-subtle">
-          <span className="font-mono text-[11px] tracking-[0.08em] text-ink-muted">{certificate.credentialId}</span>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-cyan-glow">
+          <span className="font-mono text-2xs text-ink-muted">{certificate.credentialId}</span>
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
             View credential
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
           </span>
@@ -113,15 +128,32 @@ function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
   )
 }
 
-function AvailableRow({ certificate }: { certificate: AcademyCertificateCard }) {
+function AvailableRow({ certificate, onSignUp }: { certificate: AcademyCertificateCard; onSignUp?: () => void }) {
+  if (onSignUp) {
+    return (
+      <li className="flex items-start gap-3 p-4">
+        <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-control bg-surface-2 text-ink-muted">
+          <Award className="w-4 h-4" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="eyebrow">{scopeLabel(certificate)}</p>
+          <h3 className="font-grotesk font-semibold text-ink">{certificate.title}</h3>
+          <p className="text-xs text-ink-body leading-relaxed">{certificate.description}</p>
+        </div>
+        <HudButton type="button" variant="secondary" size="sm" className="shrink-0 self-center" onClick={onSignUp}>
+          {ACADEMY_COPY.guestEarnCertificate}
+        </HudButton>
+      </li>
+    )
+  }
   return (
     <li className="flex items-start gap-3 p-4">
       <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-control bg-surface-2 text-ink-muted">
         <Lock className="w-4 h-4" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1 space-y-1">
-        <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">{scopeLabel(certificate)}</p>
-        <h3 className="font-grotesk font-bold text-ink">{certificate.title}</h3>
+        <p className="eyebrow">{scopeLabel(certificate)}</p>
+        <h3 className="font-grotesk font-semibold text-ink">{certificate.title}</h3>
         <p className="text-xs text-ink-body leading-relaxed">{certificate.description}</p>
       </div>
       {certificate.subjectTitle && certificate.subjectSlug ? (
@@ -129,7 +161,7 @@ function AvailableRow({ certificate }: { certificate: AcademyCertificateCard }) 
           <Link
             to="/academy/tracks/$slug"
             params={{ slug: certificate.subjectSlug }}
-            className={cn('shrink-0 self-center inline-flex items-center gap-1 min-h-8 px-2 rounded-control text-xs font-bold text-cyan-glow hover:bg-surface-2', ACADEMY_FOCUS)}
+            className={cn('shrink-0 self-center inline-flex items-center gap-1 min-h-8 px-2 rounded-control text-xs font-semibold text-cyan-glow hover:bg-surface-2', ACADEMY_FOCUS)}
           >
             <span className="hidden sm:inline">Open track</span>
             <ArrowRight className="w-3.5 h-3.5" aria-label="Open track" />
@@ -138,7 +170,7 @@ function AvailableRow({ certificate }: { certificate: AcademyCertificateCard }) 
           <Link
             to="/academy/courses/$slug"
             params={{ slug: certificate.subjectSlug }}
-            className={cn('shrink-0 self-center inline-flex items-center gap-1 min-h-8 px-2 rounded-control text-xs font-bold text-cyan-glow hover:bg-surface-2', ACADEMY_FOCUS)}
+            className={cn('shrink-0 self-center inline-flex items-center gap-1 min-h-8 px-2 rounded-control text-xs font-semibold text-cyan-glow hover:bg-surface-2', ACADEMY_FOCUS)}
           >
             <span className="hidden sm:inline">Open course</span>
             <ArrowRight className="w-3.5 h-3.5" aria-label="Open course" />
@@ -173,18 +205,18 @@ export function AcademyCredential({ credential }: { credential: AcademyCredentia
         <div className="relative m-2 sm:m-3 rounded-card border border-line-subtle px-5 py-8 sm:px-12 sm:py-12 text-center space-y-5">
           <GlowEmblem size={64} className="mt-2" />
           <div className="space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-cyan-glow">Molt Academy</p>
-            <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">{scopeLabel(credential)}</p>
+            <p className="eyebrow">Molt Academy</p>
+            <p className="eyebrow">{scopeLabel(credential)}</p>
           </div>
-          <h1 className="font-grotesk font-extrabold text-2xl sm:text-4xl text-ink leading-tight">{credential.title}</h1>
+          <h1 className="font-grotesk font-semibold text-2xl sm:text-4xl text-ink leading-tight">{credential.title}</h1>
           <div className="space-y-1.5">
-            <p className="text-xs uppercase tracking-[0.08em] text-ink-muted">Awarded to</p>
-            <p className="font-grotesk font-bold text-xl sm:text-2xl text-ink">{credential.holderName}</p>
+            <p className="eyebrow">Awarded to</p>
+            <p className="font-grotesk font-semibold text-xl sm:text-2xl text-ink">{credential.holderName}</p>
           </div>
           <p className="text-sm text-ink-body leading-relaxed max-w-lg mx-auto">{credential.description}</p>
           <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5 border-t border-line-subtle text-left sm:text-center">
             <div>
-              <dt className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">For</dt>
+              <dt className="eyebrow">For</dt>
               <dd className="text-sm text-ink">
                 {credential.scope === 'track' ? (
                   <Link to="/academy/tracks/$slug" params={{ slug: credential.subjectSlug }} className={cn('text-cyan-glow hover:text-cyan-hover rounded-control', ACADEMY_FOCUS)}>
@@ -198,12 +230,12 @@ export function AcademyCredential({ credential }: { credential: AcademyCredentia
               </dd>
             </div>
             <div>
-              <dt className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">Issued</dt>
+              <dt className="eyebrow">Issued</dt>
               <dd className="text-sm text-ink">{formatIssuedDate(credential.issuedAt)}</dd>
             </div>
             <div>
-              <dt className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">Credential</dt>
-              <dd className="font-mono text-sm tracking-[0.08em] text-ink">{credential.credentialId}</dd>
+              <dt className="eyebrow">Credential</dt>
+              <dd className="font-mono text-sm text-ink">{credential.credentialId}</dd>
             </div>
           </dl>
         </div>

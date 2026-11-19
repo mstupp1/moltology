@@ -6,7 +6,6 @@ import { createSilentSynchronizationBridge } from './silentSynchronizationBridge
 import './silent-synchronization.css'
 import {
   DEEP_WORK_PRESETS,
-  RESET_PRESETS,
   formatTimerClock,
   getSilentSyncProgress,
   SILENT_SYNC_PRESETS,
@@ -32,15 +31,6 @@ const PRACTICE_COPY: Record<AlignmentPractice, {
     presets: SILENT_SYNC_PRESETS,
     defaultMinutes: 3,
     running: 'Syncing',
-  },
-  reset: {
-    eyebrow: 'Breathing timer',
-    title: 'Reset your focus',
-    aria: 'Reset your focus timer',
-    instructions: 'Breathe in slowly, then out a little slower. Look away from the screen. You can stop at any time.',
-    presets: RESET_PRESETS,
-    defaultMinutes: 1,
-    running: 'Breathing',
   },
   'deep-work': {
     eyebrow: 'Focus timer',
@@ -203,8 +193,8 @@ export function SilentSynchronizationDialog({
       <section className="flex max-h-[min(92dvh,760px)] flex-col overflow-y-auto" aria-describedby="silent-sync-instructions">
         <header className="flex items-start justify-between gap-4 border-b border-line-subtle px-5 py-4 sm:px-7">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-cyan-glow">{copy.eyebrow}</p>
-            <h2 className="mt-1 font-grotesk text-xl font-bold text-ink sm:text-2xl">{copy.title}</h2>
+            <p className="eyebrow">{copy.eyebrow}</p>
+            <h2 className="mt-1 font-grotesk text-xl font-semibold text-ink sm:text-2xl">{copy.title}</h2>
           </div>
           <HudButton variant="ghost" size="sm" onClick={handleClose} aria-label="Close dialog">
             Close
@@ -228,7 +218,7 @@ export function SilentSynchronizationDialog({
                 ) : (
                   <span aria-hidden="true" className="size-9 rounded-full border border-cyan-glow/60 bg-cyan-glow/15" />
                 )}
-                <span className="absolute -bottom-5 text-[11px] font-bold uppercase tracking-widest text-ink-muted">Core</span>
+                <span className="eyebrow absolute -bottom-5">Core</span>
               </div>
               <div aria-hidden="true" className={`h-px min-w-6 flex-1 bg-gradient-to-r from-cyan-glow/20 via-cyan-glow to-cyan-glow/20 ${running && !reducedMotion ? 'silent-sync-flow' : ''}`} />
               <div className={`relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-full border border-cyan-glow/40 bg-surface-2 sm:size-24 ${running ? 'silent-sync-pulse shadow-md shadow-cyan-glow/20' : ''}`}>
@@ -236,7 +226,7 @@ export function SilentSynchronizationDialog({
                 <span className="sr-only">{avatarName}</span>
               </div>
             </div>
-            <div className="absolute bottom-3 left-0 right-0 text-center text-[11px] uppercase tracking-[0.16em] text-ink-muted">{running ? copy.running : session === 'complete' ? 'Session complete' : 'Ready'}</div>
+            <div className="eyebrow absolute bottom-3 left-0 right-0 text-center">{running ? copy.running : session === 'complete' ? 'Session complete' : 'Ready'}</div>
           </div>
 
           <div className="flex items-center justify-between gap-3">

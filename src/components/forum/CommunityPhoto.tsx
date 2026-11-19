@@ -173,7 +173,7 @@ export function CommunityPhoto() {
                 }}
               >
                 <span
-                  className={`pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-control border border-line bg-surface-2/95 px-2 py-0.5 text-[11px] font-semibold text-ink shadow-lg transition-opacity ${
+                  className={`pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-control border border-line bg-surface-2/95 px-2 py-0.5 text-2xs font-semibold text-ink shadow-lg transition-opacity ${
                     picked === spot.id ? 'opacity-100' : 'opacity-0 group-focus-visible:opacity-100'
                   }`}
                 >
@@ -185,10 +185,10 @@ export function CommunityPhoto() {
       </div>
       <div className="flex items-center gap-2 border-t border-line-subtle px-3 py-2 sm:px-4">
         <Users className="h-3.5 w-3.5 text-cyan-glow" aria-hidden="true" />
-        <h2 id="community-photo-heading" className="font-grotesk text-xs font-bold uppercase tracking-[0.08em] text-ink">
+        <h2 id="community-photo-heading" className="text-xs font-medium text-ink">
           Community
         </h2>
-        <span className="text-[11px] text-ink-muted">{photo.spots.length === 1 ? '1 member' : `${photo.spots.length} members`}</span>
+        <span className="text-2xs text-ink-muted">{photo.spots.length === 1 ? '1 member' : `${photo.spots.length} members`}</span>
       </div>
     </section>
   )

@@ -35,7 +35,7 @@ export const Route = createFileRoute('/_hud/academy/certificates/')({
 function AcademyCertificatesRoute() {
   const { home } = Route.useLoaderData()
   return (
-    <AcademyFrame membersOnly>
+    <AcademyFrame>
       <AcademyCertificateIndex data={home} />
     </AcademyFrame>
   )

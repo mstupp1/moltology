@@ -51,10 +51,10 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
       <header className={cn(ACADEMY_CARD, 'overflow-hidden grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,300px)]')}>
         <div className="p-4 sm:p-5 lg:p-6 space-y-3 order-2 md:order-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-cyan-glow">Track</span>
+            <span className="eyebrow">Track</span>
             <LevelMark level={detail.level} />
           </div>
-          <h1 className="font-grotesk font-extrabold text-2xl sm:text-3xl text-ink leading-tight">{detail.title}</h1>
+          <h1 className="font-grotesk font-semibold text-2xl sm:text-3xl text-ink leading-tight">{detail.title}</h1>
           <p className="text-sm text-ink-body leading-relaxed max-w-2xl">{detail.subtitle}</p>
           <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-muted">
             <li className="inline-flex items-center gap-1.5">
@@ -93,7 +93,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-4 items-start">
         <section className="space-y-3" aria-labelledby="track-courses-heading">
-          <h2 id="track-courses-heading" className="font-grotesk text-sm font-bold tracking-[0.08em] uppercase text-ink">
+          <h2 id="track-courses-heading" className="font-grotesk text-sm font-semibold text-ink">
             Courses in order
           </h2>
           {detail.courses.length === 0 ? (
@@ -115,19 +115,19 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
                     >
                       <span
                         className={cn(
-                          'flex w-8 h-8 shrink-0 items-center justify-center rounded-control font-grotesk font-bold text-sm tabular-nums',
+                          'flex w-8 h-8 shrink-0 items-center justify-center rounded-control font-grotesk font-semibold text-sm tabular-nums',
                           course.completed ? 'bg-emerald-500/15 text-emerald-500' : lit ? 'bg-cyan-soft text-cyan-glow' : 'bg-surface-2 text-ink-muted',
                         )}
                       >
                         {course.completed ? <CheckCircle2 className="w-4 h-4" aria-label="Complete" /> : index + 1}
                       </span>
                       <div className="flex-1 min-w-0 space-y-1">
-                        <p className="text-[11px] uppercase tracking-[0.08em] text-ink-muted">
-                          <span className="font-bold text-ink">{course.code}</span>
+                        <p className="eyebrow">
+                          <span className="font-semibold text-ink">{course.code}</span>
                           {course.required ? ' · Required' : ' · Optional'} · {formatCourseLength(course.estimatedMinutes)}
-                          {lit ? <span className="font-bold text-cyan-glow"> · Up next</span> : null}
+                          {lit ? <span className="font-semibold text-cyan-glow"> · Up next</span> : null}
                         </p>
-                        <h3 className="font-grotesk font-bold text-ink">{course.title}</h3>
+                        <h3 className="font-grotesk font-semibold text-ink">{course.title}</h3>
                         <p className="text-xs text-ink-body leading-relaxed">{course.subtitle}</p>
                         {course.enrolled && !course.completed ? (
                           <div className="pt-1.5">
@@ -135,7 +135,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
                           </div>
                         ) : null}
                       </div>
-                      <span className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-cyan-glow shrink-0 self-center">
+                      <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow shrink-0 self-center">
                         {course.completed ? 'Review' : course.enrolled ? 'Continue' : 'View course'}
                         <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                       </span>
@@ -149,7 +149,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
 
         <aside className="space-y-3 lg:sticky lg:top-4">
           <section className={cn(ACADEMY_CARD, 'p-4 space-y-3')} aria-labelledby="track-outcomes-heading">
-              <h2 id="track-outcomes-heading" className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+              <h2 id="track-outcomes-heading" className="eyebrow">
                 About this track
               </h2>
               <p className="text-xs text-ink-body leading-relaxed">{detail.description}</p>
@@ -166,11 +166,11 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
             </section>
           {detail.certificate ? (
             <section className={cn(ACADEMY_CARD, 'p-4 space-y-2')} aria-labelledby="track-cert-heading">
-              <p className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.08em] text-ink-muted font-bold">
+              <p className="inline-flex items-center gap-1.5 text-2xs text-ink-muted font-semibold">
                 <Award className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
                 Path certification
               </p>
-              <h2 id="track-cert-heading" className="font-grotesk font-bold text-ink">{detail.certificate.title}</h2>
+              <h2 id="track-cert-heading" className="font-grotesk font-semibold text-ink">{detail.certificate.title}</h2>
               <p className="text-xs text-ink-body leading-relaxed">{detail.certificate.description}</p>
               {detail.certificate.earned && detail.certificate.credentialId ? (
                 <Link

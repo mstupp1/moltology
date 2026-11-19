@@ -70,7 +70,7 @@ describe("Premium HUD route", () => {
 
     expect(
       await screen.findByText(
-        "Oracle MAX is in early access.",
+        "Coming soon",
         {},
         { timeout: LAZY_TIMEOUT },
       ),
@@ -99,7 +99,7 @@ describe("Premium HUD route", () => {
 
     expect(
       await screen.findByText(
-        "Oracle MAX is in early access.",
+        "Coming soon",
         {},
         { timeout: LAZY_TIMEOUT },
       ),
@@ -123,7 +123,7 @@ describe("Premium HUD route", () => {
     render(<Component />);
     expect(
       await screen.findByText(
-        "Oracle MAX is in early access.",
+        "Coming soon",
         {},
         { timeout: LAZY_TIMEOUT },
       ),
@@ -158,7 +158,7 @@ describe("Premium HUD route", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Oracle MAX", level: 3 }),
+      screen.getByRole("heading", { name: "Oracle MAX", level: 2 }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Subscribe to Oracle MAX/i }),

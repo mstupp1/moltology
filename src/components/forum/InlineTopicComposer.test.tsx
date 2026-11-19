@@ -113,7 +113,7 @@ describe('InlineTopicComposer', () => {
 
     // Mobile viewport verification: font size 16px to prevent iOS Safari auto-zoom
     const titleInput = screen.getByLabelText(/title/i)
-    expect(titleInput.className).toContain('text-[16px]')
+    expect(titleInput.className).toContain('text-base')
     // The content editor's 16px phone size is covered in ForumEditor.test.tsx.
   })
 
@@ -149,7 +149,7 @@ describe('InlineTopicComposer', () => {
 
     fireEvent.click(screen.getByTestId('inline-composer-collapsed'))
     expect(screen.getByTestId('inline-composer-expanded')).toBeInTheDocument()
-    expect(screen.getByText('CARAPACE TUNING')).toBeInTheDocument()
+    expect(screen.getAllByText('Carapace Tuning').length).toBeGreaterThan(0)
   })
 
   it('validates minimum length before enabling transmit', async () => {

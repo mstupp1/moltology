@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
 import { setOracleCoreIntroBlocked } from '@/lib/ai/oracle-core-intro'
-import { UnderwaterBubblesCanvas, isLowPowerDevice, readDeviceHints } from '@/components/hud/UnderwaterBubblesCanvas'
+import { UnderwaterBubbles, isLowPowerDevice, readDeviceHints } from '@/components/hud/UnderwaterBubbles'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
@@ -18,6 +18,7 @@ import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
 import '@/styles/scene.css'
 import { useBackdropCovered } from '@/hooks/useBackdropCovered'
+import { usePillClearance } from '@/hooks/usePillClearance'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
@@ -70,6 +71,8 @@ function HudContent() {
               (location.search as string).includes('mainOnly=true') ||
               (location.search as string).includes('main_only=true')))
     )
+  const panelRef = useRef<HTMLDivElement>(null)
+  usePillClearance(panelRef, !isFullscreenRoute && !isMainOnly)
 
   const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
@@ -173,10 +176,10 @@ function HudContent() {
             </div>
           )}
 
-          {/* Clear glass bubbles rising from the vents in the painting */}
+          {/* Clear glass bubbles rising from the vents in the painting, moved by the GPU */}
           {!isFullscreenRoute && (
-            <UnderwaterBubblesCanvas
-              bubbleCount={48}
+            <UnderwaterBubbles
+              bubbleCount={32}
               paused={backdropCovered}
               className="absolute inset-0 pointer-events-none z-[1]"
             />
@@ -198,7 +201,7 @@ function HudContent() {
         <div className="absolute inset-0 bg-benthic-vignette opacity-70 pointer-events-none" />
 
         {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-abyss/80 pointer-events-none" />
 
         {/* Phone: the page panel goes full width, so its tint sits over the whole scene. */}
         <div className="md:hidden absolute inset-0 bg-surface-1/[0.82] pointer-events-none" />
@@ -226,7 +229,9 @@ function HudContent() {
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
-                  : 'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain'
+                  : // Always keep the scrollbar's lane, so pages that scroll and pages that don't share one
+                  // panel width and nothing shifts when switching tabs or pages.
+                  'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain [scrollbar-gutter:stable]'
               } ${
                 // Desktop standard pages keep the scene bright around one see-through page panel.
                 // Phones get the full-width panel tint from the backdrop layer above, so main stays clear there.
@@ -245,7 +250,9 @@ function HudContent() {
                       ? 'absolute top-1 right-2'
                       : // The pill (74px with the XP ring) straddles the page panel's top edge and sits
                         // in the panel's top padding, so content starts right under it, not under a bar.
-                        'sticky -top-6 -mt-6 -mx-2 px-2 pt-2.5 -mb-[44px] shrink-0'
+                        // Pulled back up so the pill (74px with the avatar ring) is centred on the
+                        // band's title row, which is --hud-band-h tall from the panel's top edge.
+                        'sticky -top-6 -mt-6 -mx-2 px-2 pt-2.5 -mb-[calc(37px+var(--hud-band-h)/2)] shrink-0'
                   }`}
                 >
                   <div id="hud-top-controls-slot" className="pointer-events-auto" />
@@ -257,10 +264,11 @@ function HudContent() {
                 // Desktop gutters: main 8px + panel border 1px + panel 15px = the 24px pages had before
                 // the panel, and 1312px max leaves 1280px of content, so page layouts keep their width.
                 <div
+                  ref={panelRef}
                   data-hud-page-panel
                   data-hud-main-only={isMainOnly ? '' : undefined}
                   className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1312px] md:px-[15px] md:pb-6 ${
-                    isMainOnly ? 'md:pt-6' : 'md:pt-[54px]'
+                    isMainOnly ? 'md:pt-6' : 'md:pt-[var(--hud-band-top)]'
                   } md:rounded-panel md:border md:border-line-subtle md:bg-surface-1/[0.68] md:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]`}
                 >
                   <Outlet />

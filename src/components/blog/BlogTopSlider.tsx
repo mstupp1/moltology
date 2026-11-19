@@ -122,19 +122,19 @@ export function BlogTopSlider({
         {/* Header HUD Bar */}
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-line-subtle">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-crimson-soft border border-crimson-aggro/50 text-crimson-text font-sans font-bold text-[11px] tracking-[0.08em] uppercase rounded-chip">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-crimson-soft border border-crimson-aggro/50 text-crimson-text font-sans font-semibold text-2xs rounded-chip">
               <Flame className="w-3.5 h-3.5 text-crimson-aggro animate-pulse" />
               <span>LEAD NEWS DISPATCH · BREAKING COVERAGE #{String(currentIndex + 1).padStart(2, '0')}</span>
             </span>
 
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-cyan-soft border border-line-subtle text-cyan-glow font-sans font-bold text-[11px] uppercase tracking-[0.08em] rounded-chip">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-cyan-soft border border-line-subtle text-cyan-glow font-sans font-semibold text-2xs rounded-chip">
               <Radio className="w-3 h-3 text-cyan-glow animate-ping" />
               <span>{currentPost.category}</span>
             </span>
           </div>
 
           <div className="flex items-center gap-3 font-sans text-xs text-ink-muted">
-            <span className="text-cyan-glow font-bold">
+            <span className="text-cyan-glow font-semibold">
               {String(currentIndex + 1).padStart(2, '0')} / {String(featuredPosts.length).padStart(2, '0')}
             </span>
 
@@ -164,7 +164,7 @@ export function BlogTopSlider({
             <div className="space-y-2">
               <h2
                 onClick={() => onSelectPost(currentPost.slug)}
-                className="font-grotesk font-black text-2xl sm:text-4xl lg:text-5xl text-ink uppercase tracking-tight leading-tight hover:text-cyan-glow transition-colors cursor-pointer drop-shadow-md"
+                className="font-grotesk font-semibold text-2xl sm:text-4xl lg:text-5xl text-ink uppercase tracking-tight leading-tight hover:text-cyan-glow transition-colors cursor-pointer drop-shadow-md"
               >
                 {formatNewsTitle(currentPost.title).headline}
               </h2>
@@ -188,7 +188,7 @@ export function BlogTopSlider({
                   alt={currentPost.authorName}
                   className="w-6 h-6 rounded-full border border-line object-cover"
                 />
-                <span className="text-ink font-bold">{currentPost.authorName}</span>
+                <span className="text-ink font-semibold">{currentPost.authorName}</span>
               </div>
 
               <div className="flex items-center gap-1.5 text-ink-muted">
@@ -221,10 +221,10 @@ export function BlogTopSlider({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent opacity-70" />
 
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-sans text-cyan-glow bg-abyss/85 backdrop-blur-md px-3 py-1.5 border border-line-subtle rounded-control">
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-2xs font-sans text-cyan-glow bg-abyss/85 backdrop-blur-md px-3 py-1.5 border border-line-subtle rounded-control">
                 <span className="flex items-center gap-1.5">
                   <Sparkles className="w-3 h-3 text-cyan-glow" />
-                  <span>SYNAPTIC FRAME</span>
+                  <span>Synaptic frame</span>
                 </span>
                 <span className="text-ink-muted">CLICK TO VIEW</span>
               </div>
@@ -240,7 +240,7 @@ export function BlogTopSlider({
               <button
                 key={post.slug}
                 onClick={() => goToIndex(idx)}
-                className={`relative px-3 py-1.5 text-[11px] font-sans font-bold uppercase transition-all duration-300 rounded-control flex items-center gap-2 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
+                className={`relative px-3 py-1.5 text-2xs font-sans font-semibold transition-all duration-300 rounded-control flex items-center gap-2 border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow ${
                   idx === currentIndex
                     ? 'bg-surface-2 text-ink border-cyan-glow/40'
                     : 'bg-surface-1 text-ink-muted hover:text-ink hover:bg-surface-2 border-line-subtle hover:border-line-hover'
