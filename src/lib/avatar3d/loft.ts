@@ -110,6 +110,7 @@ export function superellipse(k: LoftKey, theta: number): [number, number] {
 
 /** Mesh density for everything lofted from here on; small stills need far fewer rings. */
 let detail = 1
+export const loftDetail = () => detail
 
 /** Build with coarser (or finer) meshes inside `fn`: 0.5 halves rows and ring points. */
 export function withLoftDetail<T>(scale: number, fn: () => T): T {

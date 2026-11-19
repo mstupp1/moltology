@@ -5,6 +5,7 @@
  */
 import { BufferAttribute, BufferGeometry, Mesh, Quaternion, Vector3, Vector4, type Object3D } from 'three'
 import type { Rig } from './rig'
+import { groupOfBone } from './bake'
 
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(Math.max((x - a) / (b - a), 0), 1)
@@ -137,11 +138,20 @@ export const OCCLUDERS = 24
 
 /** Bones whose bulk shades its neighbours. Small parts (eyes, lids, fingers, feelers) do not. */
 const BULKY = /^(chest|pelvis|tail|arm[LR]|forearm[LR]|claw[LR]|thigh[LR]|shin[LR]|foot[LR])$/
+const TORSO = /^(chest|pelvis)$/
 
 export interface Occluders {
-  /** World-space centre (xyz) and radius (w) of each sphere, as the shader reads them. */
+  /**
+   * World-space centre (xyz) of each sphere, and in w its radius plus 10 times the group it moves
+   * with (0 body, 1 left arm, 2 right arm; see bake.ts), as the shader reads them.
+   */
   spheres: Vector4[]
   count: number
+  /**
+   * Once the shading is baked, only these first spheres are still needed: the arms and the torso,
+   * which shade each other as the arms move. The body's own creases are in the bake.
+   */
+  liveCount: number
   /** Move the spheres to where the bones are now. */
   update: () => void
 }
@@ -170,20 +180,24 @@ export function buildOccluders(rig: Rig): Occluders {
       }
     }
   }
-  // The biggest parts matter most if there are more than the shader takes.
+  // The biggest parts matter most if there are more than the shader takes. The arms and torso go
+  // first, so a baked character can stop after them.
+  const rank = (name: string) => (groupOfBone(name) ? 0 : TORSO.test(name) ? 1 : 2)
   items.sort((a, b) => b.r - a.r)
-  const used = items.slice(0, OCCLUDERS)
+  const used = items.slice(0, OCCLUDERS).sort((a, b) => rank(a.bone.name) - rank(b.bone.name))
+  const liveCount = used.filter((item) => rank(item.bone.name) < 2).length
   const spheres = Array.from({ length: OCCLUDERS }, () => new Vector4(0, -1000, 0, 0))
   const w = new Vector3()
   const scale = new Vector3()
   return {
     spheres,
     count: used.length,
+    liveCount,
     update() {
       used.forEach((item, i) => {
         w.copy(item.at).applyMatrix4(item.bone.matrixWorld)
         item.bone.matrixWorld.decompose(new Vector3(), new Quaternion(), scale)
-        spheres[i].set(w.x, w.y, w.z, item.r * scale.x)
+        spheres[i].set(w.x, w.y, w.z, item.r * scale.x + 10 * groupOfBone(item.bone.name))
       })
     },
   }

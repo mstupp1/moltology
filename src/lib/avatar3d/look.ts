@@ -80,6 +80,13 @@ export function lookFromConfig(config: LobsterAvatarConfig): Avatar3DLook {
 const MOTION_KEYS = ['pose', 'temperament'] as const
 const PAINT_KEYS = ['palette', 'finish', 'marking', 'eyeColor', 'pupil', 'bellyColor', 'markingColor', 'markingScale'] as const
 
+/** Everything that decides a character's shape and pose: two looks with the same key bake alike. */
+export function shapeKey(look: Avatar3DLook): string {
+  const rest: Record<string, unknown> = { ...look }
+  for (const key of [...PAINT_KEYS, 'temperament']) delete rest[key]
+  return JSON.stringify(rest)
+}
+
 /**
  * What it takes to turn one look into another: nothing but new bone targets (`motion`), a repaint
  * of the materials (`paint`), or a rebuilt body (`shape`).

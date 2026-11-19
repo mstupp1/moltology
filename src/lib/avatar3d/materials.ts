@@ -155,7 +155,7 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   if (finish === 'pearl') Object.assign(material, { roughness: 0.34, clearcoat: 0.7, clearcoatRoughness: 0.2, iridescence: 1, iridescenceIOR: 1.6 })
   // Polished metal that still reads as the shell's colour: not a full mirror, which shows the
   // room as blotches on rounded shells.
-  if (finish === 'chrome') Object.assign(material, { roughness: 0.2, metalness: 0.45, clearcoat: 1, clearcoatRoughness: 0.05, sheen: 0, envMapIntensity: 3.5 })
+  if (finish === 'chrome') Object.assign(material, { roughness: 0.2, metalness: 0.45, clearcoat: 1, clearcoatRoughness: 0.05, sheen: 0, envMapIntensity: 2.2 })
   const u = material.userData.uniforms as ShellUniforms
   u.uShade.value.set(o.shade)
   u.uMark.value.set(o.markingColor ?? o.shade)
@@ -175,6 +175,9 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   material.needsUpdate = true
 }
 
+/** How strongly the baked shading darkens (1 is the full measured amount). */
+const BAKE_STRENGTH = 0.9
+
 type ShellUniforms = ReturnType<typeof shellUniforms>
 const shellUniforms = () => ({
   uShade: { value: new Color() },
@@ -190,6 +193,9 @@ const shellUniforms = () => ({
   // Spheres standing in for the body's bulk, which shade the shell where parts crowd it.
   uOcc: { value: Array.from({ length: OCCLUDERS }, () => new Vector4(0, -1000, 0, 0)) },
   uOccN: { value: 0 },
+  // 1 once the body's creases are baked into the vertices: a sphere then shades only what moves
+  // apart from it (an arm against the body, the body against an arm).
+  uBaked: { value: 0 },
   uThin: { value: 0 },
   uWet: { value: 0 },
 })
@@ -197,11 +203,12 @@ const shellUniforms = () => ({
 /** Let a character's shell materials shade themselves with its own occluder spheres. */
 const SHELL_SLOTS = ['shell', 'fin', 'belly', 'brow'] as const
 
-export function shadeWith(materials: Record<MaterialSlot, Material>, spheres: Vector4[], count: number): void {
+export function shadeWith(materials: Record<MaterialSlot, Material>, spheres: Vector4[], count: number, baked = false): void {
   for (const slot of SHELL_SLOTS) {
     const u = (materials[slot] as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
     u.uOcc.value = spheres
     u.uOccN.value = count
+    u.uBaked.value = baked ? 1 : 0
   }
 }
 
@@ -209,12 +216,14 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
   const material = new MeshPhysicalMaterial({ vertexColors: true })
   const uniforms = shellUniforms()
   material.userData.uniforms = uniforms
+  // Every mesh drawn with it carries a `bake` attribute (bake.ts).
+  material.userData.bakedAo = true
   paintShell(material, o)
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms)
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nattribute vec3 restPos;\nvarying vec3 vRest;\nvarying vec3 vA3World;\nvarying vec3 vA3Normal;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRest = restPos;')
+      .replace('#include <common>', '#include <common>\nattribute vec3 restPos;\nattribute vec2 bake;\nvarying vec3 vRest;\nvarying vec2 vBake;\nvarying vec3 vA3World;\nvarying vec3 vA3Normal;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRest = restPos;\nvBake = bake;')
       .replace(
         '#include <project_vertex>',
         '#include <project_vertex>\nvA3World = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvA3Normal = normalize(mat3(modelMatrix) * objectNormal);',
@@ -224,13 +233,16 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         '#include <common>',
         `#include <common>
         varying vec3 vRest;
+        varying vec2 vBake;
         varying vec3 vA3World;
         varying vec3 vA3Normal;
         uniform vec4 uOcc[${OCCLUDERS}];
         uniform int uOccN;
+        uniform float uBaked;
         uniform float uThin; uniform float uWet;
         uniform vec3 uShade; uniform vec3 uMark; uniform vec3 uSplit; uniform vec3 uSoft;
         uniform int uMarking; uniform float uMarkScale; uniform float uGrain; uniform float uDetail; uniform float uGlow; uniform float uMarkGlow;
+        #define A3_BAKE_STRENGTH ${BAKE_STRENGTH.toFixed(2)}
         float a3Mask = 0.0;
         float a3Soft = 0.0;
         float a3Pebble = 0.0;
@@ -298,18 +310,26 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         // Soft contact shadow: how much of the sky around this point the body's other parts hide.
         float a3Occ = 1.0;
         vec3 a3N = normalize(vA3Normal);
+        float a3Group = floor(vBake.y + 0.5);
         for (int i = 0; i < ${OCCLUDERS}; i++) {
           if (i >= uOccN) break;
+          float a3SphereGroup = floor(uOcc[i].w / 10.0);
+          // The bake already holds what moves together.
+          if (uBaked > 0.5 && a3SphereGroup == a3Group) continue;
           vec3 a3D = uOcc[i].xyz - vA3World;
           float a3L2 = max(dot(a3D, a3D), 1e-6);
-          float a3R = uOcc[i].w;
+          float a3R = uOcc[i].w - a3SphereGroup * 10.0;
           a3Occ *= 1.0 - clamp(1.5 * max(dot(a3N, a3D * inversesqrt(a3L2)), 0.0) * a3R * a3R / a3L2, 0.0, 0.85);
         }
         a3Occ = max(a3Occ, 0.3);
-        reflectedLight.indirectDiffuse *= a3Occ;
-        reflectedLight.indirectSpecular *= a3Occ;
-        reflectedLight.directDiffuse *= mix(1.0, a3Occ, 0.55);
-        reflectedLight.directSpecular *= mix(1.0, a3Occ, 0.4);
+        // Baked: the share of the sky this point sees past the rest of its own part of the body.
+        // It also dims direct light a fair way, which is what gives creases their painted depth.
+        float a3Baked = mix(1.0, pow(vBake.x, 1.5), A3_BAKE_STRENGTH);
+        reflectedLight.indirectDiffuse *= a3Occ * a3Baked;
+        reflectedLight.indirectSpecular *= a3Occ * a3Baked;
+        reflectedLight.directDiffuse *= mix(1.0, a3Occ, 0.55) * mix(1.0, a3Baked, 0.75);
+        reflectedLight.directSpecular *= mix(1.0, a3Occ, 0.4) * mix(1.0, a3Baked, 0.6);
+        a3Occ *= a3Baked;
         // Light through thin parts: fins, feelers and soft joints glow warm toward their edges.
         float a3Thin = max(uThin, a3Soft * 0.6);
         if (a3Thin > 0.0) {
@@ -323,7 +343,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-7'
+  material.customProgramCacheKey = () => 'avatar3d-shell-8'
   return material
 }
 
