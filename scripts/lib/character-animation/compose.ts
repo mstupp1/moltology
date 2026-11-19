@@ -28,20 +28,65 @@ async function ffmpeg(args: string[]): Promise<void> {
  * the character stands and a darker edge, in the site's colours. Painted ImageGen backdrops
  * replace it for real episodes.
  */
-export async function defaultBackdrop(outPath: string): Promise<string> {
+const BACKDROP_TONES: Record<string, { sky: [string, string, string]; shaft: string; pool: string }> = {
+  'open-water': { sky: ['#0b3a4f', '#08263a', '#040d18'], shaft: '160,235,255', pool: '90,170,190' },
+  'codex-study': { sky: ['#3b2618', '#22150d', '#0c0705'], shaft: '255,205,140', pool: '210,150,90' },
+  'reef-office': { sky: ['#0f4c55', '#0a3038', '#041419'], shaft: '170,245,240', pool: '110,200,190' },
+}
+
+/** Shelves of books along the back wall, for the Codex study. */
+function shelves(ctx: SKRSContext2D) {
+  const spines = ['#7a2e2a', '#2f4f6e', '#6b5a2a', '#3d5c3a', '#5a3a62', '#8a6a3a']
+  for (const [x0, w] of [[40, 360], [680, 360]] as const) {
+    for (let row = 0; row < 4; row++) {
+      const y = 330 + row * 190
+      ctx.fillStyle = 'rgba(30,18,10,0.9)'
+      ctx.fillRect(x0, y + 150, w, 16)
+      let x = x0 + 10
+      let k = row * 3 + x0
+      while (x < x0 + w - 30) {
+        const bw = 18 + ((k * 37) % 22)
+        const bh = 100 + ((k * 53) % 45)
+        ctx.fillStyle = spines[k % spines.length]
+        ctx.globalAlpha = 0.55
+        ctx.fillRect(x, y + 150 - bh, bw, bh)
+        x += bw + 3
+        k++
+      }
+      ctx.globalAlpha = 1
+    }
+  }
+}
+
+/** A tall window of bright water, for the reef office. */
+function window_(ctx: SKRSContext2D) {
+  const g = ctx.createLinearGradient(0, 260, 0, 1100)
+  g.addColorStop(0, 'rgba(120,230,235,0.32)')
+  g.addColorStop(1, 'rgba(120,230,235,0.06)')
+  ctx.fillStyle = g
+  ctx.fillRect(330, 260, 420, 840)
+  ctx.fillStyle = 'rgba(6,30,36,0.85)'
+  ctx.fillRect(530, 260, 20, 840)
+  ctx.fillRect(330, 660, 420, 18)
+}
+
+export async function defaultBackdrop(outPath: string, set?: string): Promise<string> {
+  const tone = BACKDROP_TONES[set ?? 'open-water'] ?? BACKDROP_TONES['open-water']
   const canvas = createCanvas(OUT_W, OUT_H)
   const ctx = canvas.getContext('2d')
   const sky = ctx.createLinearGradient(0, 0, 0, OUT_H)
-  sky.addColorStop(0, '#0b3a4f')
-  sky.addColorStop(0.45, '#08263a')
-  sky.addColorStop(1, '#040d18')
+  sky.addColorStop(0, tone.sky[0])
+  sky.addColorStop(0.45, tone.sky[1])
+  sky.addColorStop(1, tone.sky[2])
   ctx.fillStyle = sky
   ctx.fillRect(0, 0, OUT_W, OUT_H)
+  if (set === 'codex-study') shelves(ctx)
+  if (set === 'reef-office') window_(ctx)
   // Light falling from above, in three soft shafts.
   for (const [x, w, a] of [[300, 260, 0.07], [620, 180, 0.05], [820, 220, 0.04]] as const) {
     const g = ctx.createLinearGradient(0, 0, 0, OUT_H * 0.85)
-    g.addColorStop(0, `rgba(160,235,255,${a})`)
-    g.addColorStop(1, 'rgba(160,235,255,0)')
+    g.addColorStop(0, `rgba(${tone.shaft},${a})`)
+    g.addColorStop(1, `rgba(${tone.shaft},0)`)
     ctx.fillStyle = g
     ctx.beginPath()
     ctx.moveTo(x - w * 0.3, 0)
@@ -53,8 +98,8 @@ export async function defaultBackdrop(outPath: string): Promise<string> {
   }
   // A pale sandy floor glow where the character stands.
   const pool = ctx.createRadialGradient(OUT_W / 2, OUT_H * 0.8, 40, OUT_W / 2, OUT_H * 0.8, OUT_W * 0.75)
-  pool.addColorStop(0, 'rgba(90,170,190,0.32)')
-  pool.addColorStop(1, 'rgba(90,170,190,0)')
+  pool.addColorStop(0, `rgba(${tone.pool},0.32)`)
+  pool.addColorStop(1, `rgba(${tone.pool},0)`)
   ctx.fillStyle = pool
   ctx.fillRect(0, 0, OUT_W, OUT_H)
   const edge = ctx.createRadialGradient(OUT_W / 2, OUT_H / 2, OUT_H * 0.3, OUT_W / 2, OUT_H / 2, OUT_H * 0.75)

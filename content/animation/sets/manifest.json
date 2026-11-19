@@ -1,0 +1,36 @@
+{
+  "codex-study": {
+    "plate": {
+      "key": "animation/sets/codex-study/plate.jpg",
+      "sha": "3fde93a84a78"
+    },
+    "floor": {
+      "key": "animation/sets/codex-study/floor.jpg",
+      "sha": "be89a15bbce6"
+    },
+    "rug": {
+      "key": "animation/sets/codex-study/rug.jpg",
+      "sha": "e5f1b3ec06be"
+    }
+  },
+  "reef-office": {
+    "plate": {
+      "key": "animation/sets/reef-office/plate.jpg",
+      "sha": "e804abd2df9a"
+    },
+    "floor": {
+      "key": "animation/sets/reef-office/floor.jpg",
+      "sha": "7184f6b51089"
+    }
+  },
+  "open-water": {
+    "plate": {
+      "key": "animation/sets/open-water/plate.jpg",
+      "sha": "5f831c6ba79a"
+    },
+    "floor": {
+      "key": "animation/sets/open-water/floor.jpg",
+      "sha": "a8dc1718791c"
+    }
+  }
+}

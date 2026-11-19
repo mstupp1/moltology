@@ -1,10 +1,12 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { buildTimeline, castLook, estimateWords, lessonProblems, narrationOf, reelDraftFrom, sceneWindows, talkFromWords, type Lesson } from './lesson'
+import { buildTimeline, castLook, castOf, estimateWords, lessonProblems, narrationOf, reelDraftFrom, sceneWindows, talkFromWords, type Lesson } from './lesson'
+import { segmentsOf } from './voices'
 import { talkFromSamples } from './talk'
 
 const example: Lesson = JSON.parse(fs.readFileSync(path.resolve('content/animation/examples/daily-shedding-routine.json'), 'utf8'))
+const dialogue: Lesson = JSON.parse(fs.readFileSync(path.resolve('content/animation/examples/nightly-molt-audit.json'), 'utf8'))
 
 describe('animated lessons', () => {
   it('accepts the example lesson and resolves its host from the cast', () => {
@@ -17,8 +19,8 @@ describe('animated lessons', () => {
   it('flags lessons that would make a bad short', () => {
     const bad = { ...example, hookHeadline: 'Something else entirely.', scenes: example.scenes.slice(0, 5) }
     const problems = lessonProblems(bad)
-    expect(problems).toContain('a short has exactly six scenes')
-    expect(problems).toContain('hookHeadline must be the exact start of scene 1')
+    expect(problems).toContain('a short has six to ten scenes')
+    expect(problems).toContain('scene 1 must be exactly the hookHeadline (put the rest of the line in scene 2)')
     const wrongWord = { ...example, scenes: example.scenes.map((s, i) => (i === 0 ? { ...s, react: [{ kind: 'snap' as const, word: 40 }] } : s)) }
     expect(lessonProblems(wrongWord).some((p) => p.includes('reaction word 40'))).toBe(true)
   })
@@ -43,12 +45,15 @@ describe('animated lessons', () => {
     const talk = talkFromWords(words, fps, frames)
     expect(talk.some((v) => v > 0.5)).toBe(true)
     expect(talk[0]).toBe(0)
-    const { timeline, hookEnd } = buildTimeline(example, castLook(example.host), words, talk, { width: 540, height: 960, fps, hookLift: 0.5 })
+    const { timeline, hookEnd } = buildTimeline(example, { [example.host]: castLook(example.host) }, words, [talk], { width: 540, height: 960, fps, hookLift: 0.5 })
     expect(timeline.frames).toBe(frames)
     expect(timeline.look.pose).toBe('point')
     // The hook opens on a cut with the camera aimed high, then lets the character back up after it.
     expect(timeline.cues[0]).toMatchObject({ t: 0, camera: { cut: true, lift: 0.5 } })
-    expect(timeline.cues.some((c) => c.t === hookEnd && c.camera?.lift === 0)).toBe(true)
+    // The lift holds through the first scene and goes on a cut, never a slide.
+    expect(timeline.cues.some((c) => c.t > 0 && c.t <= hookEnd && c.camera)).toBe(false)
+    const second = timeline.cues.find((c) => c.t > 0 && c.camera)
+    expect(second?.camera).toMatchObject({ lift: 0, cut: true })
     // The snap on "first" in scene three lands as that word is spoken.
     const first = words.findIndex((w) => w.word === 'first.')
     expect(timeline.cues.some((c) => c.react?.kind === 'snap' && c.t === words[first].startMs / 1000)).toBe(true)
@@ -72,5 +77,45 @@ describe('animated lessons', () => {
     expect(talk).toHaveLength(30)
     expect(Math.max(...talk.slice(0, 14))).toBe(0)
     expect(talk[29]).toBeGreaterThan(0.8)
+  })
+
+  it('accepts the dialogue example and puts the host first', () => {
+    expect(lessonProblems(dialogue)).toEqual([])
+    expect(castOf(dialogue).map((c) => c.id)).toEqual(['host-crab', 'junior-lobster'])
+    const bad = { ...dialogue, scenes: dialogue.scenes.map((s, i) => (i === 0 ? { ...s, speaker: 'nobody' } : s)) }
+    expect(lessonProblems(bad)).toContain('scene 1 speaker "nobody" is not in the cast')
+  })
+
+  it('voices runs of lines by one speaker as one take, in their own voice', () => {
+    const segments = segmentsOf(dialogue, 'BOOK RECORD REGULAR')
+    expect(segments.map((s) => s.speaker)).toEqual(['junior-lobster', 'host-crab', 'junior-lobster', 'host-crab', 'junior-lobster', 'host-crab'])
+    expect(segments[0].scenes).toEqual([0, 1]) // hook and the next line: one take
+    expect(segments[3].scenes).toEqual([4, 5])
+    expect(segments[0].voice).toBe('Friendly Young Female')
+    expect(segments[1].voice).toBe('BOOK RECORD REGULAR')
+    const narrated = { ...dialogue, scenes: dialogue.scenes.map((s) => ({ ...s, speaker: 'narrator' })) }
+    expect(segmentsOf(narrated, 'Laura')).toEqual([expect.objectContaining({ speaker: 'narrator', voice: 'Laura' })])
+  })
+
+  it('stages a dialogue: two-shots take in everyone, cuts go to the speaker, listeners turn to them', () => {
+    const words = estimateWords(narrationOf(dialogue))
+    const looks = Object.fromEntries(castOf(dialogue).map((c) => [c.id, castLook(c.id)]))
+    const { timeline, windows } = buildTimeline(dialogue, looks, words, [[], []], { width: 540, height: 960, fps: 30 })
+    expect(timeline.cast?.map((c) => c.x)).toEqual([0.75, -0.75])
+    expect(timeline.set).toBe('codex-study')
+    const cameraAt = (t: number) => timeline.cues.find((c) => c.t === t && c.camera)!.camera!
+    expect(cameraAt(windows[0].start).pan).toBe(0) // two-shot of both
+    expect(cameraAt(windows[1].start).pan).toBe(-0.75) // the junior, still speaking
+    expect(cameraAt(windows[2].start).pan).toBe(0.75) // the host speaking
+    // While the host speaks in scene 3, the junior (cast index 1) looks toward it, to the viewer's right.
+    const junior = timeline.cues.find((c) => c.t === windows[2].start && c.who === 1 && c.look)!
+    expect(junior.look!.x).toBeGreaterThan(0)
+    expect(timeline.cues.find((c) => c.t === windows[2].start && c.who === 1 && c.yaw !== undefined)!.yaw).toBeGreaterThan(0)
+  })
+
+  it('folds a longer dialogue into the six scene prompts reel:create stores', () => {
+    const draft = reelDraftFrom(dialogue)
+    expect(draft.scenePrompts).toHaveLength(6)
+    expect((draft.scenePrompts as string[]).join(' ')).toContain('Both face camera')
   })
 })

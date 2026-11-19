@@ -8,6 +8,7 @@ import path from 'node:path'
 import { AVATAR_POSES, type AvatarPose } from '../../../src/lib/avatar/traits'
 import { lookFromConfig, type Avatar3DLook } from '../../../src/lib/avatar3d/look'
 import type { Reaction } from '../../../src/lib/avatar3d/motion'
+import { SET_NAMES, type SetName } from '../../../src/lib/avatar3d/sets'
 import { SHOTS, type AnimationTimeline, type CameraMove, type ShotName, type TimelineCue } from '../../../src/lib/avatar3d/scripted'
 import { parseLobsterAvatarConfig } from '../../../src/lib/lobster-avatar'
 import { tokenizeScriptText, type WordBoundaryEvent } from '../tts-engine'
@@ -18,10 +19,32 @@ export type LessonLook = (typeof LOOKS)[number]
 export const FRAMES = ['center', 'left', 'right'] as const
 export type LessonFrame = (typeof FRAMES)[number]
 export const MOVES: readonly CameraMove[] = ['cut', 'glide', 'push-in', 'pull-out']
+export const MARKS = ['left', 'center', 'right'] as const
+export type Mark = (typeof MARKS)[number]
+/** Where each mark stands on the floor, in world units. */
+const MARK_X: Record<Mark, number> = { left: -0.75, center: 0, right: 0.75 }
+/** The narrator: a voice with no body, so no mouth moves while it speaks. */
+export const NARRATOR = 'narrator'
+
+/** What one character does in a scene. */
+export interface CharacterDirection {
+  pose?: AvatarPose
+  react?: { kind: Reaction; word?: number; side?: 1 | -1 }[]
+  look?: LessonLook | 'other'
+  /** Turn in degrees (positive turns to the viewer's left). */
+  turn?: number
+}
 
 export interface LessonScene {
-  /** What the narrator says during this scene. The scenes' lines joined make the narration. */
+  /** What is said during this scene. The scenes' lines joined make the narration. */
   line: string
+  /**
+   * Who says it: a cast id (that character's mouth moves, in its own voice) or "narrator" (an
+   * unseen voice; nobody's mouth moves). Default: the host.
+   */
+  speaker?: string
+  /** Who the camera is on: a cast id, or "all" for everyone. Default: everyone in a two-shot, else the speaker. */
+  focus?: string
   shot: ShotName
   /** How the camera reaches the shot. The first scene always starts on it. Default glide. */
   move?: CameraMove
@@ -31,14 +54,20 @@ export interface LessonScene {
   pose?: AvatarPose
   /** Reactions, each on a word of this scene's line (0-based), or at the start without one. */
   react?: { kind: Reaction; word?: number; side?: 1 | -1 }[]
-  /** Where the eyes go. Default camera: the host talks to the viewer. */
-  look?: LessonLook
+  /** Where the eyes go. Default camera alone; in a dialogue the speaker looks at the other ("other"). */
+  look?: LessonLook | 'other'
   /** Turn of the whole character in degrees (positive turns to the viewer's left). */
   turn?: number
   /** Slow turntable across the scene, in degrees per second. */
   spin?: number
   /** Backdrop image for this scene; default the lesson's. */
   backdrop?: string
+  /**
+   * Direction for the other characters, by cast id. The scene's own pose, react, look and turn
+   * apply to its subject (the speaking character, or the host when the narrator speaks).
+   * Listeners turn to the speaker on their own unless told otherwise here.
+   */
+  act?: Record<string, CharacterDirection>
   /** What the scene shows, for the reel ledger and review (one sentence). */
   description: string
 }
@@ -50,8 +79,15 @@ export interface Lesson {
   series: string
   episode: number
   format: 'short'
-  /** Cast id from content/animation/cast.json. */
+  /** Cast id from content/animation/cast.json: the main character. */
   host: string
+  /**
+   * Everyone on stage, with their marks. Default: just the host, centre. The camera's framing is
+   * built around the host's size.
+   */
+  cast?: { id: string; at: Mark }[]
+  /** Set dressing in front of the backdrop: codex-study, reef-office or open-water. */
+  set?: SetName
   /** The Codex passage taught, when there is one. */
   codex?: { id: string; title: string; url: string }
   /** The exact first sentence of the first scene's line. Shown big during the spoken hook. */
@@ -73,6 +109,8 @@ export interface Lesson {
 export interface CastMember {
   name?: string
   role: string
+  /** The character's Fish voice (catalog name), used whenever it speaks. */
+  voice?: string
   /** A saved character config, exactly as the site stores it. */
   config: Record<string, unknown>
 }
@@ -92,6 +130,18 @@ export function castLook(id: string, cast = loadCast()): Avatar3DLook {
   return lookFromConfig(config)
 }
 
+/** Everyone on stage, with marks; a lesson without a cast list has only its host, centre. */
+export function castOf(lesson: Pick<Lesson, 'host' | 'cast'>): { id: string; at: Mark }[] {
+  if (!lesson.cast?.length) return [{ id: lesson.host, at: 'center' }]
+  // The host comes first: the camera's framing is built around it.
+  return [...lesson.cast].sort((a, b) => Number(b.id === lesson.host) - Number(a.id === lesson.host))
+}
+
+/** Who speaks a scene: a cast id or the narrator. */
+export function speakerOf(lesson: Pick<Lesson, 'host'>, scene: Pick<LessonScene, 'speaker'>): string {
+  return scene.speaker ?? lesson.host
+}
+
 /** Words as the voice step counts them (hyphenated words split, spoken domains joined). */
 const wordsOf = (text: string) => tokenizeScriptText(text.trim())
 
@@ -107,7 +157,13 @@ export function lessonProblems(lesson: Lesson): string[] {
     if (typeof lesson[key] !== 'string' || !lesson[key].trim()) problems.push(`needs ${key}`)
   }
   if (lesson.format !== 'short') problems.push('format must be "short" (long form is not built yet)')
-  if (!Array.isArray(lesson.scenes) || lesson.scenes.length !== 6) problems.push('a short has exactly six scenes')
+  if (!Array.isArray(lesson.scenes) || lesson.scenes.length < 6 || lesson.scenes.length > 10) problems.push('a short has six to ten scenes')
+  const cast = castOf(lesson)
+  const ids = cast.map((c) => c.id)
+  if (!ids.includes(lesson.host)) problems.push('cast must include the host')
+  if (new Set(cast.map((c) => c.at)).size !== cast.length) problems.push('each cast member needs their own mark')
+  if (cast.some((c) => !MARKS.includes(c.at))) problems.push(`cast marks are ${MARKS.join(', ')}`)
+  if (lesson.set && !SET_NAMES.includes(lesson.set)) problems.push(`set "${lesson.set}" is not one of ${SET_NAMES.join(', ')}`)
   if (!Array.isArray(lesson.hashtags) || lesson.hashtags.length > 3) problems.push('at most three hashtags')
   const scenes = Array.isArray(lesson.scenes) ? lesson.scenes : []
   scenes.forEach((scene, i) => {
@@ -117,19 +173,27 @@ export function lessonProblems(lesson: Lesson): string[] {
     if (!(scene.shot in SHOTS)) problems.push(`${at} shot "${scene.shot}" is not one of ${Object.keys(SHOTS).join(', ')}`)
     if (scene.move && !MOVES.includes(scene.move)) problems.push(`${at} move "${scene.move}" is not one of ${MOVES.join(', ')}`)
     if (scene.frame && !FRAMES.includes(scene.frame)) problems.push(`${at} frame "${scene.frame}" is not one of ${FRAMES.join(', ')}`)
-    if (scene.look && !LOOKS.includes(scene.look)) problems.push(`${at} look "${scene.look}" is not one of ${LOOKS.join(', ')}`)
-    if (scene.pose && !AVATAR_POSES.includes(scene.pose)) problems.push(`${at} pose "${scene.pose}" is not one of ${AVATAR_POSES.join(', ')}`)
+    if (scene.speaker && scene.speaker !== NARRATOR && !ids.includes(scene.speaker)) problems.push(`${at} speaker "${scene.speaker}" is not in the cast`)
+    if (scene.focus && scene.focus !== 'all' && !ids.includes(scene.focus)) problems.push(`${at} focus "${scene.focus}" is not in the cast`)
     const count = wordsOf(scene.line ?? '').length
-    for (const r of scene.react ?? []) {
-      if (!REACTIONS.includes(r.kind)) problems.push(`${at} reaction "${r.kind}" is not one of ${REACTIONS.join(', ')}`)
-      if (r.word !== undefined && (r.word < 0 || r.word >= count)) problems.push(`${at} reaction word ${r.word} is outside its ${count}-word line`)
+    const directions: [string, CharacterDirection][] = [['scene', scene], ...Object.entries(scene.act ?? {})]
+    for (const [who, d] of directions) {
+      if (who !== 'scene' && !ids.includes(who)) problems.push(`${at} directs "${who}", who is not in the cast`)
+      if (d.look && d.look !== 'other' && !LOOKS.includes(d.look)) problems.push(`${at} look "${d.look}" is not one of ${LOOKS.join(', ')}, other`)
+      if (d.pose && !AVATAR_POSES.includes(d.pose)) problems.push(`${at} pose "${d.pose}" is not one of ${AVATAR_POSES.join(', ')}`)
+      for (const r of d.react ?? []) {
+        if (!REACTIONS.includes(r.kind)) problems.push(`${at} reaction "${r.kind}" is not one of ${REACTIONS.join(', ')}`)
+        if (r.word !== undefined && (r.word < 0 || r.word >= count)) problems.push(`${at} reaction word ${r.word} is outside its ${count}-word line`)
+      }
     }
   })
   const first = scenes[0]?.line?.trim() ?? ''
-  if (lesson.hookHeadline && !first.startsWith(lesson.hookHeadline.trim())) problems.push('hookHeadline must be the exact start of scene 1')
+  // Scene 1 is the hook alone: its framing leaves room for the headline, and body subtitles would
+  // land on the cast in that framing.
+  if (lesson.hookHeadline && first.trim() !== lesson.hookHeadline.trim()) problems.push('scene 1 must be exactly the hookHeadline (put the rest of the line in scene 2)')
   if (lesson.hookHeadline && wordsOf(lesson.hookHeadline).length >= 14) problems.push('hookHeadline must be under 14 words')
   const words = wordsOf(narrationOf({ scenes })).length
-  if (words < 40 || words > 75) problems.push(`narration is ${words} words; aim for 50 to 65`)
+  if (words < 40 || words > 80) problems.push(`narration is ${words} words; aim for 50 to 65 (up to 75 for a dialogue)`)
   return problems
 }
 
@@ -208,30 +272,58 @@ export interface TimelineOptions {
 
 /**
  * The frame-by-frame plan for one lesson: camera, pose, reactions, gaze and turn cues on the
- * timings of the actual voice, plus the speech level per frame.
+ * timings of the actual voice, plus each character's speech level per frame (`talkBy`, in cast
+ * order; a character that never speaks gets an empty track).
  */
-export function buildTimeline(lesson: Lesson, look: Avatar3DLook, words: WordBoundaryEvent[], talk: number[], options: TimelineOptions): { timeline: AnimationTimeline; windows: ReturnType<typeof sceneWindows>; hookEnd: number } {
+export function buildTimeline(
+  lesson: Lesson,
+  looks: Record<string, Avatar3DLook>,
+  words: WordBoundaryEvent[],
+  talkBy: number[][],
+  options: TimelineOptions & { set?: SetName },
+): { timeline: AnimationTimeline; windows: ReturnType<typeof sceneWindows>; hookEnd: number } {
   const fps = options.fps
+  const cast = castOf(lesson)
+  const index = new Map(cast.map((c, i) => [c.id, i]))
+  const xOf = (id: string) => MARK_X[cast[index.get(id)!].at]
   const lastWord = words.length ? words[words.length - 1].endMs / 1000 : 0
-  const duration = Math.max(lastWord + (options.tail ?? 0.8), talk.length / fps)
+  const longest = Math.max(0, ...talkBy.map((t) => t.length))
+  const duration = Math.max(lastWord + (options.tail ?? 0.8), longest / fps)
   const frames = Math.ceil(duration * fps)
   const windows = sceneWindows(lesson, words, duration)
   const hookWords = wordsOf(lesson.hookHeadline).length
   const hookEnd = hookWords && words[hookWords - 1] ? words[hookWords - 1].endMs / 1000 : 0
   const cues: TimelineCue[] = []
-  // The first scene opens on the character's pose with no blend in.
-  const opening = lesson.scenes[0]
-  const start: Avatar3DLook = { ...look, pose: opening.pose ?? look.pose }
+  const solo = cast.length === 1
+  const others = (id: string) => cast.filter((c) => c.id !== id)
+  /** The eyes of `from` turned toward `to`, as a pointer offset (viewer's right is +x). */
+  const toward = (from: string, to: string) => ({ x: Math.sign(xOf(to) - xOf(from)) * 1.5, y: 0 })
+  const lookFor = (who: string, look: CharacterDirection['look'], partner: string | null) =>
+    look === 'other' ? (partner ? toward(who, partner) : LOOK_AT.camera) : LOOK_AT[(look ?? 'camera') as LessonLook]
+
+  // Everyone opens on their first pose with no blend in.
+  const firstPose = (id: string) => {
+    const s0 = lesson.scenes[0]
+    const subject0 = speakerOf(lesson, s0) === NARRATOR ? lesson.host : speakerOf(lesson, s0)
+    return (id === subject0 ? s0.pose : s0.act?.[id]?.pose) ?? looks[id].pose
+  }
 
   lesson.scenes.forEach((scene, i) => {
     const { start: t0, end: t1, firstWord } = windows[i]
+    const speaker = speakerOf(lesson, scene)
+    const subject = speaker === NARRATOR ? lesson.host : speaker
+    // A two-shot takes in everyone; other shots go to whoever is talking.
+    const focus = scene.focus ?? (scene.shot === 'two' && !solo ? 'all' : speaker !== NARRATOR ? speaker : solo ? lesson.host : 'all')
     const shot = SHOTS[scene.shot]
-    const pan = PAN[scene.frame ?? 'center']
-    const move = i === 0 ? 'cut' : (scene.move ?? 'glide')
-    // During the spoken hook the camera looks a little higher, so the character stands lower in
-    // the frame and the headline has room above it.
+    // Centre the camera on its subject (or between everyone), then nudge for the frame setting.
+    const centre = focus === 'all' ? cast.reduce((sum, c) => sum + MARK_X[c.at], 0) / cast.length : xOf(focus)
+    const pan = centre + PAN[scene.frame ?? 'center']
+    // The opening shot looks a little higher, so the characters stand lower in the frame and the
+    // hook headline has room above them. It holds for the whole first scene and goes on the cut to
+    // the second (a glide there becomes a cut), so the frame never visibly slides.
+    const move = i === 0 || (i === 1 && options.hookLift && (scene.move ?? 'glide') === 'glide') ? 'cut' : (scene.move ?? 'glide')
     const lift = i === 0 && options.hookLift ? options.hookLift : 0
-    const camera = { zoom: shot.zoom, tilt: shot.tilt, pan, lift }
+    const camera = { zoom: shot.zoom, tilt: shot.tilt, pan, lift, subject: focus === 'all' ? 0 : index.get(focus)! }
     if (move === 'push-in') {
       cues.push({ t: t0, camera: { ...camera, zoom: shot.zoom * 0.82, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })
@@ -239,17 +331,46 @@ export function buildTimeline(lesson: Lesson, look: Avatar3DLook, words: WordBou
       cues.push({ t: t0, camera: { ...camera, zoom: shot.zoom * 1.22, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })
     } else cues.push({ t: t0, camera: { ...camera, cut: move === 'cut' } })
-    if (i === 0 && lift && hookEnd) cues.push({ t: hookEnd, camera: { zoom: shot.zoom, tilt: shot.tilt, pan, lift: 0, rate: 3 } })
-    if (scene.pose && i > 0) cues.push({ t: t0, pose: scene.pose })
-    cues.push({ t: t0, look: LOOK_AT[scene.look ?? 'camera'] })
-    cues.push({ t: t0, yaw: deg(scene.turn ?? 0), spin: deg(scene.spin ?? 0) })
-    for (const r of scene.react ?? []) {
-      const at = r.word === undefined ? t0 : words[firstWord + r.word].startMs / 1000
-      cues.push({ t: Math.min(at, t1), react: { kind: r.kind, side: r.side } })
+
+    for (const member of cast) {
+      const who = index.get(member.id)!
+      const own: CharacterDirection = member.id === subject ? scene : (scene.act?.[member.id] ?? {})
+      const partner = member.id === subject ? (others(subject)[0]?.id ?? null) : speaker !== NARRATOR ? speaker : subject
+      // A speaker in a dialogue talks to the other character; alone, or to the narrator, they face us.
+      const defaultLook: CharacterDirection['look'] = solo ? 'camera' : member.id === speaker ? 'other' : speaker !== NARRATOR ? 'other' : 'camera'
+      const look = own.look ?? defaultLook
+      // Listeners (and anyone told to look at the other) turn a little toward who they look at.
+      const facing = look === 'other' && partner ? Math.sign(xOf(partner) - xOf(member.id)) * 18 : 0
+      if (own.pose && i > 0) cues.push({ t: t0, who, pose: own.pose })
+      cues.push({ t: t0, who, look: lookFor(member.id, look, partner) })
+      cues.push({ t: t0, who, yaw: deg(own.turn ?? facing) })
+      for (const r of own.react ?? []) {
+        const at = r.word === undefined ? t0 : words[firstWord + r.word].startMs / 1000
+        cues.push({ t: Math.min(at, t1), who, react: { kind: r.kind, side: r.side } })
+      }
     }
+    cues.push({ t: t0, spin: deg(scene.spin ?? 0) })
   })
   cues.sort((a, b) => a.t - b.t)
-  return { timeline: { width: options.width, height: options.height, fps, frames, look: start, cues, talk: talk.slice(0, frames), lighting: 'cinematic' }, windows, hookEnd }
+  const castLooks = cast.map((c) => ({ look: { ...looks[c.id], pose: firstPose(c.id) }, x: MARK_X[c.at] }))
+  const tracks = cast.map((_, i) => (talkBy[i] ?? []).slice(0, frames))
+  return {
+    timeline: {
+      width: options.width,
+      height: options.height,
+      fps,
+      frames,
+      look: castLooks[0].look,
+      cues,
+      talk: tracks[0],
+      talkBy: tracks,
+      cast: solo ? undefined : castLooks,
+      set: options.set ?? lesson.set,
+      lighting: 'cinematic',
+    },
+    windows,
+    hookEnd,
+  }
 }
 
 /** The reel draft `npm run reel:create -- --custom-video` needs to archive and queue the finished file. */
@@ -262,7 +383,12 @@ export function reelDraftFrom(lesson: Lesson): Record<string, unknown> {
     format: 'animated-lesson',
     hookHeadline: lesson.hookHeadline,
     narrationScript: narrationOf(lesson),
-    scenePrompts: lesson.scenes.map((s) => s.description),
+    // reel:create stores exactly six scene prompts; longer dialogues fold neighbouring scenes together.
+    scenePrompts: Array.from({ length: 6 }, (_, k) => {
+      const from = Math.floor((k * lesson.scenes.length) / 6)
+      const to = Math.floor(((k + 1) * lesson.scenes.length) / 6)
+      return lesson.scenes.slice(from, Math.max(to, from + 1)).map((s) => s.description).join(' ')
+    }),
     caption: lesson.caption,
     hashtags: lesson.hashtags,
     firstComment: lesson.firstComment,
@@ -270,6 +396,6 @@ export function reelDraftFrom(lesson: Lesson): Record<string, unknown> {
     youtubeDescription: lesson.youtubeDescription,
     youtubeTags: lesson.youtubeTags ?? [],
     ctaGoal: lesson.ctaGoal,
-    characterArc: `${lesson.host} (animated 3D host)`,
+    characterArc: `${castOf(lesson).map((c) => c.id).join(', ')} (animated 3D cast)`,
   }
 }

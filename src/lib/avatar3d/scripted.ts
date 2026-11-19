@@ -6,12 +6,15 @@
 import type { AvatarPose } from '../avatar/traits'
 import type { Avatar3DLook } from './look'
 import type { Reaction } from './motion'
+import { buildSet, type SetArt, type SetName } from './sets'
 import type { Stage } from './stage'
 
 /** Named camera setups, so scripts say "close" rather than numbers. */
 export const SHOTS = {
   /** The whole figure, feet to antennae. */
   wide: { zoom: 1, tilt: 0.04 },
+  /** Two or three characters side by side, all in frame. */
+  two: { zoom: 0.58, tilt: 0.05 },
   /** Knees up: the everyday talking shot. */
   medium: { zoom: 1.35, tilt: 0.06 },
   /** Head and shoulders. */
@@ -38,11 +41,15 @@ export interface CameraCue {
   /** How quickly the camera glides there (6 snappy, 1 a slow creep). */
   rate?: number
   cut?: boolean
+  /** Cast index the shot is on; close shots aim at that member's head (default 0). */
+  subject?: number
 }
 
 export interface TimelineCue {
   /** Seconds from the start of the video. */
   t: number
+  /** Which cast member pose, react, yaw and look apply to (index into `cast`; default 0). */
+  who?: number
   camera?: CameraCue
   pose?: AvatarPose
   react?: { kind: Reaction; side?: 1 | -1 }
@@ -66,6 +73,16 @@ export interface AnimationTimeline {
   /** Speech level per frame, 0..1. Shorter than `frames` means silent after it ends. */
   talk: number[]
   lighting?: 'studio' | 'cinematic'
+  /**
+   * Several characters: replaces `look` (the first member is the stage's own character) and
+   * `talk` (one speech track per member, in the same order).
+   */
+  cast?: { look: Avatar3DLook; x: number; z?: number; yaw?: number }[]
+  talkBy?: number[][]
+  /** Set dressing in front of the backdrop. */
+  set?: SetName
+  /** Painted textures and the cut-out layer for the set (see sets.ts). */
+  setArt?: SetArt
 }
 
 /**
@@ -78,17 +95,24 @@ export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
   const dt = 1 / timeline.fps
   let next = 0
   let drawn = -1
-  stage.setLook(timeline.look, true)
+  const members = timeline.cast?.length ?? 1
+  if (timeline.cast?.length) stage.setCast(timeline.cast)
+  else stage.setLook(timeline.look, true)
+  const set = timeline.set ? buildSet(timeline.set, timeline.setArt) : null
+  if (set) stage.setProps(set.root)
   const apply = (cue: TimelineCue) => {
-    const character = stage.character()
+    const who = cue.who ?? 0
+    const character = stage.member(who)
     if (cue.camera) stage.setCamera(cue.camera)
-    if (cue.pose) stage.setPose(cue.pose)
-    if (cue.react) stage.react(cue.react.kind, cue.react.side)
-    if (cue.yaw !== undefined) stage.setYaw(cue.yaw)
+    if (cue.pose) character?.setPose(cue.pose)
+    if (cue.react) character?.react(cue.react.kind, cue.react.side)
+    if (cue.yaw !== undefined) stage.setMemberYaw(who, cue.yaw)
     if (cue.spin !== undefined) stage.setSpin(cue.spin)
     if (cue.look !== undefined) character?.lookAt(cue.look)
   }
   return {
+    /** Resolves when the set's art has loaded; wait for it before the first frame. */
+    ready: set?.ready ?? Promise.resolve(),
     /** Draw frame `index` (the next one in order). */
     seek(index: number) {
       if (index <= drawn) throw new Error(`Frames must be drawn in order (asked for ${index} after ${drawn})`)
@@ -96,7 +120,11 @@ export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
         drawn++
         const t = drawn * dt
         while (next < cues.length && cues[next].t <= t + 1e-6) apply(cues[next++])
-        stage.character()?.setTalk(timeline.talk[drawn] ?? 0)
+        for (let m = 0; m < members; m++) {
+          const track = timeline.talkBy ? timeline.talkBy[m] : m === 0 ? timeline.talk : undefined
+          stage.member(m)?.setTalk(track?.[drawn] ?? 0)
+        }
+        set?.update(t)
         stage.step(dt)
       }
     },

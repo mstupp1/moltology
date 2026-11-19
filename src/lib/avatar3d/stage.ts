@@ -23,6 +23,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three'
+import type { Object3D } from 'three'
 import type { AvatarPose } from '../avatar/traits'
 import { buildCharacter, type Character3D } from './character'
 import { bakedLightTexture } from './stage-light'
@@ -93,7 +94,19 @@ export interface Stage {
    * camera glides to the new place (`rate` sets how quickly: 6 is the usual snappy glide, 1 a slow
    * creep across a scene); `cut` jumps there in the next frame.
    */
-  setCamera: (camera: { zoom?: number; tilt?: number; pan?: number; lift?: number; rate?: number; cut?: boolean }) => void
+  setCamera: (camera: { zoom?: number; tilt?: number; pan?: number; lift?: number; rate?: number; cut?: boolean; subject?: number }) => void
+  /**
+   * Several characters on one stage, for scripted animation: the first is the stage's own
+   * character (camera framing follows it), the rest stand beside it. `x` and `z` are world units
+   * along the floor, `yaw` turns each one (0 faces the viewer).
+   */
+  setCast: (members: readonly { look: Avatar3DLook; x: number; z?: number; yaw?: number }[]) => void
+  /** A cast member by position in the last setCast (0 is the stage's own character). */
+  member: (index: number) => Character3D | null
+  /** Turn one cast member (radians, 0 faces the viewer). */
+  setMemberYaw: (index: number, yaw: number) => void
+  /** Set dressing for scripted animation: replaces the last props (which are freed). Null clears. */
+  setProps: (props: Object3D | null) => void
   /** Switch a manual stage between the whole figure and the head-and-shoulders framing. */
   setFraming: (framing: 'full' | 'portrait') => void
   /** Move time on by `dt` seconds and draw. For manual stages (tests and review renders). */
@@ -236,6 +249,33 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
 
   let character: Character3D | null = null
+  // Scripted animation only: where the stage's own character stands, the others beside it, and
+  // any set dressing.
+  let primaryX = 0
+  let primaryZ = 0
+  let extras: { character: Character3D; x: number; z: number; yaw: number; blob: Mesh }[] = []
+  let props: Object3D | null = null
+  const freeProps = (node: Object3D) => {
+    node.removeFromParent()
+    node.traverse((child) => {
+      const mesh = child as Mesh
+      mesh.geometry?.dispose()
+      const material = mesh.material as MeshBasicMaterial | MeshBasicMaterial[] | undefined
+      for (const m of Array.isArray(material) ? material : material ? [material] : []) {
+        m.map?.dispose()
+        m.dispose()
+      }
+    })
+  }
+  const clearExtras = () => {
+    for (const e of extras) {
+      e.character.dispose()
+      e.blob.removeFromParent()
+      e.blob.geometry.dispose()
+      ;(e.blob.material as MeshBasicMaterial).dispose()
+    }
+    extras = []
+  }
   // The character just replaced. Freed only after the next one has been drawn, so the shader
   // programs both share stay alive in between instead of being thrown away and recompiled.
   let retired: Character3D | null = null
@@ -264,7 +304,9 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       // Zooming in closes on the head and shoulders rather than the middle of the body.
       const near = clamp((zoom - 1) / (ZOOM_MAX - 1), 0, 1)
       wantLook.copy(home.look)
-      wantLook.y += ((character?.height ?? 1.8) * 0.8 - home.look.y) * near
+      // Close shots aim at the head of whoever the shot is on (a cast member may be shorter).
+      const on = subject > 0 ? (extras[subject - 1]?.character ?? character) : character
+      wantLook.y += ((on?.height ?? 1.8) * 0.8 - home.look.y) * near
       dist = (home.position.z - home.look.z) / zoom
       rise = (home.position.y - home.look.y) / zoom
     } else {
@@ -281,6 +323,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
   let yaw = options.yaw ?? 0
   let zoom = 1
+  let subject = 0
   let tilt = 0
   let pan = 0
   let lift = 0
@@ -358,7 +401,14 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     }
     if (character) {
       character.root.rotation.y = yaw
+      character.root.position.set(primaryX, 0, primaryZ)
       character.update(dt, time, !options.reducedMotion)
+    }
+    blob.position.set(primaryX, 0.002, primaryZ)
+    for (const e of extras) {
+      e.character.root.rotation.y = e.yaw
+      e.character.root.position.set(e.x, 0, e.z)
+      e.character.update(dt, time, !options.reducedMotion)
     }
     // A close portrait would be all halo, so only the whole figure wears it.
     halo.visible = glowing && framing === 'full'
@@ -590,6 +640,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       if (next.tilt !== undefined) tilt = clamp(next.tilt, TILT_MIN, TILT_MAX)
       if (next.pan !== undefined) pan = next.pan
       if (next.lift !== undefined) lift = next.lift
+      if (next.subject !== undefined) subject = next.subject
       glideRate = next.rate ?? 6
       // A cut lands on the next frame drawn, as the very first frame does.
       if (next.cut) started = false
@@ -626,6 +677,44 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       draw(0, time)
     },
     character: () => character,
+    setCast(members) {
+      clearExtras()
+      if (!members.length) return
+      const [first, ...rest] = members
+      this.setLook(first.look, true)
+      primaryX = first.x
+      primaryZ = first.z ?? 0
+      yaw = first.yaw ?? 0
+      for (const m of rest) {
+        const built = buildCharacter(m.look)
+        scene.add(built.root)
+        const shadow = new Mesh(blob.geometry.clone(), (blob.material as MeshBasicMaterial).clone())
+        shadow.rotation.x = -Math.PI / 2
+        shadow.position.set(m.x, 0.002, m.z ?? 0)
+        scene.add(shadow)
+        extras.push({ character: built, x: m.x, z: m.z ?? 0, yaw: m.yaw ?? 0, blob: shadow })
+      }
+      // Widen the sun's shadow to take in everyone.
+      const reach = Math.max(1.7, ...members.map((m) => Math.abs(m.x) + 1.2))
+      key.shadow.camera.left = key.shadow.camera.bottom = -reach
+      key.shadow.camera.right = key.shadow.camera.top = reach
+      key.shadow.camera.updateProjectionMatrix()
+      wake()
+    },
+    member: (index) => (index === 0 ? character : (extras[index - 1]?.character ?? null)),
+    setMemberYaw(index, value) {
+      if (index === 0) yaw = value
+      else if (extras[index - 1]) extras[index - 1].yaw = value
+      wake()
+    },
+    setProps(next) {
+      if (props) freeProps(props)
+      props = next
+      if (props) scene.add(props)
+      // A set has its own floor: the studio's glowing ring would float on it.
+      if (ring) ring.visible = !props
+      wake()
+    },
     // WebP where the browser can write it (much smaller, keeps transparency); PNG elsewhere.
     snapshot: () => canvas.toDataURL('image/webp', 0.9),
     dispose() {
@@ -640,6 +729,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       canvas.removeEventListener('webglcontextlost', onLost)
       retired?.dispose()
       character?.dispose()
+      clearExtras()
+      if (props) freeProps(props)
       env.dispose()
       blobTexture.dispose()
       glowTexture.dispose()
