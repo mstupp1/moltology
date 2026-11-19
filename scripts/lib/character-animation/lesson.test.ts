@@ -50,7 +50,10 @@ describe('animated lessons', () => {
     expect(timeline.look.pose).toBe('point')
     // The hook opens on a cut with the camera aimed high, then lets the character back up after it.
     expect(timeline.cues[0]).toMatchObject({ t: 0, camera: { cut: true, lift: 0.5 } })
-    expect(timeline.cues.some((c) => c.t === hookEnd && c.camera?.lift === 0)).toBe(true)
+    // The lift holds through the first scene and goes on a cut, never a slide.
+    expect(timeline.cues.some((c) => c.t > 0 && c.t <= hookEnd && c.camera)).toBe(false)
+    const second = timeline.cues.find((c) => c.t > 0 && c.camera)
+    expect(second?.camera).toMatchObject({ lift: 0, cut: true })
     // The snap on "first" in scene three lands as that word is spoken.
     const first = words.findIndex((w) => w.word === 'first.')
     expect(timeline.cues.some((c) => c.react?.kind === 'snap' && c.t === words[first].startMs / 1000)).toBe(true)

@@ -44,7 +44,7 @@ Word indexes count words as the voice does: hyphenated words split ("check-in" i
 ## Layout facts
 
 - Output is 1080x1920 at 30 fps.
-- The hook headline sits inside x 120-900, y 460-900 at 80 to 104px. During the spoken hook the camera aims higher so the host stands below it, then rises back as the first body word starts.
+- The hook headline sits inside x 120-900, y 460-900 at 80 to 104px. The opening shot aims higher so the cast stands below the headline; that framing holds for all of scene 1 and changes on the cut to scene 2 (scene 2 always cuts in), so the frame never slides. Keep scene 1 short after the hook.
 - Regular subtitles sit at y 1180 (from the reel compositor). In a medium or close shot the host's face is above them; in an extreme close-up the subtitles cross the mouth, so keep extreme shots short.
 - With a cast, everyone shares one key light; a set's lamp adds a warm pool. The two shot fits marks at ±0.75 (a three-character cast fits too, but tightly).
 - The host's temperament (`lively` for host-crab) drives breathing, sway, glances and blinks between cues. Talking adds the mouth, a small nod and brow lifts.

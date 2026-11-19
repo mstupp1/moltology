@@ -316,9 +316,10 @@ export function buildTimeline(
     // Centre the camera on its subject (or between everyone), then nudge for the frame setting.
     const centre = focus === 'all' ? cast.reduce((sum, c) => sum + MARK_X[c.at], 0) / cast.length : xOf(focus)
     const pan = centre + PAN[scene.frame ?? 'center']
-    const move = i === 0 ? 'cut' : (scene.move ?? 'glide')
-    // During the spoken hook the camera looks a little higher, so the characters stand lower in
-    // the frame and the headline has room above them.
+    // The opening shot looks a little higher, so the characters stand lower in the frame and the
+    // hook headline has room above them. It holds for the whole first scene and goes on the cut to
+    // the second (a glide there becomes a cut), so the frame never visibly slides.
+    const move = i === 0 || (i === 1 && options.hookLift && (scene.move ?? 'glide') === 'glide') ? 'cut' : (scene.move ?? 'glide')
     const lift = i === 0 && options.hookLift ? options.hookLift : 0
     const camera = { zoom: shot.zoom, tilt: shot.tilt, pan, lift }
     if (move === 'push-in') {
@@ -328,7 +329,6 @@ export function buildTimeline(
       cues.push({ t: t0, camera: { ...camera, zoom: shot.zoom * 1.22, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })
     } else cues.push({ t: t0, camera: { ...camera, cut: move === 'cut' } })
-    if (i === 0 && lift && hookEnd) cues.push({ t: hookEnd, camera: { zoom: shot.zoom, tilt: shot.tilt, pan, lift: 0, rate: 3 } })
 
     for (const member of cast) {
       const who = index.get(member.id)!
