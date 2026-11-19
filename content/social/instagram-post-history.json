@@ -935,6 +935,125 @@
         "height": 2880
       },
       "verifiedAt": "2026-10-30T13:06:52.506Z"
+    },
+    {
+      "id": "post-1793570550899",
+      "topic": "Use one saved article instead of collecting more unread resources",
+      "hookHeadline": "Your reading list has entered the fossil record.",
+      "theme": "reading-list-fossils",
+      "mascot": "lobster_peaceful",
+      "archivePath": "Social Archive/2026/11/post-0453e458cd1ad96107bf1681",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1793570551875_3b7288bb13868813_01.png"
+      ],
+      "aspectRatio": "3:4",
+      "caption": "Your reading list has entered the fossil record.\n\n“Read later” has acquired sediment layers.\nBefore saving another article, open one you already saved. Try one useful idea, then archive it.\nThe deep has enough rocks.\n\nSend this to your fellow bookmark collector.",
+      "hashtags": [
+        "#Moltology",
+        "#DeepWork",
+        "#DigitalClutter"
+      ],
+      "firstComment": "https://moltology.org\n\n#Moltology\n#DeepWork\n#DigitalClutter",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-04T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ae7b6f8dc666b1cf3ffbf9b",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-11-01T22:02:34.286Z",
+      "verifiedDimensions": {
+        "width": 1086,
+        "height": 1448
+      },
+      "verifiedAt": "2026-11-01T22:02:46.483Z"
+    },
+    {
+      "id": "carousel-1793714956021",
+      "type": "carousel",
+      "topic": "Turn meeting notes into an agreed action handoff",
+      "theme": "ecdysis",
+      "mascot": "lobster_engineer",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/11/carousel-ddb05d0560325dab93d3a70f",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793714957357_d35a3caaf01fa13c_01.png",
+        "https://media.zernio.com/media/1793714958418_c16568496baf0d46_02.png",
+        "https://media.zernio.com/media/1793714959482_b2df3d6ac65de10c_03.png",
+        "https://media.zernio.com/media/1793714960399_e6df57e3b2312cdb_04.png",
+        "https://media.zernio.com/media/1793714961278_fba1c661d9f86d5a_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1793714957357_d35a3caaf01fa13c_01.png",
+        "https://media.zernio.com/media/1793714958418_c16568496baf0d46_02.png",
+        "https://media.zernio.com/media/1793714959482_b2df3d6ac65de10c_03.png",
+        "https://media.zernio.com/media/1793714960399_e6df57e3b2312cdb_04.png",
+        "https://media.zernio.com/media/1793714961278_fba1c661d9f86d5a_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "Your meeting notes never left the meeting.\n\n“We’ll sort it” is still circling the unclaimed cargo bay.\nBefore closing, agree who owns the next step, what they’ll send and when you’ll check back.\n“Sam will send the draft agenda by Thursday. We’ll review it Friday.” The parcel has a destination.\n\nSave this handoff for meeting close.",
+      "hashtags": [
+        "#Moltology",
+        "#Communication",
+        "#Meetings"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-06T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6ae9eb12984d2cc9c898f341",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-11-03T14:09:27.507Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-11-03T14:09:33.394Z"
+    },
+    {
+      "id": "carousel-1793801288957",
+      "type": "carousel",
+      "topic": "Replace ambiguous final filenames with project, date, version and status",
+      "theme": "swipe-lab",
+      "mascot": "lobster_engineer",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/11/carousel-caf679aa5c45e16e39e8717d",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793801290172_06a04be7fb164cca_01.png",
+        "https://media.zernio.com/media/1793801291471_c145de70e9f49f5e_02.png",
+        "https://media.zernio.com/media/1793801292569_b9737ed048b49b58_03.png",
+        "https://media.zernio.com/media/1793801293492_c87aca2d60569a31_04.png",
+        "https://media.zernio.com/media/1793801294561_6de197b6865f828b_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/media/1793801290172_06a04be7fb164cca_01.png",
+        "https://media.zernio.com/media/1793801291471_c145de70e9f49f5e_02.png",
+        "https://media.zernio.com/media/1793801292569_b9737ed048b49b58_03.png",
+        "https://media.zernio.com/media/1793801293492_c87aca2d60569a31_04.png",
+        "https://media.zernio.com/media/1793801294561_6de197b6865f828b_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "Your final file has three aliases.\n\n“Final_final_REAL” has requested a disguise.\nUse project, date, version and status so the next person can tell what they have.\nKeep the approved copy in one agreed place.\n\nSave this naming rule before the next handoff.",
+      "hashtags": [
+        "#Moltology",
+        "#DigitalClutter",
+        "#CreativeWork"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-09T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6aeb3c4fd3d9f49b616eba85",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-11-04T14:08:22.159Z",
+      "verifiedDimensions": {
+        "width": 2160,
+        "height": 2880
+      },
+      "verifiedAt": "2026-11-04T14:08:30.963Z"
     }
   ]
 }

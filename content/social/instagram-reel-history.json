@@ -2307,6 +2307,141 @@
       }
     },
     {
+      "id": "reel-1793925376453",
+      "topic": "Renaming a draft instead of writing inside it",
+      "hookHeadline": "Your draft has more names than sentences.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "Engineer stops the filename trilogy by writing one rough sentence inside the newest copy.",
+      "narrationScript": "Your draft has more names than sentences. Final. Final two. Final actually final. The filename has completed a trilogy. The document has completed a heading. The lobster opens the newest copy, writes one rough sentence, and leaves the name alone. Give the next five minutes to the words inside. Try the audit at moltology dot org.",
+      "archivePath": "Social Archive/2026/11/reel-86864d3ff01ab006b65a5855",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1793925377518_3dd5d13803b487ca_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 28.033333,
+      "status": "queued",
+      "scheduledFor": "2026-11-12T23:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6aed2103fe44cd105fd386ef",
+      "zernioYouTubePostId": "6aed2103fe44cd105fd386ef",
+      "zernioPostId": "6aed2103fe44cd105fd386ef",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "https://moltology.org/quiz",
+      "caption": "Your draft has more names than sentences.\nThe filename finished a trilogy. The page still has a heading.\nWrite one rough sentence before renaming it again.\nTry the audit at moltology.org.\n\n#Moltology #Writing #Focus",
+      "hashtags": [
+        "#Moltology",
+        "#Writing",
+        "#Focus"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-06T00:36:22.508Z",
+      "format": "Roast list",
+      "loudness": 3,
+      "pitchScores": [
+        {
+          "format": "Roast list",
+          "hook": "Your draft has more names than sentences.",
+          "beats": "Escalating final filenames become a trilogy; the document still has one heading; Engineer writes inside it.",
+          "payoff": "Write one rough sentence before renaming again.",
+          "Stop": 5,
+          "Laugh": 4,
+          "Pull": 5,
+          "Keep": 5,
+          "Fresh": 5
+        },
+        {
+          "format": "Nature documentary",
+          "hook": "The final draft is reproducing again.",
+          "beats": "Observe copies multiplying while the page remains empty; Engineer writes in the newest copy.",
+          "payoff": "Open the newest copy and write one rough sentence.",
+          "Stop": 4,
+          "Laugh": 4,
+          "Pull": 4,
+          "Keep": 4,
+          "Fresh": 4
+        },
+        {
+          "format": "Expectation vs reality",
+          "hook": "You renamed the draft instead of finishing the sentence.",
+          "beats": "A confident final filename becomes a long procession; Engineer returns to the actual sentence.",
+          "payoff": "Give five minutes to the words inside.",
+          "Stop": 4,
+          "Laugh": 3,
+          "Pull": 4,
+          "Keep": 5,
+          "Fresh": 4
+        }
+      ],
+      "productionCostEstimateUsd": 2.87,
+      "videoOutputCostUsd": 2.83808,
+      "videoOutputTokens": 162176,
+      "videoModel": "gemini-omni-1.1-flash",
+      "mascot": "lobster_engineer",
+      "youtubeContainsSyntheticMedia": true,
+      "verifiedAt": "2026-11-06T00:36:39.808Z",
+      "productionReview": {
+        "rawDirectory": "/Users/mylesstupp/Development/moltology/tmp/reel-daily-1793887476365",
+        "finalVideo": "/Users/mylesstupp/Development/moltology/tmp/reels-2026-11-05/the-filename-trilogy.mp4",
+        "durationSeconds": 28.033333,
+        "hookWordStartsSeconds": [
+          0,
+          0.21,
+          0.71,
+          0.92,
+          1.14,
+          1.64,
+          1.78
+        ],
+        "bodySubtitleStartSeconds": 2.71,
+        "subtitleHandoff": "Full clean timeline overlay through measured first body word; original body subtitles and narration preserved; sentence boundary prevents straddling.",
+        "headlineSafeBox": [
+          120,
+          460,
+          900,
+          900
+        ],
+        "animation": "18px exponential horizontal settle; amber final phrase; stable line breaks",
+        "costs": {
+          "videoOutputTokens": 162176,
+          "videoUsd": 2.83808,
+          "inputUsd": 0.007794,
+          "conservativeOtherUsd": 0.019215,
+          "voiceUsd": 0.00495,
+          "directorReserveUsd": 0,
+          "unusedDirectedOpeningIncluded": false,
+          "builtInImageGenCost": "Separate, unavailable",
+          "sources": [
+            "https://ai.google.dev/gemini-api/docs/pricing",
+            "https://fish.audio/developers/"
+          ],
+          "billingCaveat": "Token based estimate with conservative nonvideo token estimate; exact invoice unavailable.",
+          "externalEstimateUsd": 2.87,
+          "sourceClipSeconds": [
+            4.032,
+            4.032,
+            4.032,
+            6.037333,
+            4.032,
+            6.037333
+          ]
+        },
+        "voiceoverSeconds": 24.77,
+        "finalSha256": "bc4537517ac0d05f03f7c67c9926f1b5e74c158e12f3aaf76e14e7b4e9b02957",
+        "verification": "Exact final visuals/crops and audio technical checks completed during production; user sound-on phone-size review passed. Final SHA-256 rechecked before queueing; API readback confirms both targets, native comments, AI disclosures and one matching post.",
+        "queueStatus": "scheduled; verified both targets",
+        "archiveStatus": "archived before upload and queue; final archive hash and publication result verified",
+        "soundReview": "User confirmed sound review passed and instructed queueing."
+      }
+    },
+    {
       "id": "reel-1794846062728",
       "topic": "The Daily Shedding Routine (Codex SCR-030): one thing first in the morning, one thing let go at night",
       "hookHeadline": "Two moments decide your whole day.",
@@ -2345,6 +2480,46 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-11-16T16:21:10.628Z"
+    },
+    {
+      "id": "reel-1795121986071",
+      "topic": "The Nightly Molt Audit (Codex SCR-032): release one thing a night, not the whole day",
+      "hookHeadline": "I try to fix my whole day every night.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "host-crab, junior-lobster (animated 3D cast)",
+      "narrationScript": "I try to fix my whole day every night. It never works. That's the problem. Shed one thing a night, not the whole day. Just one? One. Name three candidates: a thought that looped, an hour that vanished, a distraction. Then pick exactly one, write it down, and let it go. That's it? Four minutes? Small enough for bad nights, and those are the ones that count. Read the Nightly Molt Audit at moltology.org.",
+      "series": "Codex Lessons",
+      "episode": 2,
+      "format": "animated-lesson",
+      "archivePath": "Social Archive/2026/11/reel-67a0b808f797a4221a1577a0",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795121987407_36e84ba2f561fa76_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 33.6,
+      "status": "queued",
+      "scheduledFor": "2026-11-22T23:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6aff63453c1f0d555a5793c5",
+      "zernioYouTubePostId": "6aff63453c1f0d555a5793c5",
+      "zernioPostId": "6aff63453c1f0d555a5793c5",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "The full passage: https://moltology.org/codex/scr-032",
+      "caption": "I try to fix my whole day every night. It never works.\n\nThe Codex says shed one thing a night: name three candidates, pick one, write it down, let it go. Four minutes.\n\nRead the Nightly Molt Audit at moltology.org.",
+      "hashtags": [
+        "#nightroutine",
+        "#productivity"
+      ],
+      "ctaGoal": "codex",
+      "commentTriggerKeyword": "CODEX",
+      "commentTriggerUrl": "https://moltology.org/codex",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-19T20:59:51.478Z"
     }
   ]
 }

@@ -14,6 +14,226 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    "slug": "2026-11-16-weekly-leaderboard-and-connected-oracle",
+    "version": "2026.11.16",
+    "title": "Weekly Community Leaderboard and a Connected Oracle",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "AI",
+      "Navigation",
+      "UI/UX"
+    ],
+    "summary": "See weekly top contributors on the new community leaderboard, scroll endlessly through forum discussions, and ask the Oracle about live forum threads, news, Academy courses, and the Codex.",
+    "content": "### Community Leaderboard and Endless Scroll\n- Added a community leaderboard with weekly and all-time rankings, stage filters, and gold, silver, and bronze crests for last week's top three members.\n- Forum feeds, boards, and discussion replies now load automatically as you scroll, keeping your place when navigating back.\n\n### An Oracle That Reads Moltology\n- The Oracle can now look up public forum threads, news articles, changelog updates, Academy courses, and Codex passages to answer questions with current context.\n- Replies display rich interactive cards for everything the Oracle read, alongside rotating starter prompts and a Suggested or More ideas view on new chats.\n\n### Character Proportions and Support\n- Spread character height naturally across the body instead of stretching legs alone, with calmer option previews and faster portrait generation.\n- Updated the Support page to a two-column desktop layout with recent updates and added an optional tip jar link in the footer, Support page, and account menu.",
+    "isPublished": true,
+    "releasedAt": "2026-11-16T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-15-practice-days-and-action-linked-tasks",
+    "version": "2026.11.15",
+    "title": "Flexible Practice Days and Livelier 3D Characters",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Improvement",
+      "Mobile",
+      "Design"
+    ],
+    "summary": "Choose which days of the week count toward your streak, complete daily tasks automatically through real actions, and enjoy smoother 3D character movement and phone chat layouts.",
+    "content": "### Practice Days and Action-Linked Tasks\n- Set your weekly practice days in Settings so scheduled rest days protect your streak instead of breaking it.\n- Daily tasks now connect directly to real actions across the app, including focus and breathing timers, saving your top priority, helping in the forum, and finishing Academy lessons.\n- Completed tasks stay checked off cleanly, with each practice name shown beneath its title.\n\n### Livelier 3D Characters\n- Added springy movement to antennae, claws, tails, and hats, smoother bending joints, and natural turning steps when rotating your character.\n- Character reactions now animate the mouth and brows alongside sharper, higher-detail portraits.\n\n### Smoother Phone Chats\n- Fixed the phone keyboard spacing in Oracle chat, moved new chats to a bottom composer, and added a list of recent conversations when starting fresh.",
+    "isPublished": true,
+    "releasedAt": "2026-11-15T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-14-oracle-personality-and-forum-refresh",
+    "version": "2026.11.14",
+    "title": "Oracle Personalities and a Refreshed Forum",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "AI",
+      "UI/UX",
+      "Mobile"
+    ],
+    "summary": "Customize how the Oracle speaks to you with personalities and instructions, browse a cleaner forum with a community group photo, and share member profile links with rich previews.",
+    "content": "### Tailor Your Oracle\n- Choose from five Oracle personalities, add your own custom instructions, and search saved chats right from the header.\n- Browse Oracle skills with icons in a redesigned phone sheet and desktop menu, or toggle the live core view from the chat header.\n\n### Refreshed Forum and Comments\n- Added a community group photo on the forum showing every member's 3D character together.\n- Updated forum boards, topic cards, discussion threads, and article comments with cleaner rows, a sticky thread sidebar, and 3D member portraits.\n\n### Link Previews and Public Progress\n- Member profile links now generate custom share cards featuring each member's saved 3D portrait.\n- Signed-in members see their live XP ring and daily task progress in the public site header, and the Codex reader spans edge to edge on phones.",
+    "isPublished": true,
+    "releasedAt": "2026-11-14T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-13-guest-character-builder-and-oracle-skills",
+    "version": "2026.11.13",
+    "title": "Build Characters as a Guest and Discover Oracle Skills",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "UI/UX",
+      "AI",
+      "Mobile"
+    ],
+    "summary": "Visitors can customize a 3D character and keep it when they join, while Oracle skills and a dedicated launcher make guided conversations easier to start anywhere.",
+    "content": "### Expressive Character Customization\n- Guests can customize a starter character and automatically keep it when they create an account.\n- Added full-body poses, reactions, shell details, size sliders, and instant color updates to the 3D character studio.\n- Replaced the large stats card with a compact Moltmax stat bar and an interactive stat guide showing what each gear slot boosts.\n\n### Oracle Launcher and Skills\n- Added a dedicated Synaptic Core launcher for the Oracle, opening as a smooth slide-up panel on phones.\n- Added Oracle skills to the Shop and a quick slash menu inside chat so you can launch structured methods like focus rounds or weekly reviews.\n\n### Simpler Menus and Support\n- Moved daily alignment tasks into the account menu and gave phones a full-screen account and public navigation menu.\n- Streamlined Support into a single message box with automatic topic sorting.",
+    "isPublished": true,
+    "releasedAt": "2026-11-13T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-11-live-3d-characters-and-guest-previews",
+    "version": "2026.11.11",
+    "title": "Live 3D Characters and Open Guest Access",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Design",
+      "UI/UX",
+      "Security"
+    ],
+    "summary": "Every member's crustacean character now comes to life in full 3D across the platform, and visitors can browse the Shop, Academy catalog, and Oracle before signing up.",
+    "content": "### Live 3D Characters Everywhere\n- Replaced the flat character drawings with live 3D characters framed in a glass porthole across profiles, the forum, and the top bar.\n- Added an interactive progress ring and daily task notches around your portrait so today's progress stays visible at a glance.\n\n### Open Access for Visitors\n- Opened the Shop, Academy catalog, support contact form, and a preview of the Oracle to visitors without an account.\n- Added one-tap Google sign-in for faster account creation and sign-in.\n\n### Unified Panels and Reader Controls\n- Placed app pages on a consistent see-through panel with full-width header bands and a calm ocean background.\n- Moved your Profile and Chitin Gems and Molt Credits balances into the account menu, and added selectable text and a dark page toggle to the Codex reader.",
+    "isPublished": true,
+    "releasedAt": "2026-11-11T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-08-clearer-names-and-a-floating-top-bar",
+    "version": "2026.11.08",
+    "title": "Clearer Names and a Floating Top Bar",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "Navigation",
+      "Mobile",
+      "Design"
+    ],
+    "summary": "Every page now has one clear name, the top bar floats above your content, and the Activity feed is easier to scan. The Codex reader is lighter and quicker to move through.",
+    "content": "### One Name for Each Page\n- Pages use the same name in the menu, the page heading, and the browser tab.\n- Icons are clearer: Character has a shell, Forum uses speech bubbles, and Quiz has a checklist.\n\n### A Floating Top Bar\n- The top bar floats above your content on phones and desktop.\n- On desktop, the side rail is more compact. On phones, today's alignment count sits inside a small progress ring.\n\n### Activity and Codex\n- Activity shows newer items first, grouped under Today, Yesterday, and date headings, and loads more as you scroll.\n- The Codex reader is slimmer, with section links, search hits, and a sticky bar on phones.\n- Daily alignment tasks now use the names from the Daily Shedding Routine.",
+    "isPublished": true,
+    "releasedAt": "2026-11-08T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-06-lighter-lists-and-a-cleaner-search",
+    "version": "2026.11.06",
+    "title": "Lighter Lists and a Cleaner Search",
+    "category": "Performance",
+    "tags": [
+      "Performance",
+      "Navigation",
+      "UI/UX",
+      "Tools"
+    ],
+    "summary": "Forum topics and replies load in short pages, so long lists open faster. Search has a cleaner panel, and notifications have their own bell.",
+    "content": "### Faster Long Lists\n- Forum topics and replies load 30 at a time, with a Load more button when you want to keep reading.\n- Forum boards show unread counts faster.\n\n### A Cleaner Search\n- The search panel is simpler, and it fills the screen on phones.\n- A Go to list option takes you straight to the full page of results.\n\n### Clearer Notifications and Gear\n- Notifications have their own bell, so they are easy to find.\n- Customize shows only the gear you own, and you can try on new pieces in the shop.",
+    "isPublished": true,
+    "releasedAt": "2026-11-06T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-05-five-vectors-and-a-phone-bottom-bar",
+    "version": "2026.11.05",
+    "title": "Five Vectors and a Phone Bottom Bar",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "Mobile",
+      "Navigation",
+      "UI/UX"
+    ],
+    "summary": "Your character now shows five clear vectors, with gear bonuses shown beside each one. Phones get a bottom bar for the pages you use most, and the sidebar is flatter.",
+    "content": "### Five Clear Vectors\n- Shell, Torque, Synapse, Ecdysis, and Depth are now the only stats on your character.\n- Gear bonuses appear beside each number, so you can see exactly what a piece adds.\n\n### A Bottom Bar for Phones\n- Dashboard, Oracle, Character, Forum, and More sit at the bottom of the screen.\n- More opens a short sheet with Profile, Codex, Academy, support, and your account.\n\n### A Flatter Sidebar\n- Daily alignment lives in the sidebar, and the sidebar is one simple list.\n- Stages moved into Character, and Friends moved into Profile.\n- Your guest audit results and alignment ticks are kept when you sign up.",
+    "isPublished": true,
+    "releasedAt": "2026-11-05T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-04-earn-gems-and-shop-the-rebuilt-market",
+    "version": "2026.11.04",
+    "title": "Earn Chitin Gems and Shop the Rebuilt Market",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Improvement",
+      "UI/UX",
+      "Tools"
+    ],
+    "summary": "Chitin Gems now come from your own work, and the market is rebuilt around gear with clearer filters, bundles, and a new hoodie and tote in the store.",
+    "content": "### Gems From Your Work\n- Chitin Gems are now earned from daily alignment, streaks, stage milestones, and first-time achievements.\n- Spend your gems on gear you want, with a clear price for each rarity.\n\n### A Rebuilt Market\n- Gear is now shown as unlocks, with rarer versions of each piece to collect.\n- Filter by slot and rarity, and sort the grid to find what you want quickly.\n- A featured banner sits above the grid when nothing is filtered.\n\n### Better Fit and New Store Items\n- Hats sit on the head, and wide bodies no longer clash with narrow heads.\n- A new hoodie and tote are now in the store.\n- On phones, the Creator keeps your character in view while you choose options.",
+    "isPublished": true,
+    "releasedAt": "2026-11-04T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-03-referral-rewards-and-shareable-profiles",
+    "version": "2026.11.03",
+    "title": "Referral Rewards and Shareable Profiles",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Navigation",
+      "UI/UX"
+    ],
+    "summary": "Inviting friends now earns you XP, and profile links preview nicely wherever you share them. Support and character pages are easier to find and use.",
+    "content": "### Rewards for Inviting Friends\n- Friends who join through your invitation now earn you XP.\n- Share your profile link with a clear preview, so the invitation looks as good as it reads.\n\n### Character Studio Polish\n- Head gear sits on the head, and leg gear fits the real legs.\n- Expressions are clearer, and the creator page has a refreshed layout.\n\n### Easier Support\n- Support navigation is simpler, and the support portal matches the rest of the app's look.",
+    "isPublished": true,
+    "releasedAt": "2026-11-03T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-02-oracle-models-and-clearer-limits",
+    "version": "2026.11.02",
+    "title": "Simpler Oracle Choices and Clearer Limits",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "AI",
+      "UI/UX"
+    ],
+    "summary": "The Oracle model picker is simpler, the Oracle has a fresh look, and free prompts and forum posts now show clear length limits.",
+    "content": "### Simpler Oracle Choices\n- The model picker is shorter and easier to scan, with clearer tier icons.\n- Oracle chat titles are created with the shared chat models, so they stay consistent.\n\n### Clear Limits\n- Free Oracle prompts can be up to 1,500 characters.\n- Forum posts can be up to 1,350 characters, with a live counter while you write.\n\n### A Fresh Look\n- The Oracle core has new flowing currents and lightning.\n- Avatar creation and settings got a polish pass, with consistent profile portraits.",
+    "isPublished": true,
+    "releasedAt": "2026-11-02T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-30-oracle-entity-and-stronger-safeguards",
+    "version": "2026.10.30",
+    "title": "Meet the Oracle in Entity Mode",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Tools",
+      "Security"
+    ],
+    "summary": "The full-page Oracle now offers an animated Entity view that responds as you type and chat. Stronger safeguards keep conversation allowances, single-use discounts, and unpublished articles protected.",
+    "content": "### A New Way to Talk\n- Switch between standard chat and a three-dimensional Entity view on the full-page Oracle.\n- The Entity responds visually to typing and replies while keeping your conversation context.\n- Your preferred view is remembered for your next visit.\n\n### Fairer Limits and Private Drafts\n- Simultaneous chat requests now share the same allowance check, keeping usage limits consistent.\n- Once-per-email discounts are protected against duplicate claims made at the same time.\n- Unpublished articles stay out of public article pages and text downloads.",
+    "isPublished": true,
+    "releasedAt": "2026-10-30T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-27-oracle-workspace-and-stage-explorer",
+    "version": "2026.10.27",
+    "title": "More Room for Oracle Conversations",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "UI/UX",
+      "Navigation",
+      "Mobile"
+    ],
+    "summary": "Saved Oracle chats now sit beside desktop conversations, with easier search and controls. The stage explorer lets you focus on one stage at a time.",
+    "content": "### Keep Your Conversations Close\n- Browse and search saved chats beside your conversation on desktop.\n- Start a new chat from the header and switch the chat sidebar with clearer controls.\n- Select and copy message text again, with a compact button to return to the latest reply.\n\n### Find Your Next Step\n- Choose a stage from a horizontal row to see its details without a long stack of expanded sections.\n- The selected stage stays in view as you move between stages.\n\n### Chat More Comfortably\n- The phone message box has a revised layout, and full-screen conversations use a solid background.\n- A simpler model picker makes conversation options easier to scan.",
+    "isPublished": true,
+    "releasedAt": "2026-10-27T23:59:00Z"
+  },
+  {
+    "slug": "2026-10-26-welcome-email-and-subscription-choices",
+    "version": "2026.10.26",
+    "title": "A Useful Welcome in Your Inbox",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Guides",
+      "Improvement"
+    ],
+    "summary": "Newly verified members receive a welcome email with direct starting points for daily routines, the Oracle, and the community. Email subscription choices are clearer across signup, guide requests, and settings.",
+    "content": "### Start With One Useful Step\n- A welcome email arrives after account verification, linking to daily routines, the Oracle, and the community.\n- Illustrated previews show where each starting point leads.\n- Account verification emails use the same clearer visual style.\n\n### Choose Your Email Updates\n- Optional subscription choices are available during signup and guide requests, with confirmation before updates begin.\n- Manage your email preference from member settings.\n- A failed subscription update shows an error so you can try again.",
+    "isPublished": true,
+    "releasedAt": "2026-10-26T23:59:00Z"
+  },
+  {
     "slug": "2026-10-25-character-equipment-and-oracle-usage",
     "version": "2026.10.25",
     "title": "Visible Equipment and Clearer Oracle Usage",
