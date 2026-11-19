@@ -44,6 +44,8 @@ export interface MemberProfilePageProps {
   canonicalizePath?: boolean
   /** The profile opens the page (no header band above it), so its hero becomes the band. */
   opensPage?: boolean
+  /** Sits right under a header band (your own Overview tab), so its hero joins that band. */
+  joinsBand?: boolean
 }
 
 type MemberLoadout = {
@@ -57,6 +59,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   profileId,
   canonicalizePath = false,
   opensPage = false,
+  joinsBand = false,
 }) => {
   const navigate = useNavigate()
   const session = useAuthSession()
@@ -156,7 +159,8 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
       <section
         aria-labelledby="member-name"
         className={cn(
-          opensPage && 'hud-band-hero',
+          (opensPage || joinsBand) && 'hud-band-hero',
+          joinsBand && 'hud-band-hero-joined',
           'relative overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset',
         )}
       >
@@ -191,7 +195,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
               name={profile.displayName}
             />
             <div className="min-w-0 flex-1 w-full space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div>
                 <div className="min-w-0 space-y-1.5">
                   <h1
                     id="member-name"
@@ -211,54 +215,6 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                     <RankRecordChip userId={profile.id} />
                   </div>
                 </div>
-                <div
-                  className={cn(
-                    'flex flex-wrap justify-center sm:justify-end items-center gap-2 shrink-0 max-sm:[&>*]:flex-1',
-                    opensPage && 'hud-hero-pill-clear',
-                  )}
-                >
-                  {isSelf && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
-                  {session.isGuest ? (
-                    <>
-                      {/* Guests can already dress a starter character, so this is the shortest path to sign-up. */}
-                      <HudButton
-                        type="button"
-                        variant="primary"
-                        size="sm"
-                        onClick={() => void navigate({ to: '/character' })}
-                        icon={<Shell className="w-3.5 h-3.5" />}
-                      >
-                        Build your own
-                      </HudButton>
-                      <HudButton
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setAuthOpen(true)}
-                        icon={<UserPlus className="w-3.5 h-3.5" />}
-                      >
-                        Sign up to add friend
-                      </HudButton>
-                    </>
-                  ) : (
-                  <FriendRequestButton
-                    profileId={profile.id}
-                    relationship={profile.relationship}
-                    pendingRequestId={profile.pendingRequestId}
-                    onRelationshipChange={(next) =>
-                      setProfile((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              relationship: next.relationship,
-                              pendingRequestId: next.pendingRequestId,
-                            }
-                          : prev
-                      )
-                    }
-                  />
-                  )}
-                </div>
               </div>
               {profile.bio && (
                 <p className="text-sm text-ink-body leading-relaxed max-w-prose mx-auto sm:mx-0">{profile.bio}</p>
@@ -275,6 +231,53 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
                   ))}
                 </ul>
               )}
+              {/* Actions follow the profile text instead of the top-right corner, where the
+                  floating search pill sits on desktop. */}
+              <div
+                className="flex flex-wrap justify-center sm:justify-start items-center gap-2 pt-1 max-sm:[&>*]:flex-1"
+              >
+                {isSelf && <ProfileLinkButton userId={profile.id} handle={profile.handle} />}
+                {session.isGuest ? (
+                  <>
+                    {/* Guests can already dress a starter character, so this is the shortest path to sign-up. */}
+                    <HudButton
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => void navigate({ to: '/character' })}
+                      icon={<Shell className="w-3.5 h-3.5" />}
+                    >
+                      Build your own
+                    </HudButton>
+                    <HudButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setAuthOpen(true)}
+                      icon={<UserPlus className="w-3.5 h-3.5" />}
+                    >
+                      Sign up to add friend
+                    </HudButton>
+                  </>
+                ) : (
+                <FriendRequestButton
+                  profileId={profile.id}
+                  relationship={profile.relationship}
+                  pendingRequestId={profile.pendingRequestId}
+                  onRelationshipChange={(next) =>
+                    setProfile((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            relationship: next.relationship,
+                            pendingRequestId: next.pendingRequestId,
+                          }
+                        : prev
+                    )
+                  }
+                />
+                )}
+              </div>
             </div>
           </div>
 

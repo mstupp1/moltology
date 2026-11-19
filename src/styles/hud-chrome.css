@@ -296,12 +296,11 @@ input[type="range"].dial-range:focus-visible {
     border-width: 0 0 1px;
     border-radius: 11px 11px 0 0;
   }
-  /* Actions in a hero's top-right corner step aside for the pill, only as far as it reaches. */
-  .hud-hero-pill-clear {
-    margin-right: var(--hud-pill-clear, 0px);
-  }
-  [data-pill-clear='none'] .hud-hero-pill-clear {
-    margin-right: 0;
+  /* A hero directly under a header band (your own profile's Overview) joins it: no gap, no
+     rounded top, so band and hero read as one header like another member's profile. */
+  .hud-band-hero-joined {
+    margin-top: -1rem;
+    border-radius: 0;
   }
 }
 /* Codex: the reader's slim sticky bar on phones becomes the page's header band from lg up. */
@@ -317,6 +316,11 @@ input[type="range"].dial-range:focus-visible {
   }
 }
 /* Same as .hud-title-band-lead, from lg up only (the Character title row). */
+@media (min-width: 1024px) {
+  .hud-band-hero-joined {
+    margin-top: -1.25rem;
+  }
+}
 @media (min-width: 1024px) {
   .hud-title-band-lead-lg {
     margin-top: calc(var(--hud-band-top, 0px) * -1);
