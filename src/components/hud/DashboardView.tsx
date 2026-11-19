@@ -15,7 +15,8 @@ import { DashboardChangelogPanel } from '@/components/hud/dashboard/DashboardCha
  */
 export default function DashboardView() {
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans">
+    // No header band here: the Today hero opens the page, starting at the panel's top edge.
+    <div className="hud-page-flush-top space-y-3 sm:space-y-4 lg:space-y-5 font-sans">
       <DashboardTodayStrip />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 items-stretch">

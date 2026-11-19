@@ -1,5 +1,4 @@
 import { BandSectionNav, type BandSection } from '@/components/hud/BandSectionNav'
-import { HudTitleBandTop } from '@/components/hud/HudTitlePanel'
 import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { ChevronRight, GraduationCap } from 'lucide-react'
@@ -59,13 +58,9 @@ const ACADEMY_SECTIONS = [
   { id: 'certificates', label: 'Certificates', to: '/academy/certificates' },
 ] as const satisfies readonly BandSection[]
 
-/** Catalog / Certificates: the top row of the Academy header band (same style as Character's). */
+/** Catalog / Certificates: the section tabs in the Academy header band (pass as `sections`). */
 export function AcademyNav({ current }: { current: 'catalog' | 'certificates' | null }) {
-  return (
-    <HudTitleBandTop>
-      <BandSectionNav label="Academy" sections={ACADEMY_SECTIONS} current={current} />
-    </HudTitleBandTop>
-  )
+  return <BandSectionNav label="Academy" sections={ACADEMY_SECTIONS} current={current} />
 }
 
 /** Academy › Course › Lesson trail above detail pages. */

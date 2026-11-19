@@ -35,7 +35,7 @@ export function MarketCurrencyBar({ chitinGems, moltCredits, creditsLive, classN
       <div className="flex min-w-0 items-center gap-2 rounded-control bg-surface-2 px-3 py-2">
         <img src={getAssetUrl('/images/chitin_gem.png')} alt="" className="w-6 h-6 object-contain shrink-0" />
         <div className="flex flex-col leading-none min-w-0 gap-1">
-          <span className="eyebrow whitespace-nowrap">
+          <span className="text-xs text-ink-muted whitespace-nowrap">
             Chitin Gems
           </span>
           <span className="font-grotesk text-base font-semibold text-ink tabular-nums" data-testid="gem-balance">
@@ -46,7 +46,7 @@ export function MarketCurrencyBar({ chitinGems, moltCredits, creditsLive, classN
       <div className="flex min-w-0 items-center gap-2 rounded-control bg-surface-2 px-3 py-2">
         <img src={getAssetUrl('/images/molt_credit.png')} alt="" className="w-6 h-6 object-contain shrink-0" />
         <div className="flex flex-col leading-none min-w-0 gap-1">
-          <span className="eyebrow whitespace-nowrap">
+          <span className="text-xs text-ink-muted whitespace-nowrap">
             Molt Credits
           </span>
           <span className="font-grotesk text-base font-semibold text-ink tabular-nums">

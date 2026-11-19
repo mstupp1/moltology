@@ -1,4 +1,4 @@
-import { HudTitleBandTop, HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import React, { useState } from 'react'
 import { HudTabs } from '@/components/ui/HudTabs'
 import { HudButton } from '@/components/ui/HudButton'
@@ -140,8 +140,10 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
 
   return (
     <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans text-ink">
-      <div>
-        <HudTitleBandTop>
+      <HudTitlePanel
+        treatment="band"
+        title={SUPPORT_PAGE_COPY.pageTitle}
+        sections={
           <HorizontalScroll className="-ml-2.5 overflow-x-auto pl-2.5" tabIndex={-1}>
             <HudTabs
               label="Support sections"
@@ -155,9 +157,8 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
               ]}
             />
           </HorizontalScroll>
-        </HudTitleBandTop>
-        <HudTitlePanel treatment="band" joined title={SUPPORT_PAGE_COPY.pageTitle} />
-      </div>
+        }
+      />
       <div role="tabpanel" aria-labelledby={`support-tab-${activeTab}`}>
         {/* Changelog */}
         {activeTab === 'changelog' && (

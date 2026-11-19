@@ -16,10 +16,9 @@ export interface BandSection<K extends string = string> {
 }
 
 /**
- * The quiet top row of a page's header band (inside `HudTitleBandTop`): links between the
- * parts of one area (Character, Academy, Admin, Support). Plain labels, the current one in
- * full ink, no underline or pill, so it never reads like the in-page tabs further down.
- * Scrolls sideways on narrow screens instead of wrapping.
+ * The section tabs of a page's header band (`HudTitlePanel` `sections`): links between the
+ * parts of one area (Character, Academy, Admin, Profile). The current one is a lit tile, as in
+ * the public header; no underline. Scrolls sideways on narrow screens instead of wrapping.
  */
 export function BandSectionNav<K extends string>({
   label,
@@ -50,7 +49,9 @@ export function BandSectionNav<K extends string>({
                   'inline-flex min-h-9 items-center gap-1.5 justify-center whitespace-nowrap rounded-control px-2.5 text-ui font-medium transition-colors',
                   // Inset focus ring: the scroll row would clip an outer one.
                   'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
-                  selected ? 'text-ink' : 'text-ink-muted hover:text-ink',
+                  selected
+                    ? 'bg-surface-3 shadow-nav-current text-ink'
+                    : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
                 )}
               >
                 {section.label}
@@ -70,7 +71,7 @@ export function BandSectionNav<K extends string>({
   )
 }
 
-/** A small figure in a band's actions (XP, clearance, admin status): tracked label over a value. */
+/** A small figure in a band's actions (XP, clearance, admin status): a sentence-case label over a value. */
 export function BandStat({
   label,
   value,
@@ -84,7 +85,7 @@ export function BandStat({
 }) {
   return (
     <div className="min-w-0" title={title}>
-      <div className="eyebrow whitespace-nowrap">{label}</div>
+      <div className="text-xs text-ink-muted whitespace-nowrap">{label}</div>
       <div
         className={cn(
           'font-grotesk text-lg font-semibold leading-tight tabular-nums',

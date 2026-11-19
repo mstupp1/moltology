@@ -124,8 +124,8 @@ pinned to the bottom.
 faint `surface-2` fill with a `line-subtle` edge), `ghost`, `danger` (alias `sacred`). Inter 13px weight
 500, sentence case, no glow. One `primary` per screen. There are two tab styles and no underline tabs:
 
-- Section tabs, the top row of a header band: `BandSectionNav` (each section has a URL) or
-  `HudTabs` (in-page state). Inter 13px weight 500, the current one in full ink.
+- Section tabs, on a header band's title row: `BandSectionNav` (each section has a URL) or
+  `HudTabs` (in-page state). Inter 13px weight 500, the current one a lit `surface-3` tile.
 - In-page view tabs and filters: `pillTabClass()` from `src/components/ui/pillTab.ts`, round
   pills with the current one a lit `surface-3` pill.
 
@@ -169,20 +169,30 @@ the top of the page panel (rounded to the panel's top corners on desktop, flush 
 the top bar on phones) with a `surface-2` fill and a `line-subtle` bottom divider, so it
 stands apart from the `surface-1` panel. Use it as the first element of every standard page
 (Academy, Certificates, Forum, Shop, Progress, Admin, Logic Atlas, Support, Settings, Search,
-Profile; Character builds
-the same band by hand). On desktop the search pill straddles the band's top-right corner,
-so the band leaves room for it.
+Profile; Character and Codex build
+the same band by hand with `BandHeadingRow`). On desktop the search pill straddles the band's
+top-right corner, so the title row leaves room for it.
 
 One band, the same rows on every page:
 
-1. Section tabs (only for an area with sibling pages: Character, Academy, Admin, Support, Profile):
-   `HudTitleBandTop` holding `BandSectionNav` or `HudTabs`, level with the pill. The band
-   below passes `joined`. Phones scroll this row sideways rather than wrapping it.
-2. Title row: the `h1`, at most one short description line, no eyebrow. `actions` on the
-   right hold page commands (Forum's New post) or a few figures as `BandStat` (Progress XP,
-   Admin status). Shop's wallet is the one custom summary.
-3. Optional `toolbar`: in-page view tabs as lit pills (Shop's Gear / Earn gems / Credits).
+1. Title row, level with the pill on desktop: the `h1`, then for an area with sibling pages
+   (Character, Academy, Admin, Support, Profile) a thin divider and the section tabs
+   (`sections`: `BandSectionNav` when each section has a URL, `HudTabs` for in-page state). The
+   title is the area's name on every one of its tabs (Character on Customize, Shop and Progress);
+   the current tab is a lit tile. `actions` sit on the right of the same row (Forum's New post,
+   Character's save, or a few figures as `BandStat`) and stop short of the pill
+   (`.hud-pill-clear`). Admin, with six sections, passes `sectionsBelow` to give its tabs their
+   own row. No eyebrow.
+2. Optional description: one short line. `hideDescriptionOnPhone` drops it where the tabs
+   and figures already say enough (Shop).
+3. Optional `toolbar`: in-page view tabs as lit tiles (Shop's Gear / Skills / Earn gems / Credits).
    Content such as cards, lists or forms always starts below the band.
+
+On phones the title row holds the title and short actions; section tabs get their own row
+under it (scrolling sideways), then figures (`actionsBelowOnPhone`), then the toolbar.
+Pages that open with their own hero instead of a band (Dashboard) add `hud-page-flush-top`
+so the hero starts at the panel's top edge rather than under the strip kept for the pill.
+Codex builds the same band by hand on desktop (title, stage and position, reader actions).
 
 `actions` holds page-level commands or a short status summary. `toolbar` spans the
 full width below the heading and actions, for navigation or filters. Both wrap on

@@ -31,15 +31,12 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
   const guest = useAcademyGuestEnroll()
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div>
-        <AcademyNav current="certificates" />
-        <HudTitlePanel
-          treatment="band"
-          joined
-          title="Certificates"
-          description="Finish every lesson for a course certificate, or every required course on a track for its certificate."
-        />
-      </div>
+      <HudTitlePanel
+        treatment="band"
+        title="Academy"
+        sections={<AcademyNav current="certificates" />}
+        description="Finish every lesson for a course certificate, or every required course on a track for its certificate."
+      />
       <section className="space-y-3" aria-labelledby="earned-heading">
         <AcademySectionHeading
           id="earned-heading"

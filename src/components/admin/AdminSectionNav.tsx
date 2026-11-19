@@ -1,6 +1,5 @@
 import React from 'react'
 import { BandSectionNav, type BandSection } from '@/components/hud/BandSectionNav'
-import { HudTitleBandTop } from '@/components/hud/HudTitlePanel'
 
 export const ADMIN_TAB_IDS = ['watch', 'members', 'store', 'experiments', 'prompts'] as const
 export type AdminTab = (typeof ADMIN_TAB_IDS)[number]
@@ -15,11 +14,7 @@ const SECTIONS = [
   { id: 'logic', label: 'Logic Atlas', to: '/admin/logic' },
 ] as const satisfies readonly BandSection<AdminSection>[]
 
-/** First row of the admin header band: the hub's tabs plus the Logic Atlas page. */
+/** The admin header band's section tabs (pass as `sections`): the hub's tabs plus the Logic Atlas page. */
 export function AdminSectionNav({ current }: { current: AdminSection }) {
-  return (
-    <HudTitleBandTop>
-      <BandSectionNav label="Admin sections" sections={SECTIONS} current={current} />
-    </HudTitleBandTop>
-  )
+  return <BandSectionNav label="Admin sections" sections={SECTIONS} current={current} />
 }

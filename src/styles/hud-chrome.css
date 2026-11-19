@@ -224,14 +224,15 @@ input[type="range"].dial-range:focus-visible {
 
 /* A band that starts the page: pulled up to the panel's top edge and out to its sides. */
 .hud-title-band,
-.hud-title-band-top {
+.hud-title-band-top,
+.hud-title-band-lead {
   margin-top: calc(var(--hud-band-top, 0px) * -1);
   margin-left: calc(var(--hud-band-x, 0px) * -1);
   margin-right: calc(var(--hud-band-x, 0px) * -1);
   padding-left: var(--hud-band-x, 1rem);
   padding-right: var(--hud-band-x, 1rem);
 }
-/* The rest of a band whose first row (section tabs) sits directly above it. */
+/* The rest of a band whose first row (crumbs) sits directly above it. */
 .hud-title-band-rest {
   margin-left: calc(var(--hud-band-x, 0px) * -1);
   margin-right: calc(var(--hud-band-x, 0px) * -1);
@@ -239,36 +240,73 @@ input[type="range"].dial-range:focus-visible {
   padding-right: var(--hud-band-x, 1rem);
 }
 .hud-title-band {
-  padding-top: 0.875rem;
-  padding-bottom: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.875rem;
 }
 .hud-title-band-top {
   padding-top: 0.625rem;
 }
+/* Room for the floating search pill at the end of a band's title row (desktop only). */
+.hud-pill-clear {
+  display: none;
+}
 @media (min-width: 768px) {
   .hud-title-band,
-  .hud-title-band-top {
+  .hud-title-band-top,
+  .hud-title-band-lead {
     /* Panel radius 12px less its 1px border. */
     border-top-left-radius: 11px;
     border-top-right-radius: 11px;
   }
-  /* The search pill straddles the panel's top-right corner, so a band without section
-     tabs starts its title just under the pill; section tabs sit level with the pill. */
+  /* The search pill straddles the panel's top-right corner, so the title row sits level
+     with it, in the strip the panel keeps for it, and stops short of it. */
   .hud-title-band {
-    padding-top: 2.75rem;
-    padding-bottom: 1.25rem;
+    padding-top: 0.6875rem;
+    padding-bottom: 0.875rem;
   }
   .hud-title-band-top {
     padding-top: 0.75rem;
   }
+  .hud-pill-clear {
+    display: block;
+    flex-shrink: 0;
+    width: 220px;
+    margin-left: -0.5rem;
+  }
+  /* Inline section tabs start a step after the divider instead of hanging into it. */
+  .hud-band-sections.is-inline > * {
+    margin-left: 0;
+  }
 }
-/* Same as .hud-title-band-rest, from lg up only (the Character title row). */
+/* A page that opens with its own hero instead of a band (Dashboard): the hero starts at
+   the panel's top edge padding instead of under the empty strip kept for the pill. */
+@media (min-width: 768px) {
+  .hud-page-flush-top {
+    margin-top: calc(var(--hud-band-top, 0px) * -1 + var(--hud-band-x, 0px));
+  }
+}
+/* Codex: the reader's slim sticky bar on phones becomes the page's header band from lg up. */
 @media (min-width: 1024px) {
-  .hud-title-band-rest-lg {
+  .hud-codex-band {
+    position: static;
+    margin-top: calc(var(--hud-band-top, 0px) * -1);
+    margin-left: calc(var(--hud-band-x, 0px) * -1);
+    margin-right: calc(var(--hud-band-x, 0px) * -1);
+    padding: 0.6875rem var(--hud-band-x, 1rem) 0.875rem;
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
+  }
+}
+/* Same as .hud-title-band-lead, from lg up only (the Character title row). */
+@media (min-width: 1024px) {
+  .hud-title-band-lead-lg {
+    margin-top: calc(var(--hud-band-top, 0px) * -1);
     margin-left: calc(var(--hud-band-x, 0px) * -1);
     margin-right: calc(var(--hud-band-x, 0px) * -1);
     padding-left: var(--hud-band-x, 1rem);
     padding-right: var(--hud-band-x, 1rem);
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
   }
 }
 

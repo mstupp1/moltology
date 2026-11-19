@@ -277,10 +277,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div>
-        <AcademyNav current="catalog" />
-        <HudTitlePanel treatment="band" joined title="Academy" />
-      </div>
+      <HudTitlePanel treatment="band" title="Academy" sections={<AcademyNav current="catalog" />} />
 
       {nothingPublished ? (
         <AcademyComingSoon />
