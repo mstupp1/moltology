@@ -9,8 +9,9 @@ import { isAdmin } from './permissions'
 
 export const EXPERIMENTS = {
   premium: {
-    title: 'Oracle MAX',
-    description: 'Show Oracle MAX membership, settings, and dashboard offers for your account.',
+    title: 'Oracle MAX checkout',
+    description:
+      'Subscribe to or activate Oracle MAX on your account, with the Settings card and dashboard offer. Everyone else sees Oracle MAX as coming soon.',
   },
   'molt-credits': {
     title: 'Molt Credits',

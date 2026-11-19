@@ -94,7 +94,6 @@ describe('command catalog', () => {
       'nav-admin',
       'nav-logic-atlas',
     ])
-    expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-premium')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-admin')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-watch')
     expect(filterCommandCatalog('').length).toBe(
@@ -105,10 +104,7 @@ describe('command catalog', () => {
   })
 
   it('keeps hidden pages out of search unless the viewer can see them', () => {
-    expect(filterCommandCatalog('premium').map((cmd) => cmd.id)).not.toContain('nav-premium')
-    expect(
-      filterCommandCatalog('premium', undefined, { includeHidden: true }).map((cmd) => cmd.id),
-    ).toContain('nav-premium')
+    expect(filterCommandCatalog('premium').map((cmd) => cmd.id)).toContain('nav-premium')
     expect(filterCommandCatalog('', undefined, { includeHidden: true }).length).toBe(
       COMMAND_CATALOG.filter((cmd) => !isAdminOnlyPath(cmd.to)).length,
     )

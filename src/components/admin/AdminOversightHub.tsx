@@ -1,6 +1,5 @@
 import { AdminStarterPrompts } from './AdminStarterPrompts'
 import React, { useCallback, useEffect, useState } from 'react'
-import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, FlaskConical, Search, ShieldCheck } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
@@ -133,11 +132,10 @@ const TOOLS = [
 
 /** Pages outside the admin tabs, as a quiet link row under the title. */
 function AdminToolLinks() {
-  const premiumAccess = useHiddenPageAccess('premium')
   return (
     <nav aria-label="Admin tools" data-testid="admin-sectors" className="pt-1">
       <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        {TOOLS.filter((tool) => tool.to !== '/max' || (!premiumAccess.pending && premiumAccess.canView)).map((tool) => (
+        {TOOLS.map((tool) => (
           <li key={tool.to}>
             <Link
               to={tool.to}

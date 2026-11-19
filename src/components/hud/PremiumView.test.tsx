@@ -38,7 +38,7 @@ describe("Oracle MAX offer panel", () => {
       <PremiumOfferPanel offer={base} busy={null} preview {...handlers()} />,
     );
     expect(
-      screen.getByText("Early access"),
+      screen.getByText("Coming soon"),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Subscribe|Activate/ }),

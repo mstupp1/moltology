@@ -70,7 +70,7 @@ describe("Premium HUD route", () => {
 
     expect(
       await screen.findByText(
-        "Early access",
+        "Coming soon",
         {},
         { timeout: LAZY_TIMEOUT },
       ),
@@ -99,7 +99,7 @@ describe("Premium HUD route", () => {
 
     expect(
       await screen.findByText(
-        "Early access",
+        "Coming soon",
         {},
         { timeout: LAZY_TIMEOUT },
       ),
@@ -123,7 +123,7 @@ describe("Premium HUD route", () => {
     render(<Component />);
     expect(
       await screen.findByText(
-        "Early access",
+        "Coming soon",
         {},
         { timeout: LAZY_TIMEOUT },
       ),
