@@ -1,12 +1,11 @@
 /**
- * The stage a character stands on: renderer, studio lighting, soft ground shadow and
+ * The stage a character stands on: renderer, studio lighting (baked, plus one live key light), soft ground shadow and
  * drag-to-turn. Framework free, so the creator, portraits and tests can all drive it.
  */
 import {
   AdditiveBlending,
   CanvasTexture,
   DirectionalLight,
-  HemisphereLight,
   Mesh,
   MeshBasicMaterial,
   NeutralToneMapping,
@@ -24,9 +23,10 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three'
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import type { AvatarPose } from '../avatar/traits'
 import { buildCharacter, type Character3D } from './character'
+import { bakedLightTexture } from './stage-light'
+import type { BakeOptions } from './bake'
 import { lookChange, type Avatar3DLook } from './look'
 import { withLoftDetail } from './loft'
 import type { Reaction } from './motion'
@@ -45,19 +45,21 @@ export interface StageOptions {
   framing?: 'full' | 'portrait'
   /** Draw only when asked (`renderStill`), with no animation loop. */
   manual?: boolean
-  /** Cast soft shadows (default true). Small stills skip them: they barely show and cost the most. */
+  /** Cast soft shadows (default true, except a live stage at `low` quality). */
   shadows?: boolean
   /**
    * `studio` (default) is even, soft light for stills. `cinematic` is for the live full-body view:
    * a darker fill, a cyan rim on one edge and a pink kicker on the other (the glass portrait's
-   * colours), and a faint glowing ring on the floor. Lights only, so it costs no more to draw.
+   * colours), and a faint glowing ring on the floor. All but the key light are baked (stage-light.ts).
    */
   lighting?: 'studio' | 'cinematic'
   /**
-   * `low` is for phones and weaker machines: a lower pixel ratio, a smaller shadow map and coarser
-   * meshes. Either way the stage lowers its own resolution if frames run slow.
+   * `low` is for phones and weaker machines: a lower pixel ratio, no cast shadow on a live stage
+   * (stills keep a small one), a quicker bake and coarser meshes. Either way the stage lowers its own resolution if frames run slow.
    */
   quality?: 'high' | 'low'
+  /** How finely to bake the character's creases (bake.ts); small stills ask for a quick one. */
+  bake?: BakeOptions
   /** The browser took the 3D context away (too many canvases, or the graphics driver reset). */
   onContextLost?: () => void
 }
@@ -166,21 +168,26 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   renderer.outputColorSpace = SRGBColorSpace
   renderer.toneMapping = NeutralToneMapping
   renderer.toneMappingExposure = 1.05
-  renderer.shadowMap.enabled = options.shadows ?? true
+  // A live character on a phone goes without the cast shadow: the baked creases and the soft
+  // blob under its feet carry the depth, and the shadow map was the heaviest part of a frame.
+  renderer.shadowMap.enabled = options.shadows ?? !(low && !options.manual)
   renderer.shadowMap.type = VSMShadowMap
   renderer.setClearColor(0x000000, 0)
 
   const scene = new Scene()
+  const cinematic = options.lighting === 'cinematic'
+  // The soft lights (sky and floor bounce, fill, rim and kicker) are baked into one environment
+  // picture (stage-light.ts), so only the key light is worked out live.
   const pmrem = new PMREMGenerator(renderer)
-  const room = new RoomEnvironment()
-  const env = pmrem.fromScene(room, 0.04)
+  const baked = bakedLightTexture(cinematic ? 'cinematic' : 'studio')
+  const env = pmrem.fromEquirectangular(baked)
+  baked.dispose()
+  pmrem.dispose()
   scene.environment = env.texture
-  scene.environmentIntensity = 0.28
 
   const camera = new PerspectiveCamera(26, 1, 0.1, 50)
 
-  const hemi = new HemisphereLight(0xfff1e6, 0x5a3038, 0.4)
-  const key = new DirectionalLight(0xfff4e8, 3.2)
+  const key = new DirectionalLight(0xfff4e8, cinematic ? 3 : 3.2)
   key.position.set(2.2, 3.4, 4.4)
   key.castShadow = true
   key.shadow.mapSize.set(low ? 512 : 1024, low ? 512 : 1024)
@@ -193,27 +200,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   key.shadow.radius = 7
   key.shadow.blurSamples = low ? 8 : 16
   key.target.position.set(0, 1, 0)
-  const fill = new DirectionalLight(0xa9c9ff, 0.5)
-  fill.position.set(-3.2, 1.6, 2.4)
-  const rim = new DirectionalLight(0xc8ecff, 1.9)
-  rim.position.set(-1.8, 2.6, -3.6)
-  scene.add(hemi, key, key.target, fill, rim)
-  const cinematic = options.lighting === 'cinematic'
-  if (cinematic) {
-    // Darker all round, so the coloured edges read: cyan behind the left side, pink behind the right.
-    scene.environmentIntensity = 0.2
-    hemi.intensity = 0.22
-    hemi.groundColor.set(0x0b2a36)
-    fill.intensity = 0.28
-    fill.color.set(0x7fb8ff)
-    key.intensity = 3
-    rim.color.set(0x48dcff)
-    rim.intensity = 8
-    rim.position.set(-3.4, 2.2, -1.6)
-  }
-  const kicker = new DirectionalLight(0xff8fc4, 3.2)
-  kicker.position.set(3.4, 1.4, -1.4)
-  if (cinematic) scene.add(kicker)
+  scene.add(key, key.target)
 
   const ground = new Mesh(new PlaneGeometry(8, 8), new ShadowMaterial({ opacity: 0.26 }))
   ground.rotation.x = -Math.PI / 2
@@ -557,6 +544,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       // A live character on a phone is built from slightly coarser meshes; stills choose their own detail.
       character = low && !options.manual ? withLoftDetail(0.8, () => buildCharacter(look)) : buildCharacter(look)
       scene.add(character.root)
+      // Bake its creases once, in the pose it stands in. Phones look from fewer directions.
+      character.bake(renderer, options.bake ?? (low && !options.manual ? { directions: 24, size: 384 } : undefined))
       lightHalo(look, character.height)
       // New gear on a live character: it tries the piece on.
       if (before && follow && JSON.stringify(before.equipment ?? {}) !== JSON.stringify(look.equipment ?? {})) character.react('equip')
@@ -652,8 +641,6 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       retired?.dispose()
       character?.dispose()
       env.dispose()
-      pmrem.dispose()
-      room.dispose()
       blobTexture.dispose()
       glowTexture.dispose()
       halo.material.dispose()

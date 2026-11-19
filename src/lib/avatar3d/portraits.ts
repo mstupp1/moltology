@@ -76,6 +76,8 @@ function stageFor(framing: 'portrait' | 'full', px: number): NonNullable<typeof 
         manual: true,
         // Soft cast shadows give small pictures their depth; one draw of them costs very little.
         quality: 'low',
+        // A picture this small shows only the broad creases, so a quick bake is plenty.
+        bake: { directions: 20, size: 256 },
         // Start again with a fresh canvas the next time a picture is asked for.
         onContextLost: () => {
           studio = null
