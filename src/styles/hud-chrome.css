@@ -246,6 +246,11 @@ input[type="range"].dial-range:focus-visible {
 .hud-title-band-top {
   padding-top: 0.625rem;
 }
+/* Section tabs in a band keep their lit tile inside the band's padding: on phones its left
+   edge lines up with the title, and on desktop it starts a step after the divider. */
+.hud-band-sections > * {
+  margin-left: 0;
+}
 /* Room for the floating search pill at the end of a band's title row (desktop only). */
 .hud-pill-clear {
   display: none;
@@ -272,10 +277,6 @@ input[type="range"].dial-range:focus-visible {
     flex-shrink: 0;
     width: 220px;
     margin-left: -0.5rem;
-  }
-  /* Inline section tabs start a step after the divider instead of hanging into it. */
-  .hud-band-sections.is-inline > * {
-    margin-left: 0;
   }
 }
 /* A page that opens with its own hero instead of a band (Dashboard): the hero starts at
