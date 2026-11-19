@@ -41,6 +41,8 @@ export interface CameraCue {
   /** How quickly the camera glides there (6 snappy, 1 a slow creep). */
   rate?: number
   cut?: boolean
+  /** Cast index the shot is on; close shots aim at that member's head (default 0). */
+  subject?: number
 }
 
 export interface TimelineCue {

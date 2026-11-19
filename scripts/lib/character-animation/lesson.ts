@@ -323,7 +323,7 @@ export function buildTimeline(
     // the second (a glide there becomes a cut), so the frame never visibly slides.
     const move = i === 0 || (i === 1 && options.hookLift && (scene.move ?? 'glide') === 'glide') ? 'cut' : (scene.move ?? 'glide')
     const lift = i === 0 && options.hookLift ? options.hookLift : 0
-    const camera = { zoom: shot.zoom, tilt: shot.tilt, pan, lift }
+    const camera = { zoom: shot.zoom, tilt: shot.tilt, pan, lift, subject: focus === 'all' ? 0 : index.get(focus)! }
     if (move === 'push-in') {
       cues.push({ t: t0, camera: { ...camera, zoom: shot.zoom * 0.82, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })

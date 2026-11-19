@@ -92,7 +92,7 @@ export interface Stage {
    * camera glides to the new place (`rate` sets how quickly: 6 is the usual snappy glide, 1 a slow
    * creep across a scene); `cut` jumps there in the next frame.
    */
-  setCamera: (camera: { zoom?: number; tilt?: number; pan?: number; lift?: number; rate?: number; cut?: boolean }) => void
+  setCamera: (camera: { zoom?: number; tilt?: number; pan?: number; lift?: number; rate?: number; cut?: boolean; subject?: number }) => void
   /**
    * Several characters on one stage, for scripted animation: the first is the stage's own
    * character (camera framing follows it), the rest stand beside it. `x` and `z` are world units
@@ -317,7 +317,9 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       // Zooming in closes on the head and shoulders rather than the middle of the body.
       const near = clamp((zoom - 1) / (ZOOM_MAX - 1), 0, 1)
       wantLook.copy(home.look)
-      wantLook.y += ((character?.height ?? 1.8) * 0.8 - home.look.y) * near
+      // Close shots aim at the head of whoever the shot is on (a cast member may be shorter).
+      const on = subject > 0 ? (extras[subject - 1]?.character ?? character) : character
+      wantLook.y += ((on?.height ?? 1.8) * 0.8 - home.look.y) * near
       dist = (home.position.z - home.look.z) / zoom
       rise = (home.position.y - home.look.y) / zoom
     } else {
@@ -334,6 +336,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   }
   let yaw = options.yaw ?? 0
   let zoom = 1
+  let subject = 0
   let tilt = 0
   let pan = 0
   let lift = 0
@@ -648,6 +651,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       if (next.tilt !== undefined) tilt = clamp(next.tilt, TILT_MIN, TILT_MAX)
       if (next.pan !== undefined) pan = next.pan
       if (next.lift !== undefined) lift = next.lift
+      if (next.subject !== undefined) subject = next.subject
       glideRate = next.rate ?? 6
       // A cut lands on the next frame drawn, as the very first frame does.
       if (next.cut) started = false
