@@ -65,6 +65,7 @@ export function HudTitlePanel({
         className={cn(
           'relative flex flex-wrap items-center gap-x-4 gap-y-2 bg-surface-2 border-b border-line-subtle',
           joined ? 'hud-title-band-rest pt-2 pb-4 md:pb-5' : 'hud-title-band',
+          (description || children || toolbar || (sections && sectionsBelow)) && 'has-more',
           className,
         )}
         {...props}
@@ -149,7 +150,7 @@ export function BandHeadingRow({
     <>
       <TitleTag
         className={cn(
-          'order-1 min-w-0 font-grotesk font-semibold text-xl sm:text-2xl text-ink tracking-tight',
+          'hud-band-title order-1 min-w-0 font-grotesk font-semibold text-xl sm:text-2xl text-ink tracking-tight',
           titleClassName,
         )}
       >

@@ -213,9 +213,16 @@ input[type="range"].dial-range:focus-visible {
   }
 }
 @media (min-width: 768px) {
+  /* The panel's top edge lines up with the top of the floating search pill (3.5rem tall), so a
+     band's title row is exactly the pill's height and the title, tabs, actions and pill share
+     one centre line on every page. Content on a page without a band starts under the pill. */
   [data-hud-page-panel] {
     --hud-band-x: 15px;
-    --hud-band-top: 54px;
+    --hud-pill-h: 3.5rem;
+    --hud-band-row: 2.25rem;
+    /* (pill height - panel top border - band bottom border - row) / 2 */
+    --hud-band-pad: calc((var(--hud-pill-h) - 2px - var(--hud-band-row)) / 2);
+    --hud-band-top: calc(var(--hud-pill-h) + 0.75rem);
   }
   [data-hud-page-panel][data-hud-main-only] {
     --hud-band-top: 1.5rem;
@@ -265,12 +272,23 @@ input[type="range"].dial-range:focus-visible {
   }
   /* The search pill straddles the panel's top-right corner, so the title row sits level
      with it, in the strip the panel keeps for it, and stops short of it. */
-  .hud-title-band {
-    padding-top: 0.6875rem;
+  .hud-title-band,
+  .hud-title-band-lead-lg {
+    padding-top: var(--hud-band-pad);
+    padding-bottom: var(--hud-band-pad);
+  }
+  /* A band with a description or toolbar under its title row keeps more room at the bottom. */
+  .hud-title-band.has-more {
     padding-bottom: 0.875rem;
   }
   .hud-title-band-top {
-    padding-top: 0.75rem;
+    padding-top: var(--hud-band-pad);
+  }
+  /* Every item in a title row fits the one row height, so rows never grow past the pill. */
+  .hud-band-title {
+    display: flex;
+    align-items: center;
+    min-height: var(--hud-band-row);
   }
   .hud-pill-clear {
     display: block;
@@ -310,7 +328,7 @@ input[type="range"].dial-range:focus-visible {
     margin-top: calc(var(--hud-band-top, 0px) * -1);
     margin-left: calc(var(--hud-band-x, 0px) * -1);
     margin-right: calc(var(--hud-band-x, 0px) * -1);
-    padding: 0.6875rem var(--hud-band-x, 1rem) 0.875rem;
+    padding: var(--hud-band-pad) var(--hud-band-x, 1rem);
     border-top-left-radius: 11px;
     border-top-right-radius: 11px;
   }
@@ -322,8 +340,14 @@ input[type="range"].dial-range:focus-visible {
   }
 }
 @media (min-width: 1024px) {
-  .hud-title-band-lead-lg {
+  /* The Character grid moves up as a whole (.hud-grid-band-top): a grid item's negative margin
+     can't shrink its row below zero, which left a gap under this band. */
+  .hud-grid-band-top {
     margin-top: calc(var(--hud-band-top, 0px) * -1);
+  }
+  .hud-title-band-lead-lg {
+    padding-top: var(--hud-band-pad);
+    padding-bottom: var(--hud-band-pad);
     margin-left: calc(var(--hud-band-x, 0px) * -1);
     margin-right: calc(var(--hud-band-x, 0px) * -1);
     padding-left: var(--hud-band-x, 1rem);

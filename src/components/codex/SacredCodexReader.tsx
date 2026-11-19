@@ -16,7 +16,7 @@ export { stripMarkdown, formatCodexInline, CodexVerseBody } from './CodexDocumen
 export const CODEX_LAST_READ_KEY = 'moltology:codex:last-read'
 
 const ICON_BUTTON =
-  'flex items-center justify-center w-10 h-10 shrink-0 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
+  'flex items-center justify-center w-10 h-10 lg:w-9 lg:h-9 shrink-0 rounded-control text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow'
 
 /** Searches shorter than this filter the list but are not marked in the text. */
 const MIN_HIGHLIGHT = 2

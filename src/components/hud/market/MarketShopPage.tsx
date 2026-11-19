@@ -423,7 +423,7 @@ export function MarketShopPage() {
     ) : null
 
   return (
-    <div className="space-y-3 sm:space-y-4 font-sans pb-2">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans pb-2">
       <HudTitlePanel
         treatment="band"
         accent="cyan"
