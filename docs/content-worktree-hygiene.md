@@ -31,6 +31,17 @@ If a selected file also contains unrelated edits, isolate this run's hunks with 
 
 Run `git -c core.fsmonitor=false status --porcelain=v1 --untracked-files=all` again and compare it with the starting state. A run that starts clean must finish clean. A run that starts dirty must leave no new uncommitted or untracked work of its own; preserve and report pre-existing or concurrent changes.
 
-Report the commit ID and final Git state alongside the content result. If publication, checks, or committing fails, preserve recoverable files and report the exact unfinished paths and blocker. Do not claim the workflow is complete or the tree clean while run-owned changes remain.
+Report the commit ID, PR URL (when opened), and final Git state alongside the content result. If publication, checks, or committing fails, preserve recoverable files and report the exact unfinished paths and blocker. Do not claim the workflow is complete or the tree clean while run-owned changes remain.
 
-Routine completion requires local commits. Push or reconcile with the remote when the user requests synchronization or an existing instruction authorizes it; inspect divergence first and preserve local and remote commits. Never force-push shared `main` to make it match. Do not repeat publication merely to synchronize Git.
+## Sync content ledgers to `main`
+
+Scheduled runs and isolated worktrees must sync their committed content/ledger updates back to `main` so future runs read up-to-date continuity ledgers:
+
+- **Content/ledger-only runs** (every changed file is under `content/**` or `src/lib/changelogs-data.ts`): fetch `origin/main`, rebase if needed to avoid ledger conflicts, push the branch, open a PR into `main`, and enable auto-merge:
+  ```bash
+  git push -u origin HEAD
+  gh pr create --base main --fill
+  gh pr merge --auto --squash --delete-branch
+  ```
+- **Runs touching code, scripts, or skills** (any file outside `content/**` and `src/lib/changelogs-data.ts`): push and open a PR for review instead of auto-merging unless the user explicitly requested a merge.
+- **Direct `main` checkouts or local-only requests:** inspect divergence first, preserve local and remote commits, and never force-push shared `main`. Do not repeat publication or ingestion merely to synchronize Git.
