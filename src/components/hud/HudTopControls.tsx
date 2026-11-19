@@ -125,9 +125,10 @@ export function HudTopControls({
         onClick={() => onNavigate('/')}
         aria-label="Moltology home"
         title="Moltology home"
-        className={`w-10 h-10 -ml-1 shrink-0 inline-flex items-center justify-center rounded-full hover:bg-surface-2 transition-colors active:scale-95 ${focusRing}`}
+        className={`w-11 h-11 shrink-0 inline-flex items-center justify-center rounded-full hover:bg-surface-2 transition-colors active:scale-95 ${focusRing}`}
       >
-        <BrandIcon className="w-7 h-7" />
+        {/* Same 36px emblem, same 16px edge as the public site header */}
+        <BrandIcon className="w-9 h-9" />
       </button>
       {/* A faint, low pill: echoes the desktop pill without the glass bulk */}
       <div className="flex items-center gap-1.5 shrink-0 -mr-1.5">
