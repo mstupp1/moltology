@@ -10,8 +10,9 @@ import { resolveChromeExecutable } from './lib/composite-renderer'
 import { REGISTERED_TARGETS, DEFAULT_CAPTURE_TARGETS, type CaptureTarget } from './lib/mockup-targets'
 import { advanceServiceWorkerVersion } from './lib/mockup-cache-version'
 import { validateDevCapture } from './lib/mockup-dev-auth'
-import { installShowcase, showcaseNow } from './lib/mockup-showcase'
+import { installShowcase, showcaseNow, SHOWCASE_USER_ID } from './lib/mockup-showcase'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
+import { ORACLE_CORE_INTRO_KEY } from '../src/lib/ai/oracle-core-intro'
 import { needsEmailRefresh } from './build-email-feature-images.mjs'
 
 const PORT = 3019
@@ -186,9 +187,13 @@ async function main() {
         await context.clock.setFixedTime(now)
         // Start with the member sidebar collapsed to its icon rail, so the page itself fills the shot.
         await context.addInitScript(() => localStorage.setItem('moltology_hud_sidebar_collapsed', 'true'))
+        // First-visit tips a returning member never sees (the Oracle core's "Ask the Oracle anything").
+        await context.addInitScript((key) => localStorage.setItem(key, '1'), ORACLE_CORE_INTRO_KEY)
         // The synthetic preview session has no JWT, so member reads come back empty. Stage the
         // showcase member instead; a real --auth-dev login shows that account's own data.
         if (!credentials) await installShowcase(context, now)
+        // Mark every sub-stage as already celebrated, so no "stage reached" card covers the page.
+        await context.addInitScript((id) => localStorage.setItem(`moltology:xp-seen:${id}`, '999'), credentials?.userId ?? SHOWCASE_USER_ID)
         const page = await context.newPage()
         if (credentials) {
           await context.addInitScript((id) => localStorage.setItem(`moltology:welcomed:${id}`, '1'), credentials.userId)
@@ -224,7 +229,7 @@ async function main() {
         const response = await page.goto(captureUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60000 })
         if (!response?.ok()) throw new Error(`Capture route failed: ${captureUrl.pathname}`)
         await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => undefined)
-        if (target.name.startsWith('oracle')) await stageOracleConversation(page, target.isMobile ? 1 : ORACLE_SAMPLES.length, now)
+        if (target.name.startsWith('oracle')) await stageOracleConversation(page, target.isMobile || target.name.endsWith('_feature') ? 1 : ORACLE_SAMPLES.length, now)
         if (target.name.startsWith('moltmax')) {
           await page.getByRole('button', { name: 'Start the quiz', exact: true }).last().click()
           await page.locator('[role=progressbar]').first().waitFor()
@@ -255,6 +260,11 @@ async function main() {
         if (text.trim().length < 30 || /Something went wrong|Internal Server Error|Cannot read properties|Cannot destructure|Could not load equipment|Could not load your character|Unauthenticated: Authentication required|Reading today’s liturgies…/.test(text)) {
           throw new Error(`Invalid or empty UI for ${target.name}; existing library preserved.`)
         }
+        // A celebration card, welcome tour or sheet over the page is never a usable marketing shot.
+        if (await page.getByText('Ask the Oracle anything', { exact: true }).isVisible()) throw new Error(`The Oracle first-visit tip covers ${target.name}.`)
+        const dialogs = await page.locator('[role=dialog], [role=alertdialog]').filter({ visible: true }).evaluateAll((nodes) =>
+          nodes.map((node) => node.getAttribute('aria-label') || node.querySelector('h1, h2, h3')?.textContent?.trim() || 'untitled dialog'))
+        if (dialogs.length) throw new Error(`A dialog covers ${target.name}: ${dialogs.join(', ')}`)
         // Park the pointer on empty page edge; the top-left corner shows the collapsed rail's brand tooltip.
         await page.mouse.move(width - 2, Math.round(height / 2))
         await page.addStyleTag({ content: CAPTURE_CSS })
@@ -327,7 +337,8 @@ const CAPTURE_CSS = [
  * A guest Oracle opens on an empty chat, which reads as nothing on the homepage. Ask sample
  * questions and answer each from a fixed reply, so the capture shows a real exchange without
  * calling the model. Replies only suggest things a member can do; the Oracle has no tools.
- * Phones show the first exchange; the wide desktop column has room for the follow-up too.
+ * Phones and the short feature frame show the first exchange (a second reply would be cut off
+ * by the composer); the tall desktop column has room for the follow-up too.
  */
 const ORACLE_SAMPLES = [
   {

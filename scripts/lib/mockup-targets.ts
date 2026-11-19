@@ -58,6 +58,11 @@ export const SHARED_MOCKUP_SOURCES = [
   'src/components/hud/HUDMobileTabBar.tsx',
   'src/components/hud/HUDTaskBar.tsx',
   'src/components/hud/HudLayout.tsx',
+  'src/components/hud/HudTopControls.tsx',
+  'src/components/hud/HudTitlePanel.tsx',
+  'src/components/hud/BandSectionNav.tsx',
+  'src/components/hud/XpRing.tsx',
+  'src/index.css',
   'src/routes/_hud.tsx',
 ]
 

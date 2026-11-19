@@ -55,6 +55,11 @@ npm run mockups:capture -- --base-url=http://127.0.0.1:3000 --skip-s3
 npm run mockups:capture -- --url=/journal --output=journal_desktop_preview
 ```
 
+Running from Codex: the capture launches Chrome, which Codex's sandbox blocks. Run the capture
+command outside the sandbox (request escalation up front) rather than retrying it inside. A full
+refresh against a warm dev server takes about 70 seconds; a dev server started on a stale
+`node_modules` fails on missing packages, so run `npm ci` first if the dev log reports unresolved imports.
+
 Without `--base-url` the CLI builds production and starts an isolated server on port 3019.
 `--base-url` uses an existing server and never stops it. Use the development server, not
 production: production server function URLs are hashed, so the showcase fixtures can't
@@ -77,7 +82,9 @@ open every desktop and phone image and check:
   real exchange and past chats; Character wears bought gear. Empty states only where the
   product really is empty for a member.
 - **Nothing covering content.** No floating launcher, toast, cookie bar, dialog or tooltip.
-  The capture hides the Oracle launcher; anything new that floats needs the same.
+  The capture hides the Oracle launcher, marks the Oracle core's first-visit tip and every
+  sub-stage celebration as already seen, and fails if a dialog or that tip is still visible.
+  Anything new that floats or celebrates on first visit needs the same.
 - **Text is readable on art.** On phones, stage art must not sit under the greeting or
   headings (fix the page's scrim or layout, not the screenshot).
 - **No promises the product can't keep.** Sample Oracle replies only suggest things a member
