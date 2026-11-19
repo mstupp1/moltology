@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Painted art kits for the animation sets (background plate, cut-out middle layer, textures).
+ * Painted art kits for the animation sets (background plate, floor and rug textures).
  *
  *   npm run anim:art -- prompts --set codex-study          # print each prompt and where to save it
  *   npm run anim:art -- generate --set codex-study         # ask the Codex CLI to draw missing images

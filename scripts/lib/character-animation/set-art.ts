@@ -1,6 +1,6 @@
 /**
- * Painted art for the animation sets: a background plate, a cut-out middle layer and surface
- * textures for the 3D pieces, one kit per set. Prompts live in content/animation/sets/art.json so
+ * Painted art for the animation sets: a background plate and the textures the characters stand on,
+ * one kit per set. Prompts live in content/animation/sets/art.json so
  * any agent can make the images (Codex draws them with its own image tool; Claude asks Codex).
  * Raw images land in tmp/anim-art/<set>/raw/, `importArt` fits them to size, and the approved kit
  * is kept in the asset bucket under animation/sets/<set>/ and listed in manifest.json, so every
@@ -11,10 +11,10 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import { createCanvas, loadImage, type Image } from '@napi-rs/canvas'
 
-export const ART_SLOTS = ['plate', 'back', 'floor', 'rug', 'wood', 'rock'] as const
+export const ART_SLOTS = ['plate', 'floor', 'rug'] as const
 export type ArtSlot = (typeof ART_SLOTS)[number]
-/** Slots the 3D set uses as textures (the plate goes behind the frames instead). */
-export const TEXTURE_SLOTS = ['back', 'floor', 'rug', 'wood', 'rock'] as const
+/** All slots go to the 3D set: the plate as a card at the back, the rest as surfaces. */
+export const TEXTURE_SLOTS = ART_SLOTS
 export type TextureSlot = (typeof TEXTURE_SLOTS)[number]
 
 const ROOT = process.cwd()
@@ -68,7 +68,7 @@ export function artPrompt(spec: ArtSpec, set: string, slot: ArtSlot): string {
 }
 
 export const rawPath = (set: string, slot: ArtSlot) => path.join(ART_DIR, set, 'raw', `${slot}.png`)
-const extOf = (slot: ArtSlot) => (slot === 'back' ? 'png' : 'jpg')
+const extOf = (_slot: ArtSlot) => 'jpg'
 export const finalPath = (set: string, slot: ArtSlot) => path.join(ART_DIR, set, `${slot}.${extOf(slot)}`)
 export const bucketKey = (set: string, slot: ArtSlot) => `animation/sets/${set}/${slot}.${extOf(slot)}`
 

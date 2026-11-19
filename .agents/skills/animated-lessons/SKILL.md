@@ -45,7 +45,7 @@ Pitch three hooks and shapes for the same idea (for example: claim then steps, m
 
 Characters, their looks and their fixed Fish voices live in `content/animation/cast.json`. A character always uses its own voice so viewers learn who is who; the narrator (`speaker: "narrator"`) uses the reel narrator. Add a new cast member there (a config from the character creator, a role, a voice from Fish) rather than restyling an existing one. Keep a dialogue to two or three characters.
 
-Pick a set: `codex-study` (desk, lamp, books, rug: Codex lessons), `reef-office` (desk, screen, kelp: work and routines), `open-water` (rocks and kelp: what Moltology is, moltmaxxing). The set is built in 3D so the characters stand on it and cast shadows, and its painted art kit (see [Set art kits](#set-art-kits)) gives it a background, a cut-out layer and textured surfaces.
+Pick a set: `codex-study` (bookshelves, lamp, rug: Codex lessons), `reef-office` (round window, desk: work and routines), `open-water` (sea floor, kelp: what Moltology is, moltmaxxing). The set is built in 3D so the characters stand on it and cast shadows, and its painted art kit (see [Set art kits](#set-art-kits)) gives it a painted background and textured floor.
 
 ## 4. Write the scenes
 
@@ -86,21 +86,22 @@ Every set has a painted art kit, made with image generation and reused by every 
 
 | Slot | What it is | How the renderer uses it |
 | --- | --- | --- |
-| `plate` | 9:16 painted background, empty floor in the lower third | Behind every frame |
-| `back` | 9:16 cut-out: scenery on the left and right edges and the top, transparent elsewhere | A flat layer standing just behind the set pieces, so it slides against the plate when the camera pans |
-| `floor`, `wood`, `rock` | Square seamless textures | On the floor disc, the desk tops and the rocks |
+| `plate` | 9:16 painted background, empty floor in the lower third, nothing in the foreground | A card at the back of the 3D scene, so the camera moves past the painting, the floor and the cast together |
+| `floor` | Square seamless texture | On the floor disc the cast stands on, fading into the painting |
 | `rug` | Square, a round rug seen from above | On the study rug |
+
+Keep everything that is not a surface the cast touches in the painting. Nothing goes in front of the cast.
 
 The same steps work for any agent:
 
 1. `npm run anim:art -- prompts --set <set>` prints each prompt and the path to save it at (`tmp/anim-art/<set>/raw/<slot>.png`).
 2. Make each image and save it as PNG at that path. An agent with its own image generation tool (Codex) generates it directly. Any other agent runs `npm run anim:art -- generate --set <set>`, which asks the Codex CLI to draw each missing image (about 45 seconds each); `--only <slot> --force` redoes one.
-3. `npm run anim:art -- import --set <set>` fits each image to size, makes textures repeat without seams and keys out the cut-out's background (transparent, or flat magenta when the generator can't do transparency). It writes `tmp/anim-art/<set>/sheet.jpg`.
-4. Look at the sheet. A plate needs an empty, calm floor and no characters or text; the cut-out needs a clear centre and lower third with no magenta fringe; textures shown tiled 2×2 must not show a seam. Regenerate what fails, then import again.
+3. `npm run anim:art -- import --set <set>` fits each image to size, makes textures repeat without seams and keeps every image the right size. It writes `tmp/anim-art/<set>/sheet.jpg`.
+4. Look at the sheet. A plate needs an empty, calm floor and no characters or text; textures shown tiled 2×2 must not show a seam. Regenerate what fails, then import again.
 5. Render a short silent test (`--max-seconds 3 --frames-only` is enough to check the first frame) to see the kit with the cast in it. A fresh import in `tmp/anim-art/` is used before the stored kit, so a new kit can be tried first.
 6. `npm run anim:art -- upload --set <set>` puts the kit in the asset bucket under `animation/sets/<set>/` and records it in `content/animation/sets/manifest.json`. Commit the manifest; every machine then renders with the same art, fetched once and cached.
 
-To change a set's look, edit its prompts in `art.json`, then repeat the steps. A new set needs prompts there and its 3D pieces in `src/lib/avatar3d/sets.ts`.
+To change a set's look, edit its prompts in `art.json`, then repeat the steps. A new set needs prompts there and an entry in `src/lib/avatar3d/sets.ts`.
 
 ## 7. Inspect and queue
 

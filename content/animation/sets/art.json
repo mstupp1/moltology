@@ -1,33 +1,36 @@
 {
   "style": "Stylized, soft painterly look of a modern 3D animated feature film. The underwater world of Moltology: crustaceans live at depth, light comes from above as soft teal shafts and caustic ripples, warm lamps give amber pools. Palette of warm amber, coral and deep teal. Gentle, readable shapes, no clutter. No characters, no creatures, no people, no faces, no text, no letters, no numbers, no logos, no watermarks.",
   "slots": {
-    "plate": { "size": "1080x1920", "aspect": "9:16 vertical", "note": "The painted background behind everything. Eye-level view. The lower third is an empty floor in soft focus where characters will stand; keep the centre of the frame calm so characters read in front of it. Slight depth-of-field blur." },
-    "back": { "size": "1080x1920", "aspect": "9:16 vertical", "transparent": true, "note": "A cut-out middle layer that sits a little in front of the background: scenery only along the left and right edges and across the top. The whole centre column and the entire lower third must be empty (fully transparent). Crisp edges, no ground shadow, no floor." },
-    "floor": { "size": "1024x1024", "aspect": "square", "tile": true, "note": "Seen straight from above, flat even lighting, no perspective, no shadows of objects. Seamless and tileable on all four edges." },
-    "rug": { "size": "1024x1024", "aspect": "square", "note": "A round rug seen straight from above, filling the square edge to edge, flat even lighting, no perspective, no shadows. Pattern centred." },
-    "wood": { "size": "1024x1024", "aspect": "square", "tile": true, "note": "A flat wood surface seen straight on, grain running left to right, even lighting, no perspective. Seamless and tileable on all four edges." },
-    "rock": { "size": "1024x1024", "aspect": "square", "tile": true, "note": "A flat close-up surface texture seen straight on, even lighting, no perspective, no single object. Seamless and tileable on all four edges." }
+    "plate": {
+      "size": "1080x1920",
+      "aspect": "9:16 vertical",
+      "note": "The painted background, seen at eye level. The lower third is an empty floor in soft focus where characters will stand; keep the centre of the frame calm so characters read in front of it. Nothing in the foreground: no furniture, plants or objects close to the viewer or at the bottom corners. Slight depth-of-field blur."
+    },
+    "floor": {
+      "size": "1024x1024",
+      "aspect": "square",
+      "tile": true,
+      "note": "Seen straight from above, flat even lighting, no perspective, no shadows of objects. Seamless and tileable on all four edges."
+    },
+    "rug": {
+      "size": "1024x1024",
+      "aspect": "square",
+      "note": "A round rug seen straight from above, filling the square edge to edge, flat even lighting, no perspective, no shadows. Pattern centred."
+    }
   },
   "sets": {
     "codex-study": {
       "plate": "Interior of a cozy underwater scholar's study at depth: tall wooden bookshelves full of old leather books along the back wall, a warm brass desk lamp glow on the right, soft blue-green water light filtering from above, gentle caustic ripples, floating specks. The lower third is an empty wooden floor.",
-      "back": "Foreground dressing for the same study: on the left edge, the end of a tall dark wooden bookcase with a few leaning old books and a hanging brass lantern; on the right edge, a heavy velvet curtain in deep teal tied back with a gold cord; along the top, a carved wooden ceiling beam with a few strands of sea moss hanging down.",
       "floor": "Old warm-brown wooden floorboards, worn and polished, planks running left to right, a faint sandy dust in the grooves.",
-      "rug": "A worn round woven rug in deep coral red and amber with a simple concentric shell-spiral border pattern and a soft fringe.",
-      "wood": "Dark walnut desk top with rich polished grain and a few small scratches."
+      "rug": "A worn round woven rug in deep coral red and amber with a simple concentric shell-spiral border pattern and a soft fringe."
     },
     "reef-office": {
       "plate": "A bright, modern underwater office carved into a reef: a large round window on the back wall looking out into sunny turquoise water with distant coral, pale stone walls, a soft cyan glow from screens, potted sea plants. The lower third is an empty pale stone tile floor.",
-      "back": "Foreground dressing for the same office: on the left edge, tall swaying green kelp in a stone planter; on the right edge, a pale coral column with small glowing anemones; along the top, a curved pale stone arch with a few hanging cable lights.",
-      "floor": "Pale sand-coloured stone floor tiles with thin grout lines, slightly polished, a few faint ripples of light.",
-      "wood": "Pale bleached driftwood desk surface, smooth and light grey-beige.",
-      "rock": "Rough pinkish coral rock surface with small pores and patches of moss."
+      "floor": "Pale sand-coloured stone floor tiles with thin grout lines, slightly polished, a few faint ripples of light."
     },
     "open-water": {
       "plate": "The open sea floor at dusk depth: a wide sandy plain with distant rock formations and kelp forest silhouettes fading into deep blue-teal water, long sun shafts from the surface far above, drifting particles. The lower third is empty rippled sand.",
-      "back": "Foreground dressing for the same sea floor: on the left edge, a tall dark rock pillar with tufts of sea grass and a few barnacles; on the right edge, tall swaying kelp fronds catching light; along the top, nothing but a faint bright shimmer of the surface.",
-      "floor": "Rippled pale golden sea-floor sand with tiny shell fragments.",
-      "rock": "Grey-blue weathered sea rock surface with small barnacles and patches of green algae."
+      "floor": "Rippled pale golden sea-floor sand with tiny shell fragments."
     }
   }
 }

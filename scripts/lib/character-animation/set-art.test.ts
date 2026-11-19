@@ -15,7 +15,6 @@ describe('set art', () => {
       expect(slotsOf(spec, set)).toContain('plate')
       expect(artPrompt(spec, set, 'plate')).toContain('No characters')
     }
-    expect(artPrompt(spec, 'codex-study', 'back')).toContain('#FF00FF')
   })
 
   it('keys out a magenta background and keeps the scenery', () => {
