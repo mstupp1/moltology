@@ -63,7 +63,7 @@ export function ProfileTabsPage({
       />
       <Suspense fallback={<HudWorkspaceGhost />}>
         {section === 'profile' ? (
-          <LazyMemberProfilePage profileId={profileId} />
+          <LazyMemberProfilePage profileId={profileId} joinsBand />
         ) : section === 'activity' ? (
           <LazyActivityStreamPage />
         ) : section === 'friends' ? (

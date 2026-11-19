@@ -13,7 +13,7 @@ function MemberProfileRoute() {
   // Public: signed-out visitors can read dossiers; friend requests ask them to sign up.
   return (
     <Suspense fallback={<HudWorkspaceGhost />}>
-      <LazyMemberProfilePage profileId={profileId} canonicalizePath />
+      <LazyMemberProfilePage profileId={profileId} canonicalizePath opensPage />
     </Suspense>
   )
 }

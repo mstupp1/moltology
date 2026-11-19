@@ -124,7 +124,7 @@ export function DashboardTodayStrip() {
     <section
       aria-labelledby="dashboard-today-heading"
       data-testid="dashboard-today"
-      className="relative isolate overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset"
+      className="hud-band-hero relative isolate overflow-hidden rounded-card border border-line-subtle bg-surface-1 shadow-sheen-inset"
     >
       <div className="relative">
         <div aria-hidden="true" className="pointer-events-none absolute top-0 right-0 h-[210px] sm:h-full w-[72%] sm:w-3/5 overflow-hidden">
