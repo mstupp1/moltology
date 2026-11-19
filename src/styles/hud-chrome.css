@@ -308,23 +308,30 @@ input[type="range"].dial-range:focus-visible {
   }
 }
 /* A page that opens with its own hero instead of a band (Dashboard, another member's profile):
-   from md up the hero is the page's band, starting at the panel's top edge and running to its
-   sides, instead of a card floating under the empty strip kept for the pill. */
-@media (min-width: 768px) {
-  .hud-page-hero-top {
-    margin-top: calc(var(--hud-band-top, 0px) * -1);
-  }
-  .hud-band-hero {
-    margin-left: calc(var(--hud-band-x, 0px) * -1);
-    margin-right: calc(var(--hud-band-x, 0px) * -1);
-    border-width: 0 0 1px;
-    border-radius: 11px 11px 0 0;
-  }
-  /* A hero directly under a header band (your own profile's Overview) joins it: no gap, no
-     rounded top, so band and hero read as one header like another member's profile. */
+   the hero is the page's band, starting at the panel's top edge and running to its sides (on
+   phones, to the screen edges like every band), instead of a card floating below the top. */
+.hud-page-hero-top {
+  margin-top: calc(var(--hud-band-top, 0px) * -1);
+}
+.hud-band-hero {
+  margin-left: calc(var(--hud-band-x, 0px) * -1);
+  margin-right: calc(var(--hud-band-x, 0px) * -1);
+  border-width: 0 0 1px;
+  border-radius: 0;
+}
+/* A hero directly under a header band (your own profile's Overview) joins it: no gap, so band
+   and hero read as one header like another member's profile. Cancels the page's section gap. */
+.hud-band-hero-joined {
+  margin-top: -0.75rem;
+}
+@media (min-width: 640px) {
   .hud-band-hero-joined {
     margin-top: -1rem;
-    border-radius: 0;
+  }
+}
+@media (min-width: 768px) {
+  .hud-band-hero:not(.hud-band-hero-joined) {
+    border-radius: 11px 11px 0 0;
   }
 }
 /* Codex: the reader's slim sticky bar on phones becomes the page's header band from lg up. */

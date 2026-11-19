@@ -197,7 +197,7 @@ On phones the title row holds the title and short actions; section tabs get thei
 under it (scrolling sideways), then figures (`actionsBelowOnPhone`), then the toolbar.
 Pages that open with their own hero instead of a band (Dashboard, another member's profile)
 add `hud-page-hero-top` on the page and `hud-band-hero` on the hero, so the hero is the band:
-it starts at the panel's top edge and runs to its sides.
+it starts at the panel's top edge and runs to its sides (on phones, to the screen edges).
 Codex builds the same band by hand on desktop (title, stage and position, reader actions).
 
 `actions` holds page-level commands or a short status summary. `toolbar` spans the
