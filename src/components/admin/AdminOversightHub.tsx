@@ -1,4 +1,3 @@
-import { AdminStarterPrompts } from './AdminStarterPrompts'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, FlaskConical, Search, ShieldCheck } from 'lucide-react'
@@ -119,7 +118,6 @@ export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
         </>
       ) : null}
       {tab === 'experiments' ? <ExperimentSwitches userId={session.userId} /> : null}
-      {tab === 'prompts' ? <AdminStarterPrompts /> : null}
     </div>
   )
 }
