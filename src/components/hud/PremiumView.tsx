@@ -216,10 +216,10 @@ export function PremiumOfferPanel({
             {preview ? (
               <>
                 <span className="font-grotesk text-2xl font-semibold tracking-tight text-ink">
-                  Early access
+                  Coming soon
                 </span>
                 <span className="text-sm text-ink-muted">
-                  Subscriptions aren't open to everyone yet.
+                  Sign-ups aren't open yet.
                 </span>
               </>
             ) : price ? (
@@ -239,7 +239,7 @@ export function PremiumOfferPanel({
           </div>
           {preview ? (
             <HudButton type="button" variant="secondary" fullWidth disabled>
-              Opening soon
+              Not open yet
             </HudButton>
           ) : offer.isPremium ? (
             <HudButton

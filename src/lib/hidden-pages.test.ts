@@ -7,16 +7,14 @@ import {
 } from './hidden-pages'
 
 describe('hidden pages', () => {
-  it('treats premium and store as hidden pages', () => {
-    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/max', '/store'])
+  it('treats the store as a hidden page and Oracle MAX as public', () => {
+    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/store'])
     expect(isHiddenPagePath('/store')).toBe(true)
     expect(isHiddenPagePath('/store/')).toBe(true)
     expect(isHiddenPagePath('/store?checkout=success')).toBe(true)
     expect(isHiddenPagePath('/store/benthic-shell-tee')).toBe(true)
     expect(isHiddenPagePath('/storefront')).toBe(false)
-    expect(isHiddenPagePath('/max')).toBe(true)
-    expect(isHiddenPagePath('/max/')).toBe(true)
-    expect(isHiddenPagePath('/max?checkout=success')).toBe(true)
+    expect(isHiddenPagePath('/max')).toBe(false)
   })
 
   it('leaves ordinary chambers visible', () => {

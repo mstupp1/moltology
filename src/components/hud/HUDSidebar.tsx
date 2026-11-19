@@ -251,8 +251,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const canViewHiddenPages = isAdmin(user, userRole)
   const canViewAdmin = canViewHiddenPages
-  const { membership: premiumMembership, canViewPremium } = usePremiumMembership()
-  const showGoPremium = canViewPremium && premiumMembership !== null && !premiumMembership.isPremium
+  // Oracle MAX is public as "coming soon"; only current members lose the entry.
+  const { membership: premiumMembership } = usePremiumMembership()
+  const showGoPremium = !premiumMembership?.isPremium
   const isAdminActive =
     effectiveRoute === '/admin' ||
     (effectiveRoute !== '/' && effectiveRoute.startsWith('/admin'))
@@ -695,7 +696,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   </div>
                 )}
 
-                {/* Go Oracle MAX (free members who can see the premium experiment) */}
+                {/* Go Oracle MAX (everyone who is not a current member) */}
                 {showGoPremium && (
                   <div className={`relative transition-colors duration-150 ${effectiveRoute === '/max' ? 'bg-surface-2' : 'bg-surface-1 hover:bg-surface-2'}`}>
                     <button

@@ -2,7 +2,6 @@ import React, { useEffect, useId, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import type { OracleUsageSnapshot, OracleUsageWindow } from '@/lib/ai/usage-limits'
 import { useOracleUsage } from '@/hooks/useOracleUsage'
-import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { SettingsCard } from '@/components/hud/settings/settings-ui'
 
 function UsageBar({ window, label }: { window: OracleUsageWindow; label: string }) {
@@ -58,11 +57,10 @@ export function OracleUsage({ snapshot, unavailable, expanded = false }: {
 
 export function PlanUsageSection({ userId }: { userId: string | null }) {
   const usage = useOracleUsage(userId)
-  const access = useHiddenPageAccess('premium')
   if (!userId) return null
   return <SettingsCard title="Plan & usage"
     description={usage.snapshot ? `${usage.snapshot.isPremium ? 'Oracle MAX' : 'Free'} plan · Oracle messages` : undefined}>
     <OracleUsage snapshot={usage.snapshot} unavailable={usage.unavailable} expanded />
-    {access.canView && <Link to="/max" className="inline-block text-xs text-ink-muted underline underline-offset-2 hover:text-ink">View Oracle MAX</Link>}
+    {!usage.snapshot?.isPremium && <Link to="/max" className="inline-block text-xs text-ink-muted underline underline-offset-2 hover:text-ink">View Oracle MAX</Link>}
   </SettingsCard>
 }

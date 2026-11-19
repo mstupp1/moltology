@@ -371,7 +371,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
   })
 
-  it('hides admin tools and Go Oracle MAX badge from members', async () => {
+  it('hides admin tools from members but shows the coming-soon Oracle MAX entry', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -390,7 +390,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     await waitFor(() => {
       expect(mockGetUserProfileFn).toHaveBeenCalled()
     })
-    expect(screen.queryByRole('button', { name: /Go Oracle MAX/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Go Oracle MAX/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^ADMIN$/i })).not.toBeInTheDocument()
   })
 
