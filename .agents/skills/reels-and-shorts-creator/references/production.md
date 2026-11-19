@@ -85,7 +85,7 @@ Record git status at the start of the run. Final queueing uses --commit for the 
 
 Keep generated images, video, audio, frame previews, draft JSON, logs and temporary runners under tmp/, which is already ignored. Final videos and metadata are archived by the CLI in Google Drive before direct Zernio upload. Website assets and reusable templates remain on S3. Add narrow .gitignore entries only when a new kind of disposable output genuinely falls outside the existing rules. Do not ignore tracked content/social ledgers or source files to hide changes.
 
-Before returning, inspect git status --porcelain. The run must leave no new uncommitted or untracked files. Preserve pre-existing or concurrent work; if it remains, report it rather than discarding it or claiming the whole tree is clean. When the user explicitly requests a completely clean current tree, inspect and commit legitimate pre-existing changes within that authorization. Do not use reset --hard, clean -fd or a hidden stash to manufacture cleanliness. Push/sync when the user authorizes it; otherwise the automatic cleanup is a local commit.
+Before returning, inspect git status --porcelain. The run must leave no new uncommitted or untracked files. Preserve pre-existing or concurrent work; if it remains, report it rather than discarding it or claiming the whole tree is clean. When the user explicitly requests a completely clean current tree, inspect and commit legitimate pre-existing changes within that authorization. Do not use reset --hard, clean -fd or a hidden stash to manufacture cleanliness. For pushing and opening an auto-merge PR back to `main`, follow [content worktree hygiene](../../../../docs/content-worktree-hygiene.md#sync-content-ledgers-to-main).
 
 ## Social archive and retries
 
