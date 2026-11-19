@@ -6,13 +6,16 @@
  * - Turntable: the emblem rocking through one loop, `frames` frames side by side in one WebP.
  *   GlowEmblem steps through it with CSS, so hero marks get the 3D look with no WebGL.
  */
+/** Bump after re-baking: /images/* is cached for a year. */
+const BAKE_VERSION = 1
+
 export const EMBLEM_MATCAP = {
-  cap: '/images/emblem/matcap-cap.webp',
-  bevel: '/images/emblem/matcap-bevel.webp',
+  cap: `/images/emblem/matcap-cap.webp?v=${BAKE_VERSION}`,
+  bevel: `/images/emblem/matcap-bevel.webp?v=${BAKE_VERSION}`,
 } as const
 
 export const EMBLEM_TURNTABLE = {
-  src: '/images/emblem/turntable.webp',
+  src: `/images/emblem/turntable.webp?v=${BAKE_VERSION}`,
   /** Frames in the strip, one loop of the rock. */
   frames: 36,
   /** Each frame's square size in pixels (2x the 56px sign-in mark; the 72px 404 mark is close enough). */

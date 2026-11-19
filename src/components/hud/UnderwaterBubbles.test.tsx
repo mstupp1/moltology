@@ -84,7 +84,7 @@ describe('planBubbleRise', () => {
     const random = seeded(3)
     const sprites = new Set<string>()
     for (let i = 0; i < 300; i++) sprites.add(planBubbleRise(1440, 900, random).sprite)
-    expect([...sprites].sort()).toEqual(['bead', 'glass', 'soft'])
+    expect([...sprites].sort()).toEqual(['bead', 'glass', 'glassLit', 'glassShade', 'soft'])
   })
 })
 
@@ -167,5 +167,24 @@ describe('UnderwaterBubbles', () => {
     const { unmount } = render(<UnderwaterBubbles bubbleCount={4} />)
     unmount()
     expect(animations.every((a) => a.cancel.mock.calls.length >= 1)).toBe(true)
+  })
+})
+
+describe('baked bubble light', () => {
+  const seeded = (seed: number) => () => {
+    seed = (seed * 16807) % 2147483647
+    return (seed - 1) / 2147483646
+  }
+
+  it('uses the lit glass in the central light shafts and the shaded glass at the dark edges', () => {
+    const random = seeded(7)
+    const byX: Record<string, number[]> = {}
+    for (let i = 0; i < 600; i++) {
+      const plan = planBubbleRise(1440, 900, random)
+      ;(byX[plan.sprite] ??= []).push(plan.x / 1440)
+    }
+    const mean = (xs: number[]) => xs.reduce((a, b) => a + Math.abs(b - 0.5), 0) / xs.length
+    expect(mean(byX.glassLit)).toBeLessThan(mean(byX.glass))
+    expect(mean(byX.glass)).toBeLessThan(mean(byX.glassShade))
   })
 })

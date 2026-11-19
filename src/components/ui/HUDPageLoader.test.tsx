@@ -13,7 +13,7 @@ describe('HUDPageLoader Component', () => {
 
     const emblem = screen.getByRole('img', { name: 'Loading' })
     expect(emblem).toBeInTheDocument()
-    expect(emblem.querySelector('img')).toHaveAttribute('src', '/images/emblem/turntable.webp')
+    expect(emblem.querySelector('img')).toHaveAttribute('src', expect.stringContaining('/images/emblem/turntable.webp'))
   })
 
   it('renders cleanly without extra text paragraphs or boot logs', () => {
