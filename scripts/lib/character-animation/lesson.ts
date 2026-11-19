@@ -199,6 +199,10 @@ export function lessonProblems(lesson: Lesson): string[] {
       if (who !== 'scene' && !ids.includes(who)) problems.push(`${at} directs "${who}", who is not in the cast`)
       if (d.look && d.look !== 'other' && !LOOKS.includes(d.look)) problems.push(`${at} look "${d.look}" is not one of ${LOOKS.join(', ')}, other`)
       if (d.pose && !AVATAR_POSES.includes(d.pose)) problems.push(`${at} pose "${d.pose}" is not one of ${AVATAR_POSES.join(', ')}`)
+      // The think pose holds a claw at the chin, right over the mouth: fine for a listener, but it
+      // hides the lip sync on a character who is talking.
+      const talking = who === 'scene' ? speakerOf(lesson, scene) !== NARRATOR : who === speakerOf(lesson, scene)
+      if (talking && d.pose === 'think') problems.push(`${at}: the speaker can't use the think pose (its claw covers the mouth); give it to a listener`)
       if (d.acting && !ACTING.includes(d.acting)) problems.push(`${at} acting "${d.acting}" is not one of ${ACTING.join(', ')}`)
       for (const g of d.gesture ?? []) {
         if (!GESTURES.includes(g.kind)) problems.push(`${at} gesture "${g.kind}" is not one of ${GESTURES.join(', ')}`)
