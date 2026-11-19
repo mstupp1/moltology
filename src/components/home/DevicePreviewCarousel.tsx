@@ -148,13 +148,18 @@ export function DevicePreviewCarousel() {
       <div className="group/frame relative mx-auto max-w-[340px] sm:max-w-none rounded-t-[2.25rem] sm:rounded-t-[1.25rem] border-[6px] sm:border border-b-0 border-surface-2 sm:border-cyan-300/25 ring-1 ring-cyan-300/25 sm:ring-0 bg-surface-1/95 shadow-[0_-20px_80px_rgba(0,195,255,0.18)] overflow-hidden">
         <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-10 h-5 w-20 rounded-full bg-black" aria-hidden="true" />
         <div className="hidden sm:flex items-center gap-3 px-4 h-10 border-b border-line-subtle bg-surface-2">
-          <div className="flex gap-1.5" aria-hidden="true">
+          <div className="flex w-[76px] shrink-0 gap-1.5" aria-hidden="true">
             <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/80" />
           </div>
           <div className="mx-auto max-w-[260px] w-full rounded-control bg-surface-1 border border-line-subtle px-3 py-0.5 text-2xs text-ink-muted text-center truncate">moltology.org{current.route}</div>
-          <div className="w-[42px]" aria-hidden="true" />
+          {/* Full size lives in the faux browser bar on wider screens so it never covers the app's own top-right controls. */}
+          <button type="button" onClick={openFull} disabled={!loaded.has(active)} tabIndex={-1} aria-hidden="true"
+            className="inline-flex w-[76px] shrink-0 items-center justify-end gap-1.5 rounded-control py-0.5 text-2xs text-ink-muted transition-colors hover:text-cyan-glow group-hover/frame:text-cyan-glow disabled:opacity-40">
+            <Maximize2 size={12} aria-hidden="true" />
+            Full size
+          </button>
         </div>
         <div className="relative aspect-[540/790] sm:aspect-[1280/600] overflow-hidden">
           {DEVICE_PREVIEW_LIBRARY.map((shot, index) => {
@@ -188,7 +193,7 @@ export function DevicePreviewCarousel() {
           <button type="button" onClick={openFull} disabled={!loaded.has(active)}
             aria-label={`Open the ${current.label} screenshot full size`}
             className="absolute inset-0 z-10 cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-cyan-glow disabled:cursor-default">
-            <span className="absolute right-3 top-10 sm:top-3 inline-flex items-center gap-1.5 rounded-control border border-line bg-surface-1/85 px-2.5 py-1.5 text-xs text-ink-heading backdrop-blur-sm transition-colors group-hover/frame:border-cyan-glow/60 group-hover/frame:text-cyan-glow">
+            <span className="sm:hidden absolute right-7 top-1 inline-flex items-center gap-1 rounded-control border border-line bg-surface-1/85 px-2 py-0.5 text-2xs text-ink-heading backdrop-blur-sm transition-colors group-hover/frame:border-cyan-glow/60 group-hover/frame:text-cyan-glow">
               <Maximize2 size={13} aria-hidden="true" />
               Full size
             </span>
