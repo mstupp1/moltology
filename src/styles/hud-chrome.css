@@ -212,17 +212,23 @@ input[type="range"].dial-range:focus-visible {
     --hud-band-top: 1rem;
   }
 }
+/* Height of a band's title row on desktop: 4.5rem, twice the 2.25rem row content, so title,
+   tabs and actions sit at its middle with a quarter above and below. The floating pill
+   (3.5rem bar, 74px avatar) is centred on it with room to spare (HudLayout). */
 @media (min-width: 768px) {
-  /* The panel's top edge lines up with the top of the floating search pill (3.5rem tall), so a
-     band's title row is exactly the pill's height and the title, tabs, actions and pill share
-     one centre line on every page. Content on a page without a band starts under the pill. */
+  :root {
+    --hud-band-h: 4.5rem;
+  }
+}
+@media (min-width: 768px) {
+  /* The floating pill is centred on the band's title row, so the title, tabs, actions and pill
+     share one centre line on every page. Content on a page without a band starts under it. */
   [data-hud-page-panel] {
     --hud-band-x: 15px;
-    --hud-pill-h: 3.5rem;
     --hud-band-row: 2.25rem;
     /* (pill height - panel top border - band bottom border - row) / 2 */
-    --hud-band-pad: calc((var(--hud-pill-h) - 2px - var(--hud-band-row)) / 2);
-    --hud-band-top: calc(var(--hud-pill-h) + 0.75rem);
+    --hud-band-pad: calc((var(--hud-band-h) - 2px - var(--hud-band-row)) / 2);
+    --hud-band-top: calc(var(--hud-band-h) + 0.75rem);
   }
   [data-hud-page-panel][data-hud-main-only] {
     --hud-band-top: 1.5rem;

@@ -172,10 +172,10 @@ the top bar on phones) with a `surface-2` fill and a `line-subtle` bottom divide
 stands apart from the `surface-1` panel. Use it as the first element of every standard page
 (Academy, Certificates, Forum, Shop, Progress, Admin, Logic Atlas, Support, Settings, Search,
 Profile; Character and Codex build
-the same band by hand with `BandHeadingRow`). On desktop the page panel's top edge is level with
-the top of the floating search pill, and the band's title row is exactly the pill's height
-(`--hud-pill-h` 3.5rem, row content `--hud-band-row` 2.25rem, padding `--hud-band-pad`), so the
-title, tabs, actions and pill share one centre line on every page. Nothing in the title row may be
+the same band by hand with `BandHeadingRow`). On desktop the band's title row is `--hud-band-h` (4.5rem, twice
+the 2.25rem row content `--hud-band-row`, padding `--hud-band-pad`) and the floating search pill is
+centred on it, so the title, tabs, actions and pill share one centre line on every page. The pill
+and avatar medallion are solid, never see-through. Nothing in the title row may be
 taller than 2.25rem (tab tiles `min-h-9`, `HudButton size="sm"`, one-line `BandStat`).
 
 One band, the same rows on every page:

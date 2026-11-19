@@ -250,9 +250,9 @@ function HudContent() {
                       ? 'absolute top-1 right-2'
                       : // The pill (74px with the XP ring) straddles the page panel's top edge and sits
                         // in the panel's top padding, so content starts right under it, not under a bar.
-                        // Pulled back up so the panel's top edge is level with the pill bar's top
-                        // (the avatar ring, 74px, is taller than the 3.5rem bar).
-                        'sticky -top-6 -mt-6 -mx-2 px-2 pt-2.5 -mb-[calc(37px+1.75rem)] shrink-0'
+                        // Pulled back up so the pill (74px with the avatar ring) is centred on the
+                        // band's title row, which is --hud-band-h tall from the panel's top edge.
+                        'sticky -top-6 -mt-6 -mx-2 px-2 pt-2.5 -mb-[calc(37px+var(--hud-band-h)/2)] shrink-0'
                   }`}
                 >
                   <div id="hud-top-controls-slot" className="pointer-events-auto" />
