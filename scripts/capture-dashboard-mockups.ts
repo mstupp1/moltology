@@ -326,11 +326,13 @@ async function clipRegion(page: Page, clip: NonNullable<CaptureTarget['clip']>, 
 
 /**
  * Capture-only chrome: no scrollbars, no floating Oracle launcher (it covers the bottom-right of
- * desktop shots and the bottom of phone shots) and no chat "Jump to latest" button.
+ * desktop shots and the bottom of phone shots), no chat "Jump to latest" button, and no phone
+ * app top bar (the homepage phone frame is small, so the shot starts at the page itself).
  */
 const CAPTURE_CSS = [
   '* { scrollbar-width: none !important; } ::-webkit-scrollbar { display: none !important; }',
   '[aria-label="Open Oracle AI Popout"], [aria-label="Open Oracle AI Tray"], [aria-label="Jump to latest"] { visibility: hidden !important; }',
+  '[data-phone-top-bar] { display: none !important; }',
 ].join('\n')
 
 /**
