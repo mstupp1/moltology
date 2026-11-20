@@ -12,7 +12,7 @@ import { promisify } from 'node:util'
 import type { WordBoundaryEvent } from '../tts-engine'
 import { castOf, estimateWords, loadCast, NARRATOR, speakerOf, talkFromWords, type Lesson } from './lesson'
 import { talkFromAudio } from './talk'
-import { mouthForTake } from './lipsync'
+import { emphasisFrames, LEAD_FRAMES, mouthForTake } from './lipsync'
 import { silentAudio } from './compose'
 
 const execFileAsync = promisify(execFile)
@@ -65,6 +65,9 @@ export interface LessonVoice {
   talkBy: number[][]
   /** Cartoon mouth shape per frame (one letter each) for each cast member, in cast order. */
   mouthBy: string[]
+  /** How strongly each frame's word is said (0..1) and accent pulses on the strongest, in cast order. */
+  emphasisBy: number[][]
+  accentBy: number[][]
 }
 
 export async function voiceLesson(lesson: Lesson, outDir: string, options: { silent: boolean; fps: number; narratorVoice: string; rate?: string }): Promise<LessonVoice> {
@@ -106,6 +109,8 @@ export async function voiceLesson(lesson: Lesson, outDir: string, options: { sil
   const frames = Math.ceil((total + 1) * options.fps)
   const talkBy = cast.map(() => new Array<number>(frames).fill(0))
   const mouths = cast.map(() => new Array<string>(frames).fill('X'))
+  const emphasisBy = cast.map(() => new Array<number>(frames).fill(0.5))
+  const accentBy = cast.map(() => new Array<number>(frames).fill(0))
   const sources = new Set<string>()
   for (const [k, seg] of segments.entries()) {
     const who = cast.findIndex((c) => c.id === seg.speaker)
@@ -116,9 +121,20 @@ export async function voiceLesson(lesson: Lesson, outDir: string, options: { sil
     level.forEach((v, f) => {
       if (at + f < frames) talkBy[who][at + f] = v
     })
-    const mouth = await mouthForTake({ file: take.file, text: seg.text, words: take.words }, options.fps, Math.ceil(take.seconds * options.fps))
+    // The mouth leads the voice by LEAD_FRAMES (lipsync.ts), so each take is laid that much early
+    // on the shared clock: its first shapes may land in the gap before its own slot.
+    const span = Math.ceil(take.seconds * options.fps)
+    const mouth = await mouthForTake({ file: take.file, text: seg.text, words: take.words }, options.fps, span, { lead: 0 })
     sources.add(mouth.source)
-    for (let f = 0; f < mouth.frames.length && at + f < frames; f++) mouths[who][at + f] = mouth.frames[f]
+    const said = emphasisFrames(take.words, level, options.fps, span, { lead: 0 })
+    for (let f = 0; f < span; f++) {
+      const g = at + f - LEAD_FRAMES
+      if (g < 0 || g >= frames) continue
+      // Rest from this take never paints over the end of the line before it.
+      if (mouth.frames[f] !== 'X' || f >= LEAD_FRAMES) mouths[who][g] = mouth.frames[f]
+      emphasisBy[who][g] = said.size[f]
+      accentBy[who][g] = Math.max(accentBy[who][g], said.accent[f])
+    }
   }
   if (sources.size) console.log(`👄 Mouth shapes from ${[...sources].map((s) => (s === 'rhubarb' ? 'Rhubarb Lip Sync' : 'the words (guessed)')).join(' and ')}`)
 
@@ -126,5 +142,5 @@ export async function voiceLesson(lesson: Lesson, outDir: string, options: { sil
   if (options.silent) await silentAudio(total + 0.1, audio)
   else await joinTakes(takes.map((t) => t.file!), audio)
   fs.writeFileSync(path.join(outDir, 'words.json'), JSON.stringify({ segments, offsets, words }, null, 2))
-  return { audio, words, talkBy, mouthBy: mouths.map((m) => m.join('')) }
+  return { audio, words, talkBy, mouthBy: mouths.map((m) => m.join('')), emphasisBy, accentBy }
 }

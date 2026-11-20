@@ -85,8 +85,11 @@ export interface Character3D {
    * How loud the character is speaking right now, 0 (silent) to 1, for scripted animation, and
    * the cartoon mouth shape for the sound being made (mouth-shapes.ts). Without a shape the mouth
    * just opens with the level. The head nods a little on the louder syllables either way.
+   * `mouth` is the exact drawn mouth for this frame (speechMouthTrack, with its sizes, in-betweens
+   * and pauses), shown as given; `accent` (0..1) is a stressed word landing: the head dips and the
+   * brows lift with it.
    */
-  setTalk: (level: number, shape?: MouthShape | null) => void
+  setTalk: (level: number, shape?: MouthShape | null, mouth?: MouthParams | null, accent?: number) => void
   /**
    * A talking gesture over the current pose (scripted animation): a beat of a claw, both claws
    * opening out, a claw offered to someone, a head tilt, a nod or a shift of weight. `side` is 1
@@ -383,6 +386,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   })
   const mouthNow = mouthParams('X')
   const mouthWant = mouthParams('X')
+  const mouthRest = mouthBone ? { at: mouthBone.position.clone(), facing: mouthBone.quaternion.clone() } : null
   const partAt = new Vector3()
   const brows = (['L', 'R'] as const).flatMap((tag) => {
     const bone = rig.bones.get(`brow${tag}`)
@@ -405,6 +409,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   /** Speech level from a scripted voice track (0 silent, 1 loudest), and the mouth shape for it. */
   let talk = 0
   let talkShape: MouthShape | null = null
+  let talkMouth: MouthParams | null = null
+  let talkAccent = 0
   /** Talking gestures playing over the pose (scripted animation only). */
   let gestures: { kind: Gesture; side: 1 | -1; amount: number; start: number | null }[] = []
 
@@ -447,6 +453,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     mouthBone.scale.set(sx, sy, 1)
     const H = MOUTH_HOLE.y * sy
     const W = MOUTH_HOLE.x * sx
+    // A speaking mouth hangs from the top lip like a jaw: the more it opens, the further its centre
+    // drops, so the top edge stays near the drawn mouth's line and the bottom does the travelling.
+    const jaw = open ? -0.22 * (H - MOUTH_HOLE.y * 0.3) * m.speech : 0
+    if (mouthRest) mouthBone.position.copy(mouthRest.at).add(partAt.set(0, jaw, 0).applyQuaternion(mouthRest.facing))
     /** How far forward the oval's surface is at height y (in the mouth's own space). */
     const front = (y: number) => MOUTH_HOLE.z * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
     /** Width of the oval at height y. */
@@ -454,7 +464,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     const place = (part: (typeof mouthParts)[number], y: number, z: number, scale: [number, number]) => {
       if (!part) return
       part.bone.visible = open && scale[1] > 0.04
-      part.bone.position.copy(part.rest).add(partAt.set(0, y, z).applyQuaternion(part.facing))
+      part.bone.position.copy(part.rest).add(partAt.set(0, y + jaw, z).applyQuaternion(part.facing))
       part.bone.scale.set(Math.max(scale[0], 1e-3), Math.max(scale[1], 1e-3), 1)
     }
     // Each row of teeth tucks under the top or bottom of the oval and is as wide as the oval is there.
@@ -824,10 +834,13 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       }
       // Speaking: the head nods a touch on the louder syllables and the brows ride up with
       // emphasis; the chest drifts as the sentence goes on, so a long line never freezes.
-      if (talk > 0.02 || talkShape) {
-        overlay('chest', X, -0.03 * talk)
+      if (talk > 0.02 || talkShape || talkMouth) {
+        // A stressed word lands with a small dip of the head and a lift of the brows.
+        overlay('chest', X, -0.03 * talk + 0.035 * talkAccent)
         overlay('chest', Yaxis, Math.sin(time * 1.7) * 0.03 * Math.min(1, talk * 2))
-        browUp += 0.006 * talk
+        browUp += 0.006 * talk + 0.012 * talkAccent
+        // A wide-open vowel pushes the cheeks up, so the eyes narrow a touch with it.
+        if (talkMouth) squint = Math.max(squint, 0.25 * Math.max(0, talkMouth.open - 0.6) / 0.6)
       }
       // Eyes squash a little as they blink and stretch when startled.
       squash = -0.1 * closed + 0.12 * wide - 0.07 * squint
@@ -843,8 +856,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       // What the mouth is doing: a cartoon mouth shape while speaking, opening with the voice when
       // there is no shape, and a reaction's bigger mouth over either. A cheer is wide, a gasp is round.
       const want = mouthWant
-      Object.assign(want, MOUTH_PARAMS[talkShape ?? 'X'])
-      if (talkShape) {
+      Object.assign(want, talkMouth ?? MOUTH_PARAMS[talkShape ?? 'X'])
+      if (talkMouth) {
+        // Drawn exactly as given: the track already has its in-betweens and holds.
+      } else if (talkShape) {
         want.open *= 0.9 + 0.2 * talk
         want.speech = 1
       }
@@ -855,7 +870,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         want.width = ((1 - 0.42 * mouthRound) * (1 + 0.45 * (1 - mouthRound))) / 1.2
       }
       // Shapes change within a frame or two: snappy like a drawn mouth, never a one-frame flicker.
-      blendMouth(mouthNow, want, idle ? 1 - Math.exp(-dt * 40) : 1)
+      blendMouth(mouthNow, want, idle && !talkMouth ? 1 - Math.exp(-dt * 40) : 1)
       placeMouth(mouthNow)
     }
     for (const b of brows) {
@@ -969,9 +984,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         aimPose('cheer')
       }
     },
-    setTalk(level, shape = null) {
+    setTalk(level, shape = null, mouth = null, accent = 0) {
       talk = Math.min(1, Math.max(0, level))
       talkShape = shape
+      talkMouth = mouth
+      talkAccent = Math.min(1, Math.max(0, accent))
     },
     avoidContacts(on, others = []) {
       avoiding = on

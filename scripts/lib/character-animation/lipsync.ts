@@ -24,19 +24,140 @@ export interface MouthCue {
   value: MouthShape
 }
 
-/** One letter per frame from timed cues; anything not covered is rest (X). */
-export function framesFromCues(cues: MouthCue[], fps: number, frames: number): string {
-  const out = new Array<string>(frames).fill('X')
-  for (const cue of cues) {
-    const from = Math.max(0, Math.round(cue.start * fps))
-    const to = Math.min(frames, Math.round(cue.end * fps))
-    for (let f = from; f < to; f++) out[f] = cue.value
+/**
+ * How many frames the mouth runs ahead of the voice. Animators lead the sound by a frame or two:
+ * the eye reads a mouth that is exactly on the sound as late, one a touch early as in sync.
+ */
+export const LEAD_FRAMES = 2
+
+/**
+ * Shapes the eye needs to catch or the word looks wrong: lips meeting (M, B, P), top teeth on the
+ * lip (F, V) and the pucker (OO, W). They always get a frame, two when the sounds around them can
+ * spare it, however short the sound itself is.
+ */
+const KEY_SHAPES: Partial<Record<string, number>> = { A: 2, G: 2, F: 2 }
+
+interface Run {
+  shape: string
+  from: number
+  to: number
+}
+
+/**
+ * One letter per frame from timed cues; anything not covered is rest (X). The cues move `lead`
+ * frames earlier, snap to whole frames, and are then tidied so each frame reads: a lip close, F or
+ * pucker never rounds away, and any other shape that would flash for one frame between two others
+ * holds the one before instead.
+ */
+export function framesFromCues(cues: MouthCue[], fps: number, frames: number, options: { lead?: number } = {}): string {
+  const lead = options.lead ?? LEAD_FRAMES
+  // Cues on whole frames, in order, with the gaps between them filled with rest.
+  const runs: Run[] = []
+  let at = Number.NEGATIVE_INFINITY
+  for (const cue of [...cues].sort((a, b) => a.start - b.start)) {
+    let from = Math.round(cue.start * fps) - lead
+    const to = Math.round(cue.end * fps) - lead
+    if (from < at) from = at
+    if (from > at && runs.length) runs.push({ shape: 'X', from: at, to: from })
+    if (to < from) continue
+    runs.push({ shape: cue.value, from, to })
+    at = to
   }
-  // A shape that would show for a single frame between two others is a flicker; hold the one before.
-  for (let f = 1; f < frames - 1; f++) {
-    if (out[f] !== out[f - 1] && out[f] !== out[f + 1] && out[f - 1] !== 'X' && out[f + 1] !== 'X') out[f] = out[f - 1]
+  const len = (r: Run) => r.to - r.from
+  const least = (r: Run) => KEY_SHAPES[r.shape] ?? 1
+  /** Frames a run can give up and still read. */
+  const spare = (r: Run | undefined) => (r ? len(r) - least(r) : 0)
+
+  // A key shape takes the frames it needs from whichever side can spare more (usually a vowel).
+  for (let i = 0; i < runs.length; i++) {
+    const r = runs[i]
+    const need = KEY_SHAPES[r.shape]
+    if (!need) continue
+    while (len(r) < need) {
+      const prev = runs[i - 1]
+      const next = runs[i + 1]
+      const fromPrev = spare(prev) >= spare(next)
+      if (Math.max(spare(prev), spare(next)) > 0) {
+        if (fromPrev) prev.to = --r.from
+        else next.from = ++r.to
+      } else if (len(r) === 0) {
+        // Nothing to spare: the close still shows for one frame, taken from the longer side.
+        const side = (prev ? len(prev) : 0) >= (next ? len(next) : 0) ? prev : next
+        if (!side || len(side) === 0) break
+        if (side === prev) prev.to = --r.from
+        else next.from = ++r.to
+      } else break
+    }
+  }
+
+  const out = new Array<string>(frames).fill('X')
+  const kept = runs.filter((r) => len(r) > 0)
+  for (const [i, r] of kept.entries()) {
+    // Any other shape that would flash for a single frame between two ordinary spoken ones is a
+    // flicker: the shape before holds through it. Next to a key shape it stays, since it is the
+    // only opening between two closes ("mama").
+    const prev = kept[i - 1]
+    const next = kept[i + 1]
+    const plain = (n: Run | undefined) => n && n.shape !== 'X' && !KEY_SHAPES[n.shape]
+    const shape = len(r) === 1 && !KEY_SHAPES[r.shape] && plain(prev) && plain(next) && r.from > 0 ? out[r.from - 1] : r.shape
+    for (let f = Math.max(0, r.from); f < Math.min(frames, r.to); f++) out[f] = shape
   }
   return out.join('')
+}
+
+/** Little words that never carry the stress of a line, however long the voice holds them. */
+const LIGHT_WORDS = new Set(
+  'a an the and or but so of to in on at by for with from as is are was were be been am it its this that these those i you he she we they me him her us them my your our their do does did has have had not if then than just very really because through without would could should will can about into'.split(' '),
+)
+
+/**
+ * How strongly each word is said, 0..1 (0.5 ordinary), and a short accent pulse on the strongest
+ * ones, per video frame (led like the mouth). Loudness against the take's typical word decides
+ * most of it; the words themselves the rest (little words stay light, long words and numbers carry
+ * weight, an exclamation lifts), so a silent test still has a shape to it.
+ */
+export function emphasisFrames(words: WordBoundaryEvent[], level: number[], fps: number, frames: number, options: { lead?: number } = {}): { size: number[]; accent: number[] } {
+  const lead = options.lead ?? LEAD_FRAMES
+  const size = new Array<number>(frames).fill(0.5)
+  const accent = new Array<number>(frames).fill(0)
+  if (!words.length) return { size, accent }
+  const spans = words.map((w) => {
+    const from = Math.max(0, Math.round((w.startMs / 1000) * fps))
+    const to = Math.max(from + 1, Math.round((w.endMs / 1000) * fps))
+    let peak = 0
+    let at = from
+    for (let f = from; f < to && f < level.length; f++) if (level[f] > peak) [peak, at] = [level[f], f]
+    return { w, from, to, peak, at }
+  })
+  const peaks = spans.map((s) => s.peak).filter((p) => p > 0).sort((a, b) => a - b)
+  const typical = peaks.length ? peaks[Math.floor(peaks.length / 2)] : 0
+  const scores = spans.map(({ w, peak }) => {
+    const plain = w.word.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const loud = typical > 0 ? Math.min(1, Math.max(0, 0.5 + 1.1 * (peak / typical - 1))) : 0.5
+    let said = LIGHT_WORDS.has(plain) ? 0.2 : /\d/.test(plain) || plain.length >= 7 ? 0.75 : plain.length >= 4 ? 0.55 : 0.4
+    if (/!/.test(w.word)) said = Math.min(1, said + 0.25)
+    return 0.6 * loud + 0.4 * said
+  })
+  // Size: each word's own, held across the little gaps between words until the next one starts.
+  spans.forEach((s, k) => {
+    const end = k + 1 < spans.length ? spans[k + 1].from : s.to + 3
+    for (let f = s.from - lead; f < end - lead; f++) if (f >= 0 && f < frames) size[f] = Math.round(scores[k] * 100) / 100
+  })
+  // Accents: the strongest words, no closer than about two thirds of a second, peak on the loudest frame.
+  let last = Number.NEGATIVE_INFINITY
+  spans.forEach((s, k) => {
+    if (scores[k] < 0.68 || s.at - last < fps * 0.65) return
+    last = s.at
+    const strength = Math.min(1, (scores[k] - 0.5) * 2.2)
+    for (let d = -2; d <= 10; d++) {
+      const f = s.at - lead + d
+      if (f < 0 || f >= frames) continue
+      // Rises over two frames to the hit, then settles over about a third of a second.
+      const v = d < 0 ? (d + 3) / 3 : Math.exp(-d / 4)
+      accent[f] = Math.max(accent[f], Math.round(strength * v * 100) / 100)
+    }
+  })
+  return { size, accent }
 }
 
 /**
@@ -142,7 +263,12 @@ export async function rhubarbCues(audioPath: string, text: string): Promise<Mout
  * Mouth shapes per frame for one take: Rhubarb on the audio when there is audio and it runs,
  * otherwise a guess from the words. Rhubarb's answer is cached beside the take.
  */
-export async function mouthForTake(take: { file?: string; text: string; words: WordBoundaryEvent[] }, fps: number, frames: number): Promise<{ frames: string; source: 'rhubarb' | 'words' }> {
+export async function mouthForTake(
+  take: { file?: string; text: string; words: WordBoundaryEvent[] },
+  fps: number,
+  frames: number,
+  options: { lead?: number } = {},
+): Promise<{ frames: string; source: 'rhubarb' | 'words' }> {
   if (take.file) {
     const cache = take.file.replace(/\.[a-z0-9]+$/i, `.mouth-${RHUBARB_VERSION}.json`)
     let cues: MouthCue[] | null = fs.existsSync(cache) ? JSON.parse(fs.readFileSync(cache, 'utf8')) : null
@@ -150,7 +276,7 @@ export async function mouthForTake(take: { file?: string; text: string; words: W
       cues = await rhubarbCues(take.file, take.text)
       if (cues) fs.writeFileSync(cache, JSON.stringify(cues))
     }
-    if (cues) return { frames: framesFromCues(cues, fps, frames), source: 'rhubarb' }
+    if (cues) return { frames: framesFromCues(cues, fps, frames, options), source: 'rhubarb' }
   }
-  return { frames: framesFromCues(cuesFromWords(take.words), fps, frames), source: 'words' }
+  return { frames: framesFromCues(cuesFromWords(take.words), fps, frames, options), source: 'words' }
 }
