@@ -103,7 +103,7 @@ One scale, tighter on phones. Use these exact class sets so pages stay in step:
 | Hero padding (Dashboard today, Academy, profile header) | `p-4 sm:p-5 lg:p-6` | 16 / 20 / 24px |
 | List rows inside a card | `py-2 sm:py-2.5` | 8 / 10px |
 
-Phone page edges are 8px (HudLayout `px-2`, `--hud-band-x` 0.5rem) and the header band has 10px above and below its title row. The band's background runs edge to edge, but its title, tabs and buttons are inset by `--hud-band-inset` (page edge + card padding: 20px phone, 32px sm, 35px lg) so they line up with the text inside the cards below.
+Phone page edges are 8px (HudLayout `px-2`, `--hud-band-x` 0.5rem) and the header band has 10px above and below its title row. The band's background runs edge to edge. Its title, tabs and buttons are inset by `--hud-band-inset`: on phones and small tablets that is page edge + card padding (20px phone, 32px sm) so they line up with the text inside cards; from md up it is the panel's content edge (15px), the same line as card borders and the Codex band.
 
 Every standard page starts with the header band (see Page headings), then its sections.
 Pages never wrap themselves in an extra outer card; the page panel is the frame.
@@ -127,10 +127,13 @@ pinned to the bottom.
 
 `HudButton` variants: `primary` (alias `cyan`, solid cyan), `crimson`, `secondary` (alias `dark`, a
 faint `surface-2` fill with a `line-subtle` edge), `ghost`, `danger` (alias `sacred`). Inter 13px weight
-500, sentence case, no glow. One `primary` per screen. There are two tab styles and no underline tabs:
+500, sentence case, no glow. One `primary` per screen. There are two tab styles:
 
 - Section tabs, below a header band's title: `BandSectionNav` (each section has a URL) or
-  `HudTabs` (in-page state). Inter 13px weight 500, the current one a lit `surface-3` tile.
+  `HudTabs` (in-page state). Plain labels (Inter 13px weight 500, 20px apart, first label in line
+  with the title) on the band's bottom edge. The current one is full ink with a 2px ink bar under
+  it that slides between tabs with an ease-out, leading edge first (`useTabIndicator`, which also
+  carries the bar across routes that remount the band). Never a short cyan mark.
 - In-page view tabs and filters: `pillTabClass()` from `src/components/ui/pillTab.ts`, round
   pills with the current one a lit `surface-3` pill.
 
@@ -187,14 +190,16 @@ One band, the same rows on every page:
    reserves space where the pill reaches into the panel.
 2. Section tabs, when present, sit beneath the title on every screen size. Use `BandSectionNav`
    for sections with URLs and `HudTabs` for in-page state. Keep the area name as the title
-   across sections (Character on Customize, Shop and Progress). The current tab is a lit tile.
+   across sections (Character on Customize, Shop and Progress). The tabs are the band's last row
+   and sit on its bottom border (the band has no bottom padding then).
 3. Optional description: one short line. `hideDescriptionOnPhone` drops it where the tabs
-   and figures already say enough (Shop).
-4. Optional `toolbar`: in-page view tabs as lit tiles (Shop's Gear / Skills / Earn gems / Credits).
+   and figures already say enough (Shop). On a band with section tabs it sits just under the band.
+4. Optional `toolbar`: in-page view tabs as lit pills (Shop's Gear / Skills / Earn gems / Credits).
+   On a band with section tabs it also sits just under the band, with any `children`.
    Content such as cards, lists or forms always starts below the band.
 
 On phones section tabs scroll sideways when needed. Figures using `actionsBelowOnPhone`
-follow the tabs.
+sit above the tabs.
 Pages that open with their own hero instead of a band (Dashboard, another member's profile)
 add `hud-page-hero-top` on the page and `hud-band-hero` on the hero, so the hero is the band:
 it starts at the panel's top edge and runs to its sides (on phones, to the screen edges).

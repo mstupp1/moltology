@@ -1,5 +1,7 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
+import { BAND_TAB_LIST, BandTabBar, bandTabClass } from '@/components/hud/BandSectionNav'
+import { useTabIndicator } from '@/hooks/useTabIndicator'
 
 export interface HudTabItem<T extends string = string> {
   value: T
@@ -20,7 +22,7 @@ export interface HudTabsProps<T extends string = string> {
 
 /**
  * Section tabs for a header band (`HudTitlePanel` `sections`), matching `BandSectionNav`:
- * the current one is a lit tile, no underline. Use this when the sections are
+ * plain labels on the band's bottom edge with a sliding bar under the current one. Use this when the sections are
  * in-page state; use `BandSectionNav` when each section has its own URL.
  * Arrow keys move between tabs; Home and End jump to the ends.
  */
@@ -33,6 +35,9 @@ export function HudTabs<T extends string = string>({
   idPrefix = 'hud-tab',
 }: HudTabsProps<T>) {
   const refs = React.useRef<Array<HTMLButtonElement | null>>([])
+  const listRef = React.useRef<HTMLDivElement>(null)
+  const barRef = React.useRef<HTMLSpanElement>(null)
+  useTabIndicator(listRef, barRef, label, value)
 
   const focusAt = (start: number, step: 1 | -1) => {
     const count = items.length
@@ -56,36 +61,33 @@ export function HudTabs<T extends string = string>({
   }
 
   return (
-    <div role="tablist" aria-label={label} className={cn('-ml-2.5 flex flex-wrap gap-1', className)}>
-      {items.map((item, index) => {
-        const selected = item.value === value
-        return (
-          <button
-            key={item.value}
-            ref={(el) => {
-              refs.current[index] = el
-            }}
-            id={`${idPrefix}-${item.value}`}
-            type="button"
-            role="tab"
-            aria-selected={selected}
-            tabIndex={selected ? 0 : -1}
-            disabled={item.disabled}
-            onClick={() => onValueChange(item.value)}
-            onKeyDown={(event) => onKeyDown(event, index)}
-            className={cn(
-              'inline-flex min-h-9 items-center whitespace-nowrap rounded-control px-2.5 text-ui font-medium transition-colors',
-              'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan-glow',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              selected
-                ? 'bg-surface-3 shadow-nav-current text-ink'
-                : 'text-ink-muted hover:text-ink hover:bg-surface-3/60'
-            )}
-          >
-            {item.label}
-          </button>
-        )
-      })}
+    <div ref={listRef} className="relative w-max">
+      <div role="tablist" aria-label={label} className={cn(BAND_TAB_LIST, className)}>
+        {items.map((item, index) => {
+          const selected = item.value === value
+          return (
+            <button
+              key={item.value}
+              ref={(el) => {
+                refs.current[index] = el
+              }}
+              id={`${idPrefix}-${item.value}`}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              tabIndex={selected ? 0 : -1}
+              disabled={item.disabled}
+              onClick={() => onValueChange(item.value)}
+              onKeyDown={(event) => onKeyDown(event, index)}
+              className={cn(bandTabClass(selected), 'disabled:cursor-not-allowed disabled:opacity-50')}
+              data-tab-active={selected ? 'true' : undefined}
+            >
+              {item.label}
+            </button>
+          )
+        })}
+      </div>
+      <BandTabBar ref={barRef} />
     </div>
   )
 }
