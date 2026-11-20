@@ -53,13 +53,29 @@ export function HudTitlePanel({
 }: HudTitlePanelProps) {
   const accentClasses = ACCENT_CLASS[accent]
   if (treatment === 'band') {
-    return (
+    // With section tabs, the tabs are the band's bottom edge, so anything else the page puts
+    // in its header (a description, extra links, a toolbar) sits just under the band instead.
+    const extras =
+      description || children || toolbar ? (
+        <>
+          {description ? (
+            // Full-width wrapper so the line always starts its own row; the text keeps a reading width.
+            <div className={cn('order-6 basis-full min-w-0', hideDescriptionOnPhone && 'max-md:hidden')}>
+              <p className="max-w-2xl text-xs text-ink-muted leading-relaxed">{description}</p>
+            </div>
+          ) : null}
+          {children ? <div className="order-6 basis-full min-w-0">{children}</div> : null}
+          {toolbar ? <div className={cn('order-7 basis-full min-w-0', !sections && 'pt-1')}>{toolbar}</div> : null}
+        </>
+      ) : null
+    const band = (
       <div
         data-heading-treatment="band"
         className={cn(
           'relative flex flex-wrap items-center gap-x-4 gap-y-2 bg-surface-2 border-b border-line-subtle',
-          joined ? 'hud-title-band-rest pt-2 pb-4 md:pb-5' : 'hud-title-band',
+          joined ? cn('hud-title-band-rest pt-2', !sections && 'pb-4 md:pb-5') : 'hud-title-band',
           (description || children || toolbar || sections) && 'has-more',
+          sections && 'has-sections',
           className,
         )}
         {...props}
@@ -72,15 +88,15 @@ export function HudTitlePanel({
           clearPill={!joined}
           titleAs={titleAs}
         />
-        {description ? (
-          // Full-width wrapper so the line always starts its own row; the text keeps a reading width.
-          <div className={cn('order-6 basis-full min-w-0', hideDescriptionOnPhone && 'max-md:hidden')}>
-            <p className="max-w-2xl text-xs text-ink-muted leading-relaxed">{description}</p>
-          </div>
-        ) : null}
-        {children ? <div className="order-6 basis-full min-w-0">{children}</div> : null}
-        {toolbar ? <div className="order-7 basis-full min-w-0 pt-1">{toolbar}</div> : null}
+        {sections ? null : extras}
       </div>
+    )
+    if (!sections || !extras) return band
+    return (
+      <>
+        {band}
+        <div className="space-y-2">{extras}</div>
+      </>
     )
   }
   return (
@@ -156,7 +172,8 @@ export function BandHeadingRow({
         </div>
       ) : null}
       {clearPill ? <span aria-hidden="true" className="hud-pill-clear order-4" /> : null}
-      {sections ? <div className="hud-band-sections order-5 basis-full min-w-0">{sections}</div> : null}
+      {/* Last, so the tabs sit on the band's bottom edge. */}
+      {sections ? <div className="hud-band-sections order-9 basis-full min-w-0">{sections}</div> : null}
     </>
   )
 }

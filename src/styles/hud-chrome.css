@@ -216,9 +216,11 @@ input[type="range"].dial-range:focus-visible {
     --hud-band-card-pad: 1rem;
   }
 }
-@media (min-width: 1024px) {
+/* On desktop the band lines up with the panel's content edge (card borders, Codex), as the
+   panel's own border already frames it. Phones keep the card-text inset. */
+@media (min-width: 768px) {
   [data-hud-page-panel] {
-    --hud-band-card-pad: 1.25rem;
+    --hud-band-card-pad: 0px;
   }
 }
 /* Height of a band's title row on desktop: 4.5rem, twice the 2.25rem row content, so the title
@@ -275,8 +277,6 @@ input[type="range"].dial-range:focus-visible {
     padding-bottom: 0.625rem;
   }
 }
-/* Section tabs keep BandSectionNav's -ml-2.5 so the first tab's label, not its tile edge,
-   lines up with the title. */
 /* Room for the floating search pill at the end of a band's title row (desktop only). */
 .hud-pill-clear {
   display: none;
@@ -720,4 +720,12 @@ input[type="range"].dial-range:focus-visible {
   pointer-events: none;
   -webkit-mask-image: radial-gradient(circle closest-side, #000 62%, transparent 100%);
   mask-image: radial-gradient(circle closest-side, #000 62%, transparent 100%);
+}
+
+/* A band with section tabs ends with them: the tabs sit on its bottom border, so it has no
+   bottom padding (BandSectionNav). Last in the file so it wins over the per-size paddings. */
+.hud-title-band.has-sections,
+.hud-title-band-rest.has-sections,
+.hud-title-band-lead-lg:has(> .hud-band-sections) {
+  padding-bottom: 0;
 }

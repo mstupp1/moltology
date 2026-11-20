@@ -144,7 +144,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
         treatment="band"
         title={SUPPORT_PAGE_COPY.pageTitle}
         sections={
-          <HorizontalScroll className="-ml-2.5 overflow-x-auto pl-2.5" tabIndex={-1}>
+          <HorizontalScroll className="overflow-x-auto" tabIndex={-1}>
             <HudTabs
               label="Support sections"
               className="w-max flex-nowrap"
