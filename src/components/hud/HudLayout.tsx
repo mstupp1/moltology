@@ -231,7 +231,7 @@ function HudContent() {
                   ? 'p-0 overflow-hidden'
                   : // app-scroll-lane keeps the scrollbar's lane on mouse devices so short and long pages share
                   // one panel width; touch devices use overlay bars and get no lane (see index.css).
-                  'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain app-scroll-lane'
+                  'p-2.5 sm:p-4 md:px-[clamp(8px,1vw,24px)] md:py-6 overflow-y-auto overscroll-y-contain app-scroll-lane'
               } ${
                 // Desktop standard pages keep the scene bright around one see-through page panel.
                 // Phones get the full-width panel tint from the backdrop layer above, so main stays clear there.
@@ -261,13 +261,14 @@ function HudContent() {
               {isFullscreenRoute ? (
                 <Outlet />
               ) : (
-                // Desktop gutters: main 8px + panel border 1px + panel 15px = the 24px pages had before
-                // the panel, and 1312px max leaves 1280px of content, so page layouts keep their width.
+                // Desktop: main gutter grows 8-24px with the window, panel border 1px + 15px padding.
+                // 1632px max leaves 1600px of content, so laptops up to ~1760px wide are filled edge to
+                // edge and only big monitors get margins. Reading pages cap their own text inside.
                 <div
                   ref={panelRef}
                   data-hud-page-panel
                   data-hud-main-only={isMainOnly ? '' : undefined}
-                  className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1312px] md:px-[15px] md:pb-6 ${
+                  className={`mx-auto flex w-full min-w-0 flex-1 shrink-0 flex-col md:max-w-[1632px] md:px-[15px] md:pb-6 ${
                     isMainOnly ? 'md:pt-6' : 'md:pt-[var(--hud-band-top)]'
                   } md:rounded-panel md:border md:border-line-subtle md:bg-surface-1/[0.68] md:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)]`}
                 >

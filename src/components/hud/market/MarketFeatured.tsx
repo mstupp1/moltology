@@ -200,9 +200,10 @@ export function MarketFeatured({
       {bundles.length ? (
         <div className="space-y-2">
           <h2 className="text-2xs font-semibold text-ink-muted px-1">Bundles</h2>
-          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 snap-x">
+          {/* Scrolls as one row until xl; from there the bundles share the row evenly, edge to edge. */}
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 snap-x xl:grid xl:grid-flow-col xl:auto-cols-fr xl:overflow-visible xl:pb-0">
             {bundles.map(({ bundle, items }) => (
-              <BundleTile key={bundle.id} bundle={bundle} items={items} onOpen={onOpenBundle} className="w-64 shrink-0 snap-start" />
+              <BundleTile key={bundle.id} bundle={bundle} items={items} onOpen={onOpenBundle} className="w-64 shrink-0 snap-start xl:w-auto" />
             ))}
           </div>
         </div>
