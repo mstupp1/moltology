@@ -5,7 +5,9 @@ import {
   MASCOT_CAST,
   MASCOT_S3_PREFIX,
   getMascotKeys,
+  mascotFilenameForPose,
   resolveMascotAlias,
+  splitPose,
 } from '@/lib/mascots'
 import { cn } from '@/lib/utils'
 
@@ -79,9 +81,12 @@ export function normalizeMascotKey(rawKey: string): string {
  * Get full mascot metadata from any key, filename, or alias
  */
 export function getMascotInfo(mascotKey: string): MascotInfo {
+  const { pose } = splitPose(mascotKey ?? '')
   const normKey = normalizeMascotKey(mascotKey)
   if (MASCOT_REGISTRY[normKey]) {
-    return MASCOT_REGISTRY[normKey]
+    // `key:pose` picks the published still of that pose (npm run cast:render -- --publish).
+    const posed = pose ? mascotFilenameForPose(normKey, pose) : undefined
+    return posed ? { ...MASCOT_REGISTRY[normKey], filename: posed, s3Url: mascotS3Url(posed) } : MASCOT_REGISTRY[normKey]
   }
 
   // Dynamic fallback for custom or unlisted mascot files
@@ -138,8 +143,10 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
   const handleImageError = () => {
     if (!hasFailed) {
       setHasFailed(true)
-      // Fall back to the default mascot cutout
-      setCurrentSrc(MASCOT_REGISTRY[DEFAULT_MASCOT_KEY].s3Url)
+      // A pose that was never published falls back to the character's signature still, anything
+      // else to the default character.
+      const signature = MASCOT_REGISTRY[info.key]?.s3Url
+      setCurrentSrc(signature && signature !== currentSrc ? signature : MASCOT_REGISTRY[DEFAULT_MASCOT_KEY].s3Url)
     }
   }
 

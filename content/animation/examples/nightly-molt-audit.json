@@ -5,14 +5,14 @@
   "series": "Codex Lessons",
   "episode": 2,
   "format": "short",
-  "host": "host-crab",
+  "host": "juno",
   "cast": [
     {
-      "id": "junior-lobster",
+      "id": "kit",
       "at": "left"
     },
     {
-      "id": "host-crab",
+      "id": "juno",
       "at": "right"
     }
   ],
@@ -25,13 +25,13 @@
   "hookHeadline": "I try to fix my whole day every night.",
   "scenes": [
     {
-      "speaker": "junior-lobster",
+      "speaker": "kit",
       "line": "I try to fix my whole day every night.",
       "shot": "two",
       "pose": "shrug",
       "look": "camera",
       "act": {
-        "host-crab": {
+        "juno": {
           "pose": "think",
           "look": "other"
         }
@@ -39,7 +39,7 @@
       "description": "The junior lobster confesses to camera in the Codex study while the host crab listens, thinking."
     },
     {
-      "speaker": "junior-lobster",
+      "speaker": "kit",
       "line": "It never works.",
       "shot": "close",
       "move": "cut",
@@ -48,7 +48,7 @@
       "description": "Close on the junior lobster, shrugging."
     },
     {
-      "speaker": "host-crab",
+      "speaker": "juno",
       "line": "That's the problem. Shed one thing a night, not the whole day.",
       "shot": "medium",
       "move": "cut",
@@ -63,7 +63,7 @@
       "description": "Medium on the host crab pointing, snapping on 'one'."
     },
     {
-      "speaker": "junior-lobster",
+      "speaker": "kit",
       "line": "Just one?",
       "shot": "close",
       "move": "cut",
@@ -76,7 +76,7 @@
       "description": "Close on the junior lobster, startled."
     },
     {
-      "speaker": "host-crab",
+      "speaker": "juno",
       "line": "One. Name three candidates: a thought that looped, an hour that vanished, a distraction.",
       "shot": "medium",
       "move": "cut",
@@ -85,7 +85,7 @@
       "description": "The host crab counts off the three candidates to camera."
     },
     {
-      "speaker": "host-crab",
+      "speaker": "juno",
       "line": "Then pick exactly one, write it down, and let it go.",
       "shot": "close",
       "move": "push-in",
@@ -101,7 +101,7 @@
       "description": "Push in on the host crab as it lets the one thing go."
     },
     {
-      "speaker": "junior-lobster",
+      "speaker": "kit",
       "line": "That's it? Four minutes?",
       "shot": "close",
       "move": "cut",
@@ -109,13 +109,13 @@
       "description": "Close on the junior lobster, delighted."
     },
     {
-      "speaker": "host-crab",
+      "speaker": "juno",
       "line": "Small enough for bad nights, and those are the ones that count.",
       "shot": "two",
       "move": "cut",
       "pose": "rest",
       "act": {
-        "junior-lobster": {
+        "kit": {
           "pose": "rest",
           "look": "other"
         }
@@ -123,7 +123,7 @@
       "description": "Two-shot in the study: the host crab explains, the junior nods along."
     },
     {
-      "speaker": "host-crab",
+      "speaker": "juno",
       "line": "Read the Nightly Molt Audit at moltology.org.",
       "shot": "two",
       "move": "pull-out",
@@ -136,7 +136,7 @@
         }
       ],
       "act": {
-        "junior-lobster": {
+        "kit": {
           "pose": "wave",
           "look": "camera"
         }

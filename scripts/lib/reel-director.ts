@@ -8,6 +8,7 @@
  *  - writes a beat-matched shot list with one recurring protagonist and one recurring hero (Gemini text),
  *  - falls back to the curated scene pools plus a shared continuity layer when the director call fails.
  */
+import { castMember } from '../../src/lib/cast'
 import type { WordBoundaryEvent } from './tts-engine'
 import { normalizeMascotKey } from './character-overlay'
 import { DEFAULT_MASCOT_KEY, MASCOT_CAST } from '../../src/lib/mascots'
@@ -42,22 +43,13 @@ export interface MascotVeoProfile {
   storyRole: string
 }
 
-/** The video director uses the same named identities as the active cutout registry. */
-const NAMED_STORY_ROLES: Record<string, string> = {
-  lobster_pip_current: 'A shy, observant experimenter learning to share an imperfect first attempt',
-  crab_mira_kelp: 'An encouraging explorer learning to check the route and listen before committing',
-  crab_cal_brack: 'A patient mediator learning to make room for his own opinions as well as everyone else’s',
-  lobster_rook_tide: 'A steady, decisive friend learning to accept help while encouraging everyone to take the next step',
-  lobster_tess_shoal: 'An attentive listener whose practical questions help others choose while she learns to make her own decisions',
-  lobster_faye_ripple: 'A stylish, sassy problem-solver whose sharp wit and practical confidence are tempered by learning to listen before fixing',
-}
-
+/** The video director uses the content cast (content/characters/cast.json): its look and story role. */
 export const MASCOT_VEO_PROFILES: Record<string, MascotVeoProfile> = Object.fromEntries(
   MASCOT_CAST.map((mascot) => [mascot.key, {
     key: mascot.key,
     name: mascot.name,
-    heroDescription: `a polished 3D animated feature-film character: ${mascot.description}; sculpted facial volume, seated expressive eyes, attached brows, satin organic chitin, two pincer arms and six walking legs, with two short legs before the final long supporting leg on each side`,
-    storyRole: NAMED_STORY_ROLES[mascot.key] ?? 'A thoughtful companion in the benthic community',
+    heroDescription: `the 3D animated character ${mascot.name} exactly as in the supplied reference frame: ${mascot.description}; smooth satin 3D finish, two pincer arms and six walking legs, unchanged proportions and colours`,
+    storyRole: castMember(mascot.key)?.storyRole ?? 'A thoughtful companion in the benthic community',
   }])
 )
 

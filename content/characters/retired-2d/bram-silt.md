@@ -44,7 +44,7 @@ he packed for himself is usually the first thing he gives away.
 
 The satchel must leave limb attachments readable. Keep adult proportions and
 recognizable pincers. No occupational uniform, armor, tool belt or extra props.
-The [species guide](../character-species.md) owns reference roles and anatomy;
+The [species guide](../../character-species.md) owns reference roles and anatomy;
 the approved lobster image supplies film quality while the avatar study supplies
 Bram's selected shape and color relationships.
 
@@ -65,7 +65,7 @@ The third attempt used a concise prompt after inspecting the approved species
 anchors, corrected turnarounds and Bram's avatar study, with a focused Luna
 art-direction review. It returned the same output-stage rejection and no image.
 Generation stopped without another retry. Exact prompt, reference checksums and
-QA status are in the [continuation record](../../docs/character-generation-bram-attempt-03.md).
+QA status are in the [continuation record](../../../docs/character-generation-bram-attempt-03.md).
 
 The brief and avatar study are preserved for a future attempt. No provider switch,
 upload, publication or production registry replacement occurred.

@@ -81,14 +81,14 @@ describe('animated lessons', () => {
 
   it('accepts the dialogue example and puts the host first', () => {
     expect(lessonProblems(dialogue)).toEqual([])
-    expect(castOf(dialogue).map((c) => c.id)).toEqual(['host-crab', 'junior-lobster'])
+    expect(castOf(dialogue).map((c) => c.id)).toEqual(['juno', 'kit'])
     const bad = { ...dialogue, scenes: dialogue.scenes.map((s, i) => (i === 0 ? { ...s, speaker: 'nobody' } : s)) }
     expect(lessonProblems(bad)).toContain('scene 1 speaker "nobody" is not in the cast')
   })
 
   it('voices runs of lines by one speaker as one take, in their own voice', () => {
     const segments = segmentsOf(dialogue, 'BOOK RECORD REGULAR')
-    expect(segments.map((s) => s.speaker)).toEqual(['junior-lobster', 'host-crab', 'junior-lobster', 'host-crab', 'junior-lobster', 'host-crab'])
+    expect(segments.map((s) => s.speaker)).toEqual(['kit', 'juno', 'kit', 'juno', 'kit', 'juno'])
     expect(segments[0].scenes).toEqual([0, 1]) // hook and the next line: one take
     expect(segments[3].scenes).toEqual([4, 5])
     expect(segments[0].voice).toBe('Friendly Young Female')

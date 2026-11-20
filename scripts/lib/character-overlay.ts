@@ -3,6 +3,7 @@ import path from 'node:path'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { S3_BASE_URL } from '../../src/lib/assets'
 import { DEFAULT_MASCOT_KEY, MASCOT_CAST, MASCOT_S3_PREFIX, resolveMascotAlias } from '../../src/lib/mascots'
+import { castMember, castStillFilename, splitPose } from '../../src/lib/cast'
 
 export type CharacterKey = 'random' | 'none' | (string & {})
 
@@ -74,7 +75,9 @@ export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo 
   const normKey = resolveMascotAlias(raw)
 
   if (CHARACTER_REGISTRY[normKey]) {
-    return CHARACTER_REGISTRY[normKey]
+    const { pose } = splitPose(raw)
+    const member = pose ? castMember(normKey) : undefined
+    return member ? characterInfo(normKey, castStillFilename(member, pose), member.description) : CHARACTER_REGISTRY[normKey]
   }
 
   // Dynamic S3 fallback for any character file in images/characters/
@@ -82,9 +85,37 @@ export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo 
 }
 
 /**
- * Load character image from local filesystem or fetch from Neon S3 bucket
+ * A cast member's 3D still (`key` or `key:pose`): one already drawn in tmp/cast, else the
+ * published one in the bucket, else drawn now with the 3D character code (`npm run cast:render`).
+ */
+async function loadCastStill(characterKey: string): Promise<any | undefined> {
+  const { pose: asked } = splitPose(characterKey)
+  const member = castMember(resolveMascotAlias(characterKey))
+  // Unit tests never start a browser (the renderer bundles with esbuild, which jsdom breaks).
+  if (!member || process.env.VITEST) return undefined
+  const pose = asked ?? member.pose
+  const { stillPath, renderCastStills } = await import('./cast-stills')
+  const local = stillPath({ member, shot: 'full', pose })
+  if (fs.existsSync(local)) return loadImage(local)
+  try {
+    const res = await fetch(`${S3_BASE_URL}/${MASCOT_S3_PREFIX}/${castStillFilename(member, pose)}`)
+    if (res.ok) return loadImage(Buffer.from(await res.arrayBuffer()))
+  } catch {
+    // Not published or offline: draw it.
+  }
+  if (process.env.CAST_RENDER === '0') return undefined
+  console.log(`Drawing ${member.name} (${pose}) with the 3D character code...`)
+  const [file] = await renderCastStills([{ member, shot: 'full', pose }])
+  return loadImage(file)
+}
+
+/**
+ * Load a character image: a cast member's 3D still, or an older cutout from the local folders
+ * or the Neon S3 bucket.
  */
 export async function loadCharacterImage(characterKey: CharacterKey | string): Promise<any> {
+  const still = await loadCastStill(String(characterKey))
+  if (still) return still
   const info = getCharacterInfo(characterKey)
   const baseName = info.filename.replace(/\.[^/.]+$/, '')
   const candidates = [`${baseName}.webp`, `${baseName}.png`]

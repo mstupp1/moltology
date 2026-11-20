@@ -76,7 +76,7 @@ since Tess is a lobster.
 
 ## Exact generation prompt
 
-See [`scratch/character_tests/tess-shoal-v1/prompt.txt`](../../scratch/character_tests/tess-shoal-v1/prompt.txt).
+See [`scratch/character_tests/tess-shoal-v1/prompt.txt`](../../../scratch/character_tests/tess-shoal-v1/prompt.txt).
 
 ```text
 Use case: stylized-concept. Create one original adult lobster, Tess Shoal, full body, genuinely transparent background.
@@ -98,7 +98,7 @@ successful named individuals. Parent reviewed the actual render and light/dark
 composites, preserving the anatomy/margin caveats above. Canonical key: `lobster_tess_shoal`.
 PNG and quality-90 WebP at new `images/characters/char_tess_shoal_v3` keys
 returned HTTP 200 with exact local-byte matches, expected dimensions and alpha
-before registration. No old asset was overwritten. See [cast v3](../../docs/character-cast-v3.md).
+before registration. No old asset was overwritten. See [cast v3](../../../docs/character-cast-v3.md).
 This adoption does not claim separate user review of every image or application
 deployment.
 
@@ -144,7 +144,7 @@ status describes the subagent handoff. Identity and visible anatomy are retained
 with the framing and socket caveats above. Source-preserving PNG and quality-90
 WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
 `char_tess_shoal_v4`. Both public objects matched local bytes before
-registration. See [cast v4](../../docs/character-cast-v4.md).
+registration. See [cast v4](../../../docs/character-cast-v4.md).
 
 Returned source: `/Users/mylesstupp/.codex/generated_images/01a1ae8c-9060-7892-b59f-565562a33a45/exec-ae273e1a-0d70-48fe-b366-cead36d0130a.png`.
 
@@ -177,4 +177,4 @@ Edit this same Tess character: remove the hat, add a plum-purple mohawk between 
 Selected for the active six under the user’s replacement request, retained as
 `char_tess_shoal_v5.png` and quality-90 `.webp` in both
 `scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
-See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.
+See [cast v5](../../../docs/character-cast-v5.md) for public-object verification and adoption.

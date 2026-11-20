@@ -259,6 +259,16 @@ async function captureWithBrowser(
     viewport: { width: dims.width, height: dims.height },
     deviceScaleFactor: scale,
   })
+  // 3D cast stills come from tmp/cast (drawn on demand), so composites work before a cast change
+  // has been published to the bucket and always match the current looks.
+  if (process.env.CAST_RENDER !== '0') {
+    await context.route(/\/images\/characters\/char_[a-z_]+_3d_[a-z]+_[0-9a-f]{8}\.webp/, async (route) => {
+      const { localStillForFilename } = await import('./cast-stills')
+      const file = await localStillForFilename(route.request().url()).catch(() => undefined)
+      if (file) await route.fulfill({ path: file, contentType: 'image/png' })
+      else await route.continue()
+    })
+  }
   const page = await context.newPage()
   page.on('console', (msg) => {
     if (msg.type() === 'error') consoleErrors.push(msg.text())

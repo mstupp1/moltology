@@ -10,7 +10,7 @@ A lesson is one JSON file. `npm run anim:create` checks it before rendering and 
 | `title`, `topic` | For the ledger and review |
 | `series`, `episode` | `Codex Lessons` and the next episode number |
 | `format` | `short` (the only format built so far) |
-| `host` | Cast id from `content/animation/cast.json` (`host-crab`); speaks any line without a `speaker` |
+| `host` | Cast key, first name or alias from `content/characters/cast.json` (`juno`); speaks any line without a `speaker` |
 | `cast` | Optional `[{ "id", "at" }]` for two or more characters; `at` is a mark: `left`, `center` or `right`. Must include the host |
 | `acting` | Optional `auto` (default), `calm` or `none`: how much the cast acts on their own while talking and listening (see [Acting](#acting)) |
 | `set` | Optional 3D set: `codex-study`, `reef-office` or `open-water` (pieces stay behind and beside the marks). Its art kit from `content/animation/sets/` is used automatically |
@@ -84,7 +84,7 @@ Before any frame is drawn, `anim:create` rehearses the whole timeline in Node (a
 
 - During the animation itself, a claw that ends up inside something is swung out at the shoulder, and that push carries over from frame to frame and lets go slowly, so touching arms slide past each other instead of twitching.
 - Automatic gestures that cause a crossing are halved, then dropped, until the rehearsal is clean (`🦾 Toned down N gestures`).
-- A crossing left over comes from hand-written direction: a pose, a reaction or a turn. The run stops and lists each moment, for example `11.10s–11.33s: host-crab's clawR through junior-lobster's forearmL, 56% deep`. Fix it in the lesson (a different pose or reaction side for that scene, a turn away, a `close` shot on one character, or marks further apart), then run again. `--allow-clipping` renders anyway, for tests only.
+- A crossing left over comes from hand-written direction: a pose, a reaction or a turn. The run stops and lists each moment, for example `11.10s–11.33s: juno's clawR through kit's forearmL, 56% deep`. Fix it in the lesson (a different pose or reaction side for that scene, a turn away, a `close` shot on one character, or marks further apart), then run again. `--allow-clipping` renders anyway, for tests only.
 - `npm run anim:create -- --lesson <file> --check` (add `--silent` for no voice) runs only the voice, plan and rehearsal: use it after every direction change. The report is in `clipping.json` in the output folder.
 
 ## Layout facts
@@ -94,7 +94,7 @@ Before any frame is drawn, `anim:create` rehearses the whole timeline in Node (a
 - Regular subtitles sit at y 1180 (from the reel compositor). In a medium or close shot the host's face is above them; in an extreme close-up the subtitles cross the mouth, so keep extreme shots short.
 - With a cast, everyone shares one key light; a set's lamp adds a warm pool. Marks stand at ±1.05 so two characters' claws have room to gesture without crowding each other; the two shot (a little wider than before) fits them, and a three-character cast fits too, but tightly.
 - On a cut, a character whose pose changes opens the new shot already in it (no blend), so a limb never sweeps across the frame or through a neighbour at the cut. A glide still blends.
-- The host's temperament (`lively` for host-crab) drives breathing, sway, glances and blinks between cues. Talking adds the mouth shapes, a slow drift of the head, and a head dip with a brow lift on stressed words (see [Lip sync](#lip-sync)); the acting pass adds the gestures.
+- The host's temperament (`lively` for Juno) drives breathing, sway, glances and blinks between cues. Talking adds the mouth shapes, a slow drift of the head, and a head dip with a brow lift on stressed words (see [Lip sync](#lip-sync)); the acting pass adds the gestures.
 
 ## Rendering
 

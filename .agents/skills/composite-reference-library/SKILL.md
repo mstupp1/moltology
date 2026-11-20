@@ -13,7 +13,7 @@ Before starting, read and follow [content worktree hygiene](../../../docs/conten
 
 References come in by the dozen. Each one goes through the same loop: ingest, analyze, recreate as a layout spec, compare, then promote the layouts worth reusing. The library is private working material; the layout specs are what join the system.
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses characters, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence. Characters are the 3D content cast ([content/characters/README.md](../../../content/characters/README.md)): render them with `npm run cast:render` and use the renders as the casting guide describes, never the retired 2D cutouts.
 
 ## Where things live
 

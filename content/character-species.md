@@ -1,5 +1,7 @@
 # Species reference guide
 
+> **Retired 2026-11-20.** The content cast is now 3D characters built with the site's character creator ([content/characters/README.md](characters/README.md)). This page records the earlier image-generated 2D cast for history; don't use it or its images for new content.
+
 Use this guide when planning a new mascot or preparing a species reference sheet. It records the implemented visual grammar for the two species in the cast: lobster and crab. These are stylized character conventions, not claims about real crustacean biology. The guide does not approve or supply a new visual reference; inspect the actual avatar rig or registered character images before using them as inputs.
 
 ## Reference jobs

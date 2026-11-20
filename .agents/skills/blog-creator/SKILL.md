@@ -21,7 +21,7 @@ Dispatches are written by one of the Order's correspondents about a real develop
 
 ---
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses characters, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence. Characters are the 3D content cast ([content/characters/README.md](../../../content/characters/README.md)): render them with `npm run cast:render` and use the renders as the casting guide describes, never the retired 2D cutouts.
 
 ## Core Brand & Style Rules for Blog Dispatches
 

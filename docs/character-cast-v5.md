@@ -1,5 +1,7 @@
 # Named cyber/style cast v5
 
+> **Retired 2026-11-20.** The content cast is now 3D characters built with the site's character creator ([content/characters/README.md](../content/characters/README.md)). This page records the earlier image-generated 2D cast for history; don't use it or its images for new content.
+
 The cast remains six: Rook Tide, Pip Current, Mira Kelp, Cal Brack, Tess Shoal and
 Faye Ripple. Rook remains the male red anchor and default; Clove remains retired.
 On 2026-11-05 the user requested these four replacements to the v4 signature looks.
@@ -7,12 +9,12 @@ Pip's v4 cap render and Mira's v3 scarf render remain byte-for-byte unchanged.
 
 | Individual | Canonical key | Active asset stem | Current recurring look |
 | --- | --- | --- | --- |
-| [Rook Tide](../content/characters/rook-tide.md) | `lobster_rook_tide` | `char_rook_tide_v5` | Red male lobster, amber eyes, common charcoal cyber chest plate, bare pincers; cape removed |
-| [Pip Current](../content/characters/pip-current.md) | `lobster_pip_current` | `char_pip_current_v4` | Lavender lobster, emerald eyes, navy knit cap and copper wrist ring |
-| [Mira Kelp](../content/characters/mira-kelp.md) | `crab_mira_kelp` | `char_mira_kelp_v3` | Jade heart-shaped crab, sapphire eyes and ochre scarf |
-| [Cal Brack](../content/characters/cal-brack.md) | `crab_cal_brack` | `char_cal_brack_v5` | Cobalt square crab, full mid-level gunmetal/brass cyber chest, belt, six armored legs, feet and pincers; no helmet |
-| [Tess Shoal](../content/characters/tess-shoal.md) | `lobster_tess_shoal` | `char_tess_shoal_v5` | Tall teal lobster, plum mohawk, black biker vest, rainbow Pride patch and common gunmetal cyber claw casings |
-| [Faye Ripple](../content/characters/faye-ripple.md) | `lobster_faye_ripple` | `char_faye_ripple_v5` | Sassy pink lobster, confident smirk, tailored aubergine blazer, ivory blouse and black belt; bare pincers and wrists |
+| [Rook Tide](../content/characters/retired-2d/rook-tide.md) | `lobster_rook_tide` | `char_rook_tide_v5` | Red male lobster, amber eyes, common charcoal cyber chest plate, bare pincers; cape removed |
+| [Pip Current](../content/characters/retired-2d/pip-current.md) | `lobster_pip_current` | `char_pip_current_v4` | Lavender lobster, emerald eyes, navy knit cap and copper wrist ring |
+| [Mira Kelp](../content/characters/retired-2d/mira-kelp.md) | `crab_mira_kelp` | `char_mira_kelp_v3` | Jade heart-shaped crab, sapphire eyes and ochre scarf |
+| [Cal Brack](../content/characters/retired-2d/cal-brack.md) | `crab_cal_brack` | `char_cal_brack_v5` | Cobalt square crab, full mid-level gunmetal/brass cyber chest, belt, six armored legs, feet and pincers; no helmet |
+| [Tess Shoal](../content/characters/retired-2d/tess-shoal.md) | `lobster_tess_shoal` | `char_tess_shoal_v5` | Tall teal lobster, plum mohawk, black biker vest, rainbow Pride patch and common gunmetal cyber claw casings |
+| [Faye Ripple](../content/characters/retired-2d/faye-ripple.md) | `lobster_faye_ripple` | `char_faye_ripple_v5` | Sassy pink lobster, confident smirk, tailored aubergine blazer, ivory blouse and black belt; bare pincers and wrists |
 
 Tess is LGBTQIA+ by explicit user direction; no narrower orientation is assumed.
 Her thoughtful temperament remains. Faye's personality now includes sharper wit,

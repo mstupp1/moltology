@@ -1,5 +1,7 @@
 # Character cast v2
 
+> **Retired 2026-11-20.** The content cast is now 3D characters built with the site's character creator ([content/characters/README.md](../content/characters/README.md)). This page records the earlier image-generated 2D cast for history; don't use it or its images for new content.
+
 Historical record. The [named v3 cast](character-cast-v3.md) replaces these active
 options. Legacy role keys resolve to named successors; old asset objects remain
 available for historical links. Do not use this document to select current art.

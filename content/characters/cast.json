@@ -1,0 +1,273 @@
+{
+  "$comment": "The Moltology content cast: 3D characters built in the character creator. Every content skill (reels, posts, carousels, Swipe Lab, blog, animated lessons, composite studio) uses these. Render stills with `npm run cast:render`. See content/characters/README.md.",
+  "default": "crab_juno_marsh",
+  "cast": {
+    "crab_juno_marsh": {
+      "name": "Juno Marsh",
+      "role": "Host. Explains lessons straight to camera, warm and quick.",
+      "storyRole": "A warm, quick host who explains things straight to camera and always lands on one thing to do today",
+      "description": "Coral-orange crab with a round spiky shell, big emerald eyes under heavy relaxed lids, a small warm smile, cream ribbed belly, two curved whip antennae, long jointed legs and large textured pincers",
+      "voice": "BOOK RECORD REGULAR",
+      "pose": "wave",
+      "aliases": [
+        "juno",
+        "host-crab",
+        "host"
+      ],
+      "config": {
+        "seed": "animation-host-crab",
+        "race": "crab",
+        "shellColor": "coral",
+        "shellFinish": "satin",
+        "marking": "none",
+        "mouth": "smile",
+        "antennae": "whip",
+        "headShape": "bean",
+        "build": "classic",
+        "eyeColor": "emerald",
+        "eyeVariant": "round",
+        "pupilVariant": "standard",
+        "eyelidStyle": "relaxed",
+        "gaze": "ahead",
+        "temperament": "lively"
+      }
+    },
+    "lobster_kit_shallows": {
+      "name": "Kit Shallows",
+      "role": "Newcomer. Asks the first-timer questions, shy and curious.",
+      "storyRole": "A shy, curious newcomer who asks the questions a first-timer would ask and gets the payoff first",
+      "description": "Small slim lagoon-teal lobster with a round head, wide emerald eyes with big pupils, a shy smile, curled antennae and a pale ribbed belly",
+      "voice": "Friendly Young Female",
+      "pose": "shrug",
+      "aliases": [
+        "kit",
+        "junior-lobster",
+        "junior"
+      ],
+      "config": {
+        "seed": "animation-junior-lobster",
+        "race": "lobster",
+        "shellColor": "lagoon",
+        "shellFinish": "satin",
+        "marking": "none",
+        "mouth": "smile",
+        "antennae": "curl",
+        "headShape": "round",
+        "build": "slim",
+        "height": "short",
+        "headScale": 1.12,
+        "eyeColor": "emerald",
+        "eyeVariant": "wide",
+        "pupilVariant": "big",
+        "eyelidStyle": "relaxed",
+        "gaze": "ahead",
+        "temperament": "shy"
+      }
+    },
+    "crab_otto_basalt": {
+      "name": "Otto Basalt",
+      "role": "Veteran coach. Big, steady, says little and means it.",
+      "storyRole": "A big, steady veteran coach who says little and means it; learning to explain instead of just showing",
+      "description": "Big tall glossy obsidian-black crab with thin cyan circuit lines across the shell, keen amber eyes, focused brows, zigzag bolt antennae, a dark armored chest plate with glowing cyan vents and heavy hydraulic crusher claws",
+      "voice": "Ethan",
+      "pose": "flex",
+      "aliases": [
+        "otto"
+      ],
+      "config": {
+        "seed": "cast-otto-basalt",
+        "race": "crab",
+        "shellColor": "obsidian",
+        "shellFinish": "glossy",
+        "marking": "circuit",
+        "mouth": "grin",
+        "antennae": "bolt",
+        "headShape": "wide",
+        "build": "barrel",
+        "height": "tall",
+        "eyeColor": "amber",
+        "eyeVariant": "round",
+        "pupilVariant": "keen",
+        "eyelidStyle": "focused",
+        "gaze": "ahead",
+        "temperament": "calm",
+        "equipment": {
+          "carapace": {
+            "visualKey": "hydrostatic-seal-plate",
+            "rarity": "epic"
+          },
+          "claws": {
+            "visualKey": "hydraulic-crush-claws",
+            "rarity": "rare"
+          }
+        }
+      }
+    },
+    "lobster_sol_ember": {
+      "name": "Sol Ember",
+      "role": "The striver. Chasing the next molt, proud, a little too intense.",
+      "storyRole": "A proud striver chasing the next molt, a little too intense; learning that rest is part of the work",
+      "description": "Tall tapered tangerine lobster with darker orange bands and a pearl sheen, sparkling topaz eyes in a cheerful squint, a big beaming grin, feathery plume antennae and a ribbed steel-teal chest brace",
+      "voice": "Young Creative Voice",
+      "pose": "victory",
+      "aliases": [
+        "sol"
+      ],
+      "config": {
+        "seed": "cast-sol-ember",
+        "race": "lobster",
+        "shellColor": "tangerine",
+        "shellFinish": "pearl",
+        "marking": "bands",
+        "mouth": "beam",
+        "antennae": "plume",
+        "headShape": "tall",
+        "build": "tapered",
+        "height": "tall",
+        "eyeColor": "topaz",
+        "eyeVariant": "tall",
+        "pupilVariant": "sparkle",
+        "eyelidStyle": "cheerful_squint",
+        "gaze": "ahead",
+        "temperament": "proud",
+        "equipment": {
+          "carapace": {
+            "visualKey": "tide-braced-carapace",
+            "rarity": "uncommon"
+          }
+        }
+      }
+    },
+    "lobster_nell_quill": {
+      "name": "Nell Quill",
+      "role": "The researcher. Reads the Codex footnotes, dry and precise.",
+      "storyRole": "A dry, precise researcher who reads the Codex footnotes; learning to say the short version first",
+      "description": "Slim orchid-purple lobster with stardust speckles, keen sapphire eyes under half-closed knowing lids, a sly smirk, antennae tipped with glowing blue beacons and a slate headset",
+      "voice": "Laura",
+      "pose": "ready",
+      "aliases": [
+        "nell"
+      ],
+      "config": {
+        "seed": "cast-nell-quill",
+        "race": "lobster",
+        "shellColor": "orchid",
+        "shellFinish": "satin",
+        "marking": "stardust",
+        "mouth": "smirk",
+        "antennae": "beacon",
+        "headShape": "bean",
+        "build": "slim",
+        "eyeColor": "sapphire",
+        "eyeVariant": "round",
+        "pupilVariant": "keen",
+        "eyelidStyle": "smug",
+        "gaze": "ahead",
+        "temperament": "calm",
+        "equipment": {
+          "head": {
+            "visualKey": "creator-headset",
+            "rarity": "common"
+          }
+        }
+      }
+    },
+    "crab_bo_pebble": {
+      "name": "Bo Pebble",
+      "role": "Comic relief. Means well, trips over the obvious lesson first.",
+      "storyRole": "Comic relief who means well and trips over the obvious lesson first, then owns it",
+      "description": "Short chunky glossy sunflower-yellow crab with orange freckles, wide amber eyes with big pupils, tongue poking out of a happy grin, curled antennae and a small teal beanie",
+      "voice": "Just Many",
+      "pose": "cheer",
+      "aliases": [
+        "bo"
+      ],
+      "config": {
+        "seed": "cast-bo-pebble",
+        "race": "crab",
+        "shellColor": "sunflower",
+        "shellFinish": "glossy",
+        "marking": "freckles",
+        "mouth": "tongue",
+        "antennae": "curl",
+        "headShape": "round",
+        "build": "chunky",
+        "height": "short",
+        "eyeColor": "amber",
+        "eyeVariant": "wide",
+        "pupilVariant": "big",
+        "eyelidStyle": "open",
+        "gaze": "ahead",
+        "temperament": "goofy",
+        "equipment": {
+          "head": {
+            "visualKey": "creator-beanie",
+            "rarity": "common"
+          }
+        }
+      }
+    },
+    "lobster_vera_drift": {
+      "name": "Vera Drift",
+      "role": "The skeptic. Pushes back so the lesson has to earn it.",
+      "storyRole": "A sharp skeptic who pushes back so the lesson has to earn it; changes her mind when the evidence is good",
+      "description": "Glossy crimson lobster with dark red tiger stripes, a heart-shaped head, ruby eyes with focused brows, a confident smirk and long whip antennae",
+      "voice": "Friendly Young Woman",
+      "pose": "point",
+      "aliases": [
+        "vera"
+      ],
+      "config": {
+        "seed": "cast-vera-drift",
+        "race": "lobster",
+        "shellColor": "crimson",
+        "shellFinish": "glossy",
+        "marking": "tiger",
+        "mouth": "smirk",
+        "antennae": "whip",
+        "headShape": "heart",
+        "build": "classic",
+        "eyeColor": "ruby",
+        "eyeVariant": "tall",
+        "pupilVariant": "standard",
+        "eyelidStyle": "focused",
+        "gaze": "ahead",
+        "temperament": "proud"
+      }
+    },
+    "crab_moss_tern": {
+      "name": "Moss Tern",
+      "role": "The calm elder. Slow, kind, the one who has molted many times.",
+      "storyRole": "A calm, kind elder who has molted many times; slow to speak and the one others come to",
+      "description": "Jade-green crab with dark green spots and a pearl sheen, a heart-shaped spiky shell, calm sapphire eyes under relaxed lids, a gentle smile, plume antennae and a thin gold halo",
+      "voice": "Mommy",
+      "pose": "rest",
+      "aliases": [
+        "moss"
+      ],
+      "config": {
+        "seed": "cast-moss-tern",
+        "race": "crab",
+        "shellColor": "jade",
+        "shellFinish": "pearl",
+        "marking": "spots",
+        "mouth": "smile",
+        "antennae": "plume",
+        "headShape": "heart",
+        "build": "classic",
+        "eyeColor": "sapphire",
+        "eyeVariant": "round",
+        "pupilVariant": "standard",
+        "eyelidStyle": "chill",
+        "gaze": "ahead",
+        "temperament": "calm",
+        "equipment": {
+          "head": {
+            "visualKey": "creator-halo",
+            "rarity": "common"
+          }
+        }
+      }
+    }
+  }
+}

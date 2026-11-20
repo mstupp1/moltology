@@ -21,7 +21,7 @@ provider mappings in `content/merch/printful-sync.json`. See [launch state and o
 
 - Read `BRAND_BIBLE.md` and `STYLE_GUIDE.md`; read the annual content calendar before choosing
   treatment. Product copy is specific, brief, and uses at most one world term. Functional feedback is plain English.
-- Use canonical SVGs in `content/brand/synaptic-path/`, registered mascots, or existing bucket art.
+- Use canonical SVGs in `content/brand/synaptic-path/`, 3D cast renders (`npm run cast:render`, high `--scale` for print), or existing bucket art.
   Never redraw the logo. Reuse original vectors for logo compositions.
 - Run `npm run merch -- doctor --pilot` for the initial pilot, or `--only <slug>` for another product.
   Diagnose missing setup; never expose API keys, signing secrets, database URLs, or customer data.

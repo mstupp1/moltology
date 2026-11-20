@@ -1,10 +1,12 @@
 ---
 name: chroma-key-studio
 description: >-
-  Automated end-to-end pipeline for generating isolated assets, UI cutouts, and cartoon characters with solid chroma key backgrounds (pink/magenta, green, blue, cyan, or custom hex) via Antigravity generate_image, followed by high-precision chroma key background removal into crisp transparent PNGs. Use whenever the user asks to generate isolated characters, transparent assets, remove solid color backgrounds, or perform chroma key extraction.
+  Automated end-to-end pipeline for generating isolated props, UI cutouts and merch illustrations with solid chroma key backgrounds (pink/magenta, green, blue, cyan, or custom hex) via Antigravity generate_image, followed by high-precision chroma key background removal into crisp transparent PNGs. Use whenever the user asks to generate transparent assets (not cast characters, which come from npm run cast:render), remove solid color backgrounds, or perform chroma key extraction.
 ---
 
 # Chroma Key Studio & Character Extraction Pipeline
+
+**Cast characters are not made here any more.** The content cast are 3D characters; their transparent cutouts come straight from `npm run cast:render` (see [content/characters/README.md](../../../content/characters/README.md)), with no chroma keying. Use this skill for props, scene elements, UI pieces and merch illustrations, and for keying one-off generated art that has no 3D source.
 
 Before starting, read and follow [content worktree hygiene](../../../docs/content-worktree-hygiene.md). Completion includes committing all intentional run-owned changes and checking final Git status; a clean start must finish clean. Preserve and report unrelated work. Apply this to drafts, chained skills, and partial failures too.
 
@@ -12,7 +14,7 @@ This skill automates the complete lifecycle of generating and extracting transpa
 
 ---
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses characters, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence. Characters are the 3D content cast ([content/characters/README.md](../../../content/characters/README.md)): render them with `npm run cast:render` and use the renders as the casting guide describes, never the retired 2D cutouts.
 
 ## The Chroma Key Strategy
 
@@ -118,14 +120,4 @@ Verify the transparent PNG/WebP:
 
 ### Step 5: Registry & Asset Pipeline Integration (Optional)
 
-If the character is added to the permanent Moltology mascot roster:
-1. Upload transparent WebP to Neon S3 (`moltology-public-assets/images/characters/<filename>.webp`):
-   ```bash
-   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.webp --key images/characters/char_<name>.webp
-   ```
-2. (Optional master archive) Upload transparent PNG:
-   ```bash
-   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.png --key images/characters/char_<name>.png
-   ```
-3. Register in `scripts/lib/character-overlay.ts` under `CHARACTER_REGISTRY`.
-4. Update `scripts/lib/character-overlay.test.ts` and run `npx vitest run scripts/lib/character-overlay.test.ts`.
+Cutouts made here are not cast members and don't go in `images/characters/` or the mascot registry. A reusable prop or scene element goes to the bucket under its own folder (for example `images/props/<name>.webp`) with `npx tsx scripts/upload-asset.ts <file> --key images/props/<name>.webp`. To add a character, use the character-creator skill (3D cast).

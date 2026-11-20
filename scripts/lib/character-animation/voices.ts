@@ -1,6 +1,6 @@
 /**
  * The soundtrack of a lesson: each run of lines by one speaker is voiced in that speaker's own Fish
- * voice (the narrator's, or a character's from content/animation/cast.json), then the takes are
+ * voice (the narrator's, or a character's from content/characters/cast.json), then the takes are
  * joined with a short pause between speakers. Returns the joined audio, word timings on the joined
  * clock, and a speech level per frame for each cast member, so only the speaker's mouth moves.
  */

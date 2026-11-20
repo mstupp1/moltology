@@ -1,5 +1,7 @@
 # Named signature-look cast v4
 
+> **Retired 2026-11-20.** The content cast is now 3D characters built with the site's character creator ([content/characters/README.md](../content/characters/README.md)). This page records the earlier image-generated 2D cast for history; don't use it or its images for new content.
+
 Historical snapshot, superseded by [cast v5](character-cast-v5.md) at the user’s
 request. Pip and Mira remain unchanged; Cal, Rook, Tess and Faye have new looks.
 
@@ -10,12 +12,12 @@ anchor and the default. Mira's accepted scarf look is retained unchanged.
 
 | Individual | Canonical key | Active asset stem | Permanent signature |
 | --- | --- | --- | --- |
-| [Rook Tide](../content/characters/rook-tide.md) | `lobster_rook_tide` | `char_rook_tide_v4` | Male crimson lobster, amber eyes, dark-teal shoulder mantle and brass clasp |
-| [Pip Current](../content/characters/pip-current.md) | `lobster_pip_current` | `char_pip_current_v4` | Lavender lobster, emerald eyes, slouched navy knit cap and copper wrist ring |
-| [Mira Kelp](../content/characters/mira-kelp.md) | `crab_mira_kelp` | `char_mira_kelp_v3` | Jade-green heart-shaped crab, sapphire eyes and ochre scarf |
-| [Cal Brack](../content/characters/cal-brack.md) | `crab_cal_brack` | `char_cal_brack_v4` | Square cobalt crab, gold eyes, cream forehead patch and brass-edged slate armor |
-| [Tess Shoal](../content/characters/tess-shoal.md) | `lobster_tess_shoal` | `char_tess_shoal_v4` | Tall teal lobster, amber eyes, cream cheek patch and burgundy travelling hat |
-| [Faye Ripple](../content/characters/faye-ripple.md) | `lobster_faye_ripple` | `char_faye_ripple_v4` | Sturdy pink lobster, sapphire eyes, sea-glass bead and cream-piped teal waistcoat |
+| [Rook Tide](../content/characters/retired-2d/rook-tide.md) | `lobster_rook_tide` | `char_rook_tide_v4` | Male crimson lobster, amber eyes, dark-teal shoulder mantle and brass clasp |
+| [Pip Current](../content/characters/retired-2d/pip-current.md) | `lobster_pip_current` | `char_pip_current_v4` | Lavender lobster, emerald eyes, slouched navy knit cap and copper wrist ring |
+| [Mira Kelp](../content/characters/retired-2d/mira-kelp.md) | `crab_mira_kelp` | `char_mira_kelp_v3` | Jade-green heart-shaped crab, sapphire eyes and ochre scarf |
+| [Cal Brack](../content/characters/retired-2d/cal-brack.md) | `crab_cal_brack` | `char_cal_brack_v4` | Square cobalt crab, gold eyes, cream forehead patch and brass-edged slate armor |
+| [Tess Shoal](../content/characters/retired-2d/tess-shoal.md) | `lobster_tess_shoal` | `char_tess_shoal_v4` | Tall teal lobster, amber eyes, cream cheek patch and burgundy travelling hat |
+| [Faye Ripple](../content/characters/retired-2d/faye-ripple.md) | `lobster_faye_ripple` | `char_faye_ripple_v4` | Sturdy pink lobster, sapphire eyes, sea-glass bead and cream-piped teal waistcoat |
 
 These are their normal recurring looks. Use the actual registered PNG as identity
 reference for new poses, preserving attire, facial identity, palette and build.

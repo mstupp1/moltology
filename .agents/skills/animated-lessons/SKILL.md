@@ -38,12 +38,12 @@ Pitch three hooks and shapes for the same idea (for example: claim then steps, m
 
 | Format | Cast | Who speaks |
 | --- | --- | --- |
-| **Host lesson** | `host-crab` alone | The host, straight to camera |
-| **Ask the host** | `junior-lobster` + `host-crab` | The junior asks or admits the mistake, the host answers, the junior lands the payoff |
+| **Host lesson** | `juno` alone | The host, straight to camera |
+| **Ask the host** | `kit` + `juno` | The junior asks or admits the mistake, the host answers, the junior lands the payoff |
 | **Nature doc** | One or two characters who never speak | `narrator` only: an off-screen voice describes what the characters do, and their poses and reactions carry the scene |
 | **Myth vs fact** | Two characters | One states the myth, the other corrects it; or the narrator calls each one |
 
-Characters, their looks and their fixed Fish voices live in `content/animation/cast.json`. A character always uses its own voice so viewers learn who is who; the narrator (`speaker: "narrator"`) uses the reel narrator. Add a new cast member there (a config from the character creator, a role, a voice from Fish) rather than restyling an existing one. Keep a dialogue to two or three characters.
+Characters, their looks and their fixed Fish voices live in the shared content cast, `content/characters/cast.json` ([overview](../../../content/characters/README.md)); a lesson can name them by key, first name or alias (`juno`, `crab_juno_marsh`, the old `host-crab`). A character always uses its own voice so viewers learn who is who; the narrator (`speaker: "narrator"`) uses the reel narrator. Add a new cast member with the character-creator skill rather than restyling an existing one. Any of the eight can appear; pick by job (see creative direction's cast table). Keep a dialogue to two or three characters.
 
 Pick a set: `codex-study` (bookshelves, lamp, rug: Codex lessons), `reef-office` (round window, desk: work and routines), `open-water` (sea floor, kelp: what Moltology is, moltmaxxing). The set is built in 3D so the characters stand on it and cast shadows, and its painted art kit (see [Set art kits](#set-art-kits)) gives it a painted background and textured floor.
 
