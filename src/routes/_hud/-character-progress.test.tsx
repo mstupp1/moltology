@@ -27,9 +27,8 @@ describe('Moltology science pipeline', () => {
   it('lights the member’s own clearance', () => {
     render(<PipelineView />)
 
-    expect(screen.getByRole('heading', { name: 'Character' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Progress' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByText('600 XP')).toBeInTheDocument()
+    // The title, tabs, XP and stage are in the shared Character band (character.tsx).
+    expect(screen.queryByRole('heading', { name: 'Character' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Go to mine' })).not.toBeInTheDocument()
     expect(screen.queryByText(/Four stages, twelve clearances/)).not.toBeInTheDocument()
 

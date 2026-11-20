@@ -1,7 +1,9 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Route } from './character'
+import { Route } from './character.index'
+import { CharacterBand } from '@/components/hud/chassis/CharacterBand'
+import { calculateProgression } from '@/lib/progression'
 import { authClient } from '@/lib/auth-client'
 
 vi.mock('@/lib/auth-client', () => ({
@@ -29,6 +31,14 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 
 vi.mock('@/components/hud/avatar/AvatarCreatorPreview', () => ({
   AvatarCreatorPreview: () => <div data-testid="preview" />,
+}))
+
+vi.mock('@/hooks/useDailyAlignment', () => ({
+  useDailyAlignment: () => ({ progression: calculateProgression(600) }),
+}))
+
+vi.mock('@/hooks/useWalletBalances', () => ({
+  useWalletBalances: (userId: string | null) => (userId ? { gems: 1240, credits: 0, creditsLive: false } : null),
 }))
 
 vi.mock('@/lib/jwt', () => ({
@@ -70,20 +80,47 @@ describe('Chassis Configurator HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
+    expect(screen.getByTestId('hud-section-ghost')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Save my character/i })).not.toBeInTheDocument()
   })
 
-  it('renders chassis status page when authenticated', async () => {
+  it('shows one Character band with the wallet, XP and stage on every tab', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-1', name: 'Commander Craw' } },
+    } as any)
+    render(<CharacterBand current="customize" />)
+
+    expect(screen.getByRole('heading', { name: 'Character' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Character sections' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Customize' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', '/character/shop')
+    const stats = screen.getByRole('group', { name: 'Your character' })
+    expect(stats).toHaveTextContent('Chitin Gems1,240')
+    expect(stats).toHaveTextContent('Molt CreditsSoon')
+    expect(stats).toHaveTextContent('600 XP')
+    expect(stats).toHaveTextContent('StageL-2')
+  })
+
+  it('leaves the wallet out of the band for guests', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
+    render(<CharacterBand current="shop" />)
+
+    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.queryByText('Chitin Gems')).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Your character' })).toHaveTextContent('600 XP')
+  })
+
+  it('shows Save and Discard on the stage only once there is something to save', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const Component = Route.options.component!
     render(<Component />)
 
-    const sections = await screen.findByRole('navigation', { name: 'Character sections' })
-    expect(sections).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Customize' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: 'Shop' })).toHaveAttribute('href', '/character/shop')
+    const surprise = await screen.findByRole('button', { name: 'Surprise me' }, { timeout: 8000 })
+    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
+    surprise.click()
+    expect(await screen.findByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Discard changes' })).toBeInTheDocument()
   })
 })

@@ -1,7 +1,6 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { AdminAccessGuard } from '@/components/admin/AdminAccessGuard'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudSectionGhost } from '@/components/hud/HudGhostSkeletons'
 import { parseLogicAtlasSearch, type LogicAtlasSearch } from '@/lib/logic-atlas/search'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 
@@ -14,16 +13,15 @@ function LogicAtlasRoute() {
   const search = Route.useSearch()
 
   return (
-    <AdminAccessGuard skeleton={<HudWorkspaceGhost />}>
-      <Suspense fallback={<HudWorkspaceGhost />}>
-        <LazyLogicAtlasPage
-          search={search}
-          onSearchChange={(next: LogicAtlasSearch) =>
-            navigate({ to: '/admin/logic', search: next, replace: true })
-          }
-        />
-      </Suspense>
-    </AdminAccessGuard>
+    // The /admin layout route checks access and draws the band.
+    <Suspense fallback={<HudSectionGhost />}>
+      <LazyLogicAtlasPage
+        search={search}
+        onSearchChange={(next: LogicAtlasSearch) =>
+          navigate({ to: '/admin/logic', search: next, replace: true })
+        }
+      />
+    </Suspense>
   )
 }
 
@@ -39,5 +37,5 @@ export const Route = createFileRoute('/_hud/admin/logic')({
     ],
   }),
   component: LogicAtlasRoute,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: HudSectionGhost,
 })

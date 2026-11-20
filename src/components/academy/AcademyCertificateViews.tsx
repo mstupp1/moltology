@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, Award, Lock } from 'lucide-react'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { GlowEmblem } from '@/components/ui/GlowEmblem'
 import {
   ACADEMY_COPY,
@@ -18,7 +17,6 @@ import {
   ACADEMY_FOCUS,
   AcademyCrumbs,
   AcademyEmpty,
-  AcademyNav,
   AcademySectionHeading,
   useAcademyGuestEnroll,
 } from './AcademyChrome'
@@ -31,12 +29,10 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
   const guest = useAcademyGuestEnroll()
   return (
     <div className="space-y-4 sm:space-y-5">
-      <HudTitlePanel
-        treatment="band"
-        title="Academy"
-        sections={<AcademyNav current="certificates" />}
-        description="Finish every lesson for a course certificate, or every required course on a track for its certificate."
-      />
+      {/* The Academy band (title, tabs) is drawn by the academy/_sections layout route. */}
+      <p className="max-w-2xl text-xs text-ink-muted leading-relaxed">
+        Finish every lesson for a course certificate, or every required course on a track for its certificate.
+      </p>
       <section className="space-y-3" aria-labelledby="earned-heading">
         <AcademySectionHeading
           id="earned-heading"

@@ -1,8 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { AdminAccessGuard } from '@/components/admin/AdminAccessGuard'
 import { ADMIN_TAB_IDS, type AdminTab as AdminTabId } from '@/components/admin/AdminSectionNav'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudSectionGhost } from '@/components/hud/HudGhostSkeletons'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 
 const LazyAdminOversightHub = lazy(() =>
@@ -13,11 +12,10 @@ const LazyAdminOversightHub = lazy(() =>
 function AdminRoute() {
   const { tab } = Route.useSearch()
   return (
-    <AdminAccessGuard skeleton={<HudWorkspaceGhost />}>
-      <Suspense fallback={<HudWorkspaceGhost />}>
-        <LazyAdminOversightHub tab={tab} />
-      </Suspense>
-    </AdminAccessGuard>
+    // The /admin layout route checks access and draws the band.
+    <Suspense fallback={<HudSectionGhost />}>
+      <LazyAdminOversightHub tab={tab} />
+    </Suspense>
   )
 }
 
@@ -37,5 +35,5 @@ export const Route = createFileRoute('/_hud/admin/')({
     ],
   }),
   component: AdminRoute,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: HudSectionGhost,
 })

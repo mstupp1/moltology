@@ -1,7 +1,5 @@
-import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
 import React, { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { EquipmentCategory, EquipmentRarity } from '@/db/schema'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { HudPagination } from '@/components/ui/HudPagination'
 import { HudSelect } from '@/components/ui/HudSelect'
@@ -27,9 +25,8 @@ import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-av
 import type { MarketPayload, MarketPiece, MarketVariant } from '@/lib/market'
 import { MARKET_BUNDLES, type PieceRef } from '@/lib/market-featured'
 import { cn } from '@/lib/utils'
-import { HudWorkspaceGhost } from '../HudGhostSkeletons'
+import { HudSectionGhost } from '../HudGhostSkeletons'
 import { MarketCreditsPanel } from './MarketCreditsPanel'
-import { MarketCurrencyBar } from './MarketCurrencyBar'
 import { MarketEarnPanel } from './MarketEarnPanel'
 import { MarketBundleDetail, MarketFeatured } from './MarketFeatured'
 import { MarketPieceCard, MarketPieceDetail, variantAsCatalog } from './MarketGear'
@@ -377,6 +374,8 @@ export function MarketShopPage() {
         toast?.warning(result.error ?? 'That purchase did not go through.')
       }
       await load()
+      // The Character band shows the wallet too.
+      if (userId) void queryClient.invalidateQueries({ queryKey: accountKeys.wallet(userId) })
     } catch {
       toast?.error('That purchase did not go through. Try again.')
     } finally {
@@ -399,7 +398,7 @@ export function MarketShopPage() {
 
   if (!market) {
     if (error) return <p className="text-sm text-crimson-text p-4">{error}</p>
-    return <HudWorkspaceGhost />
+    return <HudSectionGhost />
   }
 
   const detail = bundle ? (
@@ -424,43 +423,31 @@ export function MarketShopPage() {
 
   return (
     <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans pb-2">
-      <HudTitlePanel
-        treatment="band"
-        accent="cyan"
-        title="Character"
-        sections={<CharacterSectionNav current="shop" />}
-        actionsBelowOnPhone
-        hideDescriptionOnPhone
-        description={
-          tab === 'skills'
-            ? 'Methods the Oracle can walk you through. Pick one in the chat box, or let the Oracle reach for it.'
-            : 'Gear for your character. Rarer versions come with bigger stats and stranger abilities.'
-        }
-        actions={
-          market.guest ? undefined : (
-            <MarketCurrencyBar chitinGems={market.wallet.balance} moltCredits={market.moltCredits} creditsLive={market.creditsLive} />
-          )
-        }
-        toolbar={
-          <div role="tablist" aria-label="Market sections" className="flex gap-1">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                role="tab"
-                aria-selected={tab === t.id}
-                onClick={() => chooseTab(t.id)}
-                className={cn(
-                  'flex-1 sm:flex-none min-h-9 rounded-control px-4 text-2xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
-                  tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
-                )}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        }
-      />
+      {/* The Character band (title, wallet, tabs) is drawn by the /character layout route. */}
+      <div className="space-y-2">
+        {tab === 'skills' ? (
+          <p className="max-w-2xl text-xs text-ink-muted leading-relaxed max-md:hidden">
+            Methods the Oracle can walk you through. Pick one in the chat box, or let the Oracle reach for it.
+          </p>
+        ) : null}
+        <div role="tablist" aria-label="Market sections" className="flex gap-1">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              onClick={() => chooseTab(t.id)}
+              className={cn(
+                'flex-1 sm:flex-none min-h-9 rounded-control px-4 text-2xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow',
+                tab === t.id ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-3/60',
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {tab === 'gear' ? (
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">

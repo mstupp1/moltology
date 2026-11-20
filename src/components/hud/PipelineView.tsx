@@ -1,13 +1,10 @@
-import { BandStat } from '@/components/hud/BandSectionNav'
 import React, { useState } from 'react'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { CharacterSectionNav } from '@/components/hud/chassis/CharacterSectionNav'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { STAGE_PIPELINE_DATA } from '@/lib/codexStages'
 import { PIPELINE_CLEARANCES, clearanceIndexForXp } from '@/lib/pipeline-explorer'
 import { StageStrata } from './pipeline/StageStrata'
 import { StageSection } from './pipeline/StageSection'
-import { READINGS, formatXp } from './pipeline/shared'
+import { READINGS } from './pipeline/shared'
 
 /**
  * Browse one stage at a time, starting with the member's own stage.
@@ -23,21 +20,7 @@ export default function PipelineView() {
 
   return (
     <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans">
-      <HudTitlePanel
-        treatment="band"
-        accent="cyan"
-        title="Character"
-        sections={<CharacterSectionNav current="progress" />}
-        actionsBelowOnPhone
-        actions={
-          <div className="flex items-center gap-5">
-            <BandStat label="Your XP" value={formatXp(xp)} />
-            <BandStat label="Clearance" value={current.code} tone="cyan" />
-          </div>
-        }
-      />
-
-      {/* Stage cards are content, so they sit below the band rather than inside it. */}
+      {/* The Character band (title, XP, stage, tabs) is drawn by the /character layout route. */}
       <StageStrata
         currentIndex={current.index}
         selectedStage={selectedStage}

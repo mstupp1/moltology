@@ -13,6 +13,8 @@ vi.mock('@tanstack/react-router', () => ({
     options: config,
     useLoaderData: () => mockUseLoaderData(),
   }),
+  useLocation: ({ select }: any) => select({ pathname: '/academy/certificates' }),
+  Outlet: () => <div data-testid="academy-outlet" />,
   Link: ({ children, to, params, ...props }: any) => (
     <a href={typeof params?.slug === 'string' ? `${to}/${params.slug}` : to} {...props}>
       {children}
@@ -33,6 +35,7 @@ vi.mock('@/lib/server/academy-api', () => ({
 
 import { authClient } from '@/lib/auth-client'
 import { Route } from './index'
+import { Route as SectionsRoute } from '../_sections'
 
 function homeFixture(): AcademyHomePayload {
   return assembleAcademyHome({
@@ -110,6 +113,14 @@ function homeFixture(): AcademyHomePayload {
 }
 
 describe('Molt Academy home', () => {
+  it('draws one Academy band for Catalog and Certificates and swaps only the content', () => {
+    const Layout = SectionsRoute.options.component!
+    render(<Layout />)
+    expect(screen.getByRole('heading', { level: 1, name: /^Academy$/ })).toBeInTheDocument()
+    expect(screen.getByTestId('band-section-certificates')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByTestId('academy-outlet')).toBeInTheDocument()
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     clearCachedUser()
@@ -121,7 +132,6 @@ describe('Molt Academy home', () => {
     const Page = Route.options.component!
     render(<Page />)
     expect(screen.queryByText('MOLT ACADEMY LOCKED')).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 1, name: /^Academy$/ })).toBeInTheDocument()
     expect(screen.getByText('Introduction to Ecdysis')).toBeInTheDocument()
   })
 
@@ -134,7 +144,6 @@ describe('Molt Academy home', () => {
     render(<Page />)
 
     expect(screen.queryByText('MOLT ACADEMY LOCKED')).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 1, name: /^Academy$/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'First Shell' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Abyssal Systems' })).toBeInTheDocument()
     expect(screen.getByText('Introduction to Ecdysis')).toBeInTheDocument()

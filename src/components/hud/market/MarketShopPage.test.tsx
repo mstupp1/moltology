@@ -85,12 +85,10 @@ describe('MarketShopPage', () => {
     buyGearFn.mockReset()
   })
 
-  it('shows the real gem balance and Molt Credits as coming soon', async () => {
+  it('shows Molt Credits as coming soon (the wallet itself is in the Character band)', async () => {
     getMarketFn.mockResolvedValue(payload(320))
     renderMarket()
-    expect(await screen.findByTestId('gem-balance')).toHaveTextContent('320')
-    expect(screen.getByText('Soon')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('tab', { name: 'Credits' }))
+    fireEvent.click(await screen.findByRole('tab', { name: 'Credits' }))
     expect(screen.getByText('Coming soon')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /\$1\.99/ })).not.toBeInTheDocument()
   })
@@ -105,8 +103,7 @@ describe('MarketShopPage', () => {
       Object.defineProperty(window, 'location', { configurable: true, value: realLocation })
     })
     renderMarket()
-    await screen.findByTestId('gem-balance')
-    fireEvent.click(screen.getByRole('tab', { name: 'Credits' }))
+    fireEvent.click(await screen.findByRole('tab', { name: 'Credits' }))
     expect(screen.queryByText('Coming soon')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '$1.99' }))
     await waitFor(() => expect(assign).toHaveBeenCalledWith('https://checkout.stripe.test/c'))
@@ -192,7 +189,7 @@ describe('MarketShopPage', () => {
         data: { token: 'token', catalogItemId: 'a1000000-0000-4000-8000-000000000002' },
       }),
     )
-    expect(await screen.findByTestId('gem-balance')).toHaveTextContent('170')
+    await waitFor(() => expect(getMarketFn).toHaveBeenCalledTimes(2))
   })
 
   it('lets a guest browse the shop and sends them to sign up to buy', async () => {

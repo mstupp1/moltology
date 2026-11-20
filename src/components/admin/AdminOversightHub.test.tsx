@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { AdminAccessGuard } from './AdminAccessGuard'
 import { AdminOversightHub } from './AdminOversightHub'
+import { AdminShell } from './AdminShell'
 
 const access = { canView: false, pending: false }
 const session = { userId: 'staff-1' as string | null, isPending: false }
@@ -84,7 +85,9 @@ describe('Admin access and oversight hub', () => {
   it('shows an unavailable notice for non-admins and the hub for staff', async () => {
     const { rerender } = render(
       <AdminAccessGuard>
-        <AdminOversightHub />
+        <AdminShell current="watch">
+          <AdminOversightHub />
+        </AdminShell>
       </AdminAccessGuard>,
     )
     expect(screen.getByTestId('admin-unavailable')).toHaveTextContent('This page is not available')
@@ -93,7 +96,9 @@ describe('Admin access and oversight hub', () => {
     access.canView = true
     rerender(
       <AdminAccessGuard>
-        <AdminOversightHub />
+        <AdminShell current="watch">
+          <AdminOversightHub />
+        </AdminShell>
       </AdminAccessGuard>,
     )
     expect(screen.getByTestId('admin-oversight-hub')).toBeInTheDocument()
@@ -128,7 +133,11 @@ describe('Admin access and oversight hub', () => {
 
   it('opens the Store tab with orders, Oracle MAX members and store settings', async () => {
     access.canView = true
-    render(<AdminOversightHub tab="store" />)
+    render(
+      <AdminShell current="store">
+        <AdminOversightHub tab="store" />
+      </AdminShell>,
+    )
     expect(screen.getByTestId('band-section-store')).toHaveAttribute('aria-current', 'page')
     expect(screen.getByTestId('band-section-store')).toHaveAttribute('href', '/admin?tab=store')
     expect(screen.getByTestId('admin-shop')).toBeInTheDocument()

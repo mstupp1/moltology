@@ -9,6 +9,9 @@ vi.mock('@tanstack/react-router', () => ({
     useSearch: () => ({}),
   }),
   useNavigate: () => vi.fn(),
+  useLocation: () => '/admin/logic',
+  useSearch: () => undefined,
+  Outlet: () => null,
 }))
 
 vi.mock('@/components/admin/AdminAccessGuard', () => ({
@@ -16,11 +19,13 @@ vi.mock('@/components/admin/AdminAccessGuard', () => ({
 }))
 
 import { Route } from './admin.logic'
+import { Route as AdminLayoutRoute } from './admin'
 
 describe('Logic Atlas route', () => {
-  it('gates the atlas behind the admin access guard', () => {
-    const Page = Route.options.component!
-    render(<Page />)
+  it('gates every admin tab, the atlas included, behind the admin access guard', () => {
+    // The /admin layout route checks access once for all of its tabs.
+    const Layout = AdminLayoutRoute.options.component!
+    render(<Layout />)
     expect(screen.getByTestId('admin-access-guard')).toBeInTheDocument()
   })
 

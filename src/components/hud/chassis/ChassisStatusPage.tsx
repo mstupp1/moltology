@@ -3,10 +3,8 @@ import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Check, Dices, Loader2, Undo2, UserPlus } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
-import { HudWorkspaceGhost } from '../HudGhostSkeletons'
+import { HudSectionGhost } from '../HudGhostSkeletons'
 import { HudButton } from '@/components/ui/HudButton'
-import { BandHeadingRow } from '@/components/hud/HudTitlePanel'
-import { CharacterSectionNav } from './CharacterSectionNav'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHudPersist } from '@/hooks/useHudPersist'
@@ -337,7 +335,7 @@ export const ChassisStatusPage: React.FC = () => {
         <HudButton onClick={() => setReload((n) => n + 1)}>Try again</HudButton>
       </div>
     ) : (
-      <HudWorkspaceGhost />
+      <HudSectionGhost />
     )
   const wearing = items.find((i) => i.equippedSlot === slot)
   const gearTotals = computeLoadoutTotals(items, catalogById)
@@ -389,64 +387,60 @@ export const ChassisStatusPage: React.FC = () => {
       ))}
     </div>
   )
+  // Save and Discard sit on the stage's top-right corner, only while there is something to save.
+  // Guests always see their "Save my character" button: saving is how they keep it.
+  const saveActions =
+    dirty || saving || isGuest ? (
+      <div className="absolute top-1 right-0 lg:top-2 lg:right-2 z-10 flex gap-2 animate-in fade-in duration-150" data-testid="character-save-actions">
+        {dirty || saving ? (
+          <HudButton
+            size="sm"
+            variant="secondary"
+            className="w-8 px-0"
+            aria-label="Discard changes"
+            title="Discard changes"
+            disabled={saving}
+            onClick={() => {
+              accept(saved)
+              if (isGuest && saved.config) saveGuestCharacter(saved.config, saved.items)
+            }}
+          >
+            <Undo2 className="w-4 h-4" aria-hidden="true" />
+          </HudButton>
+        ) : null}
+        {isGuest ? (
+          <HudButton size="sm" onClick={() => void save()} icon={<UserPlus className="w-3.5 h-3.5" />}>
+            Save my character
+          </HudButton>
+        ) : (
+          <HudButton
+            size="sm"
+            className="w-8 px-0"
+            aria-label={saving ? 'Saving' : 'Save changes'}
+            title="Save changes"
+            aria-busy={saving || undefined}
+            disabled={saving}
+            onClick={() => void save()}
+          >
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+            )}
+          </HudButton>
+        )}
+      </div>
+    ) : null
   return (
-    // Phones: header, character and tabs stay pinned as one compact stage while
-    // only the options scroll. Wide screens: character on the left, editor on the right.
+    // The header band lives in the /character layout route. Phones: the character and the editor
+    // tabs stay pinned under it (.character-stage-pinned) while only the options scroll.
+    // Wide screens: character on the left, editor on the right.
     <div
-      className="hud-grid-band-top grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-x-6 gap-y-3 lg:gap-y-5 items-start font-sans relative max-lg:pb-16"
+      className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] gap-x-6 gap-y-3 lg:gap-y-5 items-start font-sans relative max-lg:pb-16"
       data-testid="character-workspace"
     >
-      {/* The page's header band. Below lg the whole stage is pinned as one compact block (title
-          row, section tabs, then the character) while only the options scroll; on wide screens
-          the title and section tabs form the band above the stage. */}
-      <div className="hud-title-band-lead max-lg:sticky max-lg:z-20 max-sm:-top-2.5 sm:max-md:-top-4 md:max-lg:-top-6 max-lg:pt-3 md:max-lg:pt-[var(--hud-band-pad)] max-lg:pb-2 max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
-        <div className="hud-title-band-lead-lg lg:col-span-2 flex flex-wrap items-center gap-x-4 gap-y-2 lg:bg-surface-2 lg:border-b lg:border-line-subtle">
-          <BandHeadingRow
-            title="Character"
-            titleClassName="truncate"
-            sections={<CharacterSectionNav current="customize" />}
-            actions={
-              <div className="flex shrink-0 gap-2">
-                <HudButton
-                  size="sm"
-                  variant="secondary"
-                  className="w-8 px-0"
-                  aria-label="Discard changes"
-                  title="Discard changes"
-                  disabled={saving || !dirty}
-                  onClick={() => {
-                    accept(saved)
-                    if (isGuest && saved.config) saveGuestCharacter(saved.config, saved.items)
-                  }}
-                >
-                  <Undo2 className="w-4 h-4" aria-hidden="true" />
-                </HudButton>
-                {isGuest ? (
-                  <HudButton size="sm" onClick={() => void save()} icon={<UserPlus className="w-3.5 h-3.5" />}>
-                    Save my character
-                  </HudButton>
-                ) : (
-                  <HudButton
-                    size="sm"
-                    className="w-8 px-0"
-                    aria-label={saving ? 'Saving' : 'Save changes'}
-                    title="Save changes"
-                    aria-busy={saving || undefined}
-                    disabled={saving || !dirty}
-                    onClick={() => void save()}
-                  >
-                    {saving ? (
-                      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-                    ) : (
-                      <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
-                    )}
-                  </HudButton>
-                )}
-              </div>
-            }
-          />
-        </div>
-        <div className="lg:row-start-2 lg:sticky lg:top-6 lg:self-start space-y-3">
+      <div className="character-stage-pinned max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
+        <div className="lg:row-start-1 lg:sticky lg:top-6 lg:self-start space-y-3">
           <div className="grid grid-cols-1 lg:grid-cols-[84px_minmax(0,1fr)_84px] gap-2 items-center">
             <SlotColumn ids={LEFT_SLOTS} className="hidden lg:flex" {...slotProps} />
             <div className="relative">
@@ -460,6 +454,7 @@ export const ChassisStatusPage: React.FC = () => {
                   className="max-w-[min(212px,28svh)] lg:max-w-[560px] mx-auto"
                 />
               </div>
+              {saveActions}
               <HudButton
                 type="button"
                 variant="secondary"
@@ -490,7 +485,7 @@ export const ChassisStatusPage: React.FC = () => {
         </div>
         {!wide && tabBar}
       </div>
-      <div className="lg:col-start-2 lg:row-start-2 chitin-card p-2.5 sm:p-4 lg:p-5 chamfer-corner shadow-2xl space-y-4 min-w-0">
+      <div className="lg:col-start-2 lg:row-start-1 chitin-card p-2.5 sm:p-4 lg:p-5 chamfer-corner shadow-2xl space-y-4 min-w-0">
         {wide && (
           <div className="sticky -top-6 z-10 -mx-5 -mt-5 px-5 pt-5 pb-2 rounded-t-card bg-abyss/95 backdrop-blur-md">
             {tabBar}
