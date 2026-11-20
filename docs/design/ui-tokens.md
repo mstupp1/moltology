@@ -103,7 +103,7 @@ One scale, tighter on phones. Use these exact class sets so pages stay in step:
 | Hero padding (Dashboard today, Academy, profile header) | `p-4 sm:p-5 lg:p-6` | 16 / 20 / 24px |
 | List rows inside a card | `py-2 sm:py-2.5` | 8 / 10px |
 
-Phone page edges are 8px (HudLayout `px-2`, `--hud-band-x` 0.5rem) and the header band has 10px above and below its title row.
+Phone page edges are 8px (HudLayout `px-2`, `--hud-band-x` 0.5rem) and the header band has 10px above and below its title row. The band's background runs edge to edge, but its title, tabs and buttons are inset by `--hud-band-inset` (page edge + card padding: 20px phone, 32px sm, 35px lg) so they line up with the text inside the cards below.
 
 Every standard page starts with the header band (see Page headings), then its sections.
 Pages never wrap themselves in an extra outer card; the page panel is the frame.
