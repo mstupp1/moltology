@@ -37,7 +37,8 @@ export function mouthCheckLesson(lesson: Lesson): Lesson {
 }
 
 const clock = (seconds: number) => {
-  const cs = Math.round(seconds * 100)
+  // Rounded down, so a label never starts a frame after its shape (frames fall between centiseconds).
+  const cs = Math.floor(seconds * 100 + 1e-6)
   const h = Math.floor(cs / 360000)
   const m = Math.floor((cs % 360000) / 6000)
   const s = Math.floor((cs % 6000) / 100)

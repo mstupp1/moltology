@@ -118,3 +118,14 @@ describe('lip sync', () => {
     expect(Math.max(...accent.slice(0, 6))).toBe(0)
   })
 })
+
+describe('mouth check', () => {
+  it('starts each shape label no later than its frame', async () => {
+    const { mouthCheckSubtitles } = await import('./mouth-check')
+    const ass = mouthCheckSubtitles(['X'.repeat(41) + 'DDD' + 'X'.repeat(6)], ['host-crab'], 30, 1080, 1920)
+    const d = ass.split('\n').find((l) => l.includes('}D'))!
+    // Frame 41 is drawn at 1.3667s: the label must already be up by then.
+    expect(d).toContain('0:00:01.36,0:00:01.46')
+    expect(ass).toContain('host-crab  {\\b1}D{\\b0}  AA')
+  })
+})
