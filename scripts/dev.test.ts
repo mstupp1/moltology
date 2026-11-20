@@ -1,5 +1,6 @@
+import net from 'node:net'
 import { describe, expect, it, vi } from 'vitest'
-import { devArguments } from './dev.mjs'
+import { devArguments, portAvailable } from './dev.mjs'
 
 describe('development launcher', () => {
   it('uses the runner and a free port before auth starts', async () => {
@@ -25,5 +26,17 @@ describe('development launcher', () => {
   it('reports port exhaustion and permission failures', async () => {
     await expect(devArguments([], {}, async () => false)).rejects.toThrow('No free development port')
     await expect(devArguments([], {}, async () => { throw new Error('EPERM') })).rejects.toThrow('EPERM')
+  })
+  it('treats a port bound only on IPv4 loopback as unavailable', async () => {
+    const holder = net.createServer()
+    await new Promise<void>((resolve) => holder.listen(0, '127.0.0.1', () => resolve()))
+    const address = holder.address()
+    const port = typeof address === 'object' && address ? address.port : 0
+    try {
+      expect(await portAvailable(port)).toBe(false)
+    } finally {
+      await new Promise<void>((resolve) => holder.close(() => resolve()))
+    }
+    expect(await portAvailable(port)).toBe(true)
   })
 })

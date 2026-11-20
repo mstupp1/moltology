@@ -9,13 +9,17 @@ npm run dev
 Before Vite starts, `predev` prepares linked worktrees automatically.
 The `npm run test*`, `npm run typecheck`, and `npm run build` commands also
 prepare the dependency link, so they work before the first dev-server launch.
+These pre-hooks also check `node_modules` against `package-lock.json` and run
+`npm ci` automatically when dependencies are out of sync (or install locally in
+a worktree whose lockfile differs from the main checkout).
 These commands leave environment files untouched; `predev` handles environment setup. If the
-worktree has no dependencies, it links the main checkout's `node_modules`. If it
-has no local environment files, it links the main checkout's `.env`, after
-checking that `DATABASE_URL` matches `DEV_DATABASE_URL` and differs from the
-configured production target. Existing worktree dependencies and environment
-files are preserved. Shared environment files are linked, never printed or
-committed; edit the main file deliberately because changes affect linked worktrees.
+worktree has no dependencies and matches the main lockfile, it links the main
+checkout's `node_modules`. If it has no local environment files, it links the
+main checkout's `.env`, after checking that `DATABASE_URL` matches
+`DEV_DATABASE_URL` and differs from the configured production target. Existing
+worktree dependencies and environment files are preserved. Shared environment
+files are linked, never printed or committed; edit the main file deliberately
+because changes affect linked worktrees.
 
 For a fresh main checkout, install dependencies with `npm ci` and configure
 `.env` from `.env.example`. Without credentials, guest pages still render, but

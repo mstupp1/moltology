@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { SynapticOracleWidget } from './SynapticOracleWidget'
-import { OracleProvider, useSafeOracle } from './OracleContext'
+import { OracleProvider, STORAGE_KEY_ORACLE_LAST_MODE, useSafeOracle } from './OracleContext'
 import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 
 // Mock scrollIntoView for test environment
@@ -12,10 +12,12 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn()
 window.HTMLElement.prototype.setPointerCapture = vi.fn()
 window.HTMLElement.prototype.releasePointerCapture = vi.fn()
 
+const mockNavigate = vi.fn()
+
 // Mock TanStack router hooks
 vi.mock('@tanstack/react-router', () => ({
   useLocation: () => ({ pathname: '/dashboard' }),
-  useNavigate: () => vi.fn(),
+  useNavigate: () => mockNavigate,
 }))
 
 // Mock authClient
@@ -99,7 +101,20 @@ describe('SynapticOracleWidget', () => {
     expect(btn.querySelector('[data-testid="oracle-core-glyph"]')).not.toBeNull()
   })
 
+  it('opens fullscreen by default on desktop when no popout mode was picked', () => {
+    render(
+      <OracleProvider>
+        <SynapticOracleWidget />
+      </OracleProvider>
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /Open Oracle AI Popout/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
+    expect(document.querySelector('.fixed.rounded-card')).toBeNull()
+  })
+
   it('opens popout window on click and keeps it bottom-right', () => {
+    localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, 'popout')
     const { container } = render(
       <OracleProvider>
         <SynapticOracleWidget />
@@ -119,6 +134,7 @@ describe('SynapticOracleWidget', () => {
   })
 
   it('opens popout on click even if the pointer moved during the press', () => {
+    localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, 'popout')
     render(
       <OracleProvider>
         <SynapticOracleWidget />
@@ -151,6 +167,7 @@ describe('SynapticOracleWidget', () => {
 
   it('reopens the popout at the same bottom-right location after minimize', () => {
     vi.useFakeTimers()
+    localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, 'popout')
 
     const { container } = render(
       <OracleProvider>
@@ -178,6 +195,7 @@ describe('SynapticOracleWidget', () => {
   })
 
   it('resizes the popout window from the interior edge and persists dimensions', () => {
+    localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, 'popout')
     const { container } = render(
       <OracleProvider>
         <SynapticOracleWidget />
@@ -206,6 +224,7 @@ describe('SynapticOracleWidget', () => {
   })
 
   it('resets window size when double clicking a window edge', () => {
+    localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, 'popout')
     const { container } = render(
       <OracleProvider>
         <SynapticOracleWidget />
@@ -241,6 +260,7 @@ describe('SynapticOracleWidget', () => {
   })
 
   it('renders Chats button in popout and toggles the chats list panel', async () => {
+    localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, 'popout')
     render(
       <OracleProvider>
         <SynapticOracleWidget />

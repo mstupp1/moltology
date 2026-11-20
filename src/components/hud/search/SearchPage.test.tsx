@@ -122,18 +122,21 @@ describe('SearchPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
   })
 
-  it('shows hidden pages on Pages for admins', () => {
+  it('shows staff pages on Pages for admins', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
       isPending: false,
     } as any)
-    renderSearch({ query: 'premium', type: 'pages' })
-    expect(screen.getByText('Oracle MAX')).toBeInTheDocument()
+    renderSearch({ query: 'logic', type: 'pages' })
+    expect(screen.getByText('Logic Atlas')).toBeInTheDocument()
   })
 
-  it('keeps hidden pages off Pages for members', () => {
+  it('keeps staff pages off Pages for members and shows Oracle MAX', () => {
+    renderSearch({ query: 'logic', type: 'pages' })
+    expect(screen.queryByText('Logic Atlas')).not.toBeInTheDocument()
+
     renderSearch({ query: 'premium', type: 'pages' })
-    expect(screen.queryByText('Oracle MAX')).not.toBeInTheDocument()
+    expect(screen.getByText('Oracle MAX')).toBeInTheDocument()
   })
 
   it('surfaces HUD chambers and news dispatches on Pages for obvious queries', () => {

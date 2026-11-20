@@ -177,7 +177,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     category: 'Page',
     icon: 'premium',
     to: '/max',
-    // Members do not see this page. HIDDEN_PAGES is the registry.
     keywords: ['oracle max', 'premium', 'membership', 'subscription'],
   },
   {

@@ -6,15 +6,24 @@ import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
 
-async function portAvailable(port) {
+function canListenOnHost(port, host) {
   const server = net.createServer()
   return new Promise((resolve, reject) => {
     server.once('error', (error) => {
       if (error.code === 'EADDRINUSE') resolve(false)
+      else if (error.code === 'EAFNOSUPPORT' || error.code === 'EADDRNOTAVAIL') resolve(true)
       else reject(error)
     })
-    server.listen(port, () => server.close(() => resolve(true)))
+    server.listen(port, host, () => server.close(() => resolve(true)))
   })
+}
+
+export async function portAvailable(port) {
+  // Check IPv4 and IPv6 separately: on macOS a bind on `::` can succeed even when 127.0.0.1 is occupied.
+  for (const host of ['127.0.0.1', '0.0.0.0', '::1', '::']) {
+    if (!(await canListenOnHost(port, host))) return false
+  }
+  return true
 }
 
 // Decide the port before Nitro starts its worker and inherits the auth origin.

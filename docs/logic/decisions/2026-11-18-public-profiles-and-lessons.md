@@ -2,7 +2,7 @@
 id: public-profiles-and-lessons
 date: 2026-11-18
 title: "Open member profiles and the Academy to browse; starting lessons needs sign-up"
-summary: "Anyone can read member profiles and browse the Academy, including each lesson's page and the certificate list. Starting a lesson, saving progress, quizzes, notes, friend requests and earning certificates need a free account, and each of those spots asks visitors to sign up."
+summary: "Anyone can read member profiles and browse the Academy, including lesson pages and the certificate list. Starting lessons, saving progress, quizzes, notes, friend requests, and earning certificates require a free account."
 domains: [data]
 rules: [data.member-share-previews]
 status: accepted
