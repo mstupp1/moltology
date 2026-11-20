@@ -23,7 +23,7 @@ import {
   CanvasTexture,
 } from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { arrangeGroup, photoPose, type CommunityPhotoSpot, type Figure } from '../community-photo'
+import { arrangeToFill, photoPose, type CommunityPhotoSpot, type Figure } from '../community-photo'
 import type { LobsterAvatarConfig } from '../lobster-avatar'
 import { buildCharacter, type Character3D } from './character'
 import { withLoftDetail } from './loft'
@@ -61,6 +61,35 @@ const breathe = () =>
     if (typeof requestIdleCallback === 'function') requestIdleCallback(() => next(), { timeout: 200 })
     else setTimeout(next, 16)
   })
+
+/** The part of the canvas with something solid drawn on it, in canvas pixels. Faint shadows don't count. */
+function drawnBox(canvas: HTMLCanvasElement): { left: number; top: number; right: number; bottom: number } | null {
+  const scale = 4
+  const w = Math.ceil(canvas.width / scale)
+  const h = Math.ceil(canvas.height / scale)
+  const probe = document.createElement('canvas')
+  probe.width = w
+  probe.height = h
+  const ctx = probe.getContext('2d', { willReadFrequently: true })
+  if (!ctx) return null
+  ctx.drawImage(canvas, 0, 0, w, h)
+  const alpha = ctx.getImageData(0, 0, w, h).data
+  let left = w
+  let right = -1
+  let top = h
+  let bottom = -1
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (alpha[(y * w + x) * 4 + 3] < 64) continue
+      if (x < left) left = x
+      if (x > right) right = x
+      if (y < top) top = y
+      if (y > bottom) bottom = y
+    }
+  }
+  if (right < 0) return null
+  return { left: left * scale, top: top * scale, right: (right + 1) * scale, bottom: (bottom + 1) * scale }
+}
 
 /**
  * Draw the group photo at `width`×`height`. Members stand in the order given, the first in the
@@ -118,7 +147,7 @@ export async function renderGroupPhoto(members: readonly GroupMember[], width: n
       })
       await breathe()
     }
-    const layout = arrangeGroup(figures)
+    const layout = arrangeToFill(figures, width / height)
     const across = Math.max(...layout.map((p) => Math.abs(p.x))) + 1.6
     const deep = Math.max(...layout.map((p) => -p.z)) + 1.6
 
@@ -188,8 +217,8 @@ export async function renderGroupPhoto(members: readonly GroupMember[], width: n
     const size = box.getSize(new Vector3())
     const camera = new PerspectiveCamera(24, width / height, 0.1, 100)
     const vfov = (camera.fov * Math.PI) / 180
-    const distTall = (size.y * 1.08) / 2 / Math.tan(vfov / 2)
-    const distWide = (size.x * 1.06) / 2 / (Math.tan(vfov / 2) * camera.aspect)
+    const distTall = (size.y * 1.03) / 2 / Math.tan(vfov / 2)
+    const distWide = (size.x * 1.02) / 2 / (Math.tan(vfov / 2) * camera.aspect)
     const dist = Math.max(distTall, distWide) + size.z / 2
     camera.position.set(centre.x, centre.y + dist * 0.24, centre.z + dist)
     camera.lookAt(centre.x, centre.y - size.y * 0.02, centre.z)
@@ -197,6 +226,23 @@ export async function renderGroupPhoto(members: readonly GroupMember[], width: n
     camera.updateMatrixWorld(true)
 
     renderer.render(scene, camera)
+    // The 3D bounds run wider than what shows (claws reach out, the back rows sit higher), so
+    // look at what was drawn and zoom in on it, leaving the characters filling the frame.
+    const drawn = drawnBox(canvas)
+    if (drawn) {
+      const aspect = width / height
+      let w = (drawn.right - drawn.left) * 1.03
+      let h = (drawn.bottom - drawn.top) * 1.04
+      if (w / h < aspect) w = h * aspect
+      else h = w / aspect
+      if (w < width * 0.98) {
+        const cx = (drawn.left + drawn.right) / 2
+        const cy = (drawn.top + drawn.bottom) / 2
+        camera.setViewOffset(width, height, cx - w / 2, cy - h / 2, w, h)
+        camera.updateProjectionMatrix()
+        renderer.render(scene, camera)
+      }
+    }
     let image = canvas.toDataURL('image/webp', 0.86)
     if (!image.startsWith('data:image/webp')) image = canvas.toDataURL('image/png')
 

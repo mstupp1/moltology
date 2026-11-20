@@ -118,20 +118,22 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
     <Link
       to="/academy/tracks/$slug"
       params={{ slug: track.slug }}
-      className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col sm:flex-row')}
+      className={cn(ACADEMY_CARD_LINK, 'group relative isolate overflow-hidden flex min-h-56 sm:min-h-60')}
     >
-      <AcademyCover url={track.coverImageUrl} className="h-24 sm:h-auto sm:w-40 shrink-0 border-b sm:border-b-0 sm:border-r border-line-subtle">
-        <div className="flex h-full items-end p-3">
+      {/* The cover fills the whole card; a scrim from the text side keeps the copy readable. */}
+      <AcademyCover url={track.coverImageUrl} className="absolute inset-0 -z-10" />
+      <span
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-abyss/95 via-abyss/75 to-abyss/25 sm:bg-gradient-to-r sm:from-abyss/95 sm:via-abyss/80 sm:to-abyss/20"
+        aria-hidden="true"
+      />
+      <div className="p-3 sm:p-4 lg:p-5 flex flex-col gap-2 flex-1 min-w-0 sm:max-w-[34rem] justify-end sm:justify-center">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="inline-flex items-center gap-1.5 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">
             <RouteIcon className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
             Track
           </span>
-        </div>
-      </AcademyCover>
-      <div className="p-3 sm:p-4 flex flex-col gap-2 flex-1 min-w-0">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <LevelMark level={track.level} />
-          <span className="text-2xs text-ink-muted">
+          <span className="text-2xs text-ink-body">
             {track.courseCount} {track.courseCount === 1 ? 'course' : 'courses'} · about {track.estimatedHours} hr
           </span>
         </div>
@@ -140,7 +142,7 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
         {track.progressPercent > 0 ? (
           <AcademyProgress percent={track.progressPercent} label={`${track.completedCourseCount} of ${track.courseCount} courses`} />
         ) : null}
-        <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
           {track.progressPercent > 0 ? 'Continue track' : 'View track'}
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </span>

@@ -127,7 +127,7 @@ export function CommunityPhoto() {
         }}
       >
         <div
-          className="relative mx-auto w-full max-w-[920px]"
+          className="relative w-full"
           style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
           onPointerLeave={(e) => {
             if (e.pointerType === 'mouse') setPicked(null)
