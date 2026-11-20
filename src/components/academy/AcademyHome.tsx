@@ -118,22 +118,20 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
     <Link
       to="/academy/tracks/$slug"
       params={{ slug: track.slug }}
-      className={cn(ACADEMY_CARD_LINK, 'group relative isolate overflow-hidden flex min-h-56 sm:min-h-60')}
+      className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col sm:flex-row')}
     >
-      {/* The cover fills the whole card; a scrim from the text side keeps the copy readable. */}
-      <AcademyCover url={track.coverImageUrl} className="absolute inset-0 -z-10" />
-      <span
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-abyss/95 via-abyss/75 to-abyss/25 sm:bg-gradient-to-r sm:from-abyss/95 sm:via-abyss/80 sm:to-abyss/20"
-        aria-hidden="true"
-      />
-      <div className="p-3 sm:p-4 lg:p-5 flex flex-col gap-2 flex-1 min-w-0 sm:max-w-[34rem] justify-end sm:justify-center">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <AcademyCover url={track.coverImageUrl} className="h-24 sm:h-auto sm:w-40 shrink-0 border-b sm:border-b-0 sm:border-r border-line-subtle">
+        <div className="flex h-full items-end p-3">
           <span className="inline-flex items-center gap-1.5 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">
             <RouteIcon className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
             Track
           </span>
+        </div>
+      </AcademyCover>
+      <div className="p-3 sm:p-4 flex flex-col gap-2 flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <LevelMark level={track.level} />
-          <span className="text-2xs text-ink-body">
+          <span className="text-2xs text-ink-muted">
             {track.courseCount} {track.courseCount === 1 ? 'course' : 'courses'} · about {track.estimatedHours} hr
           </span>
         </div>
@@ -142,7 +140,7 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
         {track.progressPercent > 0 ? (
           <AcademyProgress percent={track.progressPercent} label={`${track.completedCourseCount} of ${track.courseCount} courses`} />
         ) : null}
-        <span className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
+        <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
           {track.progressPercent > 0 ? 'Continue track' : 'View track'}
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </span>
@@ -172,7 +170,11 @@ const COMING_SOON_STEPS = [
 /** The whole home page when nothing is published yet: what the Academy is, and what is coming. */
 function AcademyComingSoon() {
   return (
-    <section className={cn(ACADEMY_CARD, 'overflow-hidden')} aria-labelledby="academy-coming-soon">
+    // Runs edge to edge under the page band, flush with the panel's sides (hud-band-hero).
+    <section
+      className={cn(ACADEMY_CARD, 'hud-band-hero hud-band-hero-joined overflow-hidden')}
+      aria-labelledby="academy-coming-soon"
+    >
       <div className="relative p-5 sm:p-8 space-y-3 border-b border-line-subtle">
         <span
           className="absolute inset-0 opacity-60 bg-[radial-gradient(ellipse_at_top_right,rgba(0,195,255,0.12),transparent_55%)]"
@@ -278,7 +280,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
   const certificatePreview = [...data.certificates].sort((a, b) => Number(b.earned) - Number(a.earned)).slice(0, 4)
 
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
       <HudTitlePanel treatment="band" title="Academy" sections={<AcademyNav current="catalog" />} />
 
       {nothingPublished ? (
