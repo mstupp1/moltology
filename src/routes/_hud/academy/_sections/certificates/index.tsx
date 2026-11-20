@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { AcademyCertificateIndex } from '@/components/academy/AcademyCertificateViews'
 import { AcademyFrame } from '@/components/academy/AcademyChrome'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudSectionGhost } from '@/components/hud/HudGhostSkeletons'
 import { EMPTY_ACADEMY_HOME } from '@/lib/academy'
 import { seo } from '@/lib/seo'
 import { getAcademyHomeFn } from '@/lib/server/academy-api'
 
-export const Route = createFileRoute('/_hud/academy/certificates/')({
+export const Route = createFileRoute('/_hud/academy/_sections/certificates/')({
   loader: async () => {
     try {
       const home = await getAcademyHomeFn()
@@ -29,7 +29,7 @@ export const Route = createFileRoute('/_hud/academy/certificates/')({
     links: [{ rel: 'canonical', href: 'https://moltology.org/academy/certificates' }],
   }),
   component: AcademyCertificatesRoute,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: HudSectionGhost,
 })
 
 function AcademyCertificatesRoute() {

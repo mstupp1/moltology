@@ -2,7 +2,6 @@ import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, Award, BookOpen, Check, Clock, GraduationCap, Layers, Route as RouteIcon, Search, X } from 'lucide-react'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import {
   ACADEMY_COPY,
   ACADEMY_LEVELS,
@@ -23,7 +22,6 @@ import {
   ACADEMY_TEXT_ACTION,
   AcademyCover,
   AcademyEmpty,
-  AcademyNav,
   AcademyProgress,
   AcademySectionHeading,
   LevelMark,
@@ -281,8 +279,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
 
   return (
     <div className="space-y-3 sm:space-y-4 lg:space-y-5">
-      <HudTitlePanel treatment="band" title="Academy" sections={<AcademyNav current="catalog" />} />
-
+      {/* The Academy band (title, tabs) is drawn by the academy/_sections layout route. */}
       {nothingPublished ? (
         <AcademyComingSoon />
       ) : (

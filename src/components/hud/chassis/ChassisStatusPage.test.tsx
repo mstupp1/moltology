@@ -83,7 +83,8 @@ describe('unified character workspace', () => {
   it('shows a live loadout with only owned pieces and no usable powers', async () => {
     await mount()
     expect(preview().equipment.head.visualKey).toBe('soft-shell-visor')
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
+    // Nothing to save yet, so the stage shows no Save or Discard.
+    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
     expect(screen.queryByText('Preview only')).not.toBeInTheDocument()
     expect(screen.queryByText('Ready')).not.toBeInTheDocument()
     expect(screen.getByTestId('stat-hud')).toBeInTheDocument()
@@ -105,7 +106,7 @@ describe('unified character workspace', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
     fireEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
     expect(preview().equipment.head.visualKey).toBe('soft-shell-visor')
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
   })
   it('lists only owned pieces and sends try-ons to the shop', async () => {
     await mount()

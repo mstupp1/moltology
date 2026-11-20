@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { AcademyHome } from '@/components/academy/AcademyHome'
 import { AcademyFrame } from '@/components/academy/AcademyChrome'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudSectionGhost } from '@/components/hud/HudGhostSkeletons'
 import { EMPTY_ACADEMY_HOME } from '@/lib/academy'
 import { seo } from '@/lib/seo'
 import { getAcademyHomeFn } from '@/lib/server/academy-api'
 
-export const Route = createFileRoute('/_hud/academy/')({
+export const Route = createFileRoute('/_hud/academy/_sections/')({
   loader: async () => {
     try {
       const home = await getAcademyHomeFn()
@@ -29,7 +29,7 @@ export const Route = createFileRoute('/_hud/academy/')({
     links: [{ rel: 'canonical', href: 'https://moltology.org/academy' }],
   }),
   component: AcademyHomeRoute,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: HudSectionGhost,
 })
 
 function AcademyHomeRoute() {

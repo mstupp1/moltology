@@ -70,6 +70,28 @@ export function HudWorkspaceGhost() {
 
 
 /**
+ * Content-only placeholder for a tab whose header band stays on screen (the layout routes of
+ * Character, Academy and Admin): no fake title card, just the cards below it.
+ */
+export function HudSectionGhost() {
+  return (
+    <div className="space-y-4 font-sans select-none animate-in fade-in duration-150" data-testid="hud-section-ghost">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <HudGhostCard variant="neutral" lines={4} className={`${GHOST_CARD} md:col-span-2 min-h-[220px]`} />
+        <div className="space-y-3 flex flex-col justify-between">
+          <HudGhostStatBox variant="cyan" className={GHOST_CARD} />
+          <HudGhostStatBox variant="neutral" className={GHOST_CARD} />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <HudGhostCard variant="neutral" lines={3} className={GHOST_CARD} />
+        <HudGhostCard variant="neutral" lines={3} className={GHOST_CARD} />
+      </div>
+    </div>
+  )
+}
+
+/**
  * Dashboard first paint: the Today strip, then the three people panels.
  */
 export function DashboardGhost() {

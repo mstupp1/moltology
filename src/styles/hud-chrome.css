@@ -722,6 +722,42 @@ input[type="range"].dial-range:focus-visible {
   mask-image: radial-gradient(circle closest-side, #000 62%, transparent 100%);
 }
 
+/* Character (layout route /character): on phones and tablets Customize pins the header band and,
+   under it, the character stage and editor tabs, while only the options scroll. The band's height
+   is measured into --character-band-h (routes/_hud/character.tsx). */
+.character-area {
+  --character-pin-top: -0.625rem;
+  /* The layout's section gap (space-y-2 sm:space-y-4), cancelled so band and stage join. */
+  --character-gap: 0.5rem;
+}
+@media (min-width: 640px) {
+  .character-area {
+    --character-pin-top: -1rem;
+    --character-gap: 1rem;
+  }
+}
+@media (min-width: 768px) {
+  .character-area {
+    --character-pin-top: -1.5rem;
+  }
+}
+@media (max-width: 1023px) {
+  .character-band-pinned {
+    position: sticky;
+    top: var(--character-pin-top);
+    z-index: 21;
+  }
+  .character-stage-pinned {
+    position: sticky;
+    top: calc(var(--character-pin-top) + var(--character-band-h, 0px));
+    z-index: 20;
+    margin-top: calc(var(--character-gap) * -1);
+    margin-left: calc(var(--hud-band-x, 0px) * -1);
+    margin-right: calc(var(--hud-band-x, 0px) * -1);
+    padding: 0.5rem var(--hud-band-inset, 1rem);
+  }
+}
+
 /* A band with section tabs ends with them: the tabs sit on its bottom border, so it has no
    bottom padding (BandSectionNav). Last in the file so it wins over the per-size paddings. */
 .hud-title-band.has-sections,

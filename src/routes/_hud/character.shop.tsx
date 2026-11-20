@@ -1,10 +1,11 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudSectionGhost } from '@/components/hud/HudGhostSkeletons'
+import { loadShopPage } from '@/components/hud/chassis/character-pages'
 import { SITE_ORIGIN, seo } from '@/lib/seo'
 
 const LazyMarketShopPage = lazy(() =>
-  import('@/components/hud/market/MarketShopPage').then((m) => ({ default: m.MarketShopPage }))
+  loadShopPage().then((m) => ({ default: m.MarketShopPage }))
 )
 
 const CANONICAL = `${SITE_ORIGIN}/character/shop`
@@ -12,7 +13,7 @@ const CANONICAL = `${SITE_ORIGIN}/character/shop`
 function CharacterShopRoute() {
   return (
     <div>
-      <Suspense fallback={<HudWorkspaceGhost />}>
+      <Suspense fallback={<HudSectionGhost />}>
         <LazyMarketShopPage />
       </Suspense>
     </div>
@@ -20,7 +21,7 @@ function CharacterShopRoute() {
 }
 
 // The gear shop, formerly /market. vercel.json sends /market here with a 301.
-export const Route = createFileRoute('/_hud/character_/shop')({
+export const Route = createFileRoute('/_hud/character/shop')({
   head: () => ({
     meta: [
       ...seo({
@@ -35,5 +36,5 @@ export const Route = createFileRoute('/_hud/character_/shop')({
     links: [{ rel: 'canonical', href: CANONICAL }],
   }),
   component: CharacterShopRoute,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: HudSectionGhost,
 })

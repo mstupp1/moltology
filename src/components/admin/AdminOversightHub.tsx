@@ -1,22 +1,19 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Link } from '@tanstack/react-router'
-import { ArrowUpRight, FlaskConical, Search, ShieldCheck } from 'lucide-react'
+import { FlaskConical, Search, ShieldCheck } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
 import { cn } from '@/lib/utils'
 import { ADMIN_CARD, ADMIN_FIELD, AdminCardHeading, AdminSwitch } from '@/components/admin/admin-ui'
-import { AdminSectionNav, type AdminTab } from '@/components/admin/AdminSectionNav'
-import { BandStat } from '@/components/hud/BandSectionNav'
+import type { AdminTab } from '@/components/admin/AdminSectionNav'
+import { useAdminTelemetryReload } from '@/components/admin/AdminShell'
 import { AdminShopOrders } from '@/components/admin/AdminShopOrders'
 import { AdminStore } from '@/components/admin/AdminStore'
 import { CovenantWatchPage } from '@/components/forum/CovenantWatchPage'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { LoadMoreButton } from '@/components/ui/LoadMoreButton'
 import { PAGE_SIZES, mergeById, takePage } from '@/lib/pagination'
 import {
-  getAdminTelemetryFn,
   getMyExperimentsFn,
   listAdminPurchasesFn,
   searchAdminMembersFn,
@@ -25,7 +22,6 @@ import {
   type AdminMemberDirectory,
   type AdminMemberRole,
   type AdminPurchaseRow,
-  type AdminTelemetry,
   type ExperimentRow,
 } from '@/lib/server/api'
 
@@ -58,53 +54,10 @@ async function authData(userId: string) {
 
 export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
   const session = useAuthSession()
-  const [telemetry, setTelemetry] = useState<AdminTelemetry | null>(null)
-  const [telemetryError, setTelemetryError] = useState<string | null>(null)
-
-  const loadTelemetry = useCallback(async () => {
-    if (!session.userId || session.isPending) return
-    try {
-      const next = await getAdminTelemetryFn({ data: await authData(session.userId) })
-      setTelemetry(next)
-      setTelemetryError(next.healthy ? null : 'System status could not be read.')
-    } catch (err: unknown) {
-      setTelemetry(null)
-      setTelemetryError(err instanceof Error ? err.message : 'System status could not be read.')
-    }
-  }, [session.userId, session.isPending])
-
-  useEffect(() => {
-    void loadTelemetry()
-  }, [loadTelemetry])
-
-  const flags = telemetry?.pendingFlags ?? null
+  // The header band (title, tabs, status figures) is drawn by the /admin layout route (AdminShell).
+  const loadTelemetry = useAdminTelemetryReload()
   return (
     <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans" data-testid="admin-oversight-hub">
-      <HudTitlePanel
-        treatment="band"
-        title="Admin"
-        sections={<AdminSectionNav current={tab} />}
-        actionsBelowOnPhone
-        actions={
-          <div className="flex items-end gap-5 sm:gap-6" data-testid="admin-telemetry" aria-label="System status" role="group">
-            <BandStat label="Pending flags" value={flags === null ? '—' : String(flags)} tone={flags ? 'amber' : 'ink'} />
-            <BandStat label="Sessions" value={telemetry ? String(telemetry.activeSessions) : '—'} />
-            <BandStat
-              label="Health"
-              value={telemetryError ? 'Unavailable' : telemetry?.healthy ? 'Healthy' : '—'}
-              tone={telemetryError ? 'amber' : 'cyan'}
-            />
-          </div>
-        }
-      >
-        <AdminToolLinks />
-      </HudTitlePanel>
-      {telemetryError ? (
-        <p className="text-xs text-amber-400" data-testid="admin-telemetry-error">
-          {telemetryError}
-        </p>
-      ) : null}
-
       {tab === 'watch' ? <CovenantWatchPage onChanged={() => void loadTelemetry()} /> : null}
       {tab === 'members' ? (
         <MemberDirectory userId={session.userId} onChanged={() => void loadTelemetry()} />
@@ -118,34 +71,6 @@ export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
       ) : null}
       {tab === 'experiments' ? <ExperimentSwitches userId={session.userId} /> : null}
     </div>
-  )
-}
-
-const TOOLS = [
-  { title: 'Storefront', detail: 'The shop as members see it', to: '/store' as const },
-  { title: 'Oracle MAX', detail: 'Membership tools for this account', to: '/max' as const },
-  { title: 'Composite Studio', detail: 'Preview render layouts', to: '/render/composite' as const },
-]
-
-/** Pages outside the admin tabs, as a quiet link row under the title. */
-function AdminToolLinks() {
-  return (
-    <nav aria-label="Admin tools" data-testid="admin-sectors" className="pt-1">
-      <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        {TOOLS.map((tool) => (
-          <li key={tool.to}>
-            <Link
-              to={tool.to}
-              title={tool.detail}
-              className="inline-flex min-h-8 items-center gap-1 rounded-control text-xs font-semibold text-ink-body transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-            >
-              {tool.title}
-              <ArrowUpRight className="h-3.5 w-3.5 text-ink-muted" aria-hidden />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
   )
 }
 

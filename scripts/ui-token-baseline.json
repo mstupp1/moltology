@@ -1,8 +1,4 @@
 {
-  "src/components/AuthModal.tsx": {
-    "tracking": 1,
-    "uppercase": 1
-  },
   "src/components/HomeHero.tsx": {
     "off-scale-radius": 1
   },
@@ -18,10 +14,6 @@
   },
   "src/components/academy/AcademyChrome.tsx": {
     "tracking": 1
-  },
-  "src/components/auth/AuthView.tsx": {
-    "tracking": 1,
-    "uppercase": 1
   },
   "src/components/blog/BlogTopSlider.tsx": {
     "uppercase": 1
@@ -110,10 +102,6 @@
   "src/components/hud/GlassLens.tsx": {
     "glow": 4
   },
-  "src/components/hud/GuestLockGuard.tsx": {
-    "tracking": 1,
-    "uppercase": 1
-  },
   "src/components/hud/HiddenPageGuard.tsx": {
     "hex-color": 1
   },
@@ -160,9 +148,6 @@
     "ui-text-size": 2,
     "tracking": 1,
     "heavy-weight": 1
-  },
-  "src/components/news/NewsPostDetail.tsx": {
-    "uppercase": 1
   },
   "src/components/ui/BrandMark.tsx": {
     "hex-color": 1

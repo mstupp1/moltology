@@ -1,8 +1,6 @@
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll'
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import { History, Map as MapIcon, RefreshCw, Search, TriangleAlert, Workflow, X } from 'lucide-react'
-import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { AdminSectionNav } from '@/components/admin/AdminSectionNav'
 import { pillTabClass } from '@/components/ui/pillTab'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -195,7 +193,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
 
   return (
     <div className="space-y-4 font-sans sm:space-y-5" data-testid="logic-atlas">
-      <HudTitlePanel treatment="band" title="Admin" sections={<AdminSectionNav current="logic" />} />
+      {/* The Admin band (title, tabs, status) is drawn by the /admin layout route. */}
       <section className="grid grid-cols-2 gap-2.5 lg:grid-cols-4" aria-label="Atlas summary">
           <StatCard
             label="Rules"

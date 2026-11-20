@@ -1,16 +1,17 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudSectionGhost } from '@/components/hud/HudGhostSkeletons'
+import { loadProgressPage } from '@/components/hud/chassis/character-pages'
 import { SITE_ORIGIN, canonicalLink, seo } from '@/lib/seo'
 
-const LazyPipelineView = lazy(() => import('@/components/hud/PipelineView'))
+const LazyPipelineView = lazy(() => loadProgressPage())
 
 const CANONICAL = `${SITE_ORIGIN}/character/progress`
 
 function CharacterProgressRoute() {
   return (
     <div>
-      <Suspense fallback={<HudWorkspaceGhost />}>
+      <Suspense fallback={<HudSectionGhost />}>
         <LazyPipelineView />
       </Suspense>
     </div>
@@ -19,7 +20,7 @@ function CharacterProgressRoute() {
 
 // The four stages and your XP, formerly /stages (and before that /pipeline).
 // vercel.json sends both old addresses here with a 301.
-export const Route = createFileRoute('/_hud/character_/progress')({
+export const Route = createFileRoute('/_hud/character/progress')({
   head: () => ({
     links: [canonicalLink(CANONICAL)],
     meta: seo({
@@ -29,5 +30,5 @@ export const Route = createFileRoute('/_hud/character_/progress')({
     }),
   }),
   component: CharacterProgressRoute,
-  pendingComponent: HudWorkspaceGhost,
+  pendingComponent: HudSectionGhost,
 })

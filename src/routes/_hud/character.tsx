@@ -1,32 +1,60 @@
-import React, { Suspense, lazy } from 'react'
-import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
-import { createFileRoute } from '@tanstack/react-router'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import React from 'react'
+import { Outlet, createFileRoute, useLocation } from '@tanstack/react-router'
+import { CharacterBand } from '@/components/hud/chassis/CharacterBand'
+import type { CharacterSection } from '@/components/hud/chassis/CharacterSectionNav'
+import { loadCustomizePage, loadProgressPage, loadShopPage } from '@/components/hud/chassis/character-pages'
 
-const LazyChassisStatusPage = lazy(() =>
-  import('@/components/hud/chassis/ChassisStatusPage').then((m) => ({ default: m.ChassisStatusPage }))
-)
+function sectionFor(pathname: string): CharacterSection {
+  if (pathname.startsWith('/character/shop')) return 'shop'
+  if (pathname.startsWith('/character/progress')) return 'progress'
+  return 'customize'
+}
 
-function ChassisRoute() {
+/**
+ * One Character page for /character, /character/shop and /character/progress: the header band
+ * (title, wallet, XP, stage, tabs) is drawn once here, and switching tabs swaps only the outlet.
+ * On phones Customize pins the band with its character stage, so the band is sticky there.
+ */
+function CharacterLayout() {
+  const section = sectionFor(useLocation({ select: (location) => location.pathname }))
+  const rootRef = React.useRef<HTMLDivElement>(null)
+  useBandHeight(rootRef)
+  React.useEffect(() => {
+    // Warm the other tabs' code once the page is idle.
+    const warm = () => {
+      void loadCustomizePage()
+      void loadShopPage()
+      void loadProgressPage()
+    }
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(warm, { timeout: 3000 })
+      return () => window.cancelIdleCallback?.(id)
+    }
+    const id = window.setTimeout(warm, 1500)
+    return () => window.clearTimeout(id)
+  }, [])
   return (
-    // Open to guests: they edit the starter character and sign up to keep it.
-    <div className="flex flex-col flex-1 min-h-0 h-full w-full">
-      <Suspense fallback={<HudWorkspaceGhost />}>
-        <LazyChassisStatusPage />
-      </Suspense>
+    <div ref={rootRef} className="character-area space-y-2 sm:space-y-4 lg:space-y-5 font-sans" data-section={section}>
+      <CharacterBand current={section} className={section === 'customize' ? 'character-band-pinned' : undefined} />
+      <Outlet />
     </div>
   )
 }
 
-export const Route = createFileRoute('/_hud/character')({
-  headers: () => xRobotsNoindexHeaders(),
-  head: () => ({
-    meta: privatePageSeo({
-      title: 'Character | Moltology',
-      description: 'Customize your character and seat gear from your vault.',
-    }),
-  }),
-  component: ChassisRoute,
-  pendingComponent: HudWorkspaceGhost,
-})
+/** Publishes the band's height as --character-band-h, so the pinned Customize stage sits under it. */
+function useBandHeight(rootRef: React.RefObject<HTMLDivElement | null>) {
+  React.useEffect(() => {
+    const root = rootRef.current
+    const band = root?.querySelector<HTMLElement>('[data-testid="character-band"]')
+    if (!root || !band || typeof ResizeObserver === 'undefined') return
+    const update = () => root.style.setProperty('--character-band-h', `${band.offsetHeight}px`)
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(band)
+    return () => observer.disconnect()
+  }, [rootRef])
+}
 
+export const Route = createFileRoute('/_hud/character')({
+  component: CharacterLayout,
+})
