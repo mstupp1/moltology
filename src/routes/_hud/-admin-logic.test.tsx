@@ -43,7 +43,7 @@ describe('Logic Atlas tab', () => {
   })
 
   it('sends old /admin/logic links to the tab, keeping their view and rule', () => {
-    const beforeLoad = LegacyLogicRoute.options.beforeLoad as (ctx: { search: Record<string, unknown> }) => void
+    const beforeLoad = LegacyLogicRoute.options.beforeLoad as unknown as (ctx: { search: Record<string, unknown> }) => void
     let thrown: any
     try {
       beforeLoad({ search: { tab: 'timeline', decision: 'forum-write-hardening' } })
