@@ -23,6 +23,7 @@ Read the shared prerequisites and matching skill before any content pipeline, in
 | Reels and Shorts | [reels-and-shorts-creator](../.agents/skills/reels-and-shorts-creator/SKILL.md) |
 | Cast stills, poses and reference sheets | [character-creator](../.agents/skills/character-creator/SKILL.md), `npm run cast:render`; cast in [characters/cast.json](characters/cast.json) |
 | Animated lessons with the 3D characters | [animated-lessons](../.agents/skills/animated-lessons/SKILL.md), `npm run anim:create`; cast in [characters/cast.json](characters/cast.json) |
+| Benthic comedy shorts (Crab Logic) | [benthic-comedy-shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md), `npm run anim:create`; cast in [characters/cast.json](characters/cast.json) |
 | Blog dispatches | [blog-creator](../.agents/skills/blog-creator/SKILL.md) |
 | Long-form YouTube topic validation | [youtube-research](../.agents/skills/youtube-research/SKILL.md) |
 | Composite layouts from references | [composite-reference-library](../.agents/skills/composite-reference-library/SKILL.md), `npm run refs`; JSON specs in [composite-layouts/](composite-layouts/README.md) |

@@ -2521,6 +2521,53 @@
       },
       "createdAt": "2026-11-19T20:59:51.478Z",
       "videoReplaced": "2026-11-20 lip sync v2 render (PR #547)"
+    },
+    {
+      "id": "reel-1795213273558",
+      "topic": "Crab Logic Ep. 1: Sol tries walking straight forward like a surface human; Vera and Moss explain why sideways is undefeated",
+      "hookHeadline": "I tried walking straight forward like a surface human today.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "vera, sol, moss (animated 3D cast)",
+      "narrationScript": "I tried walking straight forward like a surface human today. Why would you walk straight toward your problems? It felt bold. Very exposed. I hated every second. Sideways is undefeated. You can leave any conversation without turning around. Evolution got it right five times.",
+      "series": "Crab Logic",
+      "episode": 1,
+      "format": "animated-sketch",
+      "cast": [
+        "vera",
+        "sol",
+        "moss"
+      ],
+      "loudness": 4,
+      "archivePath": "Social Archive/2026/11/reel-f0f9ac2cf0a87d0a8898f761",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795213274937_e7ab63301272a0a6_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 19.566667,
+      "status": "queued",
+      "scheduledFor": "2026-11-21T17:00:00.000Z",
+      "queueId": "6b00c2052c18af30956c81c9",
+      "zernioInstagramPostId": "6b00c7dc56c0d21275437d7f",
+      "zernioYouTubePostId": "6b00c7dc56c0d21275437d7f",
+      "zernioPostId": "6b00c7dc56c0d21275437d7f",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "More crustacean logic: https://moltology.org",
+      "caption": "Walking straight forward is a design flaw.\n\nSol tried it once. Never again.\n\n#CrabLogic #CrustaceanHumor #Moltology",
+      "hashtags": [
+        "#CrabLogic",
+        "#CrustaceanHumor",
+        "#Moltology"
+      ],
+      "ctaGoal": "homepage",
+      "commentTriggerKeyword": "INITIATE",
+      "commentTriggerUrl": "https://moltology.org",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-20T22:21:19.006Z"
     }
   ]
 }

@@ -384,6 +384,7 @@ export interface DailyReelScript {
   relatedBlogSlug?: string
   characterArc?: string
   ctaGoal?: CtaGoal
+  queueId?: string
   commentTriggerKeyword?: string
   commentTriggerUrl?: string
   trialParams?: {
@@ -403,6 +404,7 @@ export interface CreateReelOptions {
   topic?: string
   theme?: 'moltmaxxing' | 'meltmaxxing' | 'ecdysis' | 'pincer-torque' | 'benthic-depth' | 'quiz' | string
   ctaGoal?: CtaGoal
+  queueId?: string
   holidayOrEvent?: string
   platforms?: ('instagram' | 'youtube')[]
   platform?: 'all' | 'instagram' | 'youtube'
@@ -1068,12 +1070,13 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       masterReelPath = path.join(tempDir, 'master.mp4')
       await pipeline(Readable.fromWeb(response.body as any), fs.createWriteStream(masterReelPath))
     }
+    const targetQueueId = options.queueId || scriptData.queueId || DEFAULT_REELS_QUEUE_ID
     const publication = {
       instagramCaption: scriptData.caption,
       youtubeTitle: scriptData.youtubeTitle || `${scriptData.hookHeadline} #Shorts`,
       youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\n${ctaConfig.captionCta} ${ctaConfig.url}`,
       youtubeTags: scriptData.youtubeTags || ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
-      firstComment: scriptData.firstComment, queueId: DEFAULT_REELS_QUEUE_ID, profileId: DEFAULT_PROFILE_ID,
+      firstComment: scriptData.firstComment, queueId: targetQueueId, profileId: DEFAULT_PROFILE_ID,
       instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID, youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
       isAiGenerated: true, validateMediaWindow: true, publishNow: !!options.publishNow, platform: platformTarget,
     }
@@ -1101,7 +1104,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       durationSeconds,
       status: options.publishNow ? 'published' : 'queued',
       scheduledFor: queueResult?.scheduledFor || null,
-      queueId: DEFAULT_REELS_QUEUE_ID,
+      queueId: targetQueueId,
       zernioInstagramPostId: queueResult?.instagramPostId || null,
       zernioYouTubePostId: queueResult?.youtubePostId || null,
       zernioPostId: queueResult?.postId || null,
@@ -1130,6 +1133,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       }
     }
   } else {
+    const targetQueueId = options.queueId || scriptData.queueId || DEFAULT_REELS_QUEUE_ID
     console.log(`\n5️⃣ [Dry Run] Skipped Drive archive and uploads. Master video saved at: ${masterReelPath}`)
     queueResult = await queueDualReelAndShort({
       videoUrl: publicUrl || `https://placeholder.storage.neon.tech/moltology-public-assets/videos/social/reels/${path.basename(masterReelPath)}`,
@@ -1138,7 +1142,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       youtubeDescription: scriptData.youtubeDescription || `${scriptData.narrationScript}\n\n${ctaConfig.captionCta} ${ctaConfig.url}`,
       youtubeTags: scriptData.youtubeTags || ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
       firstComment: scriptData.firstComment,
-      queueId: DEFAULT_REELS_QUEUE_ID,
+      queueId: targetQueueId,
       profileId: DEFAULT_PROFILE_ID,
       instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
       youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
@@ -1202,6 +1206,7 @@ Options:
   --no-director             Skip the Gemini shot list and use the curated scene prompts (still continuity-styled)
   --image-model <name>      Image model for AI outro: nano-banana-pro | nano-banana-2 (default: nano-banana-pro)
   --platform <name>         Platform target: all | instagram | youtube (default: all)
+  --queue-id <id>           Override target Zernio queue ID (default: script.queueId or Moltology Reels & Shorts)
   --custom-video <path/url> Path or URL to pre-rendered master video to skip generation
 
 Examples:
@@ -1220,6 +1225,7 @@ Examples:
   let renderOnly = false
   let theme: string | undefined
   let ctaGoal: any
+  let queueId: string | undefined
   let mascot: any
   let holidayOrEvent: string | undefined
   let colorGrading: any
@@ -1256,6 +1262,7 @@ Examples:
     else if (args[i] === '--render-only') renderOnly = true
     else if (args[i] === '--theme' && args[i + 1]) theme = args[++i]
     else if (args[i] === '--cta-goal' && args[i + 1]) ctaGoal = args[++i]
+    else if (args[i] === '--queue-id' && args[i + 1]) queueId = args[++i]
     else if (args[i] === '--cta-headline' && args[i + 1]) ctaHeadline = args[++i]
     else if (args[i] === '--cta-subheadline' && args[i + 1]) ctaSubheadline = args[++i]
     else if (args[i] === '--cta-url' && args[i + 1]) ctaUrl = args[++i]
@@ -1331,6 +1338,7 @@ Examples:
       topic,
       theme,
       ctaGoal,
+      queueId,
       ctaTexture,
       ctaHeadline,
       ctaSubheadline,

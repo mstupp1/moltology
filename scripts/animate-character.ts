@@ -176,17 +176,24 @@ async function main() {
   fs.mkdirSync(outDir, { recursive: true })
   const rel = (p: string) => path.resolve(path.dirname(lessonPath), p)
 
+  const isSketch = lesson.format === 'sketch'
+  const turnGap = lesson.turnGap ?? (isSketch ? 0.14 : 0.35)
+  const tail = lesson.tail ?? (isSketch ? 0.3 : 0.8)
+  const noOutro = lesson.outro === 'none' || (isSketch && !lesson.outro)
+  const ctaDurationSeconds = noOutro ? 0 : OUTRO_SECONDS
+  const bgVolume = lesson.bgVolume ?? (isSketch ? 0 : undefined)
+
   const looks = Object.fromEntries(castOf(lesson).map((c) => [c.id, castLook(c.id)]))
   const look = looks[lesson.host]
   const narratorVoice = args.voice || (process.env.FISH_VOICE_REFERENCE_ID ? '' : NARRATOR)
-  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice })
+  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice, turnGap })
   const width = even(1080 * args.scale)
   const height = even(1920 * args.scale)
   if (args.mouthCheck) {
     await mouthCheck(lesson, looks, { audio, words, talkBy, mouthBy, emphasisBy, accentBy }, { width, height, outDir, maxSeconds: args.maxSeconds, art: args.art })
     return
   }
-  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail: 0.8, hookLift: 0.9, mouthBy, emphasisBy, accentBy })
+  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail, hookLift: 0.9, mouthBy, emphasisBy, accentBy })
   if (args.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(args.maxSeconds * FPS))
   const gestures = timeline.cues.filter((c) => c.gesture)
   console.log(`🎭 Acting: ${gestures.length} gestures (${gestures.filter((c) => c.auto).length} automatic)`)
@@ -220,11 +227,11 @@ async function main() {
   }
   if (args.framesOnly) return
 
-  // Outro: the host waves goodbye under the website invitation, rendered the same way.
+  // Outro: the host waves goodbye under the website invitation, rendered the same way (skipped for hard-cut sketches).
   const outroLines = ['Read the full passage at', 'moltology.org']
   let outroVideo: string | undefined
-  const outroImage = lesson.outro ? rel(lesson.outro) : undefined
-  if (!outroImage && !args.maxSeconds) {
+  const outroImage = lesson.outro && lesson.outro !== 'none' ? rel(lesson.outro) : undefined
+  if (!noOutro && !outroImage && !args.maxSeconds) {
     const outroFrames = Math.ceil(OUTRO_SECONDS * FPS)
     const outroTimeline = {
       ...timeline,
@@ -291,7 +298,8 @@ async function main() {
     words: words.slice(hookCount),
     outputPath: final,
     colorGrading: 'none',
-    ctaDurationSeconds: OUTRO_SECONDS,
+    ctaDurationSeconds,
+    ...(bgVolume !== undefined ? { backgroundAudioVolume: bgVolume } : {}),
     customOutroVideoPath: outroVideo,
     customOutroImagePath: outroImage,
     tempDir: path.join(outDir, 'composite'),
@@ -303,7 +311,7 @@ async function main() {
     'last-hook-word': Math.max(0, hookEnd - 0.1),
     'first-body-phrase': firstBody / 1000 + 0.2,
     later: result.durationSeconds * 0.6,
-    outro: result.durationSeconds - 1,
+    outro: noOutro ? Math.max(0, result.durationSeconds - 0.12) : result.durationSeconds - 1,
   })
   fs.writeFileSync(path.join(outDir, 'draft.json'), JSON.stringify(reelDraftFrom(lesson), null, 2))
   console.log(`\n✅ ${final} (${result.durationSeconds.toFixed(1)}s)\n   checks: ${path.join(outDir, 'checks')}\n   draft:  ${path.join(outDir, 'draft.json')}`)

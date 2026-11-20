@@ -27,6 +27,7 @@ blank page. Keep one-offs to at most one in four pieces.
 | **Ask the Oracle** | One real, recognisable problem, answered calmly and usefully | Steal these lines, cheat sheet, quote deck, reverse tutorial | `crab_moss_tern` answering, `lobster_nell_quill` for anything from the Codex | Warm lamp-lit study at depth, sea-glass glow from the orb as the one light source | Amber |
 | **The Molt Log** | A running workplace story with the same characters, one small win per episode | POV, fake group chat, expectation vs reality, story, before and after | The Log crew (section 2): the same three characters every episode | Illustrated deep-sea office, warm practicals, recurring set (the same desk, the same window, the same plant) | Lavender |
 | **Codex Lessons** | One Codex passage turned into one thing to do today, taught by the same 3D host | Animated lesson shorts ([animated-lessons](../.agents/skills/animated-lessons/SKILL.md)): claim, the passage in plain words, the action, the website invitation | `crab_juno_marsh` (Juno) hosting, `lobster_kit_shallows` (Kit) asking, rendered by the site's 3D character code | Deep-water set or a lamp-lit study at depth, cinematic rim light, the host centre frame | Amber |
+| **Crab Logic** | Pure deadpan crab and lobster micro-comedy with zero productivity tips and a hard cut on the punchline | 12–18s 3D ensemble sketches ([benthic-comedy-shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md)): Surface Confusion, Literal Crab Logic, Reef Breakroom Drama | Rotating 2–3 cast ensembles (`bo`, `vera`, `otto`, `sol`, `nell`, `moss`) rendered by the site's 3D character code | Existing 3D sets or custom 9:16 painted sets per gag; fast cuts into reaction close-ups, no promo outro | Cyan |
 
 Rules:
 
@@ -42,7 +43,8 @@ Rules:
   two-part story. Check the ledger (section 7).
 - **New series.** Propose a new series only with three episode ideas ready. Add it to this
   table in the same change. Codex Lessons started with: the Daily Shedding Routine (SCR-030),
-  the Nightly Molt Audit and the Isolation Protocols.
+  the Nightly Molt Audit and the Isolation Protocols. Crab Logic started with: Walking Forward,
+  Six Alarms, and The Cold Box.
 
 ## 2. Cast
 
@@ -239,3 +241,4 @@ character), then make the sheet again. Save it beside the draft as `phone-proof.
 | [Benthic Swipe Lab](../.agents/skills/benthic-swipe-lab/SKILL.md) | Shell Check, The Molt Log | Meme formats live here; the cover system matters most |
 | [Carousels](../.agents/skills/instagram-carousel-creator/SKILL.md) | Ask the Oracle, Field Notes | Useful decks; the payoff slide follows the type scale strictly |
 | [Single posts](../.agents/skills/instagram-post-creator/SKILL.md) | Any; lead magnets use Ask the Oracle | One frame: stopper, focal point and headline do all the work |
+| [Benthic comedy shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md) | Crab Logic | 12–18s pure 3D comedy; hard cut on the punchline, custom sets allowed, dedicated comedy queue |

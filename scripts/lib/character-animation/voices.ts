@@ -47,13 +47,13 @@ async function duration(file: string): Promise<number> {
 }
 
 /** Joins takes with a pause after each one but the last. */
-async function joinTakes(files: string[], outPath: string): Promise<void> {
+async function joinTakes(files: string[], outPath: string, turnGap = TURN_GAP): Promise<void> {
   if (files.length === 1) {
     fs.copyFileSync(files[0], outPath)
     return
   }
   const inputs = files.flatMap((f) => ['-i', f])
-  const chain = files.map((_, i) => `[${i}:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=mono${i < files.length - 1 ? `,apad=pad_dur=${TURN_GAP}` : ''}[a${i}]`)
+  const chain = files.map((_, i) => `[${i}:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=mono${i < files.length - 1 ? `,apad=pad_dur=${turnGap}` : ''}[a${i}]`)
   const filter = `${chain.join(';')};${files.map((_, i) => `[a${i}]`).join('')}concat=n=${files.length}:v=0:a=1[out]`
   await execFileAsync('ffmpeg', ['-v', 'error', '-y', ...inputs, '-filter_complex', filter, '-map', '[out]', '-c:a', 'libmp3lame', '-q:a', '2', outPath])
 }
@@ -70,7 +70,12 @@ export interface LessonVoice {
   accentBy: number[][]
 }
 
-export async function voiceLesson(lesson: Lesson, outDir: string, options: { silent: boolean; fps: number; narratorVoice: string; rate?: string }): Promise<LessonVoice> {
+export async function voiceLesson(
+  lesson: Lesson,
+  outDir: string,
+  options: { silent: boolean; fps: number; narratorVoice: string; rate?: string; turnGap?: number }
+): Promise<LessonVoice> {
+  const turnGap = options.turnGap ?? TURN_GAP
   const cast = castOf(lesson)
   const segments = segmentsOf(lesson, options.narratorVoice)
   const dir = path.join(outDir, 'voice')
@@ -103,7 +108,7 @@ export async function voiceLesson(lesson: Lesson, outDir: string, options: { sil
   takes.forEach((take, k) => {
     offsets.push(clock)
     for (const w of take.words) words.push({ ...w, startMs: w.startMs + clock * 1000, endMs: w.endMs + clock * 1000 })
-    clock += take.seconds + (k < takes.length - 1 ? TURN_GAP : 0)
+    clock += take.seconds + (k < takes.length - 1 ? turnGap : 0)
   })
   const total = clock
   const frames = Math.ceil((total + 1) * options.fps)
@@ -140,7 +145,7 @@ export async function voiceLesson(lesson: Lesson, outDir: string, options: { sil
 
   const audio = path.join(outDir, options.silent ? 'voice-silent.mp3' : 'voice.mp3')
   if (options.silent) await silentAudio(total + 0.1, audio)
-  else await joinTakes(takes.map((t) => t.file!), audio)
+  else await joinTakes(takes.map((t) => t.file!), audio, turnGap)
   fs.writeFileSync(path.join(outDir, 'words.json'), JSON.stringify({ segments, offsets, words }, null, 2))
   return { audio, words, talkBy, mouthBy: mouths.map((m) => m.join('')), emphasisBy, accentBy }
 }
