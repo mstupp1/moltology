@@ -229,9 +229,9 @@ function HudContent() {
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
-                  : // Always keep the scrollbar's lane, so pages that scroll and pages that don't share one
-                  // panel width and nothing shifts when switching tabs or pages.
-                  'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain [scrollbar-gutter:stable]'
+                  : // app-scroll-lane keeps the scrollbar's lane on mouse devices so short and long pages share
+                  // one panel width; touch devices use overlay bars and get no lane (see index.css).
+                  'p-2.5 sm:p-4 md:px-2 md:py-6 overflow-y-auto overscroll-y-contain app-scroll-lane'
               } ${
                 // Desktop standard pages keep the scene bright around one see-through page panel.
                 // Phones get the full-width panel tint from the backdrop layer above, so main stays clear there.
