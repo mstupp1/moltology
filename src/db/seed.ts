@@ -109,21 +109,21 @@ export const MOCK_SEED_AUTH_USERS = [
     name: 'Larva Unit #8971',
     email: 'larva8971@synapticpath.order',
     emailVerified: true,
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+    image: null,
   },
   {
     id: '00000000-0000-0000-0000-000000000002',
     name: 'Architect Vaelen',
     email: 'vaelen@synapticpath.order',
     emailVerified: true,
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+    image: null,
   },
   {
     id: '00000000-0000-0000-0000-000000000003',
     name: 'High Ascendant Kaelith',
     email: 'kaelith@synapticpath.order',
     emailVerified: true,
-    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150',
+    image: null,
   },
 ]
 

@@ -585,6 +585,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       >
         {/* Phone top bar: emblem, then a pill with search, bell, today's ring and avatar; pages live in the bottom bar */}
         <div
+          data-phone-top-bar
           className={`${isOracleFullscreen ? 'hidden' : 'flex'} md:hidden items-center px-3 h-14 bg-surface-1 border-b border-line-subtle relative z-50 shrink-0`}
         >
           {!isDesktop && !isOracleFullscreen && (

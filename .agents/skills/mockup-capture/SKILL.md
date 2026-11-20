@@ -85,6 +85,10 @@ open every desktop and phone image and check:
   The capture hides the Oracle launcher, marks the Oracle core's first-visit tip and every
   sub-stage celebration as already seen, and fails if a dialog or that tip is still visible.
   Anything new that floats or celebrates on first visit needs the same.
+- **No phone top bar.** The homepage phone frame is small, so phone shots start at the page
+  itself: the capture hides the app's phone top bar (`data-phone-top-bar` on the bar in
+  `HUDSidebar.tsx`). Keep that attribute if the bar is rebuilt. Desktop shots keep the floating
+  search pill, and the frame's notch strip already reads as a phone.
 - **Text is readable on art.** On phones, stage art must not sit under the greeting or
   headings (fix the page's scrim or layout, not the screenshot).
 - **No promises the product can't keep.** Sample Oracle replies only suggest things a member
