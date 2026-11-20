@@ -596,7 +596,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   // Phone: the app's faint pill (Join or menu) and the member's XP-ring portrait. Desktop: Dashboard + medallion.
   const headerActions = (
-    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
       <div className="lg:hidden flex items-center">
         {authReady ? (
           <Suspense fallback={<div className="flex items-center -mr-1.5"><div className={PUBLIC_PHONE_PILL}>{menuButton}</div></div>}>
@@ -612,7 +612,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         )}
       </div>
 
-      <div className="hidden lg:flex items-center gap-2 sm:gap-4">
+      <div className="hidden lg:flex items-center gap-3 sm:gap-4">
         {authReady ? (
           <Suspense fallback={<PublicHeaderAuthSkeleton layout="desktop" />}>
             <LazyPublicHeaderAuthSlot

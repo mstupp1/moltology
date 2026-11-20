@@ -194,7 +194,7 @@ export function NewsPostDetail() {
             })()}
 
             {/* Author bar & actions */}
-            <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 pt-4 border-t border-line-subtle">
+            <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-4 border-t border-line-subtle">
               <div className="space-y-1.5">
                 <Byline post={post} withAvatar />
                 {post.authorRole && <p className="text-xs font-sans text-ink-muted">{post.authorRole}</p>}
@@ -280,7 +280,7 @@ export function NewsPostDetail() {
               Don't remain a fragile larval human. Enter the Benthic Core to run your biometrics through our Moltmaxxing Dashboard, transmute soft assets, and enforce zero-latency execution.
             </p>
 
-            <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
               <BenthicCTAButton
                 size="lg"
                 onClick={() => {
