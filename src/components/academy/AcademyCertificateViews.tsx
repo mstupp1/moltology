@@ -183,7 +183,7 @@ function AvailableRow({ certificate, onSignUp }: { certificate: AcademyCertifica
 
 export function AcademyCredential({ credential }: { credential: AcademyCredentialView }) {
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5">
       <AcademyCrumbs
         items={[
           {

@@ -330,7 +330,7 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
 
   return (
     <section
-      className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-line-subtle space-y-3 sm:space-y-4"
+      className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-line-subtle space-y-2 sm:space-y-4"
       aria-labelledby="blog-comments-heading"
     >
       <h2 id="blog-comments-heading" className="font-grotesk text-base sm:text-lg font-semibold text-ink flex items-center gap-2">

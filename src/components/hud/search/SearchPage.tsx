@@ -54,7 +54,7 @@ export function SearchPage({
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative">
       <HudTitlePanel
         treatment="band"
         title="Search"

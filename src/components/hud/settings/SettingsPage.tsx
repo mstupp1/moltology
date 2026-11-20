@@ -110,9 +110,9 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
 
   if (loading) {
     return (
-      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
+      <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative">
         <HudTitlePanel treatment="band" title="Settings" />
-        <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-3 sm:gap-4 lg:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-2 sm:gap-4 lg:gap-5">
           <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset animate-pulse motion-reduce:animate-none h-64" />
           <div className="rounded-card border border-line-subtle bg-surface-1 hud-sheen shadow-sheen-inset animate-pulse motion-reduce:animate-none h-40" />
         </div>
@@ -121,10 +121,10 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative">
       <HudTitlePanel treatment="band" title="Settings" />
-      <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-3 sm:gap-4 lg:gap-5">
-        <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-2 sm:gap-4 lg:gap-5">
+        <div className="space-y-2 sm:space-y-4 lg:space-y-5">
           <SettingsCard
             title="Account"
             description="Your username is your public name in the forum and member lists."
@@ -168,7 +168,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
           </SettingsCard>
         </div>
 
-        <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+        <div className="space-y-2 sm:space-y-4 lg:space-y-5">
           <SettingsCard title="Oracle" description="Personality and custom instructions for every chat.">
             <OracleChatSettingsForm />
           </SettingsCard>

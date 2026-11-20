@@ -270,8 +270,8 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           </div>
 
           {/* Middle: Prominent & Larger Value Propositions */}
-          <div className="relative z-10 my-6 sm:my-8 space-y-3 sm:space-y-4 max-w-xl">
-            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
+          <div className="relative z-10 my-6 sm:my-8 space-y-2 sm:space-y-4 max-w-xl">
+            <div className="flex items-start gap-2 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
               <div className="p-2 sm:p-3 rounded-control bg-cyan-soft border border-line-subtle text-cyan-glow shrink-0">
                 <Activity className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
@@ -285,7 +285,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               </div>
             </div>
 
-            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
+            <div className="flex items-start gap-2 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
               <div className="p-2 sm:p-3 rounded-control bg-cyan-soft border border-line-subtle text-cyan-glow shrink-0">
                 <Cpu className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
@@ -299,7 +299,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               </div>
             </div>
 
-            <div className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
+            <div className="flex items-start gap-2 sm:gap-4 p-3.5 sm:p-5 rounded-card bg-surface-1/80 hud-sheen border border-line-subtle backdrop-blur-md transition-all hover:border-line hover:bg-surface-2/80 shadow-sheen-inset">
               <div className="p-2 sm:p-3 rounded-control bg-cyan-soft border border-line-subtle text-cyan-glow shrink-0">
                 <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
@@ -315,7 +315,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           </div>
 
           {/* Bottom: Social Proof & Testimonial Quote */}
-          <div className="relative z-10 pt-3 sm:pt-4 border-t border-line-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 max-w-xl">
+          <div className="relative z-10 pt-3 sm:pt-4 border-t border-line-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 max-w-xl">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="flex -space-x-2">
                 <BrandIcon className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" label="Ascendant 1" />

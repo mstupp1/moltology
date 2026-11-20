@@ -232,7 +232,7 @@ function ForumBoardPage() {
   if (!category) {
     return (
       <ForumShell>
-        <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans pb-8">
+        <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans pb-8">
           <div>
             <ForumBandCrumbs />
             <HudTitlePanel treatment="band" joined title="Board not found" description="This board does not exist or was renamed." />
@@ -245,7 +245,7 @@ function ForumBoardPage() {
 
   return (
     <ForumShell>
-      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
+      <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
         <div>
           <ForumBandCrumbs board={category} current />
           <HudTitlePanel
@@ -272,8 +272,8 @@ function ForumBoardPage() {
 
         <ForumBoardNav boards={boards} variant="strip" className="lg:hidden" current={category.slug} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
-          <div className="lg:col-span-8 space-y-3 sm:space-y-4 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 lg:gap-5 items-start">
+          <div className="lg:col-span-8 space-y-2 sm:space-y-4 min-w-0">
             {canStartTopic && (
               <InlineTopicComposer
                 ref={composerRef}
@@ -312,7 +312,7 @@ function ForumBoardPage() {
               </div>
 
               {loading ? (
-                <div className="space-y-2" aria-busy="true">
+                <div className="space-y-1.5 sm:space-y-2" aria-busy="true">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 space-y-2">
                       <HudGhostSkeleton variant="neutral" preset="heading" width="65%" height={16} />
@@ -339,7 +339,7 @@ function ForumBoardPage() {
                   ) : null}
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   {topics.map((topic) => (
                     <ForumTopicRow key={topic.id} topic={topic} showCategory={false} />
                   ))}

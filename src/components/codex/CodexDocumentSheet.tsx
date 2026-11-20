@@ -265,7 +265,7 @@ export function CodexDocumentSheet({
 
   return (
     <article className={cn('relative', compact ? 'space-y-7' : 'space-y-7 sm:space-y-10')}>
-      <header className="space-y-3 sm:space-y-4">
+      <header className="space-y-2 sm:space-y-4">
         <div className="eyebrow flex flex-wrap items-center gap-x-2 gap-y-1 opacity-70">
           <span>{scripture.volumeName}</span>
           <span aria-hidden="true">·</span>

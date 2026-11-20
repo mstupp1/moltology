@@ -53,7 +53,7 @@ export function ProfileTabsPage({
   const requestCount = usePendingFriendRequests(profileId)
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5">
       {/* On the overview the profile card below carries the member's name as the page heading. */}
       <HudTitlePanel
         treatment="band"

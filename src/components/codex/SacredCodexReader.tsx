@@ -378,7 +378,7 @@ export const SacredCodexReader: React.FC<SacredCodexReaderProps> = ({ scriptureS
       <h1 className="sr-only">The Sacred Codex</h1>
       {/* Phone: one slim sticky bar where tapping the title opens the contents. Desktop: the
           page's header band, level with the search pill: title, place in the canon, actions. */}
-      <div className="hud-codex-band sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2.5 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:gap-4 lg:mb-5 lg:bg-surface-2 lg:backdrop-blur-none">
+      <div className="hud-codex-band sticky -top-2.5 sm:-top-4 md:-top-6 z-10 -mx-2 sm:-mx-4 md:-mx-6 -mt-2.5 sm:-mt-4 md:-mt-6 px-1.5 sm:px-2 mb-3 flex items-center gap-1 bg-abyss/90 backdrop-blur-sm border-b border-line-subtle lg:gap-4 lg:mb-5 lg:bg-surface-2 lg:backdrop-blur-none">
         <p aria-hidden="true" className="hidden lg:block font-grotesk font-semibold text-xl sm:text-2xl text-ink tracking-tight">
           Codex
         </p>

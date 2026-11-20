@@ -36,9 +36,9 @@ function RowGhost() {
 /** First paint of a board: band, toolbar, then post cards beside the board rail. */
 export function ForumBoardGhost() {
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 select-none animate-in fade-in duration-150" data-testid="forum-board-ghost">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 select-none animate-in fade-in duration-150" data-testid="forum-board-ghost">
       <BandGhost titleWidth="40%" action />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 lg:gap-5 items-start">
         <div className="lg:col-span-8 space-y-2.5">
           <HudGhostSkeleton variant="neutral" preset="custom" width="100%" height={44} className="rounded-card" />
           {Array.from({ length: 4 }).map((_, i) => (
@@ -58,10 +58,10 @@ export function ForumBoardGhost() {
 /** First paint of a post: band, the opening post, the reply bar, replies, and the rail. */
 export function ForumThreadGhost() {
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 select-none animate-in fade-in duration-150" data-testid="forum-thread-ghost">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 select-none animate-in fade-in duration-150" data-testid="forum-thread-ghost">
       <BandGhost titleWidth="65%" action />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
-        <div className="lg:col-span-8 space-y-3 sm:space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 lg:gap-5 items-start">
+        <div className="lg:col-span-8 space-y-2 sm:space-y-4">
           <div className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5 space-y-3">
             <div className="flex items-center gap-2.5">
               <HudGhostSkeleton variant="neutral" preset="avatar" width={44} height={44} />

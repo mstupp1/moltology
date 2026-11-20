@@ -440,7 +440,7 @@ function ForumThreadPage() {
 
   return (
     <ForumShell>
-      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
+      <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
         <div>
           <ForumBandCrumbs board={board} />
           <HudTitlePanel
@@ -463,8 +463,8 @@ function ForumThreadPage() {
           </HudTitlePanel>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
-          <div className="lg:col-span-8 min-w-0 space-y-3 sm:space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 lg:gap-5 items-start">
+          <div className="lg:col-span-8 min-w-0 space-y-2 sm:space-y-4">
             {/* The post itself */}
             <article
               className="rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5 space-y-3"

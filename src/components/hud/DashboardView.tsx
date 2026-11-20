@@ -16,10 +16,10 @@ import { DashboardChangelogPanel } from '@/components/hud/dashboard/DashboardCha
 export default function DashboardView() {
   return (
     // No header band here: the Today hero is the band, running to the panel's top and sides.
-    <div className="hud-page-hero-top space-y-3 sm:space-y-4 lg:space-y-5 font-sans">
+    <div className="hud-page-hero-top space-y-2 sm:space-y-4 lg:space-y-5 font-sans">
       <DashboardTodayStrip />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-5 items-stretch">
         <ForumHubCard />
         <ConnectionsHubCard />
         <div className="lg:col-span-2 2xl:col-span-1 flex flex-col">
@@ -33,7 +33,7 @@ export default function DashboardView() {
 
       <DashboardStorePanel />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 lg:gap-5 items-start">
         <DashboardNewsPanel />
         <DashboardChangelogPanel />
       </div>

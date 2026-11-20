@@ -205,7 +205,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
         >
           <div>{copyrightText}</div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
             <Link
               to="/privacy"
               className="transition-colors text-2xs hover:text-cyan-glow text-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"

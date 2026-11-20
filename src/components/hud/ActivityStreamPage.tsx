@@ -196,7 +196,7 @@ export function ActivityStreamPage() {
   }, [nextCursor])
 
   return (
-    <div className="font-sans text-ink max-w-3xl space-y-3 sm:space-y-4">
+    <div className="font-sans text-ink max-w-3xl space-y-2 sm:space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
         <PillSwitch
           items={ACTIVITY_FEED_SCOPES}

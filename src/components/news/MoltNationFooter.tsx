@@ -177,7 +177,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
             © 2026 MOLTNATION MEDIA GROUP. ALL RIGHTS RESERVED.
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
             <Link
               to="/privacy"
               className="hover:text-cyan-glow transition-colors text-2xs rounded-chip focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
