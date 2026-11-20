@@ -205,11 +205,20 @@ input[type="range"].dial-range:focus-visible {
 [data-hud-page-panel] {
   --hud-band-x: 0.5rem;
   --hud-band-top: 0.625rem;
+  /* A band's content lines up with the text inside the cards below it: page edge + card padding. */
+  --hud-band-card-pad: 0.75rem;
+  --hud-band-inset: calc(var(--hud-band-x) + var(--hud-band-card-pad));
 }
 @media (min-width: 640px) {
   [data-hud-page-panel] {
     --hud-band-x: 1rem;
     --hud-band-top: 1rem;
+    --hud-band-card-pad: 1rem;
+  }
+}
+@media (min-width: 1024px) {
+  [data-hud-page-panel] {
+    --hud-band-card-pad: 1.25rem;
   }
 }
 /* Height of a band's title row on desktop: 4.5rem, twice the 2.25rem row content, so the title
@@ -242,15 +251,15 @@ input[type="range"].dial-range:focus-visible {
   margin-top: calc(var(--hud-band-top, 0px) * -1);
   margin-left: calc(var(--hud-band-x, 0px) * -1);
   margin-right: calc(var(--hud-band-x, 0px) * -1);
-  padding-left: var(--hud-band-x, 1rem);
-  padding-right: var(--hud-band-x, 1rem);
+  padding-left: var(--hud-band-inset, 1rem);
+  padding-right: var(--hud-band-inset, 1rem);
 }
 /* The rest of a band whose first row (crumbs) sits directly above it. */
 .hud-title-band-rest {
   margin-left: calc(var(--hud-band-x, 0px) * -1);
   margin-right: calc(var(--hud-band-x, 0px) * -1);
-  padding-left: var(--hud-band-x, 1rem);
-  padding-right: var(--hud-band-x, 1rem);
+  padding-left: var(--hud-band-inset, 1rem);
+  padding-right: var(--hud-band-inset, 1rem);
 }
 .hud-title-band {
   padding-top: 0.75rem;
@@ -327,7 +336,7 @@ input[type="range"].dial-range:focus-visible {
 /* A hero directly under a header band (your own profile's Overview) joins it: no gap, so band
    and hero read as one header like another member's profile. Cancels the page's section gap. */
 .hud-band-hero-joined {
-  margin-top: -0.75rem;
+  margin-top: -0.5rem;
 }
 @media (min-width: 640px) {
   .hud-band-hero-joined {
@@ -368,8 +377,8 @@ input[type="range"].dial-range:focus-visible {
     padding-bottom: var(--hud-band-pad);
     margin-left: calc(var(--hud-band-x, 0px) * -1);
     margin-right: calc(var(--hud-band-x, 0px) * -1);
-    padding-left: var(--hud-band-x, 1rem);
-    padding-right: var(--hud-band-x, 1rem);
+    padding-left: var(--hud-band-inset, 1rem);
+    padding-right: var(--hud-band-inset, 1rem);
     border-top-left-radius: 11px;
     border-top-right-radius: 11px;
   }
