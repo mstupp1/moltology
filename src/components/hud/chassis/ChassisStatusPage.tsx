@@ -398,7 +398,7 @@ export const ChassisStatusPage: React.FC = () => {
     >
       {/* The page's header band. Below lg the whole stage is pinned as one compact block (title
           row, section tabs, then the character) while only the options scroll; on wide screens
-          only the title row forms the band. */}
+          the title and section tabs form the band above the stage. */}
       <div className="hud-title-band-lead max-lg:sticky max-lg:z-20 max-sm:-top-2.5 sm:max-md:-top-4 md:max-lg:-top-6 max-lg:pt-3 md:max-lg:pt-[var(--hud-band-pad)] max-lg:pb-2 max-lg:space-y-2 max-lg:bg-surface-2/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line-subtle lg:contents">
         <div className="hud-title-band-lead-lg lg:col-span-2 flex flex-wrap items-center gap-x-4 gap-y-2 lg:bg-surface-2 lg:border-b lg:border-line-subtle">
           <BandHeadingRow
