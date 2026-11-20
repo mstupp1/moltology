@@ -512,8 +512,26 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const parentWorldQ = new Quaternion()
   const nudge = new Quaternion()
   /** Swing each arm out at the shoulder until its forearm, claw and pincer only touch what they were inside. */
-  const solveContacts = () => {
+  /**
+   * How far each shoulder is still turned out of a contact, in its parent's space. It carries over
+   * from frame to frame and lets go slowly, so an arm that has been pushed out slides along what it
+   * touches instead of snapping back in each frame and being pushed out again (which reads as two
+   * things fighting for the same space).
+   */
+  const heldOut = { L: new Quaternion(), R: new Quaternion() }
+  const local = new Quaternion()
+  /** `dt` > 0 starts a new frame: last frame's push is put back (eased off a little) before solving. */
+  const solveContacts = (dt = 0) => {
     if (!body) return
+    for (const tag of ['L', 'R'] as const) {
+      const shoulder = rig.bones.get(`arm${tag}`)
+      if (!shoulder) continue
+      if (dt > 0) {
+        heldOut[tag].slerp(local.identity(), 1 - Math.exp(-dt * 2.5))
+        shoulder.quaternion.premultiply(heldOut[tag])
+        shoulder.updateMatrixWorld(true)
+      }
+    }
     body.update()
     for (const tag of ['L', 'R'] as const) {
       const shoulder = rig.bones.get(`arm${tag}`)
@@ -555,9 +573,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         turnAxis.normalize()
         const angle = Math.min(0.4, (deepest + 0.004) / reach) * step
         nudge.setFromAxisAngle(turnAxis, angle)
-        shoulder.getWorldQuaternion(worldQ)
+        // The same turn in the shoulder's parent space, kept so next frame starts from it.
         shoulder.parent!.getWorldQuaternion(parentWorldQ)
-        shoulder.quaternion.copy(parentWorldQ.invert().multiply(nudge).multiply(worldQ))
+        local.copy(parentWorldQ).invert().multiply(nudge).multiply(parentWorldQ)
+        shoulder.quaternion.premultiply(local)
+        heldOut[tag].premultiply(local)
         shoulder.updateMatrixWorld(true)
         body.update()
       }
@@ -887,7 +907,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     }
     spring.update(dt, idle)
     rig.root.updateMatrixWorld(true)
-    if (avoiding) solveContacts()
+    if (avoiding) solveContacts(Math.max(dt, 1e-4))
     occluders.update()
   }
 

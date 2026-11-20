@@ -414,7 +414,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       e.character.update(dt, time, !options.reducedMotion)
     }
     // With a cast, everyone has moved now: settle claws that swung into a neighbour (scripted only).
-    for (let pass = 0; extras.length && pass < 2; pass++) {
+    for (let pass = 0; extras.length && pass < 3; pass++) {
       character?.settleContacts()
       for (const e of extras) e.character.settleContacts()
     }

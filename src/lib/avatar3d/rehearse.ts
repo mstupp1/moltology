@@ -54,7 +54,7 @@ function rehearsalStage(): TimelineStage & { members: Member[] } {
         m.character.update(dt, clock, true)
       }
       // As stage.ts does: once everyone has moved, claws settle out of each other.
-      for (let pass = 0; members.length > 1 && pass < 2; pass++) for (const m of members) m.character.settleContacts()
+      for (let pass = 0; members.length > 1 && pass < 3; pass++) for (const m of members) m.character.settleContacts()
     },
   }
   return stage as TimelineStage & { members: Member[] }
