@@ -13,13 +13,8 @@ export interface HudTitlePanelProps extends Omit<React.HTMLAttributes<HTMLDivEle
   treatment?: 'compact' | 'integrated' | 'hero' | 'band'
   /** Band only: a row of crumbs (`HudTitleBandTop`) sits directly above, so the band continues it. */
   joined?: boolean
-  /**
-   * Band only: the area's section tabs (`BandSectionNav` or `HudTabs`). Desktop: on the title row,
-   * after a divider. Phones: their own row under the title.
-   */
+  /** Band only: the area's section tabs (`BandSectionNav` or `HudTabs`) beneath the title. */
   sections?: React.ReactNode
-  /** Band only: sections always get their own row under the title (areas with many sections, Admin). */
-  sectionsBelow?: boolean
   /** Band only: on phones, actions (figures such as a wallet or XP) sit under the section tabs. */
   actionsBelowOnPhone?: boolean
   /** Band only: hide the description on phones (when actions and tabs already say enough). */
@@ -47,7 +42,6 @@ export function HudTitlePanel({
   treatment = 'compact',
   joined = false,
   sections,
-  sectionsBelow = false,
   actionsBelowOnPhone = false,
   hideDescriptionOnPhone = false,
   titleAs = 'h1',
@@ -65,7 +59,7 @@ export function HudTitlePanel({
         className={cn(
           'relative flex flex-wrap items-center gap-x-4 gap-y-2 bg-surface-2 border-b border-line-subtle',
           joined ? 'hud-title-band-rest pt-2 pb-4 md:pb-5' : 'hud-title-band',
-          (description || children || toolbar || (sections && sectionsBelow)) && 'has-more',
+          (description || children || toolbar || sections) && 'has-more',
           className,
         )}
         {...props}
@@ -73,7 +67,6 @@ export function HudTitlePanel({
         <BandHeadingRow
           title={title}
           sections={sections}
-          sectionsBelow={sectionsBelow}
           actions={actions}
           actionsBelowOnPhone={actionsBelowOnPhone}
           clearPill={!joined}
@@ -121,15 +114,12 @@ export function HudTitlePanel({
 }
 
 /**
- * The title row of a page header band, as flex items for a `flex flex-wrap items-center` parent:
- * the `h1`, then (desktop) a divider and the area's section tabs, then the actions on the right,
- * kept clear of the floating search pill. On phones the tabs drop to their own row under the
- * title. Shared by `HudTitlePanel` and the Character page, which builds its band by hand.
+ * The title and actions share the first row, with space for the floating search pill.
+ * Section tabs sit on a full-width row beneath it. Shared by `HudTitlePanel` and Character.
  */
 export function BandHeadingRow({
   title,
   sections,
-  sectionsBelow = false,
   actions,
   actionsBelowOnPhone = false,
   clearPill = true,
@@ -138,7 +128,6 @@ export function BandHeadingRow({
 }: {
   title: React.ReactNode
   sections?: React.ReactNode
-  sectionsBelow?: boolean
   actions?: React.ReactNode
   actionsBelowOnPhone?: boolean
   /** Leave room for the pill that straddles the panel's top-right corner (desktop). */
@@ -156,19 +145,6 @@ export function BandHeadingRow({
       >
         {title}
       </TitleTag>
-      {sections && !sectionsBelow ? (
-        <span aria-hidden="true" className="order-2 hidden md:block h-5 w-px shrink-0 bg-line" />
-      ) : null}
-      {sections ? (
-        <div
-          className={cn(
-            'hud-band-sections order-5 basis-full min-w-0',
-            !sectionsBelow && 'is-inline md:order-3 md:basis-0 md:flex-1',
-          )}
-        >
-          {sections}
-        </div>
-      ) : null}
       {actions ? (
         <div
           className={cn(
@@ -180,6 +156,7 @@ export function BandHeadingRow({
         </div>
       ) : null}
       {clearPill ? <span aria-hidden="true" className="hud-pill-clear order-4" /> : null}
+      {sections ? <div className="hud-band-sections order-5 basis-full min-w-0">{sections}</div> : null}
     </>
   )
 }

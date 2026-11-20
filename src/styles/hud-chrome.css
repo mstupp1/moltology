@@ -212,8 +212,8 @@ input[type="range"].dial-range:focus-visible {
     --hud-band-top: 1rem;
   }
 }
-/* Height of a band's title row on desktop: 4.5rem, twice the 2.25rem row content, so title,
-   tabs and actions sit at its middle with a quarter above and below. The floating pill
+/* Height of a band's title row on desktop: 4.5rem, twice the 2.25rem row content, so the title
+   and actions sit at its middle with a quarter above and below. The floating pill
    (3.5rem bar, 74px avatar) is centred on it with room to spare (HudLayout). */
 @media (min-width: 768px) {
   :root {
@@ -221,7 +221,7 @@ input[type="range"].dial-range:focus-visible {
   }
 }
 @media (min-width: 768px) {
-  /* The floating pill is centred on the band's title row, so the title, tabs, actions and pill
+  /* The floating pill is centred on the band's title row, so the title, actions and pill
      share one centre line on every page. Content on a page without a band starts under it. */
   [data-hud-page-panel] {
     --hud-band-x: 15px;
@@ -259,8 +259,7 @@ input[type="range"].dial-range:focus-visible {
 .hud-title-band-top {
   padding-top: 0.625rem;
 }
-/* Section tabs in a band keep their lit tile inside the band's padding: on phones its left
-   edge lines up with the title, and on desktop it starts a step after the divider. */
+/* Align the section tabs' first tile with the title. */
 .hud-band-sections > * {
   margin-left: 0;
 }
@@ -278,12 +277,11 @@ input[type="range"].dial-range:focus-visible {
   }
   /* The search pill straddles the panel's top-right corner, so the title row sits level
      with it, in the strip the panel keeps for it, and stops short of it. */
-  .hud-title-band,
-  .hud-title-band-lead-lg {
+  .hud-title-band {
     padding-top: var(--hud-band-pad);
     padding-bottom: var(--hud-band-pad);
   }
-  /* A band with a description or toolbar under its title row keeps more room at the bottom. */
+  /* A band with more content under its title row uses standard bottom padding. */
   .hud-title-band.has-more {
     padding-bottom: 0.875rem;
   }
@@ -346,7 +344,6 @@ input[type="range"].dial-range:focus-visible {
     border-top-right-radius: 11px;
   }
 }
-/* Same as .hud-title-band-lead, from lg up only (the Character title row). */
 @media (min-width: 1024px) {
   .hud-band-hero-joined {
     margin-top: -1.25rem;
@@ -358,6 +355,7 @@ input[type="range"].dial-range:focus-visible {
   .hud-grid-band-top {
     margin-top: calc(var(--hud-band-top, 0px) * -1);
   }
+  /* The Character header uses the same insets as the standard band on wide screens. */
   .hud-title-band-lead-lg {
     padding-top: var(--hud-band-pad);
     padding-bottom: var(--hud-band-pad);

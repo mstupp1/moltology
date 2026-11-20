@@ -195,7 +195,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
 
   return (
     <div className="space-y-4 font-sans sm:space-y-5" data-testid="logic-atlas">
-      <HudTitlePanel treatment="band" title="Admin" sections={<AdminSectionNav current="logic" />} sectionsBelow />
+      <HudTitlePanel treatment="band" title="Admin" sections={<AdminSectionNav current="logic" />} />
       <section className="grid grid-cols-2 gap-2.5 lg:grid-cols-4" aria-label="Atlas summary">
           <StatCard
             label="Rules"

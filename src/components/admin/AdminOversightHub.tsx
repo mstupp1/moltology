@@ -84,7 +84,6 @@ export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
         treatment="band"
         title="Admin"
         sections={<AdminSectionNav current={tab} />}
-        sectionsBelow
         actionsBelowOnPhone
         actions={
           <div className="flex items-end gap-5 sm:gap-6" data-testid="admin-telemetry" aria-label="System status" role="group">
