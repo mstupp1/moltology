@@ -141,9 +141,9 @@ describe('neighborhood', () => {
 })
 
 describe('search params', () => {
-  it('drops unknown tabs and unsafe ids', () => {
-    expect(parseLogicAtlasSearch({ tab: 'map', domain: 'signup', decision: 'Bad Id' })).toEqual({
-      tab: 'map',
+  it('drops unknown views and unsafe ids', () => {
+    expect(parseLogicAtlasSearch({ view: 'map', domain: 'signup', decision: 'Bad Id' })).toEqual({
+      view: 'map',
       domain: 'signup',
     })
     expect(parseLogicAtlasSearch({ q: '   ' })).toEqual({})

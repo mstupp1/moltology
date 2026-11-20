@@ -1,9 +1,12 @@
 export const ATLAS_TABS = ['map', 'timeline'] as const
 export type AtlasTab = (typeof ATLAS_TABS)[number]
 
-/** URL state for /admin/logic, so every rule and decision has a shareable link. */
+/**
+ * URL state for the Logic Atlas tab (/admin?tab=logic), so every rule and decision has a shareable
+ * link. `view` is map or timeline (`tab` names the Admin tab).
+ */
 export interface LogicAtlasSearch {
-  tab?: AtlasTab
+  view?: AtlasTab
   rule?: string
   decision?: string
   domain?: string
@@ -17,10 +20,10 @@ function readId(value: unknown): string | undefined {
 }
 
 export function parseLogicAtlasSearch(search: Record<string, unknown>): LogicAtlasSearch {
-  const tab = ATLAS_TABS.includes(search.tab as AtlasTab) ? (search.tab as AtlasTab) : undefined
+  const view = ATLAS_TABS.includes(search.view as AtlasTab) ? (search.view as AtlasTab) : undefined
   const q = typeof search.q === 'string' && search.q.trim() ? search.q.slice(0, 80) : undefined
   const result: LogicAtlasSearch = {}
-  if (tab) result.tab = tab
+  if (view) result.view = view
   const rule = readId(search.rule)
   if (rule) result.rule = rule
   const decision = readId(search.decision)

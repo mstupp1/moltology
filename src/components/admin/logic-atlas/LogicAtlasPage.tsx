@@ -131,7 +131,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
     return () => media.removeEventListener('change', update)
   }, [])
 
-  const tab: AtlasTab = search.tab ?? (narrow ? 'timeline' : 'map')
+  const tab: AtlasTab = search.view ?? (narrow ? 'timeline' : 'map')
   const domainIds = useMemo(() => new Set(atlas?.domains.map((domain) => domain.id) ?? []), [atlas])
   const focusDomain = search.domain && domainIds.has(search.domain) ? search.domain : null
 
@@ -178,13 +178,13 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
     [search, onSearchChange],
   )
 
-  const selectRule = useCallback((ruleId: string | null) => update({ tab: 'map', rule: ruleId ?? undefined }), [update])
+  const selectRule = useCallback((ruleId: string | null) => update({ view: 'map', rule: ruleId ?? undefined }), [update])
   const openDecision = useCallback(
-    (decisionId: string) => update({ tab: 'timeline', decision: decisionId, rule: undefined }),
+    (decisionId: string) => update({ view: 'timeline', decision: decisionId, rule: undefined }),
     [update],
   )
   const openRuleFromTimeline = useCallback(
-    (ruleId: string) => update({ tab: 'map', rule: ruleId, decision: undefined, domain: undefined }),
+    (ruleId: string) => update({ view: 'map', rule: ruleId, decision: undefined, domain: undefined }),
     [update],
   )
 
@@ -253,7 +253,7 @@ export function LogicAtlasView({ atlas, error, onRetry, search, onSearchChange }
                   role="tab"
                   aria-selected={selected}
                   data-testid={`atlas-tab-${item.id}`}
-                  onClick={() => update({ tab: item.id })}
+                  onClick={() => update({ view: item.id })}
                   className={pillTabClass(selected, 'flex-1 sm:flex-none')}
                 >
                   <Icon className="h-3.5 w-3.5" />

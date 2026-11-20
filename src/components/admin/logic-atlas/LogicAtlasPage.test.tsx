@@ -126,7 +126,7 @@ describe('LogicAtlasView', () => {
   it('writes rule selection and search to the URL state', async () => {
     const { onSearchChange } = renderView({ q: 'rate' })
     fireEvent.click(await screen.findByText('pick rule'))
-    expect(onSearchChange).toHaveBeenCalledWith({ q: 'rate', tab: 'map', rule: 'forum.rate-limit' })
+    expect(onSearchChange).toHaveBeenCalledWith({ q: 'rate', view: 'map', rule: 'forum.rate-limit' })
     expect(screen.getByTestId('atlas-canvas-stub')).toHaveAttribute('data-matches', 'forum.rate-limit')
   })
 
@@ -137,15 +137,15 @@ describe('LogicAtlasView', () => {
     expect(drawer).toHaveTextContent('The limiter is per server instance.')
     expect(drawer).toHaveTextContent('Prohibited posts never insert')
     fireEvent.click(screen.getByText('Harden forum writes'))
-    expect(onSearchChange).toHaveBeenCalledWith({ tab: 'timeline', decision: 'forum-write-hardening' })
+    expect(onSearchChange).toHaveBeenCalledWith({ view: 'timeline', decision: 'forum-write-hardening' })
   })
 
   it('shows decisions on the timeline and jumps back to a rule', () => {
-    const { onSearchChange } = renderView({ tab: 'timeline', decision: 'forum-write-hardening' })
+    const { onSearchChange } = renderView({ view: 'timeline', decision: 'forum-write-hardening' })
     expect(screen.getByText('Posts skipped harm filters.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /PR #90/ })).toHaveAttribute('href', 'https://github.com/example/repo/pull/90')
     fireEvent.click(screen.getByRole('button', { name: /Ten writes per minute/ }))
-    expect(onSearchChange).toHaveBeenCalledWith({ tab: 'map', rule: 'forum.rate-limit' })
+    expect(onSearchChange).toHaveBeenCalledWith({ view: 'map', rule: 'forum.rate-limit' })
   })
 
   it('shows a plain error with a retry', () => {

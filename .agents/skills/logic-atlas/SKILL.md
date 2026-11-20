@@ -1,7 +1,7 @@
 ---
 name: logic-atlas
 description: >-
-  Refresh the admin Logic Atlas at /admin/logic: re-verify business rules against the code, log new
+  Refresh the admin Logic Atlas at /admin?tab=logic: re-verify business rules against the code, log new
   decisions from recent PRs and changelogs, and regenerate the atlas data. Use whenever the user asks to
   update, refresh, sync, or audit the Logic Atlas, business logic map, rules map, or decision log, or
   asks to record a new business-logic decision.
@@ -22,7 +22,7 @@ The Logic Atlas is a staff-only map of the app's business logic. It shows each r
 | Verified anchor hashes | `docs/logic/anchors.lock.json` | The script (`--accept`) |
 | Generated atlas | `src/lib/server/logic-atlas.generated.ts` | The script (`logic:sync`) |
 | Generator | `scripts/sync-logic-atlas.ts` + `scripts/lib/logic-atlas/` | Engineering changes only |
-| Page | `/admin/logic` (`src/components/admin/logic-atlas/`) | Engineering changes only |
+| Page | `/admin?tab=logic` (`src/components/admin/logic-atlas/`) | Engineering changes only |
 
 - **Anchors** tie a rule to code. `symbol` is a top-level name (`FORUM_TRENDING_QUALITY_MIN`), a dotted path into an object or call (`profiles.chitinGems`, `auth.minPasswordLength`, `XP_CONFIG.streakMilestones`), a Markdown heading (`4.4 The Red Line`), or a line snippet in YAML/JSON (`npm run db:migrate`).
 - **Drift**: the script hashes each anchored declaration. `ok` means it matches the lock, `changed` means the code changed since the rule was last verified, `missing` means the symbol or file is gone, and `unverified` means there is no lock entry yet.
