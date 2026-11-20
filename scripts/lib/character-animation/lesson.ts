@@ -349,7 +349,9 @@ export function buildTimeline(
     // hook headline has room above them. It holds for the whole first scene and goes on the cut to
     // the second (a glide there becomes a cut), so the frame never visibly slides.
     const move = i === 0 || (i === 1 && options.hookLift && (scene.move ?? 'glide') === 'glide') ? 'cut' : (scene.move ?? 'glide')
-    const lift = i === 0 && options.hookLift ? options.hookLift : 0
+    // A two-shot is framed wider, so it needs less lift to clear the headline; more would strand the
+    // pair high above an empty floor.
+    const lift = i === 0 && options.hookLift ? options.hookLift * (scene.shot === 'two' ? 0.8 : 1) : 0
     const camera = { zoom: shot.zoom, tilt: shot.tilt, pan, lift, subject: focus === 'all' ? 0 : index.get(focus)! }
     if (move === 'push-in') {
       cues.push({ t: t0, camera: { ...camera, zoom: shot.zoom * 0.82, cut: true } })

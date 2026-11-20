@@ -15,7 +15,7 @@ export const SHOTS = {
   /** The whole figure, feet to antennae. */
   wide: { zoom: 1, tilt: 0.04 },
   /** Two or three characters side by side, all in frame. */
-  two: { zoom: 0.5, tilt: 0.05 },
+  two: { zoom: 0.56, tilt: 0.05 },
   /** Knees up: the everyday talking shot. */
   medium: { zoom: 1.35, tilt: 0.06 },
   /** Head and shoulders. */
