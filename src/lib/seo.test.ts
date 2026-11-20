@@ -284,7 +284,7 @@ describe('Sitemap and RSS XML Generators', () => {
     const xml = generateRssFeedXml(mockPosts, 'https://moltology.org')
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8" ?>')
     expect(xml).toContain('<rss version="2.0"')
-    expect(xml).toContain('<title>MoltNation News | Patriot Telemetry &amp; Benthic AI</title>')
+    expect(xml).toContain('<title>MoltNation News | Stories from Moltology</title>')
     expect(xml).toContain('<title>First Dispatch Title</title>')
     expect(xml).toContain('<link>https://moltology.org/news/first-dispatch</link>')
   })

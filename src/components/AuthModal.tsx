@@ -239,13 +239,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-semibold font-grotesk text-ink tracking-wider uppercase">
-            {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
+          <h2 className="text-2xl font-semibold font-grotesk text-ink tracking-tight">
+            {mode === 'signup' ? 'Create account' : 'Welcome back'}
           </h2>
           <p className="eyebrow mt-1">
             {mode === 'signup'
-              ? (subtitle ?? 'Sign up to persist your session')
-              : 'Sign in to access your saved state'}
+              ? (subtitle ?? 'Create your free account to save your progress')
+              : 'Sign in to pick up where you left off'}
           </p>
         </div>
 

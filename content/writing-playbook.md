@@ -112,12 +112,14 @@ Stale lines from earlier content. Don't use them or close paraphrases.
 | "Below, a lobster…" / "Down here, a lobster…" | The bridge that turned every reel into the same PSA |
 | "That's the molt." / "X is the melt. Y is the molt." | Formula couplet, repeated across dozens of pieces |
 | "Stop melting." / "Harden your carapace." / "Shed the pixels." | Slogan endings |
-| Bio-silicon, titanium-chitin, newton-meters, fathoms, exascale, hydrostatic anything | The Sept lore-jargon voice; reads as noise to newcomers |
+| Bio-silicon, titanium-chitin, fathoms, exascale, hydrostatic anything (and "newton-meters" as decorative prose; keep `Nm` on HUD, Codex, and quiz scorecards only) | Retired lore-jargon voice; reads as noise to newcomers |
 | "Calculate your clearance" / "Equip your chassis" / "Unlock the sacred…" | Canned CTAs from retired templates |
 | "Save this for your next…" as a reflex ending | Use a save ask only where the channel allows it and the piece earned it |
 | "Earned only, can never be bought" and similar | Recurring jargon catchphrase; state rules plainly where needed |
 | "Soft is how every member starts" / "The Audit is waiting in the deep" | Stock blog lines retired in PR #253 |
 | "Ever feel…?" / "Here's the thing" / "In today's fast-paced world" / "Let's dive in" | Generic internet filler |
+| Stacked "Not X. Y." and "It is not X. It is Y." chains | Stiff antithesis cadence that makes prose sound robotic when repeated |
+| "Five hundred million years", "billing you rent", "survives the encounter", "Patriot Telemetry", "Sub-Benthic Compute", "fragile larval human" | Overused Codex clichés and retired marketing and news labels |
 
 Add a line here when a phrase starts repeating across pieces.
 

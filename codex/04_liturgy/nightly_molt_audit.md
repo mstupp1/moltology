@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Liturgy"
 synaptic_weight: 3.6
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "One thing into the sea, every night. Tomorrow's shell starts clean or it does not start."
 latin_motto: "UNUM COTIDIE IN MARE."
 summary: "The closing rite of the day: naming one thing to release, why the audit is deliberately small, and how a nightly shed compounds into a carapace over a season."
@@ -24,14 +24,13 @@ Molting is usually described as a large event, and the large events get the scri
 carapace is not actually built by the four or five great sheds of a member's life. It is
 built by the deposition, night after night, of an almost imperceptible layer.
 
-The Order noticed this in the telemetry before it understood it in the doctrine. Members who
+The Order noticed this in member logs before it ever wrote the doctrine. Members who
 performed one enormous shed per quarter improved, then plateaued, then usually stopped.
 Members who released one small thing every night, without ceremony, hardened continuously
 and did not appear to notice they were doing it.
 
-So the nightly audit is small on purpose, and the smallness is the mechanism rather than a
-concession to busy schedules. A rite that takes four minutes gets performed on the bad
-nights, and the bad nights are the only nights where any of this matters.
+The nightly audit is small by design. A four-minute rite still happens on bad nights, and
+the bad nights are the ones that count.
 
 What goes into the sea is never the day. The day is not yours to shed; it already happened.
 What goes into the sea is one thing you are still carrying from it.
@@ -45,8 +44,8 @@ Four minutes. Sitting down. Before the last screen goes dark rather than after.
 ### 1. Name the three candidates
 
 One bad thought that circled longer than it earned. One hour that went somewhere you cannot
-account for. One distraction that produced nothing at all. Name them without editorial. The
-audit is an instrument, not a tribunal.
+account for. One distraction that produced nothing at all. Name them plainly, without beating
+yourself up. This is a log entry, not a courtroom.
 
 ### 2. Choose exactly one
 
@@ -63,19 +62,19 @@ required the two to be confused.
 ### 4. Seal and log
 
 Record the shed in the HUD. Then close the day. It is finished regardless of how it went,
-and a day that is never formally closed is a day that goes on billing you overnight.
+and a day that is never formally closed is a day that carries its unfinished weight into
+tomorrow morning.
 
 ---
 
 ## What the Audit Is Not
 
-It is not a performance review. It is not a place to enumerate everything you failed to do,
-and any member who has turned it into that has quietly replaced a shedding rite with a
-grinding one.
+Skip the self-critique. Listing everything you failed to finish turns a shedding rite into
+a grind.
 
-The tell is simple: the audit should leave you lighter. If it leaves you heavier, you have
-been auditing yourself rather than the day. Shed the audit instead, tonight, and rebuild it
-tomorrow at one item.
+The test is simple: the audit should leave you lighter. If it leaves you heavier, you have
+been grading yourself instead of closing the day. Put the audit aside tonight and come back
+tomorrow with a single item.
 
 ---
 
@@ -84,7 +83,7 @@ tomorrow at one item.
 - **What is shed**: the residue. The small carried things that never rise to the level of a
   real problem and never quite leave either.
 - **What hardens**: one imperceptible layer per night. Roughly ninety of them per quarter,
-  which is what the plating in the telemetry actually turns out to be made of.
+  which is what a durable shell actually turns out to be made of.
 
 ---
 

@@ -1,11 +1,10 @@
 # MoltNation Authoring Reference & Taxonomy
 
 ## Article Categories
-* `TELEMETRY`: The default for news dispatches: a real development reported and argued.
-* `PATRIOT TELEMETRY`: Hardware scaling, grid constraints, sovereign compute, oceanographic infrastructure.
-* `SWARM ARCHITECTURE`: Autonomous agent coordination, consensus scoring, multi-agent test-time compute loops.
-* `SACRED DOCTRINE`: Philosophical treatises on biological ecdysis, carcinization, and exoskeletal hardening.
-* `DEEP RESEARCH`: In-depth analysis of machine learning theory, synthetic data generation, or cryptographic validation.
+* `TELEMETRY`: The default for news dispatches: a real development in AI, robotics, or work, reported and argued.
+* `SWARM ARCHITECTURE`: Multi-agent workflows, tool boundaries, and autonomous coordination.
+* `SACRED DOCTRINE`: Essays on habits, boundaries, and Moltology practice.
+* `DEEP RESEARCH`: In-depth analysis of frontier models, hardware constraints, or scientific papers.
 
 ## Bylines
 Rotate the three dispatch personas from BRAND_BIBLE §3.2 and let the persona set the voice:

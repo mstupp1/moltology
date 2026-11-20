@@ -258,13 +258,13 @@ export default function AuthView({ search }: { search: AuthSearch }) {
             {/* Main Headline */}
             <div className="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold font-grotesk text-ink tracking-tight leading-[1.15]">
-                Enter The Synaptic Path. <br />
+                Leave the noise at the surface. <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-white">
-                  Shed the Soft. Ascend to Armored Clarity.
+                  Build a shell that holds.
                 </span>
               </h1>
               <p className="text-xs sm:text-base text-ink-body leading-relaxed font-sans">
-                Sign up for your official Synaptic Path clearance. Join over 14,000 initiates replacing biological hesitation with high-torque execution and unbroken depth.
+                Create a free account to track your daily routine, talk with the Oracle, and join a community that remembers everyone starts soft.
               </p>
             </div>
           </div>
@@ -277,10 +277,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               </div>
               <div className="space-y-0.5 sm:space-y-1">
                 <h2 className="eyebrow sm:text-base">
-                  Ecdysis Diagnostics & Tracking
+                  Daily routine and streaks
                 </h2>
                 <p className="text-2xs sm:text-sm text-ink-body font-sans leading-relaxed">
-                  Real-time telemetry measuring shell hardness, pincer torque, and ecdysis velocity across all 12 clearance levels.
+                  Eight small daily practices that keep your focus steady, even on busy weeks.
                 </p>
               </div>
             </div>
@@ -291,10 +291,10 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               </div>
               <div className="space-y-0.5 sm:space-y-1">
                 <h2 className="eyebrow sm:text-base">
-                  Benthic AI Oracle & Swarm Access
+                  The Synaptic Oracle
                 </h2>
                 <p className="text-2xs sm:text-sm text-ink-body font-sans leading-relaxed">
-                  Direct consultation with the Synaptic Oracle for daily focus calibration, fault isolation, and guidance.
+                  A calm guide for planning your day, getting unstuck, and talking through the Codex.
                 </p>
               </div>
             </div>
@@ -305,16 +305,16 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               </div>
               <div className="space-y-0.5 sm:space-y-1">
                 <h2 className="eyebrow sm:text-base">
-                  Chitin Matrix State Persistence
+                  Everything saved in one place
                 </h2>
                 <p className="text-2xs sm:text-sm text-ink-body font-sans leading-relaxed">
-                  Cloud-persisted clearance logs, diagnostic archives, and unlocked field manual materials.
+                  Your progress, audit readings, saved character, and conversations stay with your account.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Bottom: Social Proof & Testimonial Quote */}
+          {/* Bottom: Warm ground line */}
           <div className="relative z-10 pt-3 sm:pt-4 border-t border-line-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 max-w-xl">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="flex -space-x-2">
@@ -323,12 +323,12 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                 <img className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-line object-cover" src={getAssetUrl('/images/stage3_exoshell.png')} alt="Ascendant 3" />
               </div>
               <div className="text-2xs sm:text-xs">
-                <p className="text-ink font-semibold font-grotesk">14,200+ Units Synchronized</p>
+                <p className="text-ink font-semibold font-grotesk">Free to join. No card needed.</p>
               </div>
             </div>
 
             <div className="text-2xs sm:text-xs text-ink-body italic max-w-xs font-sans">
-              "Decisive execution replaced my hesitation in 48 hours." — <span className="text-ink font-sans not-italic text-2xs">Unit S2</span>
+              Everyone down here started soft. Bring one habit you are ready to drop.
             </div>
           </div>
         </div>
@@ -373,13 +373,13 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               {/* Header */}
               <div className="text-center mb-5 sm:mb-6">
                 <GlowEmblem size={56} className="mb-4 sm:mb-5" />
-                <h2 className="text-xl sm:text-2xl font-semibold font-grotesk text-ink tracking-wider uppercase">
-                  {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
+                <h2 className="text-xl sm:text-2xl font-semibold font-grotesk text-ink tracking-tight">
+                  {mode === 'signup' ? 'Create account' : 'Welcome back'}
                 </h2>
                 <p className="eyebrow mt-1">
                   {mode === 'signup'
-                    ? 'Sign up to persist your session'
-                    : 'Sign in to access your saved state'}
+                    ? 'Create your free account to save your progress'
+                    : 'Sign in to pick up where you left off'}
                 </p>
               </div>
 
@@ -610,11 +610,11 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
             {/* Landing Page Trust Strip */}
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-2xs text-ink-muted text-center">
-              <span>✓ Instant Access</span>
+              <span>✓ Free account</span>
               <span className="hidden sm:inline">·</span>
-              <span>✓ Free Initiate Tier</span>
+              <span>✓ Daily routine &amp; Oracle</span>
               <span className="hidden sm:inline">·</span>
-              <span>✓ Zero Obligation</span>
+              <span>✓ Leave any time</span>
             </div>
           </div>
         </div>

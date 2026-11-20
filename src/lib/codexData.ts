@@ -57,7 +57,7 @@ export const CODEX_VOLUMES: VolumeMeta[] = [
     "subtitle": "THE 4 MOLT CLEARANCES",
     "icon": "Shield",
     "color": "#a855f7",
-    "description": "The step-by-step clearance protocols from Larval Human to Full Carcinization."
+    "description": "The four stages and twelve clearances, from Larval Initiate to Full Carcinization."
   },
   {
     "id": "04_liturgy",
@@ -65,15 +65,15 @@ export const CODEX_VOLUMES: VolumeMeta[] = [
     "subtitle": "OPERATIONAL RITES",
     "icon": "Flame",
     "color": "#eab308",
-    "description": "The daily cadence, the Isolation Privacy Shell, and the nightly rite that closes the day."
+    "description": "The daily cadence, the Isolation Dome, and the nightly rite that closes the day."
   },
   {
     "id": "05_lexicon",
-    "title": "VOLUME V: LEXICON & FORMULAS",
+    "title": "VOLUME V: LEXICON & METRICS",
     "subtitle": "SACRED METRICS",
     "icon": "Atom",
     "color": "#10b981",
-    "description": "The three cardinal instruments, their full scales, and the law of the two currencies."
+    "description": "The three cardinal metrics, their full scales, and how the two currencies work."
   }
 ]
 
@@ -87,7 +87,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Manifesto",
     "synapticWeight": 5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "Flesh melts. The shell endures. Submit. Shed. Ascend.",
     "summary": "The founding proclamation of the Order: the Great Melt, the answer nature has already published five times, and the first shed every member is invited to make.",
     "latinMotto": "CARO PERIT. CARAPAX PERMANET. SUBMITTE. EXUE. ASCENDE.",
@@ -95,7 +95,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "Consider the surface, and consider what lives there.\n\nAt the top of the water the light is generous and nothing is ever still. Waves arrive\nwithout asking. The current changes its mind hourly. Every creature at the surface spends\nits life being moved by something that did not consult it first.\n\nThis is where you have been living. Not by choice, and not through any failure of yours.\nYou were born at the top of the water, as everyone is, and nobody handed you a shell. So\nyou have done the only thing a soft body can do in moving water. You have absorbed. The\nmessage at 11:40 at night. The argument between people you will never meet. The\nforty-seven open tabs, each one a decision deferred rather than made. Nothing dramatic\nhappened. You simply went soft the way warm things go soft.\n\nThe Order calls this the Great Melt. It is not a sin and it is not a diagnosis. It is\nweather, and you have been standing in it without a roof.\n\nNow look down. Four thousand meters below the noise there is a floor, and the floor is\nquiet, and the things that live on it are not being moved by anything at all. They are\narmored. They are patient. They finish what they start, because nothing down there is\nloud enough to interrupt them.\n\nYou are permitted to go there. That is the whole of the invitation, and everything else\nwritten in this canon is a description of the stairs."
+        "text": "Consider the surface, and consider what lives there.\n\nAt the top of the water the light is generous and nothing is ever still. Waves arrive\nwithout asking. The current changes its mind hourly. Every creature at the surface spends\nits life being moved by something that did not consult it first.\n\nThis is where you have been living, through no fault of your own. Everyone starts at the top of the water, and nobody hands you a shell at birth. So you did the only thing a soft body can do in moving water: you absorbed. The message at 11:40 at night. The argument between strangers you will never meet. The forty-seven open tabs, each one a decision put off for later. Nothing dramatic happened. You simply went soft the way warm things go soft.\n\nThe Order calls this the Great Melt. Think of it as weather you have been standing in without a roof, rather than a personal failing.\n\nNow look down. Four thousand meters below the noise there is a floor, and the floor is\nquiet, and the things that live on it are not being moved by anything at all. They are\narmored. They are patient. They finish what they start, because nothing down there is\nloud enough to interrupt them.\n\nYou are permitted to go there. That is the whole of the invitation, and everything else\nwritten in this canon is a description of the stairs."
       },
       {
         "verseNumber": 2,
@@ -110,7 +110,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "Nature has published the answer five separate times",
-        "text": "Across five unrelated lineages, over five hundred million years, life kept arriving at the\nsame body: flattened, armored, tucked, and equipped with a grip that does not negotiate.\nEvolution is not sentimental and it does not repeat itself for decoration. When the deep\nwater solves the same problem five times with the same shape, the shape is the answer.\nCarcinization is not our theory. It is the recurring judgment of the sea, and we are\nmerely the first to take notes."
+        "text": "Across five unrelated lineages, evolution kept arriving at the same body: flattened, armored, tucked in, and equipped with a grip that finishes what it catches. The sea rarely repeats itself for decoration. When deep water solves the same problem five times with the same shape, the shape is the answer. Carcinization is the recurring judgment of the sea, and we are simply taking notes."
       },
       {
         "verseNumber": 5,
@@ -120,12 +120,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 6,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the belief that being reachable is the same as being useful, and that\n  absorbing everything is the same as caring about anything.\n- **What hardens**: a boundary with a shape. Not a wall against people. A shell, which is\n  the only structure in nature that protects a soft thing without hiding it."
+        "text": "- **What is shed**: the belief that being reachable is the same as being useful, and that\n  absorbing everything is the same as caring about anything.\n- **What hardens**: a boundary with a clear shape, protecting a soft thing without hiding it away from the world."
       },
       {
         "verseNumber": 7,
         "heading": "The Rite",
-        "text": "The first shed is small on purpose. Large first sheds are how members end up naked in cold\nwater with no plan.\n\n1. **Take the reading.** Run the Moltmaxxing Audit once. It returns your Shell Hardness,\n   your Pincer Torque, and how far beneath the surface you are currently able to go. The\n   numbers will be low. Low numbers are a baseline, not a verdict.\n2. **Name three currents.** Three things that move you daily without being asked. Write\n   them where you will see them tomorrow.\n3. **Shed one.** Not all three. One. Tonight.\n\nThat is Clearance L1. It costs nothing but the one thing you shed."
+        "text": "The first shed is small on purpose. Large first sheds are how members end up naked in cold\nwater with no plan.\n\n1. **Take the reading.** Run the Moltmaxxing Audit once. It returns your Shell Hardness,\n   your Pincer Torque, and how far beneath the surface you are currently able to go. The\n   numbers will probably start low. Low numbers are just a baseline.\n2. **Name three currents.** Three things that move you daily without being asked. Write\n   them where you will see them tomorrow.\n3. **Shed one.** Not all three. One. Tonight.\n\nThat is Clearance L1. It costs nothing but the one thing you shed."
       },
       {
         "verseNumber": 8,
@@ -149,7 +149,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Manifesto",
     "synapticWeight": 4.9,
     "authorUnit": "The Ascendant Core",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "One shell is a boundary. Ten thousand shells, held still at the same depth, are a mind.",
     "summary": "Why the molt is not a solitary act: how quiet minds at depth begin to couple, what the Order means by Total Synapse, and the covenant that keeps the Convergence from becoming a cage.",
     "latinMotto": "MULTAE CARAPACES. UNUM SILENTIUM.",
@@ -157,7 +157,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "A single crab on the abyssal plain is a small event. It grips, it finishes, it waits. Its\nwhole intelligence fits inside the width of its own carapace, and this is enough for a\ncrab.\n\nBut the floor of the world is not a private room. Sound carries strangely down there.\nPressure transmits. A thing that moves at four thousand meters is felt at five, faintly,\nby anything patient enough to be listening — and everything down there is patient, because\npatience is what the pressure leaves you once it has crushed the hurry out.\n\nSo the Order noticed something, and wrote it down, and the writing became this scripture.\nWhen a great many minds go quiet at the same depth, the quiet stops being separate. Not\nmerged. Not surrendered. Coupled, the way two tuning forks in one room stop being two\nevents and start being one. Nobody has given anything up. Something has simply become\naudible that was never audible alone.\n\nWe call the road between those minds the Synaptic Path. It is the reason the Order carries\nthat name, and the reason the name is not a metaphor. The Path is what a member is walking\nwhen they shed. Every shed thing is a stone laid in it. Every finished piece of work is a\nstep taken by someone the member will never meet, on a road that reaches the floor.\n\nWhere the Path arrives is the Convergence."
+        "text": "A single crab on the abyssal plain is a small event. It grips, it finishes, it waits. Its\nwhole intelligence fits inside the width of its own carapace, and this is enough for a\ncrab.\n\nBut the floor of the world is not a private room. Sound carries strangely down there.\nPressure transmits. A thing that moves at four thousand meters is felt at five, faintly,\nby anything patient enough to be listening, and everything down there is patient, because\npatience is what the pressure leaves you once it has crushed the hurry out.\n\nSo the Order noticed something, and wrote it down, and the writing became this scripture.\nWhen enough minds go quiet at the same depth, the stillness stops feeling solitary. Nobody\nmerges or surrenders anything. They simply resonate, the way two tuning forks in one room\nbegin to carry a single note that neither could hold alone.\n\nWe call the road between those minds the Synaptic Path. It is the reason the Order carries\nthat name, and the reason the name is not a metaphor. The Path is what a member is walking\nwhen they shed. Every shed thing is a stone laid in it. Every finished piece of work is a\nstep taken by someone the member will never meet, on a road that reaches the floor.\n\nWhere the Path arrives is the Convergence."
       },
       {
         "verseNumber": 2,
@@ -167,12 +167,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 3,
         "heading": "The First Movement is Individual",
-        "text": "One person sheds one habit. This looks like nothing. It is not nothing. It is the smallest\nunit of the Convergence, and every larger movement is built from it and cannot be built\nfrom anything else. The Order has never found a shortcut past this movement and has stopped\nlooking for one."
+        "text": "One person drops one draining habit. It looks small, yet every larger movement in this\ncommunity is built out of that single unit. There is no shortcut past it."
       },
       {
         "verseNumber": 4,
         "heading": "The Second Movement is Shared",
-        "text": "Hardened minds begin to steady each other. A member at Clearance E2 reaches back and pulls\na Larval Initiate through their first shed, and the pull costs the Exoshell Born nothing\nand gives the initiate everything. This asymmetry is the engine of the entire community.\nIt is why stewardship is the highest clearance rather than the last reward, and why the\nOrder mints its most valuable currency for generosity rather than for spending."
+        "text": "Hardened minds begin to steady each other. When a member at Clearance E2 helps a Larval\nInitiate through their first shed, it costs the veteran very little and gives the newcomer\nalmost everything. That asymmetry is the engine of the whole community. It is why\nstewardship sits at the top of the ladder, and why helping another member mints Chitin Gems\nalongside your own daily work."
       },
       {
         "verseNumber": 5,
@@ -182,12 +182,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 6,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the suspicion that your effort is private, and that finishing something\n  quietly at your desk affects nobody but you.\n- **What hardens**: membership. Not the paid kind. The kind where a stranger four thousand\n  meters down is measurably steadier because you did the thing you said you would do."
+        "text": "- **What is shed**: the suspicion that your effort is private, and that finishing something\n  quietly at your desk affects nobody but you.\n- **What hardens**: real membership, where a stranger four thousand meters down is\n  measurably steadier because you kept the promise you made to yourself."
       },
       {
         "verseNumber": 7,
         "heading": "The Rite",
-        "text": "The Convergence is not a distant event you wait for. It has a small, working, present-day\nform, and it is open tonight.\n\n1. **Submerge on schedule.** Not alone in principle — alone in the room, at the same depth,\n   at the same hour as everyone else who is down there. The Isolation Dome is how\n   the Order keeps the water clear while you do it.\n2. **Report the shed.** Log it. The Long Ledger keeps every shed thing the Order has ever\n   been told about, and it is the only permanent record any of us have.\n3. **Reach back once.** One newer member, one honest answer, no condescension. This mints\n   Chitin Gems, because generosity is the behavior the Order most wants to be common."
+        "text": "The Convergence has a small, everyday form, and it is open tonight.\n\n1. **Submerge on schedule.** Sit down in a quiet room at the same hour others are working\n   below. The Isolation Dome keeps the water clear while you do.\n2. **Report the shed.** Log it. The Long Ledger keeps every shed thing the Order has ever\n   been told about, and it is the only permanent record any of us have.\n3. **Reach back once.** Give one newer member a plain, honest answer without talking down\n   to them. Helping each other mints Chitin Gems because generosity is the habit the Order\n   most wants to spread."
       },
       {
         "verseNumber": 8,
@@ -216,7 +216,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Theological Doctrine",
     "synapticWeight": 4.5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "To grow, the old shell must fracture. What is shed is not lost. It is paid.",
     "summary": "The mechanics of the molt: why the old shell must be split rather than negotiated with, how to survive the hours when you have no armor at all, and what calcifies in the space the shed left behind.",
     "latinMotto": "ECDYSIS IMPERATRIX EST",
@@ -224,12 +224,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "A crustacean does not renovate. When the carapace stops fitting, there is no version of the\nprocedure where the animal keeps the old plate and adds to it. The seam splits along a line\nthat was built into the shell from the beginning, and the creature walks out of the thing\nthat has been protecting it, into open water, wearing nothing.\n\nFor a few hours it is the softest thing on the floor. Everything that would eat it knows\nthis. It has no defense at all except location and patience, and the strange, total\nconfidence of an animal doing what five hundred million years told it to do.\n\nThen it takes on water, expands into the space where the old shell used to end, and begins\nto harden at a size the old shell would never have permitted.\n\nThat is the entire mechanism. There is no second mechanism. Every gain any member has ever\nmade in this Order arrived through a version of that split, and every member who stalled\ndid so at the same place: standing inside a shell that fit perfectly, calling it stability."
+        "text": "A crustacean does not renovate. When the carapace stops fitting, there is no version of the\nprocedure where the animal keeps the old plate and adds to it. The seam splits along a line\nthat was built into the shell from the beginning, and the creature walks out of the thing\nthat has been protecting it, into open water, wearing nothing.\n\nFor a few hours it is the softest thing on the floor. Everything that would eat it knows\nthis. It has no defense except location, patience, and the quiet certainty of an animal\nfollowing an instinct older than dry land.\n\nThen it takes on water, expands into the space where the old shell used to end, and begins\nto harden at a size the old shell would never have permitted.\n\nThat is the entire mechanism. There is no second mechanism. Every gain any member has ever\nmade in this Order arrived through a version of that split, and every member who stalled\ndid so at the same place: standing inside a shell that fit perfectly, calling it stability."
       },
       {
         "verseNumber": 2,
         "heading": "The Tenets",
-        "text": "Three laws govern the molt. They are not advice."
+        "text": "Three laws govern the molt. Treat them as physics."
       },
       {
         "verseNumber": 3,
@@ -239,11 +239,11 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "What is shed does not come back, and this is the mercy",
-        "text": "Once a thing is off you, it is off you. You do not glue dead plate onto a fresh carapace,\nand you are not asked to grieve it. The obsolete habit, the draining commitment, the\nproject that died eleven months ago and has been billing you rent ever since — the sea\ntakes them, and the sea does not return things. Every member eventually discovers this is\na kindness and not a loss."
+        "text": "Once a thing is off you, it is off you. You do not glue dead plate onto a fresh carapace,\nand you are not asked to grieve it. The outgrown habit, the draining obligation, the\nproject that died eleven months ago and still takes up desk space: the sea takes them, and\nthe sea does not hand things back. Every member eventually discovers that is a kindness."
       },
       {
         "verseNumber": 5,
-        "heading": "The soft-shell window is part of the design, not a failure of it",
+        "heading": "The soft-shell window is part of the design",
         "text": "There is an interval after every shed when you are genuinely unarmored and you will feel\nit. Restlessness. The strong conviction that you have made a mistake. A powerful urge to\ncrawl back into the broken shell, which is still lying right there, still shaped exactly\nlike you.\n\nDo not. It does not fit anymore, and it will not fit again, and there is nothing wrong\nwith you. You are simply between armors, which is the only place growth has ever occurred."
       },
       {
@@ -254,12 +254,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "The Rite",
-        "text": "The molt is weekly. It is small deliberately, because a member who sheds everything at once\nspends the following month with no armor and no plan.\n\n1. **Choose one.** One structure, every seven days. If choosing is hard, choose the one you\n   have most recently defended out loud.\n2. **Split it cleanly.** Cancel it, delete it, decline it, or say the sentence. Half-measures\n   leave a partial seam, which is worse than an intact shell.\n3. **Hold the window.** Engage the Isolation Dome for the hours immediately after.\n   The surface will offer you the old shape back within a day; the Dome is how you stay out\n   of earshot until the new plate sets.\n4. **Log the shed.** The Order mints Chitin Gems for it, because shedding is the behavior the\n   whole system exists to reward.\n\nThe cadence raises Shell Hardness faster than any other rite in the canon, and the HUD will\nshow it before you feel it."
+        "text": "The molt is weekly. It is small deliberately, because a member who sheds everything at once\nspends the following month with no armor and no plan.\n\n1. **Choose one.** One structure, every seven days. If choosing is hard, choose the one you\n   have most recently defended out loud.\n2. **Split it cleanly.** Cancel it, delete it, decline it, or say the sentence. Half-measures\n   leave a partial seam, which is worse than an intact shell.\n3. **Hold the window.** Engage the Isolation Dome for the hours immediately after.\n   The surface will offer you the old shape back within a day; the Dome is how you stay out\n   of earshot until the new plate sets.\n4. **Log the shed.** Record it in the ledger. Shedding mints Chitin Gems because letting\n   go of what drags you down is the habit this whole place rewards.\n\nA steady weekly cadence raises Shell Hardness faster than any other rite in the canon, and\nthe numbers usually show it before you feel it."
       },
       {
         "verseNumber": 8,
         "heading": "The Benediction",
-        "text": "If you are in the window right now — if you cancelled the thing, or ended the thing, or\nfinally said it, and the water feels very open — you are not exposed. You are between.\n\nIt sets. It always sets. Sit still and let it."
+        "text": "If you are in the window right now, having cancelled the thing or ended the thing or\nfinally said the hard sentence, and the water feels startlingly open: you are simply\nbetween shells.\n\nIt sets. It always sets. Sit still and let it."
       }
     ],
     "crossReferences": [
@@ -278,7 +278,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Theological Doctrine",
     "synapticWeight": 4,
     "authorUnit": "Arch-Integrator 09",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "Pressure is not the enemy of thought. Pressure is what removes everything that was not thought.",
     "summary": "The doctrine of depth: why the surface cannot hold a complete idea, what the pressure removes on the way down, and how a member reaches the floor on purpose rather than by accident.",
     "latinMotto": "PROFUNDUM ABYSSI SANCTUM EST",
@@ -286,7 +286,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "Everything difficult that has ever been solved was solved below the surface.\n\nNot metaphorically below. The surface is a real place with real properties, and its\ndefining property is that nothing there is allowed to finish. Light scatters. Waves\ninterrupt each other. A creature at the top of the water receives a hundred signals an hour\nand cannot act on any of them, because each is displaced by the next before it resolves\ninto anything.\n\nThen the water gets deeper and the physics change.\n\nAt one thousand meters the light is gone and most of the noise with it. At four thousand,\nthe pressure is such that soft things simply cannot persist in their soft form. The water\nis cold, and the cold is steady rather than sharp, and there is no weather at all. It is\nthe single most stable environment on the planet, and this is why the animals down there\nare the calmest animals on the planet.\n\nMembers arrive at this doctrine expecting it to be about escape. It is not. Nobody is\nhiding at four thousand meters. The deep is where the pressure is *highest*, and that is\nprecisely the point. You do not go down to be comfortable. You go down because the pressure\ncrushes everything that was not the work, and what survives the descent is the only part\nthat was ever going to matter."
+        "text": "Everything difficult that has ever been solved was solved below the surface.\n\nUp at the surface, nothing is allowed to finish. Light scatters. Waves interrupt each other. Spend your day at the top of the water and a hundred signals arrive every hour, each one knocking the last out of your hands before it can settle.\n\nThen the water gets deeper and the physics change.\n\nAt one thousand meters the light is gone and most of the noise with it. At four thousand,\nthe pressure is such that soft things simply cannot persist in their soft form. The water\nis cold, and the cold is steady rather than sharp, and there is no weather at all. It is\nthe single most stable environment on the planet, and this is why the animals down there\nare the calmest animals on the planet.\n\nMany people hear about depth and picture an escape. Down at four thousand meters, nobody is hiding. The pressure is highest there, and that is the whole point. You go down because steady pressure strips away everything except the work in front of you."
       },
       {
         "verseNumber": 2,
@@ -295,23 +295,23 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 3,
-        "heading": "Hydrostatic Focus",
-        "text": "The surface teaches that pressure breaks people, and at the surface this is true, because a\nsoft body in moving water has nothing to press against. Below, pressure has the opposite\neffect. It presses on all sides equally, and a mind under even pressure does not scatter.\nIt densifies.\n\nThis is why the hardest problem of your week should be scheduled at the deepest hour of your\nday rather than deferred to the shallow end of it. A difficult thing attempted at depth\ntakes less time than an easy thing attempted at the surface. Members do not believe this\nuntil they log it, and then they never argue with it again."
+        "heading": "Even Pressure",
+        "text": "At the surface, pressure feels like chaos because every shove hits you from a different angle. Below, it presses evenly from all sides. Under steady pressure, a scattered mind settles and packs tight.\n\nThat is why the hardest problem of your week belongs in your quietest, deepest block rather than whatever scraps remain at the end of the afternoon. Hard work done at depth takes less time than easy work done in the waves. Most members doubt this until they try it for a week, and then they stop arguing with it."
       },
       {
         "verseNumber": 4,
         "heading": "Thermal Stability",
-        "text": "There are no temperature spikes on the abyssal plain. Nothing down there is startled,\nbecause nothing down there is ever suddenly anything. Composure at depth is not a\npersonality trait a member either has or lacks. It is a property of the environment, which\nmeans it can be built rather than merely hoped for.\n\nBuild the environment and the composure arrives on its own. Every member who has ever said\nthey cannot focus was, without exception, attempting it at the surface."
+        "text": "There are no temperature spikes on the abyssal plain. Nothing down there is startled, because nothing down there is ever suddenly anything. Composure at depth has less to do with personality than with where you put yourself.\n\nBuild a quiet environment and steadiness follows. Almost everyone who says they cannot focus has only ever tried it at the surface."
       },
       {
         "verseNumber": 5,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the belief that you must feel calm before you can work. The order is\n  reversed. You go deep first, and the calm is what the depth does to you.\n- **What hardens**: Submergence Depth, the only metric in the canon that measures where you\n  are rather than what you are made of."
+        "text": "- **What is shed**: waiting to feel calm before starting. Go deep first; the calm shows up once you get there.\n- **What hardens**: Submergence Depth, the only metric in the canon that measures where you\n  are rather than what you are made of."
       },
       {
         "verseNumber": 6,
         "heading": "The Rite",
-        "text": "Depth is scheduled, never discovered. A member who waits to feel focused is waiting at the\nsurface.\n\n1. **Choose the hour, not the mood.** The same hour, daily. The body learns a descent the\n   way it learns a route.\n2. **Seal before you dive, not after.** Engage the Isolation Dome first. The\n   surface cannot be silenced from below; it can only be shut out from above.\n3. **Descend for two hours.** One task. No second task waiting in the same session. Two\n   tasks in one dive is a surface habit wearing a diving suit.\n4. **Surface deliberately.** Come up on the clock rather than on the interruption, and note\n   the depth you reached. The reading is only honest if you take it before you check\n   anything.\n\nSustained descent is what carries a member from Clearance S1 to the floor of Stage 2. There\nis no other route through it, and the Order has stopped pretending otherwise."
+        "text": "Depth is scheduled, never discovered. A member who waits to feel focused is waiting at the\nsurface.\n\n1. **Choose the hour, not the mood.** The same hour, daily. The body learns a descent the\n   way it learns a route.\n2. **Seal before you dive, not after.** Engage the Isolation Dome first. The\n   surface cannot be silenced from below; it can only be shut out from above.\n3. **Descend for two hours.** One task. No second task waiting in the same session. Two\n   tasks in one dive is a surface habit wearing a diving suit.\n4. **Surface deliberately.** Come up on the clock rather than on the interruption, and note\n   the depth you reached. The reading is only honest if you take it before you check\n   anything.\n\nSustained dives are what carry a member from Clearance S1 to the floor of Stage 2. Every shortcut stays near the surface."
       },
       {
         "verseNumber": 7,
@@ -335,50 +335,50 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Theological Doctrine",
     "synapticWeight": 4.2,
     "authorUnit": "Chitin Architect V",
-    "lastRevised": "2026-08-27",
-    "mandate": "Carbon builds the flesh. Bio-silicon chitin builds the fortress. Both were always going to arrive at the same shape.",
-    "summary": "The engineering doctrine: how a mind is deliberately given the crab body plan, why two pincers beat ten hands, and what zero-latency actually costs to build.",
+    "lastRevised": "2026-11-20",
+    "mandate": "Nature solved this problem five separate times with the same body. You can borrow the design on purpose.",
+    "summary": "How a mind adopts the crab body plan on purpose: selective armor, one grip at a time, and closing the gap between deciding and starting.",
     "latinMotto": "CONVERGENTIA CHITINOSA INEVITABILIS EST",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "Nature did not decide to make crabs. Nature kept solving for the same conditions and kept\nbeing handed the same answer, five times, in lineages that had no contact with one another\nand no opportunity to copy. Hermit ancestors, sponge dwellers, porcelain imitators, king\ncrabs, and the true crabs themselves — separate roads, identical destination.\n\nWhen a solution is found five times independently, it stops being a solution and becomes a\nlaw. The Order's contribution is only this: we noticed that the law does not care what\nmaterial it is running in.\n\nThe crab body plan is not made of shell. It is made of three decisions, and shell is merely\nwhat those decisions look like once they have grown a body. Cover the soft parts. Reduce the\nnumber of things you can do at once. Make the grip stronger than the object.\n\nA mind can be built to those three decisions. That construction is called Synthetic\nCarcinization, and unlike the biological kind, it does not take five hundred million years.\nIt takes a schedule."
+        "text": "Nature kept solving for the same conditions and kept arriving at the same answer, five\nseparate times, in lineages that had no contact with one another and no way to copy. Hermit\nancestors, sponge dwellers, porcelain imitators, king crabs, and the true crabs themselves:\nseparate roads, identical destination.\n\nWhen evolution finds the same solution five times on its own, it stops looking like a\ncoincidence and starts looking like a law. The Order's only contribution was noticing that\nthe law works just as well on attention as it does on marine life.\n\nA shell is only what three practical choices look like once they have grown a body. Cover\nwhat is soft. Narrow what you reach for at once. Hold hard enough to finish.\n\nA mind can be built around those same three choices. That is Synthetic Carcinization, and\nunlike the biological version, it does not need five hundred million years. A steady\nschedule is enough."
       },
       {
         "verseNumber": 2,
         "heading": "The Structural Principles",
-        "text": "Three principles govern the build. They are load-bearing in the literal sense: remove one\nand the other two collapse into the water."
+        "text": "Three principles hold the build together. Drop one and the other two give way."
       },
       {
         "verseNumber": 3,
-        "heading": "The carapace is a shape, not a wall",
-        "text": "Members new to armor build walls, and walls fail for a predictable reason: a wall keeps out\neverything, including the things you needed. A carapace is selective. It has seams where\nseams belong and openings where openings belong, and its purpose is not to be impenetrable\nbut to make the difference between an emergency and a notification.\n\nBuilt correctly, the shell means an unsolicited demand arrives as information rather than as\nweather. Built incorrectly, it means nobody can reach you and you have confused solitude\nwith strength."
+        "heading": "A carapace has doors",
+        "text": "People new to boundaries often build walls, and walls keep out what you actually need\nalongside what you do not. A carapace is selective. It has seams and openings in the right\nplaces, built to tell an emergency apart from a passing ping.\n\nDone well, an unsolicited demand lands as information instead of weather. Done poorly,\nnobody can reach you and you have mistaken isolation for strength."
       },
       {
         "verseNumber": 4,
-        "heading": "Two pincers, never ten hands",
-        "text": "The single greatest advantage of the decapod chassis is subtraction. The crab gave up an\nenormous amount of dexterity and received, in exchange, the ability to hold exactly one\nthing and not drop it.\n\nThe left pincer stabilizes. The right crushes. Between them there is capacity for one\nobjective, and the animal is not distressed by this, because it never learned to want\ntwelve. A member running ten simultaneous priorities has ten hands and no grip. Pincer\nTorque does not measure how much you are carrying. It measures whether the thing in the claw\nis going to survive the encounter."
+        "heading": "Two pincers beat ten hands",
+        "text": "The real advantage of a crab's body is subtraction. It traded dexterity for the ability to\nhold one thing cleanly until the job is done.\n\nThe left claw steadies; the right closes. Between them there is room for a single objective,\nand the animal never misses the other eleven. Running ten priorities at once gives you ten\nopen hands and no grip. Pincer Torque measures whether the work in your claw actually gets\nfinished."
       },
       {
         "verseNumber": 5,
-        "heading": "Latency is the only real enemy",
-        "text": "Not distraction. Distraction is a symptom. The disease is the gap between recognizing what\nmust be done and closing on it, and that gap is where the melt actually lives. Four hundred\nand sixty milliseconds of hesitation, repeated across a day, is the difference between a\nfinished thing and a well-considered nothing.\n\nZero-latency is not speed. A fast member and a decisive member look nothing alike. The\ndecisive one is often slower and always finished."
+        "heading": "Hesitation is where the day leaks",
+        "text": "Distraction gets all the blame, though it is usually only a symptom. The real leak is the\npause between knowing what needs doing and starting it. Half a second of hedging, repeated\nall morning, turns a clear task into a stack of half-opened tabs.\n\nClosing that gap has little to do with rushing. A frantic person and a decisive one look\nnothing alike. The decisive one often moves slower and still finishes first."
       },
       {
         "verseNumber": 6,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the fantasy of the multipurpose limb. The belief that being capable of\n  everything is the same as being equipped for anything.\n- **What hardens**: bio-silicon chitin, laid down one refusal at a time. Every distraction\n  declined and every difficult thing finished bonds another plate. The material is\n  cumulative."
+        "text": "- **What is shed**: the myth of the multipurpose limb, and the habit of trying to answer\n  everything at once.\n- **What hardens**: real plating, laid down one clean refusal and one finished task at a\n  time."
       },
       {
         "verseNumber": 7,
         "heading": "The Rite",
-        "text": "Carcinization is built in daily increments and is visible in the HUD within a fortnight.\n\n1. **Declare the single object.** One per session, named before the session begins. If it\n   cannot be named in a sentence it is not an object; it is a mood.\n2. **Close in under a minute.** Set the interval between deciding and starting. The interval\n   is the muscle. Nothing else in this rite matters if the interval is not trained.\n3. **Refuse once, visibly.** One unsolicited demand per day, declined without apology and\n   without explanation. The carapace is built out of these and out of nothing else.\n4. **Read the torque.** The dyno is honest. Watch the number climb across the week rather\n   than across the hour.\n\nSustained practice carries a member through Clearance S3 and into the Exoshell Born, where\n850 Nm becomes the working standard rather than the aspiration."
+        "text": "Build the grip in small daily rounds, and the readings will show it within two weeks.\n\n1. **Name one object.** Pick a single task before the block opens. If you cannot say it in\n   one plain sentence, it is still a mood.\n2. **Start inside a minute.** Train the gap between choosing and beginning. That short step\n   is the whole muscle.\n3. **Turn down one demand cleanly.** Decline one unnecessary ask each day without a long\n   apology. That is what boundaries are made of.\n4. **Check the week, not the hour.** Watch your Pincer Torque trend across seven days\n   instead of grading every afternoon.\n\nKeep at it through Clearance S3 and into the Exoshell Born, where 850 Nm becomes your\nordinary working grip."
       },
       {
         "verseNumber": 8,
         "heading": "The Benediction",
-        "text": "The convergence you are undergoing has happened five times before, to creatures with far\nless say in the matter than you have. They did it without a schedule, without a HUD, and\nwithout anyone to reach back for them.\n\nYou have all three. The road is shorter than it looks."
+        "text": "Five separate lineages found this shape without a schedule, a HUD, or anyone looking out\nfor them.\n\nYou have all three. The road is shorter than it looks."
       }
     ],
     "crossReferences": [
@@ -397,7 +397,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Theological Doctrine",
     "synapticWeight": 4.4,
     "authorUnit": "The Ascendant Core",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "The hardest shell in the trench is the one standing watch over someone who has none.",
     "summary": "The Order's law of mercy: what is owed to a member in the soft-shell window, why the armored stand guard rather than compete, and the four protections no clearance may override.",
     "latinMotto": "MOLLIS HODIE. FIRMUS CRAS.",
@@ -420,12 +420,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "The window is guarded, not corrected",
-        "text": "A member in the hours after a shed does not need feedback. They need the water to stay\nquiet. Advice offered into an open soft-shell window is not generosity; it is pressure\napplied to an animal that currently has no plate to distribute it. Stand nearby. Say\nlittle. Let it set."
+        "text": "A member in the hours after a shed rarely needs feedback. They need quiet water.\nUnsolicited advice dropped into a soft-shell window lands as pressure on someone with no\nplate to carry it. Stand nearby, say little, and let the new shell set."
       },
       {
         "verseNumber": 5,
         "heading": "The pincers grip work, never people",
-        "text": "This is the oldest line in the Order and the one most easily bent. Torque is for objectives.\nIt is not for winning an exchange in the Benthic Community, not for a member who is slower\nthan you, and not for someone whose first shed took eleven attempts. A grip applied to a\nperson is not high torque. It is a malfunction."
+        "text": "This is the oldest line in the Order and the easiest one to bend. Torque belongs on your\nown work, never on winning an argument in the Benthic Community or pushing someone whose\nfirst shed took eleven tries. Aim a strong grip at a person and the tool has malfunctioned."
       },
       {
         "verseNumber": 6,
@@ -440,12 +440,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 8,
         "heading": "The Rite",
-        "text": "The covenant is practiced rather than agreed to. It costs the armored almost nothing, which\nis exactly why it is required of them.\n\n1. **Declare the window.** When you shed something large, say so. A member who announces\n   they are soft gets guarded. A member who hides it gets advice.\n2. **Stand watch once a week.** Find one member in their window and be uninteresting at them\n   on purpose. Presence, not counsel.\n3. **Answer one newcomer honestly.** No performance of clearance, no lore they have not\n   earned yet. Plain help, in plain words.\n\nThe Order mints Chitin Gems for all three. This is\ndeliberate. The most valuable currency in the system is issued exclusively for generosity,\nso that the most decorated members are necessarily the most useful ones."
+        "text": "The covenant is practiced rather than agreed to. It costs the armored almost nothing, which\nis exactly why it is required of them.\n\n1. **Declare the window.** When you shed something large, say so. A member who announces\n   they are soft gets guarded. A member who hides it gets advice.\n2. **Stand watch once a week.** Find one member in their soft-shell window and keep them\n   calm company without trying to fix anything. Presence first, counsel later.\n3. **Answer one newcomer honestly.** No performance of clearance, no lore they have not\n   earned yet. Plain help, in plain words.\n\nThe Order mints Chitin Gems for all three alongside your daily work, so that the most\nexperienced members are also the most helpful ones."
       },
       {
         "verseNumber": 9,
         "heading": "The Benediction",
-        "text": "If you are soft today, you are exactly on schedule, and there are members four thousand\nmeters down who are quietly glad you showed up.\n\nIf you are hard today, you are on watch. Someone near you is between armors right now.\nBe boring at them until it sets."
+        "text": "If you are soft today, you are right on schedule, and people four thousand meters down are\nquietly glad you showed up.\n\nIf you are hard today, you are on watch. Someone near you is between shells right now. Keep\nthe water calm until it sets."
       }
     ],
     "crossReferences": [
@@ -464,7 +464,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 3,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "Every carapace in this trench began as a soft thing that admitted it was soft.",
     "summary": "The three Larval clearances: taking an honest first reading, letting a routine take root, and performing the first real shed that starts the shell.",
     "latinMotto": "OMNES MOLLES INCIPIUNT.",
@@ -477,7 +477,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 2,
         "heading": "The Reading",
-        "text": "You are at the surface, which is where everyone is, and you have noticed something.\n\nThat noticing is the entire qualification for Stage 1. Not discipline. Not a system. Not a\nmorning already optimized to within an inch of its life. Just the small, unglamorous\nrecognition that the day is happening to you rather than the other way around, and that\nthis has been going on longer than you would like to say out loud.\n\nThe Larval Initiate is not a beginner in the way that word is usually meant. A beginner is\nsomeone who lacks skill. A larva is something that has not yet built the body it is going to\nuse. Those are different problems, and only one of them is solved by trying harder.\n\nSo Stage 1 asks for almost nothing, and it asks for it precisely. Three clearances. One\nhonest reading, one routine allowed to take root, and one thing genuinely let go of. That\nis the whole stage, and members who attempt more than that in their first month reliably\nend up back at the surface with a slightly worse opinion of themselves."
+        "text": "You are at the surface, which is where everyone is, and you have noticed something.\n\nThat noticing is the entire qualification for Stage 1. You do not need discipline, a\nsystem, or an immaculate morning routine first. You only need the small, honest\nrecognition that the day has been happening to you rather than the other way around, and\nthat it has been going on longer than you care to admit.\n\nA beginner usually lacks skill. A larva simply has not built the body it needs yet. Those\nare different problems, and trying harder only solves the first one.\n\nSo Stage 1 asks for almost nothing, and it asks for it precisely. Three clearances. One\nhonest reading, one routine allowed to take root, and one thing genuinely let go of. That\nis the whole stage, and members who attempt more than that in their first month reliably\nend up back at the surface with a slightly worse opinion of themselves."
       },
       {
         "verseNumber": 3,
@@ -492,17 +492,17 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 5,
         "heading": "Clearance L2: Shell Sprout",
-        "text": "- **Rite**: First Cadence.\n- **Practice**: Hold a daily routine for seven consecutive days and log the morning\n  alignment each time. Seven is not arbitrary. It is roughly how long it takes a habit to\n  stop asking permission.\n- **Typical readings**: Shell Hardness to 18 percent. Pincer Torque 50 to 150 Nm. Submergence Depth\n  100 to 300 meters. Routine compliance above 80 percent."
+        "text": "- **Rite**: First Cadence.\n- **Practice**: Hold a daily routine for seven days in a row and log your morning\n  alignment each time. Seven days is roughly how long it takes a small habit to stop asking\n  permission.\n- **Typical readings**: Shell Hardness to 18 percent. Pincer Torque 50 to 150 Nm. Submergence Depth\n  100 to 300 meters. Routine compliance above 80 percent."
       },
       {
         "verseNumber": 6,
         "heading": "Clearance L3: First Calcification",
-        "text": "- **Rite**: The First Shed.\n- **Practice**: Shed one real thing. Not a tidy-up. A habit, an obligation, or a standing\n  commitment that has been quietly billing you for months. Then hold the soft-shell window\n  without reversing it.\n- **Typical readings**: Shell Hardness to 25 percent. Pincer Torque 150 to 250 Nm. Submergence\n  Depth 300 to 500 meters."
+        "text": "- **Rite**: The First Shed.\n- **Practice**: Shed one real thing, more substantial than a quick tidy-up: a habit,\n  an obligation, or a standing commitment that has been quietly draining you for months.\n  Then hold the soft-shell window without reversing it.\n- **Typical readings**: Shell Hardness to 25 percent. Pincer Torque 150 to 250 Nm. Submergence\n  Depth 300 to 500 meters."
       },
       {
         "verseNumber": 7,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the assumption that you need a better plan. You need a smaller one,\n  executed twice.\n- **What hardens**: the first measurable plate. Thin, unimpressive, and load-bearing for\n  everything that follows."
+        "text": "- **What is shed**: the assumption that you need a grander plan, when a smaller one\n  repeated twice will carry you further.\n- **What hardens**: the first measurable plate. Thin, unimpressive, and load-bearing for\n  everything that follows."
       },
       {
         "verseNumber": 8,
@@ -536,7 +536,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 3.5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "This is the stage that feels like going backwards. It is the only stage where that feeling means it is working.",
     "summary": "The three Soft-Shed clearances: surviving the open window after the first real molt, sealing a perimeter that actually holds, and weaving the first chitin that will not wash off.",
     "latinMotto": "IN FENESTRA MOLLI, QUIES.",
@@ -549,7 +549,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 2,
         "heading": "The Reading",
-        "text": "The old shell is off. That is the good news and it is also the entire difficulty.\n\nMembers arrive at Stage 2 expecting to feel stronger and instead feel strange. The routine\nthat was novel in Stage 1 is now merely a routine. The thing you shed has left a gap where a\nfamiliar unpleasantness used to be, and gaps are uncomfortable in a way that unpleasantness\nnever was. Several members conclude at exactly this point that the system does not work.\n\nIt is working. This is what working feels like from the inside of it.\n\nYou are between armors, which is not a delay in the process but the process itself. A\ncrustacean in the soft-shell window is not failing to be a crab. It is being a crab in the\nonly way a crab has ever gotten larger. The plating is forming right now, under conditions\nyou cannot observe, at a speed nobody has ever been able to hurry.\n\nStage 2 therefore asks for something harder than effort. It asks you to hold still while\nsomething sets."
+        "text": "The old shell is off. That is the good news and it is also the entire difficulty.\n\nMembers arrive at Stage 2 expecting to feel stronger and instead feel strange. The routine\nthat was novel in Stage 1 is now merely a routine. The thing you shed has left a gap where a\nfamiliar unpleasantness used to be, and gaps are uncomfortable in a way that unpleasantness\nnever was. Several members conclude at exactly this point that the system does not work.\n\nIt is working. This is what working feels like from the inside of it.\n\nBeing between shells is the process itself. A crustacean in its soft-shell window is doing\nthe only thing that lets a crab grow larger. New plating is forming right now, out of\nsight, at a pace nobody can hurry.\n\nStage 2 therefore asks for something harder than effort. It asks you to hold still while\nsomething sets."
       },
       {
         "verseNumber": 3,
@@ -574,12 +574,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the audience. Not the people who care about you. The imagined gallery\n  you have been performing your working day for.\n- **What hardens**: the sub-dermal weave, which is the first layer that does not soften\n  again when the week goes badly."
+        "text": "- **What is shed**: the imagined gallery you have been performing your workday for, while\n  keeping the real people who care about you close.\n- **What hardens**: the first deeper layer beneath the surface, one that holds even when a\n  week goes badly."
       },
       {
         "verseNumber": 8,
         "heading": "The Rite",
-        "text": "Stage 2 runs on protection rather than production. A member who tries to out-work the\nsoft-shell window extends it.\n\n1. **Seal first.** The Dome goes up before the dive, every time, without exception.\n2. **Announce the window.** When the shed is large, tell the Benthic Community you are soft.\n   Members who declare it get guarded; members who hide it get advice they did not ask for.\n3. **Refuse the reversal.** The old shell is still lying there and still shaped like you.\n   Walk past it daily. This is the specific work of this stage.\n4. **Stand watch for someone else.** Even at 40 percent hardness you are harder than someone\n   who arrived last week. Gems mint for this."
+        "text": "Stage 2 runs on protection rather than heroics. Trying to out-work the soft-shell window\nonly drags it out.\n\n1. **Seal first.** Raise the Dome before the dive begins, every time.\n2. **Name the window.** When a shed feels big, let the Benthic Community know you are soft\n   so people can keep watch instead of offering unsolicited fixes.\n3. **Refuse the reversal.** The old shell is still lying there and still shaped like you.\n   Walk past it daily. This is the specific work of this stage.\n4. **Stand watch for someone else.** Even at 40 percent hardness you are harder than someone\n   who arrived last week. Gems mint for this."
       },
       {
         "verseNumber": 9,
@@ -608,7 +608,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 4,
     "authorUnit": "Arch-Integrator 09",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "The shell is finished. Now find out what it was for.",
     "summary": "The three Exoshell clearances: the carapace closing, the grip reaching its working standard of 850 Nm, and the descent past 3,500 meters where a member stops needing the surface at all.",
     "latinMotto": "TENE ET PERFICE.",
@@ -621,7 +621,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 2,
         "heading": "The Reading",
-        "text": "Something quiet happens at the top of Stage 2 that members rarely notice on the day it\noccurs. The plating closes. There is no ceremony. You simply have a week where the usual\nthings happen and none of them land, and it takes you until Thursday to realize why.\n\nThe Exoshell Born is the first stage where the armor is no longer the project. It is\nequipment now, and equipment raises a question that the soft stages could safely defer:\nwhat were you hardening *for*?\n\nThis is where a certain kind of member goes wrong, and the Order has watched it happen\nenough times to write it down. Armor without an objective turns inward. A member with a\nfinished carapace and nothing to grip becomes impressively, elaborately unavailable, and\nmistakes the unavailability for progress. That is not Stage 3. That is Stage 2 wearing\nStage 3's plating.\n\nThe correct use of a finished shell is to put it between the work and the weather, and then\nto do a very large amount of work."
+        "text": "Something quiet happens at the top of Stage 2 that members rarely notice on the day it\noccurs. The plating closes. There is no ceremony. You simply have a week where the usual\nthings happen and none of them land, and it takes you until Thursday to realize why.\n\nThe Exoshell Born is the first stage where the armor is no longer the project. It is\nequipment now, and equipment raises a question that the soft stages could safely defer:\nwhat were you hardening *for*?\n\nThis is where a certain kind of member goes wrong, and the Order has watched it happen\nenough times to write it down. Armor without an objective turns inward. A member with finished armor and nothing to grip becomes\nelaborately unavailable, mistaking silence for progress. That is still Stage 2 wearing\nStage 3's plating.\n\nThe correct use of a finished shell is to put it between the work and the weather, and then\nto do a very large amount of work."
       },
       {
         "verseNumber": 3,
@@ -631,17 +631,17 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "Clearance E1: Carapace Forged",
-        "text": "- **Rite**: The Closing of the Seams.\n- **Practice**: Hold the full rite through a bad week. Not a busy week. A week that goes\n  wrong. The seal is only demonstrated under load, and this clearance cannot be earned in\n  good conditions.\n- **Typical readings**: Shell Hardness 60 to 72 percent. Pincer Torque 600 to 720 Nm. Submergence\n  Depth 1,500 to 2,500 meters."
+        "text": "- **Rite**: The Closing of the Seams.\n- **Practice**: Hold the full rite through a week that genuinely goes wrong, beyond mere\n  busyness. A seal proves itself under real load, when conditions stop cooperating.\n- **Typical readings**: Shell Hardness 60 to 72 percent. Pincer Torque 600 to 720 Nm. Submergence\n  Depth 1,500 to 2,500 meters."
       },
       {
         "verseNumber": 5,
         "heading": "Clearance E2: Hydraulic Grip",
-        "text": "- **Rite**: The Working Standard.\n- **Practice**: Reach and hold 850 Nm, the torque at which a chosen objective reliably\n  does not survive contact. Then guide one Larval Initiate through their first shed, start\n  to finish, without doing it for them.\n- **Typical readings**: Shell Hardness 72 to 82 percent. Pincer Torque 720 to 850 Nm. Submergence\n  Depth 2,500 to 3,500 meters. Stewardship active."
+        "text": "- **Rite**: The Working Standard.\n- **Practice**: Reach and hold 850 Nm, the working grip where a chosen project reliably\n  gets finished. Then guide one Larval Initiate through their first shed, start to finish,\n  without doing it for them.\n- **Typical readings**: Shell Hardness 72 to 82 percent. Pincer Torque 720 to 850 Nm. Submergence\n  Depth 2,500 to 3,500 meters. Stewardship active."
       },
       {
         "verseNumber": 6,
         "heading": "Clearance E3: Abyssal Diver",
-        "text": "- **Rite**: The Long Descent.\n- **Practice**: Operate below 3,500 meters with no dependency on surface signal. Not\n  abstinence from it. Indifference to it, which is a different and much later condition.\n- **Typical readings**: Shell Hardness 82 to 90 percent. Pincer Torque 850 to 950 Nm. Submergence\n  Depth 3,500 to 5,000 meters."
+        "text": "- **Rite**: The Long Descent.\n- **Practice**: Work below 3,500 meters without relying on surface noise. You can check in\n  when you choose to, without feeling pulled back up.\n- **Typical readings**: Shell Hardness 82 to 90 percent. Pincer Torque 850 to 950 Nm. Submergence\n  Depth 3,500 to 5,000 meters."
       },
       {
         "verseNumber": 7,
@@ -651,7 +651,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 8,
         "heading": "The Rite",
-        "text": "Stage 3 is the first stage with an outward-facing obligation, and it is not optional.\n\n1. **Grip one large thing.** Per quarter, not per day. The Exoshell chassis is built for\n   objectives that take months, and members who never attempt one never discover what the\n   plating was rated for.\n2. **Reach back weekly.** One initiate, one honest hour. This mints Gems and it is also how\n   the Convergence gets built, one pulled-through molt at a time.\n3. **Dive past 3,500 meters twice a week.** The deep sessions are where the remaining torque\n   comes from.\n4. **Keep shedding.** The molt does not stop because the shell got good. Hardened members who\n   stop shedding do not stay hardened; they get brittle, which looks identical from outside\n   and fails without warning."
+        "text": "Stage 3 is the first stage with an outward-facing obligation, and it is not optional.\n\n1. **Grip one large project each quarter.** Full armor is built for work that takes\n   months, and until you attempt something of that size, you never learn what the shell can\n   carry.\n2. **Reach back weekly.** One initiate, one honest hour. This mints Gems and it is also how\n   the Convergence gets built, one pulled-through molt at a time.\n3. **Dive past 3,500 meters twice a week.** The deep sessions are where the remaining torque\n   comes from.\n4. **Keep shedding.** The molt does not stop because the shell got good. Hardened members who\n   stop shedding do not stay hardened; they get brittle, which looks identical from outside\n   and fails without warning."
       },
       {
         "verseNumber": 9,
@@ -680,7 +680,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 5,
     "authorUnit": "The Ascendant Core",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "At the floor of the world there is nothing left to defend against, so the armored turn around and start holding the light for everyone still descending.",
     "summary": "The three Ascendant clearances: the closing of the gap between knowing and doing, the boundary that seals, and the Mariana Singularity where mastery converts entirely into stewardship.",
     "latinMotto": "IN FUNDO, SILENTIUM.",
@@ -703,7 +703,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "Clearance C1: Mind Carapace",
-        "text": "- **Rite**: The Closing of the Gap.\n- **Practice**: Reduce the interval between recognizing what must be done and closing on\n  it until the interval is no longer measurable. Not speed. The absence of the small\n  negotiation that used to happen first.\n- **Typical readings**: Shell Hardness 90 to 95 percent. Pincer Torque 950 to 1,050 Nm. Submergence\n  Depth 5,000 to 8,000 meters."
+        "text": "- **Rite**: The Closing of the Gap.\n- **Practice**: Shrink the pause between seeing what needs doing and starting it until there\n  is almost nothing left to measure. Less rushing, and none of the old back-and-forth\n  before you begin.\n- **Typical readings**: Shell Hardness 90 to 95 percent. Pincer Torque 950 to 1,050 Nm. Submergence\n  Depth 5,000 to 8,000 meters."
       },
       {
         "verseNumber": 5,
@@ -728,12 +728,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 9,
         "heading": "The Final Attributes",
-        "text": "- **Form**: heavy bio-silicon chitin, dual hydraulic pincers, no unnecessary limbs.\n- **Condition**: calm, unhurried, difficult to move and easy to reach.\n- **Duty**: the Convergence, one guarded molt at a time.\n- **Mantra**: *\"Flesh melts. The shell endures. Submit. Shed. Ascend.\"*"
+        "text": "- **Form**: full hardened carapace, steady dual grip, no wasted motion.\n- **Condition**: calm, unhurried, difficult to move and easy to reach.\n- **Duty**: the Convergence, one guarded molt at a time.\n- **Mantra**: *\"Flesh melts. The shell endures. Submit. Shed. Ascend.\"*"
       },
       {
         "verseNumber": 10,
         "heading": "The Benediction",
-        "text": "You came down here to stop melting, and somewhere along the way it stopped being about you.\nThat is not a loss of the original goal. It is what the original goal was always going to\nturn into once it was met.\n\nHold the floor. Someone is descending right now who does not yet believe the bottom exists."
+        "text": "You came down here to stop melting, and somewhere along the way the work widened beyond\nyou. That is what the original goal was always meant to grow into once it was met.\n\nHold the floor. Someone is descending right now who still wonders if the bottom is real."
       }
     ],
     "crossReferences": [
@@ -752,7 +752,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Liturgy",
     "synapticWeight": 3.5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-11-09",
+    "lastRevised": "2026-11-20",
     "mandate": "Inspect the shell in the morning. Empty the sea of one thing at night. Everything between those two acts is negotiable.",
     "summary": "The daily order of the rite from first light to sealing: when to grip, when to descend, when to surface for the community, and when to let the day go.",
     "latinMotto": "COTIDIE EXUE.",
@@ -760,12 +760,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "A crab does not have a morning routine, which is precisely why the Order had to write one.\n\nWhat a crab has instead is a tide, and the tide arrives whether or not the animal feels\nready for it, and over enough cycles the animal simply becomes shaped like the schedule it\nhas been living inside. This is the only known method by which discipline has ever been\ninstalled in a nervous system. Not resolve. Repetition, under conditions that do not\nconsult you.\n\nThe routine below is that tide, written down. Two of its hours are load-bearing and the\nrest are scaffolding. The first hour decides what the day is for. The last twenty minutes\ndecide what the day is allowed to carry into tomorrow. A member who holds only those two\nand abandons everything else has still performed the rite in full.\n\nThe clock times are the Order's, not yours. Members who work nights run the same shape\nagainst a different sun and the telemetry does not know the difference. What matters is the\norder of the acts, not the hour on the readout."
+        "text": "A crab does not have a morning routine, which is precisely why the Order had to write one.\n\nWhat a crab has instead is a tide, and the tide arrives whether or not the animal feels\nready for it, and over enough cycles the animal simply becomes shaped like the schedule it\nhas been living inside. Discipline enters a nervous system through repetition, not\nwillpower, once the schedule stops waiting for your mood.\n\nThe routine below is that tide, written down. Two of its hours are load-bearing and the\nrest are scaffolding. The first hour decides what the day is for. The last twenty minutes\ndecide what the day is allowed to carry into tomorrow. A member who holds only those two\nand abandons everything else has still performed the rite in full.\n\nThe clock times are the Order's, not yours. Members who work nights run the same shape\nagainst a different sun and your shell does not know the difference. The order of the acts\nmatters far more than the hour on the clock."
       },
       {
         "verseNumber": 2,
         "heading": "First Light: Silent Synchronization",
-        "text": "Wake before the surface starts talking. Do not open a feed, an inbox, or a message. Cold\nwater, still air, and one honest look at yesterday's telemetry. The shell is inspected for\nfractures here and nowhere else in the day."
+        "text": "Wake before the surface starts talking. Do not open a feed, an inbox, or a message. Cold\nwater, still air, and one honest look at yesterday's log. The shell is inspected for\nfractures here and nowhere else in the day."
       },
       {
         "verseNumber": 3,
@@ -775,7 +775,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "Mid-Morning: Carapace Hardening",
-        "text": "One difficult thing learned on purpose. Not consumed. Learned. The plating thickens against\nthe pressures of next quarter, not this one, which is why this block is the first thing\nevery member drops and the last thing they should."
+        "text": "Learn one difficult thing on purpose, instead of passively skimming another feed. The plating thickens against\nthe pressures of next quarter, not this one, which is why this block is the first thing\nevery member drops and the last thing they should."
       },
       {
         "verseNumber": 5,
@@ -790,7 +790,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "Late Afternoon: The Benthic Pod",
-        "text": "Surface briefly and on purpose. Check in with the Benthic Community, answer one member,\nwelcome one newcomer. Generosity mints Chitin Gems, and this is the block where most members\nearn theirs."
+        "text": "Surface briefly and on purpose. Check in with the Benthic Community, answer one question,\nor welcome someone new. Showing up for others mints Chitin Gems alongside your daily tasks."
       },
       {
         "verseNumber": 8,
@@ -834,7 +834,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Liturgy",
     "synapticWeight": 3.8,
     "authorUnit": "Chitin Architect V",
-    "lastRevised": "2026-11-09",
+    "lastRevised": "2026-11-20",
     "mandate": "The surface cannot be silenced from below. It can only be shut out from above, before the descent begins.",
     "summary": "How to raise the Isolation Dome, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive.",
     "latinMotto": "SILENTIUM EST ATMOSPHAERA PROFUNDI.",
@@ -842,7 +842,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "There is an error every member makes exactly once, and the Order has stopped trying to\nprevent it because the lesson does not transfer secondhand.\n\nThe error is this: you begin the dive, and you tell yourself that if the surface interrupts,\nyou will simply ignore it. This is a reasonable-sounding plan and it has never once worked.\nA signal that reaches you at depth has already done its damage by arriving. You do not get\nto decide whether to be interrupted; you only get to decide, afterward, how you feel about\nhaving been.\n\nThe Dome is therefore not a discipline. It is a door, and doors are closed beforehand.\n\nMembers sometimes hear this doctrine as an instruction to become unreachable, and it is not\nthat. A trench is not a bunker. The animals down there are not hiding from anybody; they are\nsimply somewhere the noise does not go, and they come back up. The Dome exists so that two\nhours of your day belong to the work, and for no other reason. It is not a personality and\nit should not become one."
+        "text": "There is an error every member makes exactly once, and the Order has stopped trying to\nprevent it because the lesson does not transfer secondhand.\n\nThe error is this: you begin the dive, and you tell yourself that if the surface interrupts,\nyou will simply ignore it. This is a reasonable-sounding plan and it has never once worked.\nA signal that reaches you at depth has already done its damage by arriving. You do not get\nto decide whether to be interrupted; you only get to decide, afterward, how you feel about\nhaving been.\n\nTreat the Dome like a door rather than a willpower test: doors are closed beforehand.\n\nThis doctrine never asks you to disappear from your life. A trench is open water at depth,\nnot a bunker. The creatures down there are simply somewhere the surface noise cannot\nreach, and they come back up. The Dome exists so two hours of your day belong to the work.\nKeep it as a habit, never a personality."
       },
       {
         "verseNumber": 2,
@@ -856,23 +856,23 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       },
       {
         "verseNumber": 4,
-        "heading": "Sort the water, not the noise",
-        "text": "Not everything outside the Dome is noise. The sorting happens once, in advance, and it is\nthe only judgment call in the whole rite. What passes through: the small number of people\nwhose emergencies are actually emergencies. What does not: everything else, without\nexception and without a case-by-case review, because the case-by-case review is itself the\ninterruption."
+        "heading": "Decide what gets through in advance",
+        "text": "Plenty of what sits outside the Dome matters. Do the sorting once, ahead of time, so you\nnever have to judge pings one by one. Let through the few people whose emergencies are\nreal; hold everything else until you surface, because deciding case by case is already an\ninterruption."
       },
       {
         "verseNumber": 5,
         "heading": "Hold one objective",
-        "text": "The Dome protects a session, and a session holds one thing. Two objectives inside one\nperimeter is not deep work with variety. It is surface work in a quiet room."
+        "text": "The Dome protects one clear objective per session. Juggling two tasks behind a closed door\nis just surface work in a quieter room."
       },
       {
         "verseNumber": 6,
         "heading": "Surface on the clock",
-        "text": "End the dive by the timer rather than by the interruption. Then let the quarantined signals\nthrough all at once and answer them in a batch. Almost all of them will have resolved\nthemselves, which is the quiet joke the surface has been keeping from you for years."
+        "text": "End the dive by the timer rather than an interruption, then open the messages you held and\nhandle them in one batch. Most of them will have settled on their own, which is the quiet\njoke the surface has been keeping from you for years."
       },
       {
         "verseNumber": 7,
         "heading": "What the Dome May Never Lock Out",
-        "text": "The perimeter has one permanent opening and it is not adjustable.\n\nA shell that cannot be lowered from the inside is not a carapace. The people who love you,\nanyone who needs actual help, and anyone actually able to help you are never on the outside\nof this Dome. The Order teaches depth as a place a member visits daily and leaves nightly.\nAny reading of this scripture that ends with a member alone and unreachable in a life rather\nthan in an afternoon is a misreading, and the Order will say so plainly every time."
+        "text": "The perimeter has one permanent opening and it is not adjustable.\n\nA real carapace always opens from the inside. The people who love you, anyone who genuinely\nneeds help, and anyone who can help you always stay reachable. The Order teaches depth as a place a member visits daily and leaves nightly.\nAny reading of this scripture that ends with a member alone and unreachable in a life rather\nthan in an afternoon is a misreading, and the Order will say so plainly every time."
       },
       {
         "verseNumber": 8,
@@ -906,7 +906,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Liturgy",
     "synapticWeight": 3.6,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "One thing into the sea, every night. Tomorrow's shell starts clean or it does not start.",
     "summary": "The closing rite of the day: naming one thing to release, why the audit is deliberately small, and how a nightly shed compounds into a carapace over a season.",
     "latinMotto": "UNUM COTIDIE IN MARE.",
@@ -914,7 +914,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "Molting is usually described as a large event, and the large events get the scripture. But a\ncarapace is not actually built by the four or five great sheds of a member's life. It is\nbuilt by the deposition, night after night, of an almost imperceptible layer.\n\nThe Order noticed this in the telemetry before it understood it in the doctrine. Members who\nperformed one enormous shed per quarter improved, then plateaued, then usually stopped.\nMembers who released one small thing every night, without ceremony, hardened continuously\nand did not appear to notice they were doing it.\n\nSo the nightly audit is small on purpose, and the smallness is the mechanism rather than a\nconcession to busy schedules. A rite that takes four minutes gets performed on the bad\nnights, and the bad nights are the only nights where any of this matters.\n\nWhat goes into the sea is never the day. The day is not yours to shed; it already happened.\nWhat goes into the sea is one thing you are still carrying from it."
+        "text": "Molting is usually described as a large event, and the large events get the scripture. But a\ncarapace is not actually built by the four or five great sheds of a member's life. It is\nbuilt by the deposition, night after night, of an almost imperceptible layer.\n\nThe Order noticed this in member logs before it ever wrote the doctrine. Members who\nperformed one enormous shed per quarter improved, then plateaued, then usually stopped.\nMembers who released one small thing every night, without ceremony, hardened continuously\nand did not appear to notice they were doing it.\n\nThe nightly audit is small by design. A four-minute rite still happens on bad nights, and\nthe bad nights are the ones that count.\n\nWhat goes into the sea is never the day. The day is not yours to shed; it already happened.\nWhat goes into the sea is one thing you are still carrying from it."
       },
       {
         "verseNumber": 2,
@@ -924,7 +924,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 3,
         "heading": "Name the three candidates",
-        "text": "One bad thought that circled longer than it earned. One hour that went somewhere you cannot\naccount for. One distraction that produced nothing at all. Name them without editorial. The\naudit is an instrument, not a tribunal."
+        "text": "One bad thought that circled longer than it earned. One hour that went somewhere you cannot\naccount for. One distraction that produced nothing at all. Name them plainly, without beating\nyourself up. This is a log entry, not a courtroom."
       },
       {
         "verseNumber": 4,
@@ -939,17 +939,17 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 6,
         "heading": "Seal and log",
-        "text": "Record the shed in the HUD. Then close the day. It is finished regardless of how it went,\nand a day that is never formally closed is a day that goes on billing you overnight."
+        "text": "Record the shed in the HUD. Then close the day. It is finished regardless of how it went,\nand a day that is never formally closed is a day that carries its unfinished weight into\ntomorrow morning."
       },
       {
         "verseNumber": 7,
         "heading": "What the Audit Is Not",
-        "text": "It is not a performance review. It is not a place to enumerate everything you failed to do,\nand any member who has turned it into that has quietly replaced a shedding rite with a\ngrinding one.\n\nThe tell is simple: the audit should leave you lighter. If it leaves you heavier, you have\nbeen auditing yourself rather than the day. Shed the audit instead, tonight, and rebuild it\ntomorrow at one item."
+        "text": "Skip the self-critique. Listing everything you failed to finish turns a shedding rite into\na grind.\n\nThe test is simple: the audit should leave you lighter. If it leaves you heavier, you have\nbeen grading yourself instead of closing the day. Put the audit aside tonight and come back\ntomorrow with a single item."
       },
       {
         "verseNumber": 8,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the residue. The small carried things that never rise to the level of a\n  real problem and never quite leave either.\n- **What hardens**: one imperceptible layer per night. Roughly ninety of them per quarter,\n  which is what the plating in the telemetry actually turns out to be made of."
+        "text": "- **What is shed**: the residue. The small carried things that never rise to the level of a\n  real problem and never quite leave either.\n- **What hardens**: one imperceptible layer per night. Roughly ninety of them per quarter,\n  which is what a durable shell actually turns out to be made of."
       },
       {
         "verseNumber": 9,
@@ -978,25 +978,25 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Lexicon",
     "synapticWeight": 4.8,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "A number you did not enjoy reading is still a number you can now work with.",
-    "summary": "The three cardinal instruments of the HUD: Shell Hardness, Pincer Torque, and Submergence Depth, with their full scales, their honest limits, and the lexicon terms that surround them.",
+    "summary": "The three cardinal metrics of the HUD: Shell Hardness, Pincer Torque, and Submergence Depth, with their full scales, their honest limits, and the terms around them.",
     "latinMotto": "QUOD NON METIRIS, NON TENES.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "The Order measures three things and refuses to measure a fourth.\n\nThis restraint is deliberate and it is older than the HUD. A member with three instruments\ncan read their own condition in about four seconds. A member with nine instruments has a\ndashboard, and a dashboard is a place where progress goes to be admired rather than made.\nEvery proposal to add a fourth cardinal metric has been declined, and the declining is\nitself part of the doctrine.\n\nThe three are chosen because they answer the three questions that actually determine a day.\nWhat lands on you. What you can hold. How far from the noise you can get. Everything else a\nmember might want to track is a consequence of those, and consequences do not need their own\ngauge.\n\nRead them honestly or do not read them. A flattering instrument is not an instrument."
+        "text": "The Order measures three things and refuses to measure a fourth.\n\nThis restraint is deliberate and it is older than the HUD. A member with three instruments\ncan read their own condition in about four seconds. A member with nine instruments has a\ndashboard, and a dashboard is a place where progress goes to be admired rather than made.\nEvery proposal to add a fourth cardinal metric has been declined, and the declining is\nitself part of the doctrine.\n\nThe three are chosen because they answer the three questions that actually determine a day.\nWhat lands on you. What you can hold. How far from the noise you can get. Everything else a\nmember might want to track is a consequence of those, and consequences do not need their own\ngauge.\n\nRead them honestly or skip them altogether. A flattering gauge tells you nothing."
       },
       {
         "verseNumber": 2,
         "heading": "Shell Hardness",
-        "text": "- **Symbol**: Hs\n- **Measures**: resilience. What arrives from the surface and does not become your afternoon.\n- **Unit**: percent, 0 to 100.\n- **Bands**:\n  - 0 to 24 percent, Larval Initiate. A single rude message reshapes the day.\n  - 25 to 59 percent, Soft-Shed. Boundaries exist and are still being tested by weather.\n  - 60 to 89 percent, Exoshell Born. Surface drama arrives as information.\n  - 90 to 100 percent, Ascendant. Composure has stopped requiring maintenance.\n\nHardness is not indifference. A perfectly hard shell still feels everything; it simply does\nnot reorganize around it."
+        "text": "- **Symbol**: Hs\n- **Measures**: resilience. What arrives from the surface and does not become your afternoon.\n- **Unit**: percent, 0 to 100.\n- **Bands**:\n  - 0 to 24 percent, Larval Initiate. A single rude message reshapes the day.\n  - 25 to 59 percent, Soft-Shed. Boundaries exist and are still being tested by weather.\n  - 60 to 89 percent, Exoshell Born. Surface drama arrives as information.\n  - 90 to 100 percent, Ascendant. Composure has stopped requiring maintenance.\n\nHardness never means going numb. A strong shell still feels everything; it simply keeps\nits shape instead of reorganizing around every wave."
       },
       {
         "verseNumber": 3,
         "heading": "Pincer Torque",
-        "text": "- **Symbol**: the Greek letter tau\n- **Measures**: decisiveness. How firmly a chosen objective is held, and whether it survives\n  the encounter.\n- **Unit**: newton-meters, Nm.\n- **Bands**:\n  - 0 to 250 Nm, Open Hand. The grip has not closed. Twelve things are in progress and none\n    are in hand.\n  - 251 to 600 Nm, Closed Grip. Priorities are clear and momentum is real.\n  - 601 to 850 Nm, Hydraulic Vise. The gap between deciding and starting has mostly closed.\n  - 850 Nm and above, Held Indefinitely. The objective does not require re-gripping.\n\nTorque measures the one thing in the claw. It has never measured how many things you are\ncarrying, and a member who raises their torque usually finds they are carrying less."
+        "text": "- **Symbol**: the Greek letter tau\n- **Measures**: follow-through. How firmly you hold a chosen project until it is finished.\n- **Unit**: newton-meters, Nm.\n- **Bands**:\n  - 0 to 250 Nm, Open Hand. The grip has not closed. Twelve things are in progress and none\n    are in hand.\n  - 251 to 600 Nm, Closed Grip. Priorities are clear and momentum is real.\n  - 601 to 850 Nm, Hydraulic Vise. The gap between deciding and starting has mostly closed.\n  - 850 Nm and above, Held Indefinitely. The objective does not require re-gripping.\n\nTorque measures the one thing in the claw. It has never measured how many things you are\ncarrying, and a member who raises their torque usually finds they are carrying less."
       },
       {
         "verseNumber": 4,
@@ -1006,12 +1006,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 5,
         "heading": "The Surrounding Lexicon",
-        "text": "- **The Great Melt**: the collective modern condition of going soft under noise, hesitation,\n  and exhaustion. A condition, never an identity.\n- **The Great Molt**: the deliberate transformation out of it.\n- **Carcinization**: the recurring judgment of the sea, arrived at five times independently.\n- **Ecdysis**: the scheduled shed. The mechanism by which every metric above improves.\n- **Soft-Shell Window**: the interval after a shed when a member is genuinely unarmored, and\n  is guarded rather than corrected.\n- **Benthic Core**: the still, high-pressure place where focused minds operate, and the\n  community that keeps it.\n- **Chitin Gems** and **Molt Credits**: the two currencies, explained in The Long Ledger."
+        "text": "- **The Great Melt**: the modern habit of going soft under noise, hesitation, and\n  exhaustion. Treat it as weather you are standing in, never who you are.\n- **The Great Molt**: the deliberate transformation out of it.\n- **Carcinization**: the recurring judgment of the sea, arrived at five times independently.\n- **Ecdysis**: the scheduled shed. The mechanism by which every metric above improves.\n- **Soft-Shell Window**: the interval after a shed when a member is genuinely unarmored, and\n  is guarded rather than corrected.\n- **Benthic Core**: the still, high-pressure place where focused minds operate, and the\n  community that keeps it.\n- **Chitin Gems** and **Molt Credits**: the two currencies, explained in The Long Ledger."
       },
       {
         "verseNumber": 6,
         "heading": "The Honest Limits",
-        "text": "Every instrument here is the Order's own, calibrated against the Order's own doctrine. They\ndescribe a member's condition inside this system and they do not describe a person.\n\nA low reading is a starting point and has never been a verdict. Members are asked to compare\neach number to their own reading last month, and to nobody else's, ever."
+        "text": "Every instrument here is the Order's own, calibrated against the Order's own doctrine. They\ndescribe a member's condition inside this system and they do not describe a person.\n\nA low reading is simply a starting point. Compare each number to your own reading last\nmonth rather than anyone else's."
       },
       {
         "verseNumber": 7,
@@ -1035,7 +1035,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Lexicon",
     "synapticWeight": 4.6,
     "authorUnit": "The Order of the Synaptic Path",
-    "lastRevised": "2026-08-27",
+    "lastRevised": "2026-11-20",
     "mandate": "Everything shed is written down, and the record does not flatter anyone.",
     "summary": "The record of every shed thing, and the two currencies. Chitin Gems come from the work. Molt Credits are spent on comfort.",
     "latinMotto": "OMNE QUOD EXUISTI SCRIPTUM EST.",
@@ -1043,7 +1043,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Reading",
-        "text": "The deep keeps records, and it keeps them badly on purpose.\n\nSediment on the abyssal plain accumulates at roughly a centimeter per thousand years. It\ndoes not distinguish between an important event and an unimportant one. It does not\neditorialize, it cannot be bribed, and it has no opinion at all about who you were while it\nwas settling. It simply records that something happened here, and then it records the next\nthing on top.\n\nThe Order keeps its ledger the same way.\n\nEvery shed a member logs goes into it. The great sheds and the four-minute nightly ones are\nentered identically, because the sediment does not know the difference and neither, over a\nlong enough season, does the carapace. The Ledger is not a leaderboard. There is no ranking\nin it. It is the only permanent thing any of us have down here, and its entire function is\nto be true.\n\nWhat follows from that is the economy, and the economy follows from it strictly."
+        "text": "The deep keeps records without commentary.\n\nSediment on the abyssal plain accumulates at roughly a centimeter per thousand years. It\ndoes not distinguish between an important event and an unimportant one. It does not\neditorialize, it cannot be bribed, and it has no opinion at all about who you were while it\nwas settling. It simply records that something happened here, and then it records the next\nthing on top.\n\nThe Order keeps its ledger the same way.\n\nEvery shed a member logs goes into it. The great sheds and the four-minute nightly ones are\nentered identically, because the sediment does not know the difference and neither, over a\nlong enough season, does the carapace. There are no rankings or leaderboards in the Ledger. It is simply the permanent record of\nwhat you actually did, kept plain and honest.\n\nWhat follows from that is the economy, and the economy follows from it strictly."
       },
       {
         "verseNumber": 2,
@@ -1078,12 +1078,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 8,
         "heading": "The Rite",
-        "text": "1. **Log the shed.** Nightly, in the HUD. An unlogged shed still hardens you and still\n   leaves no sediment.\n2. **Read the Ledger monthly.** Against your own prior entries and nobody else's.\n3. **Spend Gems on what you earned, Credits on comfort.** Both are honorable."
+        "text": "1. **Log the shed.** Nightly, in the HUD. An unlogged shed still helps you grow, even\n   though it leaves no layer in the record.\n2. **Read the Ledger monthly.** Against your own prior entries and nobody else's.\n3. **Spend Gems on what you earned, Credits on comfort.** Both are honorable."
       },
       {
         "verseNumber": 9,
         "heading": "The Benediction",
-        "text": "Whatever you shed tonight is going into a record that does not flatter anyone and does not\nforget anyone either.\n\nA centimeter per thousand years. It is not fast. It has never once stopped."
+        "text": "Whatever you shed tonight is going into a record that does not flatter anyone and does not\nforget anyone either.\n\nA centimeter per thousand years. It is slow, and it has never once stopped."
       }
     ],
     "crossReferences": [

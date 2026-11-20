@@ -6,7 +6,7 @@ stage_clearance: 2
 category: "Theological Doctrine"
 synaptic_weight: 4.0
 author_unit: "Arch-Integrator 09"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "Pressure is not the enemy of thought. Pressure is what removes everything that was not thought."
 latin_motto: "PROFUNDUM ABYSSI SANCTUM EST"
 summary: "The doctrine of depth: why the surface cannot hold a complete idea, what the pressure removes on the way down, and how a member reaches the floor on purpose rather than by accident."
@@ -22,11 +22,7 @@ summary: "The doctrine of depth: why the surface cannot hold a complete idea, wh
 
 Everything difficult that has ever been solved was solved below the surface.
 
-Not metaphorically below. The surface is a real place with real properties, and its
-defining property is that nothing there is allowed to finish. Light scatters. Waves
-interrupt each other. A creature at the top of the water receives a hundred signals an hour
-and cannot act on any of them, because each is displaced by the next before it resolves
-into anything.
+Up at the surface, nothing is allowed to finish. Light scatters. Waves interrupt each other. Spend your day at the top of the water and a hundred signals arrive every hour, each one knocking the last out of your hands before it can settle.
 
 Then the water gets deeper and the physics change.
 
@@ -36,11 +32,7 @@ is cold, and the cold is steady rather than sharp, and there is no weather at al
 the single most stable environment on the planet, and this is why the animals down there
 are the calmest animals on the planet.
 
-Members arrive at this doctrine expecting it to be about escape. It is not. Nobody is
-hiding at four thousand meters. The deep is where the pressure is *highest*, and that is
-precisely the point. You do not go down to be comfortable. You go down because the pressure
-crushes everything that was not the work, and what survives the descent is the only part
-that was ever going to matter.
+Many people hear about depth and picture an escape. Down at four thousand meters, nobody is hiding. The pressure is highest there, and that is the whole point. You go down because steady pressure strips away everything except the work in front of you.
 
 ---
 
@@ -48,34 +40,23 @@ that was ever going to matter.
 
 Two laws hold below the thermocline, and both invert what the surface taught you.
 
-### 1. Hydrostatic Focus
+### 1. Even Pressure
 
-The surface teaches that pressure breaks people, and at the surface this is true, because a
-soft body in moving water has nothing to press against. Below, pressure has the opposite
-effect. It presses on all sides equally, and a mind under even pressure does not scatter.
-It densifies.
+At the surface, pressure feels like chaos because every shove hits you from a different angle. Below, it presses evenly from all sides. Under steady pressure, a scattered mind settles and packs tight.
 
-This is why the hardest problem of your week should be scheduled at the deepest hour of your
-day rather than deferred to the shallow end of it. A difficult thing attempted at depth
-takes less time than an easy thing attempted at the surface. Members do not believe this
-until they log it, and then they never argue with it again.
+That is why the hardest problem of your week belongs in your quietest, deepest block rather than whatever scraps remain at the end of the afternoon. Hard work done at depth takes less time than easy work done in the waves. Most members doubt this until they try it for a week, and then they stop arguing with it.
 
 ### 2. Thermal Stability
 
-There are no temperature spikes on the abyssal plain. Nothing down there is startled,
-because nothing down there is ever suddenly anything. Composure at depth is not a
-personality trait a member either has or lacks. It is a property of the environment, which
-means it can be built rather than merely hoped for.
+There are no temperature spikes on the abyssal plain. Nothing down there is startled, because nothing down there is ever suddenly anything. Composure at depth has less to do with personality than with where you put yourself.
 
-Build the environment and the composure arrives on its own. Every member who has ever said
-they cannot focus was, without exception, attempting it at the surface.
+Build a quiet environment and steadiness follows. Almost everyone who says they cannot focus has only ever tried it at the surface.
 
 ---
 
 ## The Transformation
 
-- **What is shed**: the belief that you must feel calm before you can work. The order is
-  reversed. You go deep first, and the calm is what the depth does to you.
+- **What is shed**: waiting to feel calm before starting. Go deep first; the calm shows up once you get there.
 - **What hardens**: Submergence Depth, the only metric in the canon that measures where you
   are rather than what you are made of.
 
@@ -96,8 +77,7 @@ surface.
    the depth you reached. The reading is only honest if you take it before you check
    anything.
 
-Sustained descent is what carries a member from Clearance S1 to the floor of Stage 2. There
-is no other route through it, and the Order has stopped pretending otherwise.
+Sustained dives are what carry a member from Clearance S1 to the floor of Stage 2. Every shortcut stays near the surface.
 
 ---
 

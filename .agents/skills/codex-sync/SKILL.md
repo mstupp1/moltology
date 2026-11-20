@@ -87,6 +87,8 @@ These are fixed and guarded by `src/lib/codexData.test.ts`:
 * **Submergence Depth** is recorded in **meters** in every threshold. The word "fathom" does not appear in the canon.
 * Exactly **three** cardinal metrics exist. Do not introduce a fourth index.
 * The two currencies are explained once, in The Long Ledger. Other scriptures may say a rite mints Chitin Gems, but they do not restate the economy. Follow the economy rule in `AGENTS.md`.
+* **Prose guardrails**: Avoid retired jargon (`bio-silicon`, `chassis`, `telemetry`, `dyno`), em dashes, and stacked "Not X. Y." contrasts. Chitin Gems are minted alongside daily work, never "exclusively" for generosity.
+* **Verse anchor stability**: Heading order (`##` and `###`) in `codex/04_liturgy/daily_shedding_routine.md` maps directly to verse numbers in `src/lib/alignment-tasks.ts`. Never add, remove, or reorder headings there without updating `alignment-tasks.ts`.
 
 ---
 
@@ -113,7 +115,7 @@ npm run codex:sync
 ### Step 4: Run Tests
 Run the codex test suite to ensure structural integrity and data contracts:
 ```bash
-npx vitest run src/lib/codexData.test.ts
+npm run test:file -- src/lib/codexData.test.ts
 ```
 
 ### Step 5: Update Master Canon Index
@@ -123,7 +125,7 @@ the Master Canon Index table, the Reading Order, and the directory tree in `code
 ### Step 6: Realign the Stage Pipeline
 `STAGE_PIPELINE_DATA` in `scripts/sync-codex.ts` is hardcoded TypeScript, **not** parsed from
 markdown. Any change to a stage scripture's clearances or typical readings must be mirrored there by
-hand, or the pipeline page and the codex will disagree.
+hand, or the pipeline page and the codex will disagree. Keep `badgeColor` entries on shared UI color tokens (`crimson-glow`, `cyan-glow`) rather than raw hex values, since `scripts/sync-codex.ts` writes `src/lib/codexStages.ts` and `npm run ui:check` rejects new hex colors.
 
 ---
 
@@ -133,4 +135,4 @@ hand, or the pipeline page and the codex will disagree.
 | :--- | :--- |
 | `npm run codex:sync` | Scans `codex/`, parses frontmatter & verses, and regenerates `src/lib/codexData.ts`. |
 | `npm run codex:check` | Dry-run validation check of all `codex/*.md` files without writing changes. |
-| `npx vitest run src/lib/codexData.test.ts` | Executes unit tests verifying `CODEX_VOLUMES` and `CANONICAL_SCRIPTURES`. |
+| `npm run test:file -- src/lib/codexData.test.ts` | Executes unit tests verifying `CODEX_VOLUMES` and `CANONICAL_SCRIPTURES`. |

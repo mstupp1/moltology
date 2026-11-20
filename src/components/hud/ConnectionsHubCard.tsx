@@ -28,10 +28,10 @@ import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
 export const CONNECTIONS_HUB_TITLE = 'Connections'
 export const CONNECTIONS_HUB_EMPTY_COPY = {
-  title: 'The circle is quiet',
-  body: 'Search a designation to send a request.',
+  title: 'No connections yet',
+  body: 'Search by name or username to send a friend request.',
 } as const
-export const CONNECTIONS_HUB_SEARCH_PLACEHOLDER = 'Search names or designations…'
+export const CONNECTIONS_HUB_SEARCH_PLACEHOLDER = 'Search by name or username…'
 
 const HUB_SEARCH_RESULT_LIMIT = 3
 
@@ -188,7 +188,7 @@ export function ConnectionsHubCard() {
 
           {showSearchResults && !searching && searchResults.length === 0 && (
             <p className="text-xs text-ink-muted text-center py-3">
-              The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
+              No members matched that search.
             </p>
           )}
 

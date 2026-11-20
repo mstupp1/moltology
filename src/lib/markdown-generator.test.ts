@@ -20,7 +20,7 @@ describe('Markdown Generator', () => {
 
   it('generates news index markdown listing dispatches', () => {
     const newsMd = generateNewsIndexMarkdown(INITIAL_BLOG_POSTS)
-    expect(newsMd).toContain('# MoltNation News & Patriot Telemetry Dispatches')
+    expect(newsMd).toContain('# MoltNation News')
     expect(newsMd).toContain(INITIAL_BLOG_POSTS[0].title)
     expect(newsMd).toContain('https://moltology.org/news/')
   })

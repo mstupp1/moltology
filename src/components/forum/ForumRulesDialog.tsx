@@ -28,7 +28,7 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
 
         <div className="p-4 sm:p-5 space-y-3 max-h-[70vh] overflow-y-auto">
           <p className="text-xs text-ink-body leading-relaxed border-l-2 border-cyan-glow pl-3">
-            Beneath the dark biomechanical look, safety, warmth, and mutual growth stay non-negotiable.
+            Every board runs on the Soft-Shell Covenant: warmth, honesty, and room to grow.
           </p>
 
           {COMMUNITY_RULES.map((rule) => (
@@ -59,7 +59,7 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
         </div>
 
         <div className="bg-surface-2 border-t border-line-subtle p-3 flex items-center justify-between text-xs text-ink-muted">
-          <span>5 RULES ACTIVE</span>
+          <span>{COMMUNITY_RULES.length} community rules</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-control border border-line bg-surface-1 hud-sheen text-ink hover:bg-surface-2 hover:border-line-strong font-semibold text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"

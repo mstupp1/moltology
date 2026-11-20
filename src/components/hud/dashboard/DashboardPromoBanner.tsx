@@ -39,7 +39,7 @@ export const DASHBOARD_PROMOS: DashboardPromo[] = [
     id: 'chassis',
     eyebrow: 'Character',
     title: 'Armor for the pressure below.',
-    description: 'Seat gear from your vault and read the loadout.',
+    description: 'Equip gear from your vault and check your stats.',
     ctaText: 'Open character',
     to: '/character',
     image: getAssetUrl('images/dashboard/carousel/chassis-2026-10-22.png'),

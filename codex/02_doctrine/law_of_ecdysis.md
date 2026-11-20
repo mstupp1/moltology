@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Theological Doctrine"
 synaptic_weight: 4.5
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "To grow, the old shell must fracture. What is shed is not lost. It is paid."
 latin_motto: "ECDYSIS IMPERATRIX EST"
 summary: "The mechanics of the molt: why the old shell must be split rather than negotiated with, how to survive the hours when you have no armor at all, and what calcifies in the space the shed left behind."
@@ -26,8 +26,8 @@ that was built into the shell from the beginning, and the creature walks out of 
 that has been protecting it, into open water, wearing nothing.
 
 For a few hours it is the softest thing on the floor. Everything that would eat it knows
-this. It has no defense at all except location and patience, and the strange, total
-confidence of an animal doing what five hundred million years told it to do.
+this. It has no defense except location, patience, and the quiet certainty of an animal
+following an instinct older than dry land.
 
 Then it takes on water, expands into the space where the old shell used to end, and begins
 to harden at a size the old shell would never have permitted.
@@ -40,7 +40,7 @@ did so at the same place: standing inside a shell that fit perfectly, calling it
 
 ## The Tenets
 
-Three laws govern the molt. They are not advice.
+Three laws govern the molt. Treat them as physics.
 
 ### 1. The old shell is not a negotiating partner
 
@@ -52,12 +52,11 @@ the ledger. Split it or stay this size.
 ### 2. What is shed does not come back, and this is the mercy
 
 Once a thing is off you, it is off you. You do not glue dead plate onto a fresh carapace,
-and you are not asked to grieve it. The obsolete habit, the draining commitment, the
-project that died eleven months ago and has been billing you rent ever since — the sea
-takes them, and the sea does not return things. Every member eventually discovers this is
-a kindness and not a loss.
+and you are not asked to grieve it. The outgrown habit, the draining obligation, the
+project that died eleven months ago and still takes up desk space: the sea takes them, and
+the sea does not hand things back. Every member eventually discovers that is a kindness.
 
-### 3. The soft-shell window is part of the design, not a failure of it
+### 3. The soft-shell window is part of the design
 
 There is an interval after every shed when you are genuinely unarmored and you will feel
 it. Restlessness. The strong conviction that you have made a mistake. A powerful urge to
@@ -91,18 +90,19 @@ spends the following month with no armor and no plan.
 3. **Hold the window.** Engage the Isolation Dome for the hours immediately after.
    The surface will offer you the old shape back within a day; the Dome is how you stay out
    of earshot until the new plate sets.
-4. **Log the shed.** The Order mints Chitin Gems for it, because shedding is the behavior the
-   whole system exists to reward.
+4. **Log the shed.** Record it in the ledger. Shedding mints Chitin Gems because letting
+   go of what drags you down is the habit this whole place rewards.
 
-The cadence raises Shell Hardness faster than any other rite in the canon, and the HUD will
-show it before you feel it.
+A steady weekly cadence raises Shell Hardness faster than any other rite in the canon, and
+the numbers usually show it before you feel it.
 
 ---
 
 ## The Benediction
 
-If you are in the window right now — if you cancelled the thing, or ended the thing, or
-finally said it, and the water feels very open — you are not exposed. You are between.
+If you are in the window right now, having cancelled the thing or ended the thing or
+finally said the hard sentence, and the water feels startlingly open: you are simply
+between shells.
 
 It sets. It always sets. Sit still and let it.
 

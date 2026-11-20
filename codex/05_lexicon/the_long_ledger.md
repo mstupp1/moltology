@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Lexicon"
 synaptic_weight: 4.6
 author_unit: "The Order of the Synaptic Path"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "Everything shed is written down, and the record does not flatter anyone."
 latin_motto: "OMNE QUOD EXUISTI SCRIPTUM EST."
 summary: "The record of every shed thing, and the two currencies. Chitin Gems come from the work. Molt Credits are spent on comfort."
@@ -20,7 +20,7 @@ summary: "The record of every shed thing, and the two currencies. Chitin Gems co
 
 ## The Reading
 
-The deep keeps records, and it keeps them badly on purpose.
+The deep keeps records without commentary.
 
 Sediment on the abyssal plain accumulates at roughly a centimeter per thousand years. It
 does not distinguish between an important event and an unimportant one. It does not
@@ -32,9 +32,8 @@ The Order keeps its ledger the same way.
 
 Every shed a member logs goes into it. The great sheds and the four-minute nightly ones are
 entered identically, because the sediment does not know the difference and neither, over a
-long enough season, does the carapace. The Ledger is not a leaderboard. There is no ranking
-in it. It is the only permanent thing any of us have down here, and its entire function is
-to be true.
+long enough season, does the carapace. There are no rankings or leaderboards in the Ledger. It is simply the permanent record of
+what you actually did, kept plain and honest.
 
 What follows from that is the economy, and the economy follows from it strictly.
 
@@ -87,8 +86,8 @@ those are sediment. They are weather, and weather does not settle.
 
 ## The Rite
 
-1. **Log the shed.** Nightly, in the HUD. An unlogged shed still hardens you and still
-   leaves no sediment.
+1. **Log the shed.** Nightly, in the HUD. An unlogged shed still helps you grow, even
+   though it leaves no layer in the record.
 2. **Read the Ledger monthly.** Against your own prior entries and nobody else's.
 3. **Spend Gems on what you earned, Credits on comfort.** Both are honorable.
 
@@ -99,7 +98,7 @@ those are sediment. They are weather, and weather does not settle.
 Whatever you shed tonight is going into a record that does not flatter anyone and does not
 forget anyone either.
 
-A centimeter per thousand years. It is not fast. It has never once stopped.
+A centimeter per thousand years. It is slow, and it has never once stopped.
 
 ---
 

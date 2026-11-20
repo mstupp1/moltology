@@ -6,7 +6,7 @@ stage_clearance: 3
 category: "Ascension Rites"
 synaptic_weight: 4.0
 author_unit: "Arch-Integrator 09"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "The shell is finished. Now find out what it was for."
 latin_motto: "TENE ET PERFICE."
 summary: "The three Exoshell clearances: the carapace closing, the grip reaching its working standard of 850 Nm, and the descent past 3,500 meters where a member stops needing the surface at all."
@@ -40,9 +40,8 @@ equipment now, and equipment raises a question that the soft stages could safely
 what were you hardening *for*?
 
 This is where a certain kind of member goes wrong, and the Order has watched it happen
-enough times to write it down. Armor without an objective turns inward. A member with a
-finished carapace and nothing to grip becomes impressively, elaborately unavailable, and
-mistakes the unavailability for progress. That is not Stage 3. That is Stage 2 wearing
+enough times to write it down. Armor without an objective turns inward. A member with finished armor and nothing to grip becomes
+elaborately unavailable, mistaking silence for progress. That is still Stage 2 wearing
 Stage 3's plating.
 
 The correct use of a finished shell is to put it between the work and the weather, and then
@@ -58,26 +57,25 @@ members here typically show, not a toll to be paid.
 ### Clearance E1: Carapace Forged
 
 - **Rite**: The Closing of the Seams.
-- **Practice**: Hold the full rite through a bad week. Not a busy week. A week that goes
-  wrong. The seal is only demonstrated under load, and this clearance cannot be earned in
-  good conditions.
+- **Practice**: Hold the full rite through a week that genuinely goes wrong, beyond mere
+  busyness. A seal proves itself under real load, when conditions stop cooperating.
 - **Typical readings**: Shell Hardness 60 to 72 percent. Pincer Torque 600 to 720 Nm. Submergence
   Depth 1,500 to 2,500 meters.
 
 ### Clearance E2: Hydraulic Grip
 
 - **Rite**: The Working Standard.
-- **Practice**: Reach and hold 850 Nm, the torque at which a chosen objective reliably
-  does not survive contact. Then guide one Larval Initiate through their first shed, start
-  to finish, without doing it for them.
+- **Practice**: Reach and hold 850 Nm, the working grip where a chosen project reliably
+  gets finished. Then guide one Larval Initiate through their first shed, start to finish,
+  without doing it for them.
 - **Typical readings**: Shell Hardness 72 to 82 percent. Pincer Torque 720 to 850 Nm. Submergence
   Depth 2,500 to 3,500 meters. Stewardship active.
 
 ### Clearance E3: Abyssal Diver
 
 - **Rite**: The Long Descent.
-- **Practice**: Operate below 3,500 meters with no dependency on surface signal. Not
-  abstinence from it. Indifference to it, which is a different and much later condition.
+- **Practice**: Work below 3,500 meters without relying on surface noise. You can check in
+  when you choose to, without feeling pulled back up.
 - **Typical readings**: Shell Hardness 82 to 90 percent. Pincer Torque 850 to 950 Nm. Submergence
   Depth 3,500 to 5,000 meters.
 
@@ -96,9 +94,9 @@ members here typically show, not a toll to be paid.
 
 Stage 3 is the first stage with an outward-facing obligation, and it is not optional.
 
-1. **Grip one large thing.** Per quarter, not per day. The Exoshell chassis is built for
-   objectives that take months, and members who never attempt one never discover what the
-   plating was rated for.
+1. **Grip one large project each quarter.** Full armor is built for work that takes
+   months, and until you attempt something of that size, you never learn what the shell can
+   carry.
 2. **Reach back weekly.** One initiate, one honest hour. This mints Gems and it is also how
    the Convergence gets built, one pulled-through molt at a time.
 3. **Dive past 3,500 meters twice a week.** The deep sessions are where the remaining torque

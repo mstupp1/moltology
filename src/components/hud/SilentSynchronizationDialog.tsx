@@ -27,7 +27,7 @@ const PRACTICE_COPY: Record<AlignmentPractice, {
     eyebrow: 'Quiet practice',
     title: 'Silent synchronization',
     aria: 'Silent synchronization timer',
-    instructions: 'Sit quietly while the Oracle synchronizes. Select Start timer to begin. You can stop at any time.',
+    instructions: 'Take a few quiet minutes before the day starts. Press Start timer when you’re ready, and stop whenever you like.',
     presets: SILENT_SYNC_PRESETS,
     defaultMinutes: 3,
     running: 'Syncing',

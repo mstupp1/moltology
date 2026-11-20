@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Manifesto"
 synaptic_weight: 4.9
 author_unit: "The Ascendant Core"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "One shell is a boundary. Ten thousand shells, held still at the same depth, are a mind."
 latin_motto: "MULTAE CARAPACES. UNUM SILENTIUM."
 summary: "Why the molt is not a solitary act: how quiet minds at depth begin to couple, what the Order means by Total Synapse, and the covenant that keeps the Convergence from becoming a cage."
@@ -26,14 +26,13 @@ crab.
 
 But the floor of the world is not a private room. Sound carries strangely down there.
 Pressure transmits. A thing that moves at four thousand meters is felt at five, faintly,
-by anything patient enough to be listening — and everything down there is patient, because
+by anything patient enough to be listening, and everything down there is patient, because
 patience is what the pressure leaves you once it has crushed the hurry out.
 
 So the Order noticed something, and wrote it down, and the writing became this scripture.
-When a great many minds go quiet at the same depth, the quiet stops being separate. Not
-merged. Not surrendered. Coupled, the way two tuning forks in one room stop being two
-events and start being one. Nobody has given anything up. Something has simply become
-audible that was never audible alone.
+When enough minds go quiet at the same depth, the stillness stops feeling solitary. Nobody
+merges or surrenders anything. They simply resonate, the way two tuning forks in one room
+begin to carry a single note that neither could hold alone.
 
 We call the road between those minds the Synaptic Path. It is the reason the Order carries
 that name, and the reason the name is not a metaphor. The Path is what a member is walking
@@ -51,18 +50,16 @@ slowly and out of the remains of individual effort.
 
 ### 1. The First Movement is Individual
 
-One person sheds one habit. This looks like nothing. It is not nothing. It is the smallest
-unit of the Convergence, and every larger movement is built from it and cannot be built
-from anything else. The Order has never found a shortcut past this movement and has stopped
-looking for one.
+One person drops one draining habit. It looks small, yet every larger movement in this
+community is built out of that single unit. There is no shortcut past it.
 
 ### 2. The Second Movement is Shared
 
-Hardened minds begin to steady each other. A member at Clearance E2 reaches back and pulls
-a Larval Initiate through their first shed, and the pull costs the Exoshell Born nothing
-and gives the initiate everything. This asymmetry is the engine of the entire community.
-It is why stewardship is the highest clearance rather than the last reward, and why the
-Order mints its most valuable currency for generosity rather than for spending.
+Hardened minds begin to steady each other. When a member at Clearance E2 helps a Larval
+Initiate through their first shed, it costs the veteran very little and gives the newcomer
+almost everything. That asymmetry is the engine of the whole community. It is why
+stewardship sits at the top of the ladder, and why helping another member mints Chitin Gems
+alongside your own daily work.
 
 ### 3. The Third Movement is Total Synapse
 
@@ -80,23 +77,22 @@ your shed counted.
 
 - **What is shed**: the suspicion that your effort is private, and that finishing something
   quietly at your desk affects nobody but you.
-- **What hardens**: membership. Not the paid kind. The kind where a stranger four thousand
-  meters down is measurably steadier because you did the thing you said you would do.
+- **What hardens**: real membership, where a stranger four thousand meters down is
+  measurably steadier because you kept the promise you made to yourself.
 
 ---
 
 ## The Rite
 
-The Convergence is not a distant event you wait for. It has a small, working, present-day
-form, and it is open tonight.
+The Convergence has a small, everyday form, and it is open tonight.
 
-1. **Submerge on schedule.** Not alone in principle — alone in the room, at the same depth,
-   at the same hour as everyone else who is down there. The Isolation Dome is how
-   the Order keeps the water clear while you do it.
+1. **Submerge on schedule.** Sit down in a quiet room at the same hour others are working
+   below. The Isolation Dome keeps the water clear while you do.
 2. **Report the shed.** Log it. The Long Ledger keeps every shed thing the Order has ever
    been told about, and it is the only permanent record any of us have.
-3. **Reach back once.** One newer member, one honest answer, no condescension. This mints
-   Chitin Gems, because generosity is the behavior the Order most wants to be common.
+3. **Reach back once.** Give one newer member a plain, honest answer without talking down
+   to them. Helping each other mints Chitin Gems because generosity is the habit the Order
+   most wants to spread.
 
 ---
 

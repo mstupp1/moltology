@@ -130,7 +130,7 @@ describe('MemberProfilePage', () => {
     render(<MemberProfilePage profileId="member-a" />)
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(screen.getByText('Retrieving member dossier.')).toBeInTheDocument()
+    expect(screen.getByText('Loading member profile.')).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'claw_lord' })).not.toBeInTheDocument()
   })
 

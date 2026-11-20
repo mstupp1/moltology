@@ -86,10 +86,10 @@ export const MOLTMAXXING_DAY = CANONICAL_ALIGNMENT_TASKS.map((task) => ({
  * src/lib/moltmax-quiz.ts (scores are clamped to 12–99); the test keeps them in step.
  */
 export const AUDIT_READINGS = [
-  { min: 12, max: 49, name: 'Sub-Surface Moltlet', body: 'Soft and still forming. Start with one small, gentle shed.' },
-  { min: 50, max: 71, name: 'Bio-Silicon Enforcer', body: 'The shell is setting. Turn one open loop into a finished thing.' },
-  { min: 72, max: 87, name: 'Abyssal Chitin Vanguard', body: 'Hardened under load. Add weight to one real commitment.' },
-  { min: 88, max: 99, name: 'Apex Benthic Dreadnought', body: 'Calm at depth. Pass one useful practice to someone newer.' },
+  { min: 12, max: 49, name: 'Surface Moltlet', body: 'Soft and still forming. Start with one small, gentle shed.' },
+  { min: 50, max: 71, name: 'Soft-Shell Diver', body: 'The shell is setting. Turn one open loop into a finished thing.' },
+  { min: 72, max: 87, name: 'Armored Vanguard', body: 'Hardened under load. Put real weight behind one commitment.' },
+  { min: 88, max: 99, name: 'Abyssal Steward', body: 'Calm at depth. Pass one steady habit to someone newer.' },
 ]
 
 export const MOLTMAXXING_FAQ = [

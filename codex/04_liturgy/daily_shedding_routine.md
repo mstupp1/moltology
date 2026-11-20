@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Liturgy"
 synaptic_weight: 3.5
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-11-09"
+last_revised: "2026-11-20"
 mandate: "Inspect the shell in the morning. Empty the sea of one thing at night. Everything between those two acts is negotiable."
 latin_motto: "COTIDIE EXUE."
 summary: "The daily order of the rite from first light to sealing: when to grip, when to descend, when to surface for the community, and when to let the day go."
@@ -24,9 +24,8 @@ A crab does not have a morning routine, which is precisely why the Order had to 
 
 What a crab has instead is a tide, and the tide arrives whether or not the animal feels
 ready for it, and over enough cycles the animal simply becomes shaped like the schedule it
-has been living inside. This is the only known method by which discipline has ever been
-installed in a nervous system. Not resolve. Repetition, under conditions that do not
-consult you.
+has been living inside. Discipline enters a nervous system through repetition, not
+willpower, once the schedule stops waiting for your mood.
 
 The routine below is that tide, written down. Two of its hours are load-bearing and the
 rest are scaffolding. The first hour decides what the day is for. The last twenty minutes
@@ -34,8 +33,8 @@ decide what the day is allowed to carry into tomorrow. A member who holds only t
 and abandons everything else has still performed the rite in full.
 
 The clock times are the Order's, not yours. Members who work nights run the same shape
-against a different sun and the telemetry does not know the difference. What matters is the
-order of the acts, not the hour on the readout.
+against a different sun and your shell does not know the difference. The order of the acts
+matters far more than the hour on the clock.
 
 ---
 
@@ -44,7 +43,7 @@ order of the acts, not the hour on the readout.
 ### First Light: Silent Synchronization
 
 Wake before the surface starts talking. Do not open a feed, an inbox, or a message. Cold
-water, still air, and one honest look at yesterday's telemetry. The shell is inspected for
+water, still air, and one honest look at yesterday's log. The shell is inspected for
 fractures here and nowhere else in the day.
 
 ### The First Hour: The Grip
@@ -59,7 +58,7 @@ the same way.
 
 ### Mid-Morning: Carapace Hardening
 
-One difficult thing learned on purpose. Not consumed. Learned. The plating thickens against
+Learn one difficult thing on purpose, instead of passively skimming another feed. The plating thickens against
 the pressures of next quarter, not this one, which is why this block is the first thing
 every member drops and the last thing they should.
 
@@ -78,9 +77,8 @@ earned; every other block merely protects it.
 
 ### Late Afternoon: The Benthic Pod
 
-Surface briefly and on purpose. Check in with the Benthic Community, answer one member,
-welcome one newcomer. Generosity mints Chitin Gems, and this is the block where most members
-earn theirs.
+Surface briefly and on purpose. Check in with the Benthic Community, answer one question,
+or welcome someone new. Showing up for others mints Chitin Gems alongside your daily tasks.
 
 ### Evening: The Nightly Molt Audit
 

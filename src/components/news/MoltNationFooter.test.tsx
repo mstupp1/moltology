@@ -35,10 +35,10 @@ describe('MoltNationFooter Component', () => {
   it('renders essential navigation links and store link', () => {
     render(<MoltNationFooter />)
 
-    expect(screen.getByText('NEWS')).toBeInTheDocument()
+    expect(screen.getByText('News')).toBeInTheDocument()
     expect(screen.getByText('Moltmaxxing')).toBeInTheDocument()
     expect(screen.getByText('Field Manual')).toBeInTheDocument()
-    expect(screen.getByText('QUIZ')).toBeInTheDocument()
+    expect(screen.getByText('Quiz')).toBeInTheDocument()
     expect(screen.getByText('Codex')).toBeInTheDocument()
     expect(screen.getByText('Moltology home')).toBeInTheDocument()
     expect(screen.getByText('Company')).toBeInTheDocument()

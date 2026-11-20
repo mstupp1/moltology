@@ -78,11 +78,11 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/' })
 
     // Verify Headline & Value Props
-    expect(screen.getByRole('heading', { name: /Enter The Synaptic Path/i })).toBeInTheDocument()
-    expect(screen.getByText(/Ecdysis Diagnostics & Tracking/i)).toBeInTheDocument()
-    expect(screen.getByText(/Benthic AI Oracle & Swarm Access/i)).toBeInTheDocument()
-    expect(screen.getByText(/Chitin Matrix State Persistence/i)).toBeInTheDocument()
-    expect(screen.getByText(/14,200\+ Units Synchronized/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Leave the noise at the surface/i })).toBeInTheDocument()
+    expect(screen.getByText(/Daily routine and streaks/i)).toBeInTheDocument()
+    expect(screen.getByText(/The Synaptic Oracle/i)).toBeInTheDocument()
+    expect(screen.getByText(/Everything saved in one place/i)).toBeInTheDocument()
+    expect(screen.getByText(/Free to join\. No card needed\./i)).toBeInTheDocument()
 
     // Verify Auth Card on right
     expect(screen.getByRole('heading', { name: /Welcome Back/i })).toBeInTheDocument()
@@ -105,7 +105,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     fireEvent.click(signUpTab)
 
     expect(screen.getByRole('heading', { name: /Create Account/i })).toBeInTheDocument()
-    expect(screen.getByText('Sign up to persist your session')).toBeInTheDocument()
+    expect(screen.getByText('Create your free account to save your progress')).toBeInTheDocument()
     expect(screen.queryByPlaceholderText('your_username')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Create Account$/i })).toBeInTheDocument()
 

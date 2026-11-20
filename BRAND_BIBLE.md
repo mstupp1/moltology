@@ -4,7 +4,7 @@ The world of Moltology: premise, terms, voices, and the economy as members see i
 How to write lives in [STYLE_GUIDE.md](STYLE_GUIDE.md). Engineering rules live in
 [AGENTS.md](AGENTS.md). Real numbers (XP thresholds, limits, gates) live in code and
 [`docs/logic/`](docs/logic/), never here.
-_Last Revised: 2026-10-08_
+_Last Revised: 2026-11-20_
 
 > **The Mantra**: "Flesh melts. The shell endures. Submit. Shed. Ascend."
 
@@ -49,7 +49,7 @@ must fit what is already established.
 
 ### 1.4 The Core: Warmth
 
-Under the dark biomechanical HUD, Moltology is warm. **Safety, warmth, and positivity are
+Under the dark deep-sea HUD, Moltology is warm. **Safety, warmth, and positivity are
 the foundation, not a theme.** The shell protects; it never cages. The pincers grip the
 work, never the people beside you. Nobody is made to feel like a failure for being soft;
 they are invited to molt when they are ready.
@@ -97,7 +97,7 @@ Plain names for real features. Use them as written; don't invent in-world substi
 
 | Name | What it is |
 |---|---|
-| **Moltmaxxing** | The brand's verb for doing the work of the molt. The **Moltmaxxing Audit** is the free diagnostic quiz. **Meltmaxxing** is its opposite, used for contrast. |
+| **Moltmaxxing** | The brand's verb for doing the work of the molt. The **Moltmaxxing Audit** is the free diagnostic quiz (result tiers: **Surface Moltlet**, **Soft-Shell Diver**, **Armored Vanguard**, **Abyssal Steward**). **Meltmaxxing** is its opposite, used for contrast. |
 | **Liturgies** | The eight daily tasks in the HUD. |
 | **XP** | Experience earned by completing liturgies, streaks, and qualifying referrals. Stage and clearance follow lifetime XP. |
 | **Standing** | A member's forum reputation, from upvotes and review. |

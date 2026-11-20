@@ -73,8 +73,8 @@ describe('/profile own-dossier route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(screen.getByText('MEMBER PROFILES LOCKED')).toBeInTheDocument()
-    expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
+    expect(screen.getByText('Sign in for Member Profiles')).toBeInTheDocument()
+    expect(screen.getByText('Account needed')).toBeInTheDocument()
     expect(
       screen.getByText(
         'Your profile, activity, friends and friend requests need a signed-in account.',
@@ -88,7 +88,7 @@ describe('/profile own-dossier route', () => {
     render(<Component />)
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(screen.queryByText('MEMBER PROFILES LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sign in for Member Profiles')).not.toBeInTheDocument()
   })
 
   it('renders the signed-in member dossier with a loading state while data hydrates', async () => {
@@ -99,7 +99,7 @@ describe('/profile own-dossier route', () => {
     render(<Component />)
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(await screen.findByText('Retrieving member dossier.')).toBeInTheDocument()
+    expect(await screen.findByText('Loading member profile.')).toBeInTheDocument()
   })
 
   it('links the four profile sections and marks the open one', async () => {

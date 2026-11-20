@@ -16,7 +16,7 @@ export interface GuestLockGuardProps {
 
 export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
   children,
-  featureName = 'THIS TERMINAL',
+  featureName = 'this page',
   title,
   message,
   bypass = false,
@@ -44,10 +44,10 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
     return <>{children}</>
   }
 
-  const displayTitle = title || `${featureName.toUpperCase()} LOCKED`
+  const displayTitle = title || `Sign in for ${featureName}`
   const displayMessage =
     message ||
-    `Access to ${featureName} is restricted in guest mode. Create your free initiate account in seconds to unlock full access.`
+    `You’re browsing as a guest. Create a free account to open ${featureName} and keep your progress.`
 
   return (
     <div className="relative w-full h-full min-h-[calc(100vh-140px)] flex flex-col font-sans">
@@ -73,12 +73,12 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
 
           {/* Status Badge */}
           <div className="inline-block px-3 py-1 rounded-chip bg-crimson-soft border border-crimson-aggro/40 text-crimson-text text-2xs font-semibold">
-            RESTRICTED ACCESS
+            Account needed
           </div>
 
           {/* Header Title & Concise Message */}
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-grotesk font-semibold text-ink uppercase tracking-wider">
+            <h2 className="text-xl sm:text-2xl font-grotesk font-semibold text-ink tracking-tight">
               {displayTitle}
             </h2>
             <p className="text-xs sm:text-ui text-ink-body leading-relaxed max-w-sm mx-auto font-sans">
@@ -96,7 +96,7 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
               onClick={() => handleOpenAuth('signup')}
               icon={<UserPlus className="w-4 h-4" />}
             >
-              SIGN UP TO UNLOCK
+              Create a free account
             </HudButton>
 
             <div className="text-center">
@@ -106,7 +106,7 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
                 className="rounded-control text-xs text-cyan-glow hover:text-ink underline underline-offset-4 font-sans transition-colors cursor-pointer inline-flex items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Already have an account? Sign In</span>
+                <span>Already have an account? Sign in</span>
               </button>
             </div>
           </div>

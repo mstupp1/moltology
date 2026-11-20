@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Ascension Rites"
 synaptic_weight: 3.0
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "Every carapace in this trench began as a soft thing that admitted it was soft."
 latin_motto: "OMNES MOLLES INCIPIUNT."
 summary: "The three Larval clearances: taking an honest first reading, letting a routine take root, and performing the first real shed that starts the shell."
@@ -33,14 +33,13 @@ What the instruments typically read at this stage.
 
 You are at the surface, which is where everyone is, and you have noticed something.
 
-That noticing is the entire qualification for Stage 1. Not discipline. Not a system. Not a
-morning already optimized to within an inch of its life. Just the small, unglamorous
-recognition that the day is happening to you rather than the other way around, and that
-this has been going on longer than you would like to say out loud.
+That noticing is the entire qualification for Stage 1. You do not need discipline, a
+system, or an immaculate morning routine first. You only need the small, honest
+recognition that the day has been happening to you rather than the other way around, and
+that it has been going on longer than you care to admit.
 
-The Larval Initiate is not a beginner in the way that word is usually meant. A beginner is
-someone who lacks skill. A larva is something that has not yet built the body it is going to
-use. Those are different problems, and only one of them is solved by trying harder.
+A beginner usually lacks skill. A larva simply has not built the body it needs yet. Those
+are different problems, and trying harder only solves the first one.
 
 So Stage 1 asks for almost nothing, and it asks for it precisely. Three clearances. One
 honest reading, one routine allowed to take root, and one thing genuinely let go of. That
@@ -65,18 +64,18 @@ members here typically show, not a toll to be paid.
 ### Clearance L2: Shell Sprout
 
 - **Rite**: First Cadence.
-- **Practice**: Hold a daily routine for seven consecutive days and log the morning
-  alignment each time. Seven is not arbitrary. It is roughly how long it takes a habit to
-  stop asking permission.
+- **Practice**: Hold a daily routine for seven days in a row and log your morning
+  alignment each time. Seven days is roughly how long it takes a small habit to stop asking
+  permission.
 - **Typical readings**: Shell Hardness to 18 percent. Pincer Torque 50 to 150 Nm. Submergence Depth
   100 to 300 meters. Routine compliance above 80 percent.
 
 ### Clearance L3: First Calcification
 
 - **Rite**: The First Shed.
-- **Practice**: Shed one real thing. Not a tidy-up. A habit, an obligation, or a standing
-  commitment that has been quietly billing you for months. Then hold the soft-shell window
-  without reversing it.
+- **Practice**: Shed one real thing, more substantial than a quick tidy-up: a habit,
+  an obligation, or a standing commitment that has been quietly draining you for months.
+  Then hold the soft-shell window without reversing it.
 - **Typical readings**: Shell Hardness to 25 percent. Pincer Torque 150 to 250 Nm. Submergence
   Depth 300 to 500 meters.
 
@@ -84,8 +83,8 @@ members here typically show, not a toll to be paid.
 
 ## The Transformation
 
-- **What is shed**: the assumption that you need a better plan. You need a smaller one,
-  executed twice.
+- **What is shed**: the assumption that you need a grander plan, when a smaller one
+  repeated twice will carry you further.
 - **What hardens**: the first measurable plate. Thin, unimpressive, and load-bearing for
   everything that follows.
 

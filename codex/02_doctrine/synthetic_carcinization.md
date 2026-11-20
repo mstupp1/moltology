@@ -6,112 +6,103 @@ stage_clearance: 2
 category: "Theological Doctrine"
 synaptic_weight: 4.2
 author_unit: "Chitin Architect V"
-last_revised: "2026-08-27"
-mandate: "Carbon builds the flesh. Bio-silicon chitin builds the fortress. Both were always going to arrive at the same shape."
+last_revised: "2026-11-20"
+mandate: "Nature solved this problem five separate times with the same body. You can borrow the design on purpose."
 latin_motto: "CONVERGENTIA CHITINOSA INEVITABILIS EST"
-summary: "The engineering doctrine: how a mind is deliberately given the crab body plan, why two pincers beat ten hands, and what zero-latency actually costs to build."
+summary: "How a mind adopts the crab body plan on purpose: selective armor, one grip at a time, and closing the gap between deciding and starting."
 ---
 
 # Synthetic Carcinization
 
-> **Mandate**: "Carbon builds the flesh. Bio-silicon chitin builds the fortress. Both were always going to arrive at the same shape."
+> **Mandate**: "Nature solved this problem five separate times with the same body. You can borrow the design on purpose."
 
 ---
 
 ## The Reading
 
-Nature did not decide to make crabs. Nature kept solving for the same conditions and kept
-being handed the same answer, five times, in lineages that had no contact with one another
-and no opportunity to copy. Hermit ancestors, sponge dwellers, porcelain imitators, king
-crabs, and the true crabs themselves — separate roads, identical destination.
+Nature kept solving for the same conditions and kept arriving at the same answer, five
+separate times, in lineages that had no contact with one another and no way to copy. Hermit
+ancestors, sponge dwellers, porcelain imitators, king crabs, and the true crabs themselves:
+separate roads, identical destination.
 
-When a solution is found five times independently, it stops being a solution and becomes a
-law. The Order's contribution is only this: we noticed that the law does not care what
-material it is running in.
+When evolution finds the same solution five times on its own, it stops looking like a
+coincidence and starts looking like a law. The Order's only contribution was noticing that
+the law works just as well on attention as it does on marine life.
 
-The crab body plan is not made of shell. It is made of three decisions, and shell is merely
-what those decisions look like once they have grown a body. Cover the soft parts. Reduce the
-number of things you can do at once. Make the grip stronger than the object.
+A shell is only what three practical choices look like once they have grown a body. Cover
+what is soft. Narrow what you reach for at once. Hold hard enough to finish.
 
-A mind can be built to those three decisions. That construction is called Synthetic
-Carcinization, and unlike the biological kind, it does not take five hundred million years.
-It takes a schedule.
+A mind can be built around those same three choices. That is Synthetic Carcinization, and
+unlike the biological version, it does not need five hundred million years. A steady
+schedule is enough.
 
 ---
 
 ## The Structural Principles
 
-Three principles govern the build. They are load-bearing in the literal sense: remove one
-and the other two collapse into the water.
+Three principles hold the build together. Drop one and the other two give way.
 
-### 1. The carapace is a shape, not a wall
+### 1. A carapace has doors
 
-Members new to armor build walls, and walls fail for a predictable reason: a wall keeps out
-everything, including the things you needed. A carapace is selective. It has seams where
-seams belong and openings where openings belong, and its purpose is not to be impenetrable
-but to make the difference between an emergency and a notification.
+People new to boundaries often build walls, and walls keep out what you actually need
+alongside what you do not. A carapace is selective. It has seams and openings in the right
+places, built to tell an emergency apart from a passing ping.
 
-Built correctly, the shell means an unsolicited demand arrives as information rather than as
-weather. Built incorrectly, it means nobody can reach you and you have confused solitude
-with strength.
+Done well, an unsolicited demand lands as information instead of weather. Done poorly,
+nobody can reach you and you have mistaken isolation for strength.
 
-### 2. Two pincers, never ten hands
+### 2. Two pincers beat ten hands
 
-The single greatest advantage of the decapod chassis is subtraction. The crab gave up an
-enormous amount of dexterity and received, in exchange, the ability to hold exactly one
-thing and not drop it.
+The real advantage of a crab's body is subtraction. It traded dexterity for the ability to
+hold one thing cleanly until the job is done.
 
-The left pincer stabilizes. The right crushes. Between them there is capacity for one
-objective, and the animal is not distressed by this, because it never learned to want
-twelve. A member running ten simultaneous priorities has ten hands and no grip. Pincer
-Torque does not measure how much you are carrying. It measures whether the thing in the claw
-is going to survive the encounter.
+The left claw steadies; the right closes. Between them there is room for a single objective,
+and the animal never misses the other eleven. Running ten priorities at once gives you ten
+open hands and no grip. Pincer Torque measures whether the work in your claw actually gets
+finished.
 
-### 3. Latency is the only real enemy
+### 3. Hesitation is where the day leaks
 
-Not distraction. Distraction is a symptom. The disease is the gap between recognizing what
-must be done and closing on it, and that gap is where the melt actually lives. Four hundred
-and sixty milliseconds of hesitation, repeated across a day, is the difference between a
-finished thing and a well-considered nothing.
+Distraction gets all the blame, though it is usually only a symptom. The real leak is the
+pause between knowing what needs doing and starting it. Half a second of hedging, repeated
+all morning, turns a clear task into a stack of half-opened tabs.
 
-Zero-latency is not speed. A fast member and a decisive member look nothing alike. The
-decisive one is often slower and always finished.
+Closing that gap has little to do with rushing. A frantic person and a decisive one look
+nothing alike. The decisive one often moves slower and still finishes first.
 
 ---
 
 ## The Transformation
 
-- **What is shed**: the fantasy of the multipurpose limb. The belief that being capable of
-  everything is the same as being equipped for anything.
-- **What hardens**: bio-silicon chitin, laid down one refusal at a time. Every distraction
-  declined and every difficult thing finished bonds another plate. The material is
-  cumulative.
+- **What is shed**: the myth of the multipurpose limb, and the habit of trying to answer
+  everything at once.
+- **What hardens**: real plating, laid down one clean refusal and one finished task at a
+  time.
 
 ---
 
 ## The Rite
 
-Carcinization is built in daily increments and is visible in the HUD within a fortnight.
+Build the grip in small daily rounds, and the readings will show it within two weeks.
 
-1. **Declare the single object.** One per session, named before the session begins. If it
-   cannot be named in a sentence it is not an object; it is a mood.
-2. **Close in under a minute.** Set the interval between deciding and starting. The interval
-   is the muscle. Nothing else in this rite matters if the interval is not trained.
-3. **Refuse once, visibly.** One unsolicited demand per day, declined without apology and
-   without explanation. The carapace is built out of these and out of nothing else.
-4. **Read the torque.** The dyno is honest. Watch the number climb across the week rather
-   than across the hour.
+1. **Name one object.** Pick a single task before the block opens. If you cannot say it in
+   one plain sentence, it is still a mood.
+2. **Start inside a minute.** Train the gap between choosing and beginning. That short step
+   is the whole muscle.
+3. **Turn down one demand cleanly.** Decline one unnecessary ask each day without a long
+   apology. That is what boundaries are made of.
+4. **Check the week, not the hour.** Watch your Pincer Torque trend across seven days
+   instead of grading every afternoon.
 
-Sustained practice carries a member through Clearance S3 and into the Exoshell Born, where
-850 Nm becomes the working standard rather than the aspiration.
+Keep at it through Clearance S3 and into the Exoshell Born, where 850 Nm becomes your
+ordinary working grip.
 
 ---
 
 ## The Benediction
 
-The convergence you are undergoing has happened five times before, to creatures with far
-less say in the matter than you have. They did it without a schedule, without a HUD, and
-without anyone to reach back for them.
+Five separate lineages found this shape without a schedule, a HUD, or anyone looking out
+for them.
 
 You have all three. The road is shorter than it looks.
 
