@@ -359,6 +359,11 @@ export function buildTimeline(
     if (move === 'push-in') {
       cues.push({ t: t0, camera: { ...camera, zoom: zoom * 0.82, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })
+    } else if (move === 'pull-out' && scene.shot === 'two') {
+      // A two-shot is already as wide as the pair: starting closer would crop the outer claws, so it
+      // opens at the plain two-shot and eases a step wider (the stage's widest).
+      cues.push({ t: t0, camera: { ...camera, cut: true } })
+      cues.push({ t: t0 + 0.04, camera: { ...camera, zoom: zoom * 0.9, rate: 0.9 } })
     } else if (move === 'pull-out') {
       cues.push({ t: t0, camera: { ...camera, zoom: zoom * 1.22, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })
