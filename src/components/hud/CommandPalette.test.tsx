@@ -151,19 +151,22 @@ describe('CommandPalette Component', () => {
     expect(screen.queryByText('Oracle MAX')).not.toBeInTheDocument()
   })
 
-  it('lists hidden pages for admins and hides them from everyone else', () => {
+  it('lists Oracle MAX for members and restricts staff pages to admins', () => {
     const view = render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
     const input = screen.getByPlaceholderText(/Search pages and members/i)
     fireEvent.change(input, { target: { value: 'premium' } })
-    expect(screen.queryByText('Oracle MAX')).not.toBeInTheDocument()
+    expect(screen.getByText('Oracle MAX')).toBeInTheDocument()
+
+    fireEvent.change(input, { target: { value: 'logic' } })
+    expect(screen.queryByText('Logic Atlas')).not.toBeInTheDocument()
 
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
       isPending: false,
     } as any)
     view.rerender(<ToastProvider><CommandPalette /></ToastProvider>)
-    expect(screen.getByText('Oracle MAX')).toBeInTheDocument()
+    expect(screen.getByText('Logic Atlas')).toBeInTheDocument()
   })
 
   it('surfaces the shared chamber index for oracle, connections, and news', () => {
