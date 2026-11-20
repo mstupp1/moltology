@@ -15,7 +15,7 @@ export const SHOTS = {
   /** The whole figure, feet to antennae. */
   wide: { zoom: 1, tilt: 0.04 },
   /** Two or three characters side by side, all in frame. */
-  two: { zoom: 0.58, tilt: 0.05 },
+  two: { zoom: 0.5, tilt: 0.05 },
   /** Knees up: the everyday talking shot. */
   medium: { zoom: 1.35, tilt: 0.06 },
   /** Head and shoulders. */
@@ -53,6 +53,8 @@ export interface TimelineCue {
   who?: number
   camera?: CameraCue
   pose?: AvatarPose
+  /** Land the pose at once instead of blending (on a camera cut, where a blend would only show as a sweep). */
+  snap?: boolean
   react?: { kind: Reaction; side?: 1 | -1 }
   /** A talking gesture over the pose; `amount` scales it (1 full). */
   gesture?: { kind: Gesture; side?: 1 | -1; amount?: number }
@@ -120,7 +122,7 @@ export function timelinePlayer(stage: TimelineStage, timeline: AnimationTimeline
     const who = cue.who ?? 0
     const character = stage.member(who)
     if (cue.camera) stage.setCamera(cue.camera)
-    if (cue.pose) character?.setPose(cue.pose)
+    if (cue.pose) character?.setPose(cue.pose, cue.snap)
     if (cue.react) character?.react(cue.react.kind, cue.react.side)
     if (cue.gesture) character?.gesture(cue.gesture.kind, cue.gesture.side, cue.gesture.amount)
     if (cue.yaw !== undefined) stage.setMemberYaw(who, cue.yaw)

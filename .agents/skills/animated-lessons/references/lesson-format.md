@@ -66,6 +66,7 @@ Shapes come from [Rhubarb Lip Sync](https://github.com/DanielSWolf/rhubarb-lip-s
 
 Before any frame is drawn, `anim:create` rehearses the whole timeline in Node (a couple of seconds) and checks that no claw, arm or leg passes through its own body or through another character (`src/lib/avatar3d/collide.ts`). Each solid part is stood in for by spheres sitting inside it, so a hit means the parts really cross, not that they touch.
 
+- During the animation itself, a claw that ends up inside something is swung out at the shoulder, and that push carries over from frame to frame and lets go slowly, so touching arms slide past each other instead of twitching.
 - Automatic gestures that cause a crossing are halved, then dropped, until the rehearsal is clean (`🦾 Toned down N gestures`).
 - A crossing left over comes from hand-written direction: a pose, a reaction or a turn. The run stops and lists each moment, for example `11.10s–11.33s: host-crab's clawR through junior-lobster's forearmL, 56% deep`. Fix it in the lesson (a different pose or reaction side for that scene, a turn away, a `close` shot on one character, or marks further apart), then run again. `--allow-clipping` renders anyway, for tests only.
 - `npm run anim:create -- --lesson <file> --check` (add `--silent` for no voice) runs only the voice, plan and rehearsal: use it after every direction change. The report is in `clipping.json` in the output folder.
@@ -75,7 +76,8 @@ Before any frame is drawn, `anim:create` rehearses the whole timeline in Node (a
 - Output is 1080x1920 at 30 fps.
 - The hook headline sits inside x 120-900, y 460-900 at 80 to 104px. The opening shot aims higher so the cast stands below the headline; that framing holds for all of scene 1 and changes on the cut to scene 2 (scene 2 always cuts in), so the frame never slides. Keep scene 1 short after the hook.
 - Regular subtitles sit at y 1180 (from the reel compositor). In a medium or close shot the host's face is above them; in an extreme close-up the subtitles cross the mouth, so keep extreme shots short.
-- With a cast, everyone shares one key light; a set's lamp adds a warm pool. The two shot fits marks at ±0.75 (a three-character cast fits too, but tightly).
+- With a cast, everyone shares one key light; a set's lamp adds a warm pool. Marks stand at ±1.05 so two characters' claws have room to gesture without crowding each other; the two shot (a little wider than before) fits them, and a three-character cast fits too, but tightly.
+- On a cut, a character whose pose changes opens the new shot already in it (no blend), so a limb never sweeps across the frame or through a neighbour at the cut. A glide still blends.
 - The host's temperament (`lively` for host-crab) drives breathing, sway, glances and blinks between cues. Talking adds the mouth shapes, a small nod, a slow drift of the head and brow lifts; the acting pass adds the gestures.
 
 ## Rendering

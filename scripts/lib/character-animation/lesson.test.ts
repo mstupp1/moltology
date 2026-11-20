@@ -101,12 +101,12 @@ describe('animated lessons', () => {
     const words = estimateWords(narrationOf(dialogue))
     const looks = Object.fromEntries(castOf(dialogue).map((c) => [c.id, castLook(c.id)]))
     const { timeline, windows } = buildTimeline(dialogue, looks, words, [[], []], { width: 540, height: 960, fps: 30 })
-    expect(timeline.cast?.map((c) => c.x)).toEqual([0.75, -0.75])
+    expect(timeline.cast?.map((c) => c.x)).toEqual([1.05, -1.05])
     expect(timeline.set).toBe('codex-study')
     const cameraAt = (t: number) => timeline.cues.find((c) => c.t === t && c.camera)!.camera!
     expect(cameraAt(windows[0].start).pan).toBe(0) // two-shot of both
-    expect(cameraAt(windows[1].start).pan).toBe(-0.75) // the junior, still speaking
-    expect(cameraAt(windows[2].start).pan).toBe(0.75) // the host speaking
+    expect(cameraAt(windows[1].start).pan).toBe(-1.05) // the junior, still speaking
+    expect(cameraAt(windows[2].start).pan).toBe(1.05) // the host speaking
     // While the host speaks in scene 3, the junior (cast index 1) looks toward it, to the viewer's right.
     const junior = timeline.cues.find((c) => c.t === windows[2].start && c.who === 1 && c.look)!
     expect(junior.look!.x).toBeGreaterThan(0)

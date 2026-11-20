@@ -645,7 +645,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       wake()
     },
     setCamera(next) {
-      if (next.zoom !== undefined) zoom = clamp(next.zoom, 0.6, 3)
+      if (next.zoom !== undefined) zoom = clamp(next.zoom, 0.45, 3)
       if (next.tilt !== undefined) tilt = clamp(next.tilt, TILT_MIN, TILT_MAX)
       if (next.pan !== undefined) pan = next.pan
       if (next.lift !== undefined) lift = next.lift

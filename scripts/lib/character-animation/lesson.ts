@@ -22,7 +22,7 @@ export const MOVES: readonly CameraMove[] = ['cut', 'glide', 'push-in', 'pull-ou
 export const MARKS = ['left', 'center', 'right'] as const
 export type Mark = (typeof MARKS)[number]
 /** Where each mark stands on the floor, in world units. */
-const MARK_X: Record<Mark, number> = { left: -0.75, center: 0, right: 0.75 }
+const MARK_X: Record<Mark, number> = { left: -1.05, center: 0, right: 1.05 }
 /** The narrator: a voice with no body, so no mouth moves while it speaks. */
 export const NARRATOR = 'narrator'
 
@@ -368,7 +368,9 @@ export function buildTimeline(
       const look = own.look ?? defaultLook
       // Listeners (and anyone told to look at the other) turn a little toward who they look at.
       const facing = look === 'other' && partner ? Math.sign(xOf(partner) - xOf(member.id)) * 18 : 0
-      if (own.pose && i > 0) cues.push({ t: t0, who, pose: own.pose })
+      // On a cut the new shot opens already in its pose: a blend there only shows as a limb sweeping
+      // across the frame (and through whoever stands beside it).
+      if (own.pose && i > 0) cues.push({ t: t0, who, pose: own.pose, ...(move === 'cut' ? { snap: true } : {}) })
       cues.push({ t: t0, who, look: lookFor(member.id, look, partner) })
       cues.push({ t: t0, who, yaw: deg(own.turn ?? facing) })
       for (const r of own.react ?? []) {
