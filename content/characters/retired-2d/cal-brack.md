@@ -81,7 +81,7 @@ successful named individuals. Parent reviewed the actual render and light/dark
 composites, preserving the anatomy/margin caveats above. Canonical key: `crab_cal_brack`.
 PNG and quality-90 WebP at new `images/characters/char_cal_brack_v3` keys
 returned HTTP 200 with exact local-byte matches, expected dimensions and alpha
-before registration. No old asset was overwritten. See [cast v3](../../docs/character-cast-v3.md).
+before registration. No old asset was overwritten. See [cast v3](../../../docs/character-cast-v3.md).
 This adoption does not claim separate user review of every image or application
 deployment.
 
@@ -109,7 +109,7 @@ status describes the subagent handoff. Identity and visible anatomy are retained
 with the framing and socket caveats above. Source-preserving PNG and quality-90
 WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
 `char_cal_brack_v4`. Both public objects matched local bytes before
-registration. See [cast v4](../../docs/character-cast-v4.md).
+registration. See [cast v4](../../../docs/character-cast-v4.md).
 
 Returned v2 source: `/Users/mylesstupp/.codex/generated_images/01a1ae8a-61db-72b3-a856-e3da63fa4318/exec-2137cf61-2147-4cab-9c6f-9c7ff09ce1ef.png`.
 
@@ -134,4 +134,4 @@ Edit this same Cal Brack character. Replace his simple armor with a complete mid
 Selected for the active six under the user’s replacement request, retained as
 `char_cal_brack_v5.png` and quality-90 `.webp` in both
 `scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
-See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.
+See [cast v5](../../../docs/character-cast-v5.md) for public-object verification and adoption.

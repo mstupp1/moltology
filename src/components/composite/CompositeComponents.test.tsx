@@ -160,7 +160,7 @@ describe('Composite UI Components', () => {
     expect(container.querySelector('.animate-pulse')).toBeNull()
     expect(container.querySelector('.animate-ping')).toBeNull()
 
-    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_rook_tide"]')
+    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_sol_ember"]')
     expect(mascotWrapper?.className).toContain('top-8')
     expect(mascotWrapper?.className).toContain('right-8')
   })
@@ -198,7 +198,7 @@ describe('Composite UI Components', () => {
     expect(screen.getByText(/Audit my open task latency/i)).toBeInTheDocument()
     expect(screen.getByText('Ecdysis protocols')).toBeInTheDocument()
     expect(screen.getByText('Codex Liturgies')).toBeInTheDocument()
-    expect(container.querySelector('[data-mascot-key="lobster_rook_tide"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-mascot-key="lobster_sol_ember"]')).toBeInTheDocument()
   })
 
   it('renders ThreeBookCover canvas element with dimensions and custom props', async () => {
@@ -231,15 +231,15 @@ describe('Composite UI Components', () => {
       MASCOT_REGISTRY,
     } = await import('./MascotOverlay')
 
-    expect(normalizeMascotKey('pointing')).toBe('lobster_rook_tide')
-    expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_rook_tide')
-    expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_tess_shoal')
-    expect(normalizeMascotKey('navigator')).toBe('lobster_tess_shoal')
-    expect(normalizeMascotKey('stats')).toBe('crab_cal_brack')
-    expect(normalizeMascotKey('peek')).toBe('lobster_pip_current')
-    expect(normalizeMascotKey('peaceful')).toBe('lobster_rook_tide')
-    expect(normalizeMascotKey('engineer')).toBe('lobster_faye_ripple')
-    expect(normalizeMascotKey('thumbs_up')).toBe('lobster_rook_tide')
+    expect(normalizeMascotKey('pointing')).toBe('lobster_sol_ember')
+    expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_sol_ember')
+    expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_vera_drift')
+    expect(normalizeMascotKey('navigator')).toBe('lobster_vera_drift')
+    expect(normalizeMascotKey('stats')).toBe('crab_otto_basalt')
+    expect(normalizeMascotKey('peek')).toBe('lobster_kit_shallows')
+    expect(normalizeMascotKey('peaceful')).toBe('lobster_sol_ember')
+    expect(normalizeMascotKey('engineer')).toBe('lobster_nell_quill')
+    expect(normalizeMascotKey('thumbs_up')).toBe('lobster_sol_ember')
 
     // Random normalization
     const randomResolved = normalizeMascotKey('random')
@@ -247,19 +247,19 @@ describe('Composite UI Components', () => {
 
     // Random helpers
     const allKeys = getAllMascotKeys()
-    expect(allKeys.length).toBe(6)
+    expect(allKeys.length).toBe(8)
     expect(allKeys).toContain(getRandomMascotKey())
-    const exclusions = allKeys.filter((key) => key !== 'lobster_pip_current').map((key) => key === 'lobster_rook_tide' ? 'thumbs_up' : key)
-    expect(getRandomMascotKey(exclusions)).toBe('lobster_pip_current')
+    const exclusions = allKeys.filter((key) => key !== 'lobster_kit_shallows').map((key) => key === 'lobster_sol_ember' ? 'thumbs_up' : key)
+    expect(getRandomMascotKey(exclusions)).toBe('lobster_kit_shallows')
 
     const rotation = getRandomMascotRotation(6)
     expect(rotation.length).toBe(6)
     expect(new Set(rotation).size).toBe(6)
 
     // Verify all registry items have valid Neon S3 CDN URLs
-    expect(Object.keys(MASCOT_REGISTRY).length).toBe(6)
-    expect(normalizeMascotKey('char_crab_builder_adult_v2.webp')).toBe('crab_cal_brack')
-    expect(normalizeMascotKey('lobster_peek_junior')).toBe('lobster_pip_current')
+    expect(Object.keys(MASCOT_REGISTRY).length).toBe(8)
+    expect(normalizeMascotKey('char_crab_builder_adult_v2.webp')).toBe('crab_otto_basalt')
+    expect(normalizeMascotKey('lobster_peek_junior')).toBe('lobster_kit_shallows')
     for (const key of Object.keys(MASCOT_REGISTRY)) {
       const info = getMascotInfo(key)
       expect(info.s3Url).toContain('/media/images/characters/')
@@ -275,7 +275,7 @@ describe('Composite UI Components', () => {
 
     const img = container.querySelector('img')
     expect(img).toBeInTheDocument()
-    expect(img?.getAttribute('src')).toContain('char_rook_tide_v5.webp')
+    expect(img?.getAttribute('src')).toMatch(/char_sol_ember_3d_victory_[0-9a-f]{8}\.webp/)
     expect(img?.getAttribute('loading')).toBe('eager')
   })
 

@@ -111,7 +111,7 @@ new remote keys under `images/characters/` returned HTTP 200, expected dimension
 and alpha through public media URLs before registration. No old object was
 overwritten. The generation-stage candidate status above is historical; this
 adoption section describes the current state. Existing anatomy/margin caveats
-remain recorded. See [cast v3](../../docs/character-cast-v3.md) for compatibility
+remain recorded. See [cast v3](../../../docs/character-cast-v3.md) for compatibility
 and browser verification details. No application push, merge or deployment.
 
 ## Signature-look candidate at subagent handoff (2026-11-05)
@@ -160,4 +160,4 @@ status describes the subagent handoff. Identity and visible anatomy are retained
 with the framing and socket caveats above. Source-preserving PNG and quality-90
 WebP are retained in both `scratch/characters/` and `scratch/character_refs/` as
 `char_pip_current_v4`. Both public objects matched local bytes before
-registration. See [cast v4](../../docs/character-cast-v4.md).
+registration. See [cast v4](../../../docs/character-cast-v4.md).

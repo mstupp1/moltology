@@ -22,11 +22,11 @@ blank page. Keep one-offs to at most one in four pieces.
 
 | Series | Promise to the viewer | Formats | Lead cast | Look | Accent |
 | --- | --- | --- | --- | --- | --- |
-| **Field Notes** | Silas Trench observes office humans like wildlife, deadpan, with one useful trick at the end | Nature documentary, observation played straight, day in the life | `lobster_navigator` as the field researcher, a human seen from behind or in silhouette | Documentary photography: natural window light, shallow depth of field, slightly cool grade | Cyan |
-| **Shell Check** | A judge rates your habits and you laugh at yourself | Tier list, red flags, rate it, starter pack, myth vs fact, stop doing X | `crab_sentinel` as the unimpressed judge, `crab_stats` keeping score | Type-led, hard flat colour blocks, stamps and scores, high contrast | Crimson |
-| **Ask the Oracle** | One real, recognisable problem, answered calmly and usefully | Steal these lines, cheat sheet, quote deck, reverse tutorial | `lobster_oracle_attendant` answering, `lobster_archivist` for anything from the Codex | Warm lamp-lit study at depth, sea-glass glow from the orb as the one light source | Amber |
+| **Field Notes** | Nell Quill observes office humans like wildlife, deadpan, with one useful trick at the end | Nature documentary, observation played straight, day in the life | `lobster_nell_quill` as the field researcher, a human seen from behind or in silhouette | Documentary photography: natural window light, shallow depth of field, slightly cool grade | Cyan |
+| **Shell Check** | A judge rates your habits and you laugh at yourself | Tier list, red flags, rate it, starter pack, myth vs fact, stop doing X | `lobster_vera_drift` as the unimpressed judge, `crab_bo_pebble` keeping score | Type-led, hard flat colour blocks, stamps and scores, high contrast | Crimson |
+| **Ask the Oracle** | One real, recognisable problem, answered calmly and usefully | Steal these lines, cheat sheet, quote deck, reverse tutorial | `crab_moss_tern` answering, `lobster_nell_quill` for anything from the Codex | Warm lamp-lit study at depth, sea-glass glow from the orb as the one light source | Amber |
 | **The Molt Log** | A running workplace story with the same characters, one small win per episode | POV, fake group chat, expectation vs reality, story, before and after | The Log crew (section 2): the same three characters every episode | Illustrated deep-sea office, warm practicals, recurring set (the same desk, the same window, the same plant) | Lavender |
-| **Codex Lessons** | One Codex passage turned into one thing to do today, taught by the same 3D host | Animated lesson shorts ([animated-lessons](../.agents/skills/animated-lessons/SKILL.md)): claim, the passage in plain words, the action, the website invitation | `host-crab` from `content/animation/cast.json`, rendered by the site's 3D character code | Deep-water set or a lamp-lit study at depth, cinematic rim light, the host centre frame | Amber |
+| **Codex Lessons** | One Codex passage turned into one thing to do today, taught by the same 3D host | Animated lesson shorts ([animated-lessons](../.agents/skills/animated-lessons/SKILL.md)): claim, the passage in plain words, the action, the website invitation | `crab_juno_marsh` (Juno) hosting, `lobster_kit_shallows` (Kit) asking, rendered by the site's 3D character code | Deep-water set or a lamp-lit study at depth, cinematic rim light, the host centre frame | Amber |
 
 Rules:
 
@@ -49,39 +49,33 @@ Rules:
 Characters are a cast with jobs, not stickers. [Character casting](character-casting.md) is the procedure for choosing them (story fit first, then recent usage); for a series, the table below is its established story cast and the first shortlist. A mascot appears because it does something
 in the frame: reacts, judges, demonstrates, fails, wins.
 
+All characters are the 3D content cast ([characters/README.md](characters/README.md)); render them with `npm run cast:render`.
+
 | Character | Job | Running bit | Use for |
 | --- | --- | --- | --- |
-| `lobster_navigator` | Field researcher, notebook always out | Takes earnest notes on mundane human behaviour | Field Notes |
-| `crab_sentinel` | The judge | Never impressed; the shield comes up at bad habits | Shell Check |
-| `crab_stats` | Scorekeeper | Holds up the chart at the worst moment | Shell Check, any real or in-world number |
-| `lobster_oracle_attendant` | Calm advisor | Answers chaos with one plain sentence | Ask the Oracle |
-| `lobster_archivist` | Keeper of the Codex | Has a scripture for everything, finds it very slowly | Codex quotes, Ask the Oracle |
-| `lobster_engineer` | Fixer | Solves the wrong problem with great enthusiasm first | Molt Log, and only when something is being built or repaired |
-| `lobster_peek` | The new hire | Shy, notices what everyone else ignores, often right | Molt Log |
-| `crab_ritual_keeper` | Keeper of routines | Rings the bell for breaks nobody takes | Molt Log, routines, seasonal pieces |
-| `lobster_peaceful` | The one who logged off | Is visibly fine; everyone else is not | Contrast beats, payoffs, rest and boundaries |
-| Juniors (`*_junior`) | Kids' table, apprentices | Copy the adults, badly | Before and after, learning, "how it started" |
+| `crab_juno_marsh` (Juno) | Host | Always lands on one thing to do today | Codex Lessons, explainers, default when nothing fits better |
+| `lobster_kit_shallows` (Kit) | The new hire | Shy, asks what everyone wonders, often right | Codex Lessons, Molt Log viewpoint, learning |
+| `lobster_nell_quill` (Nell) | Researcher | Takes earnest notes on mundane behaviour; has a footnote for everything | Field Notes, Codex quotes, Ask the Oracle |
+| `lobster_vera_drift` (Vera) | The judge, the skeptic | Never impressed until the evidence is good | Shell Check, myth vs fact, hot takes |
+| `crab_bo_pebble` (Bo) | Scorekeeper, comic relief | Holds up the chart at the worst moment; trips over the obvious lesson first | Shell Check, any real or in-world number, before and after |
+| `crab_moss_tern` (Moss) | Calm elder | Answers chaos with one plain sentence | Ask the Oracle, rest and boundaries, payoffs |
+| `lobster_sol_ember` (Sol) | The striver, the fixer | Solves the wrong problem with great intensity first | Molt Log, moltmaxxing, overwork jokes |
+| `crab_otto_basalt` (Otto) | Veteran coach | Says one word where others say ten; rings the bell for breaks nobody takes | Molt Log, routines, training and discipline |
 
-**The Log crew** for The Molt Log: `lobster_peek` (the new hire, our viewpoint),
-`lobster_engineer` (the fixer) and `crab_ritual_keeper` (the routine keeper). Keep them in
-the same set and roles every episode.
+**The Log crew** for The Molt Log: Kit (the new hire, our viewpoint), Sol (the fixer) and
+Otto (the routine keeper). Keep them in the same set and roles every episode.
 
 Rules:
 
-- **No default mascot.** Pick the character whose job fits the beat. A hardhat engineer next
-  to an inbox joke is a badge, not a cast member. Character casting's hard-hat cooldown
-  (`lobster_engineer` and `crab_builder` count as one look) applies outside The Molt Log.
-- **Same character, same look.** Supply the identity reference every time and keep
-  proportions, colours and props. Expression, pose and angle change freely.
-- **Feature-film characters across every series.** Follow the
-  [character-creator style and reference rules](../.agents/skills/character-creator/SKILL.md#shared-style):
-  sculpted 3D forms, expressive facial anatomy, soft satin chitin and cinematic shading.
-  Flat colour blocks and illustrated sets describe the surrounding design; preserve the
-  character's volume and material depth. No sticker borders, cel outlines or flat vector
-  treatment. In scenes, match the environment's light, perspective and contact shadows.
-  For new characters, use the original family reference for rendering quality and an
-  inspected avatar reference for the relevant species, build, palette and equipment;
-  keep those reference roles explicit.
+- **No default mascot.** Pick the character whose job fits the beat. A character next to an
+  inbox joke with nothing to do is a badge, not a cast member.
+- **Same character, same look.** Use the character's own 3D render every time (see
+  [character casting](character-casting.md#using-the-3d-characters-in-artwork)). Pose, mood and
+  angle change freely; the look never does.
+- **The 3D characters, unchanged.** The character in the frame is the 3D render; image models
+  paint the world around it and match its light, perspective and contact shadow. No sticker
+  borders, cel outlines or redrawn characters unless the shot needs a pose the rig can't make
+  (then the character's reference sheet is the identity reference).
 - **Faces carry the joke.** Give each appearance an expression from the beat: deadpan stare,
   slow horror, smug calm, exhausted, triumphant. Record it in `characterRole`.
 - **One main character per frame.** A second character only when they're reacting to the
@@ -187,9 +181,9 @@ Fill this before pitching, after reading the ledger. Put it in the draft as `cre
 {
   "series": "Shell Check",
   "episode": 4,
-  "callback": "Crab's C-minus for 'quick question' from episode 2 is pinned behind the desk",
-  "cast": ["crab_sentinel", "crab_stats"],
-  "focalPoint": "The crab's unimpressed face, shield half up",
+  "callback": "Vera's C-minus for 'quick question' from episode 2 is pinned behind the desk",
+  "cast": ["lobster_vera_drift", "crab_bo_pebble"],
+  "focalPoint": "Vera's unimpressed face, one claw raised",
   "shots": ["reaction close-up", "top-down flat lay"],
   "stopper": "Eye contact plus a huge 'D' stamp",
   "easterEgg": "The tier list's S row holds one item: 'logging off'",

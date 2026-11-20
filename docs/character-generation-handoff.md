@@ -1,5 +1,7 @@
 # Character generation continuation
 
+> **Retired 2026-11-20.** The content cast is now 3D characters built with the site's character creator ([content/characters/README.md](../content/characters/README.md)). This page records the earlier image-generated 2D cast for history; don't use it or its images for new content.
+
 ## Current state: cyber/style cast v5 complete
 
 Active cast remains six: **Rook Tide, Pip Current, Mira Kelp, Cal Brack,

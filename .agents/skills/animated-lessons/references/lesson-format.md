@@ -10,7 +10,7 @@ A lesson is one JSON file. `npm run anim:create` checks it before rendering and 
 | `title`, `topic` | For the ledger and review |
 | `series`, `episode` | `Codex Lessons` and the next episode number |
 | `format` | `short` (the only format built so far) |
-| `host` | Cast id from `content/animation/cast.json` (`host-crab`); speaks any line without a `speaker` |
+| `host` | Cast key, first name or alias from `content/characters/cast.json` (`juno`); speaks any line without a `speaker` |
 | `cast` | Optional `[{ "id", "at" }]` for two or more characters; `at` is a mark: `left`, `center` or `right`. Must include the host |
 | `set` | Optional 3D set: `codex-study`, `reef-office` or `open-water` (pieces stay behind and beside the marks). Its art kit from `content/animation/sets/` is used automatically |
 | `codex` | `{ id, title, url }` when teaching a passage |
@@ -47,7 +47,7 @@ Word indexes count words as the voice does: hyphenated words split ("check-in" i
 - The hook headline sits inside x 120-900, y 460-900 at 80 to 104px. The opening shot aims higher so the cast stands below the headline; that framing holds for all of scene 1 and changes on the cut to scene 2 (scene 2 always cuts in), so the frame never slides. Keep scene 1 short after the hook.
 - Regular subtitles sit at y 1180 (from the reel compositor). In a medium or close shot the host's face is above them; in an extreme close-up the subtitles cross the mouth, so keep extreme shots short.
 - With a cast, everyone shares one key light; a set's lamp adds a warm pool. The two shot fits marks at ±0.75 (a three-character cast fits too, but tightly).
-- The host's temperament (`lively` for host-crab) drives breathing, sway, glances and blinks between cues. Talking adds the mouth, a small nod and brow lifts.
+- The host's temperament (`lively` for Juno) drives breathing, sway, glances and blinks between cues. Talking adds the mouth, a small nod and brow lifts.
 
 ## Rendering
 

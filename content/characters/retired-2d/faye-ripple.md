@@ -58,7 +58,7 @@ successful named individuals. Parent reviewed the actual render and light/dark
 composites, preserving the anatomy/margin caveats above. Canonical key: `lobster_faye_ripple`.
 PNG and quality-90 WebP at new `images/characters/char_faye_ripple_v3` keys
 returned HTTP 200 with exact local-byte matches, expected dimensions and alpha
-before registration. No old asset was overwritten. See [cast v3](../../docs/character-cast-v3.md).
+before registration. No old asset was overwritten. See [cast v3](../../../docs/character-cast-v3.md).
 This adoption does not claim separate user review of every image or application
 deployment.
 
@@ -110,7 +110,7 @@ Add a short open-front dark-teal canvas waistcoat to this same character. Cream 
 Adopted as `char_faye_ripple_v4.png` and quality-90 `.webp`, retained in both
 `scratch/characters/` and `scratch/character_refs/`. Public objects were checked
 against local bytes before registration. The first failed request remains above
-as history. See [cast v4](../../docs/character-cast-v4.md).
+as history. See [cast v4](../../../docs/character-cast-v4.md).
 
 ## Requested cyber/style revision (2026-11-05)
 
@@ -133,4 +133,4 @@ Restyle this same Faye Ripple as a sassy stylish businesswoman who means busines
 Selected for the active six under the user’s replacement request, retained as
 `char_faye_ripple_v5.png` and quality-90 `.webp` in both
 `scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
-See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.
+See [cast v5](../../../docs/character-cast-v5.md) for public-object verification and adoption.

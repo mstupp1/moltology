@@ -1,5 +1,7 @@
 # Named character cast v3
 
+> **Retired 2026-11-20.** The content cast is now 3D characters built with the site's character creator ([content/characters/README.md](../content/characters/README.md)). This page records the earlier image-generated 2D cast for history; don't use it or its images for new content.
+
 Historical cast snapshot. The [signature-look v4 cast](character-cast-v4.md)
 supersedes these active looks, retains Mira unchanged, and replaces Clove with
 the male red anchor Rook Tide at the user’s choice. v3 objects remain preserved.
@@ -13,12 +15,12 @@ that the finished cast should contain six successful characters. The shared
 
 | Key | Individual | Master and WebP stem | Recognizable identity |
 | --- | --- | --- | --- |
-| `lobster_pip_current` | [Pip Current](../content/characters/pip-current.md) | `char_pip_current_v3` | Slender lavender lobster, emerald eyes, copper keepsake ring |
-| `crab_mira_kelp` | [Mira Kelp](../content/characters/mira-kelp.md) | `char_mira_kelp_v3` | Lean jade-green crab, heart-shaped shell, sapphire eyes, ochre neckerchief |
-| `crab_cal_brack` | [Cal Brack](../content/characters/cal-brack.md) | `char_cal_brack_v3` | Broad square cobalt-blue crab, gold eyes, cream forehead patch |
-| `lobster_clove_cinder` | [Clove Cinder](../content/characters/clove-cinder.md) | `char_clove_cinder_v3` | Tall gold lobster, ruby eyes, curled antennae and subtle shell bands |
-| `lobster_tess_shoal` | [Tess Shoal](../content/characters/tess-shoal.md) | `char_tess_shoal_v3` | Tall tapered teal lobster, amber eyes, mint underside and cream cheek patch |
-| `lobster_faye_ripple` | [Faye Ripple](../content/characters/faye-ripple.md) | `char_faye_ripple_v3` | Sturdy rose-pink lobster, softly square head, sapphire eyes and sea-glass wrist bead |
+| `lobster_pip_current` | [Pip Current](../content/characters/retired-2d/pip-current.md) | `char_pip_current_v3` | Slender lavender lobster, emerald eyes, copper keepsake ring |
+| `crab_mira_kelp` | [Mira Kelp](../content/characters/retired-2d/mira-kelp.md) | `char_mira_kelp_v3` | Lean jade-green crab, heart-shaped shell, sapphire eyes, ochre neckerchief |
+| `crab_cal_brack` | [Cal Brack](../content/characters/retired-2d/cal-brack.md) | `char_cal_brack_v3` | Broad square cobalt-blue crab, gold eyes, cream forehead patch |
+| `lobster_clove_cinder` | [Clove Cinder](../content/characters/retired-2d/clove-cinder.md) | `char_clove_cinder_v3` | Tall gold lobster, ruby eyes, curled antennae and subtle shell bands |
+| `lobster_tess_shoal` | [Tess Shoal](../content/characters/retired-2d/tess-shoal.md) | `char_tess_shoal_v3` | Tall tapered teal lobster, amber eyes, mint underside and cream cheek patch |
+| `lobster_faye_ripple` | [Faye Ripple](../content/characters/retired-2d/faye-ripple.md) | `char_faye_ripple_v3` | Sturdy rose-pink lobster, softly square head, sapphire eyes and sea-glass wrist bead |
 
 Default: Faye Ripple. Each is a recurring individual with a motive, strength,
 flaw, habit, relationships and personal visual detail in their brief. Use the
@@ -80,11 +82,11 @@ named identity images. [Cast v2](character-cast-v2.md) is archival.
 
 ## Generation failures retained as history
 
-[Bram Silt](../content/characters/bram-silt.md) is retired at the user's request.
-[Oren Drift](../content/characters/oren-drift.md),
-[Ada Flint](../content/characters/ada-flint.md),
-[Nell Brine](../content/characters/nell-brine.md) and
-[Gus Pebble](../content/characters/gus-pebble.md) returned output-stage
+[Bram Silt](../content/characters/retired-2d/bram-silt.md) is retired at the user's request.
+[Oren Drift](../content/characters/retired-2d/oren-drift.md),
+[Ada Flint](../content/characters/retired-2d/ada-flint.md),
+[Nell Brine](../content/characters/retired-2d/nell-brine.md) and
+[Gus Pebble](../content/characters/retired-2d/gus-pebble.md) returned output-stage
 `moderation_blocked` errors without renders. Their archived briefs preserve
 prompts and request IDs. No blocked concept was retried unchanged; the user
 explicitly permitted fresh individuals. Gus's lane moved to the distinct Clove

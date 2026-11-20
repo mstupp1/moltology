@@ -87,4 +87,4 @@ Edit this same Rook Tide character. Remove the entire fabric cape, shoulder mant
 Selected for the active six under the user’s replacement request, retained as
 `char_rook_tide_v5.png` and quality-90 `.webp` in both
 `scratch/characters/` and `scratch/character_refs/`. Historical versions remain.
-See [cast v5](../../docs/character-cast-v5.md) for public-object verification and adoption.
+See [cast v5](../../../docs/character-cast-v5.md) for public-object verification and adoption.

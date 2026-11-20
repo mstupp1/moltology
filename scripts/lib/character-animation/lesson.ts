@@ -115,17 +115,30 @@ export interface CastMember {
   config: Record<string, unknown>
 }
 
-export const CAST_PATH = path.resolve(process.cwd(), 'content/animation/cast.json')
+/** The shared content cast (also used by the composite studio and `npm run cast:render`). */
+export const CAST_PATH = path.resolve(process.cwd(), 'content/characters/cast.json')
 
+/**
+ * The cast by key, with every alias and first name as another key for the same member, so a
+ * lesson can say `juno`, `host-crab` or `crab_juno_marsh`.
+ */
 export function loadCast(file = CAST_PATH): Record<string, CastMember> {
-  return JSON.parse(fs.readFileSync(file, 'utf8')).cast
+  const cast: Record<string, CastMember & { aliases?: string[] }> = JSON.parse(fs.readFileSync(file, 'utf8')).cast
+  const out: Record<string, CastMember> = {}
+  for (const [key, member] of Object.entries(cast)) {
+    out[key] = member
+    out[key.replace(/^(lobster|crab)_/, '')] = member
+    for (const alias of member.aliases ?? []) out[alias] = member
+  }
+  return out
 }
 
 /** The 3D look for a cast member, resolved the way the site resolves a saved character. */
 export function castLook(id: string, cast = loadCast()): Avatar3DLook {
   const member = cast[id]
-  if (!member) throw new Error(`No cast member "${id}" in content/animation/cast.json (have: ${Object.keys(cast).join(', ')})`)
-  const config = parseLobsterAvatarConfig(member.config)
+  if (!member) throw new Error(`No cast member "${id}" in content/characters/cast.json (have: ${Object.keys(cast).join(', ')})`)
+  // Lessons start everyone at rest; poses come from the scene cues.
+  const config = parseLobsterAvatarConfig({ pose: 'rest', ...member.config })
   if (!config) throw new Error(`Cast member "${id}" has an invalid character config`)
   return lookFromConfig(config)
 }

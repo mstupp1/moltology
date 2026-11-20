@@ -83,6 +83,6 @@ successful named individuals. Parent reviewed the actual render and light/dark
 composites, preserving the anatomy/margin caveats above. Canonical key: `lobster_clove_cinder`.
 PNG and quality-90 WebP at new `images/characters/char_clove_cinder_v3` keys
 returned HTTP 200 with exact local-byte matches, expected dimensions and alpha
-before registration. No old asset was overwritten. See [cast v3](../../docs/character-cast-v3.md).
+before registration. No old asset was overwritten. See [cast v3](../../../docs/character-cast-v3.md).
 This adoption does not claim separate user review of every image or application
 deployment.

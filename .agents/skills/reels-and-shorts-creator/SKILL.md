@@ -4,7 +4,7 @@ description: >-
   Write and produce Moltology Instagram Reels and YouTube Shorts: pick a known video
   format (nature documentary, POV, roast list, fake infomercial, work forecast and more),
   pitch three scripts and score them, pass a boredom check, then produce with ImageGen
-  artwork, canonical mascot references, Gemini Omni video, voiceover, kinetic captions
+  artwork, 3D cast renders, Gemini Omni video, voiceover, kinetic captions
   and deterministic publishing scripts. Use for reel and short creation or the weekly
   production automation.
 ---
@@ -28,7 +28,7 @@ Read before writing:
 
 Choose the series that is due (usually Field Notes or The Molt Log) and fill the creative brief from the creative-direction playbook: series, next episode number, a callback to the last episode, cast, focal point, shots, stopper and easter egg. All three pitches below stay in that series unless you record why a one-off is better.
 
-For content artwork that uses mascots, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Within a series, its creative-direction cast is the established story cast and the first shortlist. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence.
+For content artwork that uses characters, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Within a series, its creative-direction cast is the established story cast and the first shortlist. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence. Characters are the 3D content cast ([content/characters/README.md](../../../content/characters/README.md)): render them with `npm run cast:render` and use the renders as the casting guide describes, never the retired 2D cutouts.
 
 Start from one recognisable everyday moment, as specific as possible: a time, an object, a sentence someone actually says. "Your calendar" is a topic; "an invite called 'sync' with no agenda" is a situation. An uncovered blog dispatch can supply it. Research real-world claims with primary sources; never invent news, studies or outcomes.
 
