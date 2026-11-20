@@ -2494,11 +2494,11 @@
       "format": "animated-lesson",
       "archivePath": "Social Archive/2026/11/reel-67a0b808f797a4221a1577a0",
       "zernioMediaUrls": [
-        "https://media.zernio.com/temp/1795121987407_36e84ba2f561fa76_01.mp4"
+        "https://media.zernio.com/media/1795180354699_923fda8427583ff3_final.mp4"
       ],
       "thumbnailUrl": null,
       "s3ThumbKey": null,
-      "durationSeconds": 33.6,
+      "durationSeconds": 32.9,
       "status": "queued",
       "scheduledFor": "2026-11-22T23:30:00.000Z",
       "queueId": "6a84b7702421e968ac81f5bd",
@@ -2519,7 +2519,8 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-11-19T20:59:51.478Z"
+      "createdAt": "2026-11-19T20:59:51.478Z",
+      "videoReplaced": "2026-11-20 lip sync v2 render (PR #547)"
     }
   ]
 }
