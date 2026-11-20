@@ -217,11 +217,17 @@ additional generic title banner.
 Every standard HUD page (everything except the full-screen Oracle) sits inside one
 see-through page panel drawn by `HudLayout`, so pages never add their own outer frame.
 
-- Desktop: `main` carries a `surface-1/[0.45]` scrim and 8px side padding around
-  the panel. The page column (max 1312px) is the panel: `surface-1/[0.68]`,
-  `line-subtle` border, `rounded-panel`, 15px side padding. 8 + 1 + 15 = 24px per
-  side and 1312 - 32 = 1280px of content, the same width pages had before the
-  panel, so keep these in step if any of them changes. It grows with its content (`flex-1 shrink-0`), so
+- Desktop: `main` carries a `surface-1/[0.45]` scrim and a fluid side gutter
+  around the panel, `clamp(8px, 1vw, 24px)`. The page column (max 1632px) is the
+  panel: `surface-1/[0.68]`, `line-subtle` border, `rounded-panel`, 15px side
+  padding, so content tops out at 1600px. Every page shares this one width, so the
+  panel edges and pill never move between pages. Laptops are filled; only big
+  monitors get margins.
+- Page content picks its own width inside the panel. Grids and lists fill it, and
+  use `auto-fill`/`minmax` columns (or add a column at `2xl`) rather than a fixed
+  count, so cards never balloon. Reading text (forum posts, Codex, lessons) caps
+  its line length itself; when a reading column sits beside a rail, let the rail
+  grow instead of leaving a gap between them. It grows with its content (`flex-1 shrink-0`), so
   the frame reaches the bottom of long pages. The top-right pill straddles the
   panel's top edge and sits in its 54px top padding, so content starts right below
   the pill instead of under a reserved bar.

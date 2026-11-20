@@ -371,7 +371,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
             ) : filtered.length === 0 ? (
               <AcademyEmpty>{ACADEMY_COPY.emptyFilter}</AcademyEmpty>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-3">
                 {filtered.map((course) => (
                   <CourseCard key={course.slug} course={course} />
                 ))}

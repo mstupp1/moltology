@@ -280,7 +280,7 @@ export function MarketSkillsPanel({
             />
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-2">
           {skills.map((skill) => (
             <SkillCardButton key={skill.id} skill={skill} selected={selected?.id === skill.id} onSelect={() => select(skill.id)} />
           ))}

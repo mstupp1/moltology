@@ -505,7 +505,7 @@ export function MarketShopPage() {
                 {hideOwned && !slot && !rarity ? 'You own every piece. Nice.' : 'Nothing matches these filters.'}
               </p>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-2">
                 {pageItems.map(({ piece: p, shown: v }) => (
                   <MarketPieceCard
                     key={p.baseKey}
