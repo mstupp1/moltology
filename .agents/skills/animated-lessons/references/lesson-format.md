@@ -62,6 +62,22 @@ Speaking characters use the classic animator's mouth chart (Preston Blair, the H
 
 Shapes come from [Rhubarb Lip Sync](https://github.com/DanielSWolf/rhubarb-lip-sync) (free, offline), which listens to each voice take with its script. The renderer fetches it once into `tmp/tools/` (or set `RHUBARB_PATH`) and caches its answer next to each take (`voice/take-*.mouth-*.json`). Without it, and on silent renders, shapes are guessed from the spelling of each word over its timing. The render log says which was used (`👄 Mouth shapes from ...`).
 
+The shapes then get an animator's pass, so each frame reads at phone size and speed:
+
+- **Lead.** The mouth runs 2 frames ahead of the voice (`LEAD_FRAMES` in `scripts/lib/character-animation/lipsync.ts`). A mouth exactly on the sound reads late on screen.
+- **Key shapes always show, and only where the script has them.** Lips meeting (A), top teeth on the lip (G) and the pucker (F) get at least one frame, two when the sounds around them can spare it, however short the sound. Rhubarb sometimes hears a close or an F that isn't in the words (a hard TH, a breath); an A or G with no word spelled with M/B/P or F/V/PH around it becomes teeth together (B) instead of twitching. Any other shape that would flash for a single frame between two ordinary ones holds the shape before instead. A one-frame opening between two closes ("mama") stays.
+- **Pressed lips are a thin dark line**, not the character's resting smile, so a close mid-word never reads as a quick grin.
+- **Size follows stress.** Each word gets a strength from its loudness against the take's typical word and from the word itself (little words light, long words and numbers heavier, `!` stronger). Stressed words open up to about a third bigger, little words smaller. The strongest words, no closer than about two thirds of a second apart, also get an accent: the head dips a touch and the brows lift on the loudest frame.
+- **In-betweens only on big changes.** Wide open to shut, or a pucker to a grin, gets one halfway frame when the new shape holds long enough to land after it. Small changes snap. A lip close lands fully shut on its first frame.
+- **Pauses.** A gap of up to about a third of a second inside a line relaxes the lips slightly apart. At the end of a line the last shape holds 2 frames, then eases shut over 3.
+- **The face joins in.** The open mouth hangs like a jaw (its bottom edge travels more than its top), and wide-open vowels narrow the eyes a little.
+
+All of this is drawn from the per-frame tracks in the timeline (`mouthBy`, `emphasisBy`, `accentBy`); `speechMouthTrack` in `src/lib/avatar3d/mouth-shapes.ts` turns them into the drawn mouth.
+
+### Mouth check
+
+`npm run anim:create -- --lesson <file> --mouth-check` renders the lesson again as face close-ups on whoever is speaking, with each speaker's current shape letter (and the sounds it stands for) at the top and the voice's waveform along the bottom (labels are drawn as images, so any ffmpeg build works), to `<out>/mouth-check/mouth-check.mp4`. Letters are shown on the frames they are drawn, so they sit 2 frames ahead of their sound in the waveform. Use it when a line looks off, or after changing anything in the lip sync. It reuses the cached voice takes. Run it on the Mac (about as long as the main render); in the cloud add `--silent --scale 0.5 --max-seconds 5`.
+
 ## Clipping check
 
 Before any frame is drawn, `anim:create` rehearses the whole timeline in Node (a couple of seconds) and checks that no claw, arm or leg passes through its own body or through another character (`src/lib/avatar3d/collide.ts`). Each solid part is stood in for by spheres sitting inside it, so a hit means the parts really cross, not that they touch.
@@ -78,7 +94,7 @@ Before any frame is drawn, `anim:create` rehearses the whole timeline in Node (a
 - Regular subtitles sit at y 1180 (from the reel compositor). In a medium or close shot the host's face is above them; in an extreme close-up the subtitles cross the mouth, so keep extreme shots short.
 - With a cast, everyone shares one key light; a set's lamp adds a warm pool. Marks stand at ±1.05 so two characters' claws have room to gesture without crowding each other; the two shot (a little wider than before) fits them, and a three-character cast fits too, but tightly.
 - On a cut, a character whose pose changes opens the new shot already in it (no blend), so a limb never sweeps across the frame or through a neighbour at the cut. A glide still blends.
-- The host's temperament (`lively` for host-crab) drives breathing, sway, glances and blinks between cues. Talking adds the mouth shapes, a small nod, a slow drift of the head and brow lifts; the acting pass adds the gestures.
+- The host's temperament (`lively` for host-crab) drives breathing, sway, glances and blinks between cues. Talking adds the mouth shapes, a slow drift of the head, and a head dip with a brow lift on stressed words (see [Lip sync](#lip-sync)); the acting pass adds the gestures.
 
 ## Rendering
 

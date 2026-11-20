@@ -112,7 +112,7 @@ To change a set's look, edit its prompts in `art.json`, then repeat the steps. A
 
 ## 7. Inspect and queue
 
-Before queueing, watch the final file once with sound on at phone size and run the playbook's phone proof on the stills in `checks/` (frame zero, mid-hook, last hook word, first body phrase, a later moment and the outro). Check that the right mouth moves with each voice and its shapes match the sounds (lips shut on M, B and P, a pucker on OO), no claw passes through anyone, the headline never overlaps the face, the subtitles never cover the eyes, and every reaction lands on its word.
+Before queueing, watch the final file once with sound on at phone size and run the playbook's phone proof on the stills in `checks/` (frame zero, mid-hook, last hook word, first body phrase, a later moment and the outro). Check that the right mouth moves with each voice and its shapes match the sounds (lips shut on M, B and P, a pucker on OO; if a line looks off, run `--mouth-check`, see [Mouth check](references/lesson-format.md#mouth-check)), no claw passes through anyone, the headline never overlaps the face, the subtitles never cover the eyes, and every reaction lands on its word.
 
 Queue the inspected file through the reel CLI, which archives to Google Drive, uploads to Zernio and records the ledgers:
 

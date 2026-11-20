@@ -307,7 +307,7 @@ export function buildTimeline(
   looks: Record<string, Avatar3DLook>,
   words: WordBoundaryEvent[],
   talkBy: number[][],
-  options: TimelineOptions & { set?: SetName; mouthBy?: string[] },
+  options: TimelineOptions & { set?: SetName; mouthBy?: string[]; emphasisBy?: number[][]; accentBy?: number[][] },
 ): { timeline: AnimationTimeline; windows: ReturnType<typeof sceneWindows>; hookEnd: number } {
   const fps = options.fps
   const cast = castOf(lesson)
@@ -410,6 +410,8 @@ export function buildTimeline(
       talk: tracks[0],
       talkBy: tracks,
       mouthBy: options.mouthBy?.map((m) => m.slice(0, frames)),
+      emphasisBy: options.emphasisBy?.map((m) => m.slice(0, frames)),
+      accentBy: options.accentBy?.map((m) => m.slice(0, frames)),
       cast: solo ? undefined : castLooks,
       set: options.set ?? lesson.set,
       lighting: 'cinematic',

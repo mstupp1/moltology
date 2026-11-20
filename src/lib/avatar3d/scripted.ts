@@ -6,7 +6,7 @@
 import type { AvatarPose } from '../avatar/traits'
 import type { Avatar3DLook } from './look'
 import type { Gesture, Reaction } from './motion'
-import { isMouthShape } from './mouth-shapes'
+import { isMouthShape, speechMouthTrack } from './mouth-shapes'
 import { buildSet, type SetArt, type SetName } from './sets'
 import type { Stage } from './stage'
 
@@ -91,6 +91,12 @@ export interface AnimationTimeline {
    * MOUTH_SHAPES (X rest). Without a track a member's mouth just opens with its speech level.
    */
   mouthBy?: string[]
+  /**
+   * How strongly each frame's word is said per member (0..1, 0.5 plain): stressed words open the
+   * mouth bigger. And a short pulse on the strongest words, which the head and brows follow.
+   */
+  emphasisBy?: number[][]
+  accentBy?: number[][]
   /** Set dressing in front of the backdrop. */
   set?: SetName
   /** Painted textures and the cut-out layer for the set (see sets.ts). */
@@ -111,6 +117,8 @@ export function timelinePlayer(stage: TimelineStage, timeline: AnimationTimeline
   let next = 0
   let drawn = -1
   const members = timeline.cast?.length ?? 1
+  // The drawn mouth for every frame, worked out once from the shape letters (mouth-shapes.ts).
+  const mouths = timeline.mouthBy?.map((letters, m) => speechMouthTrack(letters, { fps: timeline.fps, size: timeline.emphasisBy?.[m] }))
   if (timeline.cast?.length) stage.setCast(timeline.cast)
   else stage.setLook(timeline.look, true)
   // Claws stay out of bodies, their own and each other's.
@@ -142,7 +150,7 @@ export function timelinePlayer(stage: TimelineStage, timeline: AnimationTimeline
         for (let m = 0; m < members; m++) {
           const track = timeline.talkBy ? timeline.talkBy[m] : m === 0 ? timeline.talk : undefined
           const shape = timeline.mouthBy?.[m]?.[drawn]
-          stage.member(m)?.setTalk(track?.[drawn] ?? 0, isMouthShape(shape) ? shape : null)
+          stage.member(m)?.setTalk(track?.[drawn] ?? 0, isMouthShape(shape) ? shape : null, mouths?.[m]?.[drawn] ?? null, timeline.accentBy?.[m]?.[drawn] ?? 0)
         }
         set?.update(t)
         stage.step(dt, drawn === index)

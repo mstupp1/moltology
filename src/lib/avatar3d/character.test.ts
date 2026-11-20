@@ -277,9 +277,13 @@ describe('avatar3d', () => {
         for (let f = 0; f < 6; f++) character.update(0.033, 1 + f * 0.033, true)
       }
       settle('A')
-      expect(bone('mouthOpen').visible, race).toBe(false)
-      expect(bone('mouthLine').visible, race).toBe(true)
+      // Pressed lips: one thin dark line with no teeth, not the resting smile.
+      expect(bone('mouthOpen').visible, race).toBe(true)
+      expect(bone('mouthLine').visible, race).toBe(false)
+      expect(bone('mouthTeethUp').visible || bone('mouthTeethLo').visible, race).toBe(false)
+      const pressed = bone('mouthOpen').scale.y
       settle('B')
+      expect(bone('mouthOpen').scale.y, race).toBeGreaterThan(pressed * 3)
       expect(bone('mouthTeethUp').visible && bone('mouthTeethLo').visible, race).toBe(true)
       expect(bone('mouthTongue').visible, race).toBe(false)
       settle('D')
