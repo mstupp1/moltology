@@ -151,10 +151,13 @@ describe('trusting Rhubarb', () => {
 describe('mouth check', () => {
   it('labels the shape of each speaker, frame by frame, as runs', async () => {
     const { mouthCheckLabels } = await import('./mouth-check')
-    const runs = mouthCheckLabels(['XXDDDAX', 'XXXXXXX'], ['host-crab', 'junior-lobster'])
+    const runs = mouthCheckLabels(['XXDDDAX' + 'X'.repeat(10), 'X'.repeat(17)], ['host-crab', 'junior-lobster'])
     // The silent member gets no line; runs add up to every frame.
-    expect(runs.map((r) => r.frames)).toEqual([2, 3, 1, 1])
+    expect(runs.map((r) => r.frames)).toEqual([2, 3, 1, 5, 6])
     expect(runs[1].lines).toEqual(['host-crab   D   AA'])
     expect(runs[2].lines).toEqual(['host-crab   A   M B P'])
+    // After the line the drawn mouth holds and eases shut before it is at rest.
+    expect(runs[3].lines).toEqual(['host-crab   X   rest (easing)'])
+    expect(runs[4].lines).toEqual(['host-crab   X   rest'])
   })
 })

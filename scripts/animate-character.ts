@@ -154,7 +154,7 @@ async function mouthCheck(
   const out = await finishMouthCheck({
     clip,
     audio,
-    labels: mouthCheckLabels((timeline.mouthBy ?? []).map((m) => m.slice(0, timeline.frames)), names),
+    labels: mouthCheckLabels((timeline.mouthBy ?? []).map((m) => m.slice(0, timeline.frames)), names, FPS),
     fps: FPS,
     outPath: path.join(dir, 'mouth-check.mp4'),
     width: OUT_W,

@@ -9,6 +9,7 @@ import path from 'node:path'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { NARRATOR, type Lesson } from './lesson'
+import { speechMouthTrack } from '../../../src/lib/avatar3d/mouth-shapes'
 
 const execFileAsync = promisify(execFile)
 
@@ -44,16 +45,21 @@ export interface LabelRun {
 
 /**
  * The label lines frame by frame, as runs: each member who speaks at all gets a line with their
- * current shape letter and the sounds it is for. Exported for tests.
+ * current shape letter and the sounds it is for. Rest frames where the drawn mouth is still
+ * relaxing between words or easing shut after a line say so, so the label matches the picture.
+ * Exported for tests.
  */
-export function mouthCheckLabels(mouthBy: string[], names: string[]): LabelRun[] {
-  const speakers = mouthBy.map((letters, m) => ({ letters, name: names[m] })).filter((s) => /[^X]/.test(s.letters))
+export function mouthCheckLabels(mouthBy: string[], names: string[], fps = 30): LabelRun[] {
+  const speakers = mouthBy
+    .map((letters, m) => ({ letters, name: names[m], drawn: speechMouthTrack(letters, { fps }) }))
+    .filter((s) => /[^X]/.test(s.letters))
   const length = Math.max(0, ...speakers.map((s) => s.letters.length))
   const runs: LabelRun[] = []
   for (let f = 0; f < length; f++) {
-    const lines = speakers.map(({ letters, name }) => {
+    const lines = speakers.map(({ letters, name, drawn }) => {
       const shape = letters[f] ?? 'X'
-      return `${name}   ${shape}   ${SHAPE_SOUNDS[shape] ?? ''}`
+      const sounds = shape === 'X' && drawn[f] ? 'rest (easing)' : (SHAPE_SOUNDS[shape] ?? '')
+      return `${name}   ${shape}   ${sounds}`
     })
     const last = runs[runs.length - 1]
     if (last && last.lines.join('|') === lines.join('|')) last.frames++
