@@ -70,7 +70,7 @@ describe('MoltMaxPage', () => {
   it('moves through the fifteen-question chamber flow and reveals a clearance', () => {
     renderPage()
     fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
-    expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
+    expect(screen.getByText(/sharp criticism lands/i)).toBeInTheDocument()
     expect(screen.getByText('01 / 15')).toBeInTheDocument()
 
     for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
@@ -87,7 +87,7 @@ describe('MoltMaxPage', () => {
     answerCurrentQuestion()
     expect(screen.getByText(/when a clear decision/i)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /^back$/i }))
-    expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
+    expect(screen.getByText(/sharp criticism lands/i)).toBeInTheDocument()
   })
 
   it('supports agreement scale interaction on agreement scale questions', () => {

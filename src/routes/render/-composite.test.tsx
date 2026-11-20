@@ -65,8 +65,8 @@ describe('Composite Studio & Render Engine Route', () => {
     render(<Component />)
 
     expect(await screen.findByText('COMPOSITE STUDIO LOCKED', {}, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
-    expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Sign up to unlock/i })).toBeInTheDocument()
+    expect(screen.getByText('Account needed')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Create a free account/i })).toBeInTheDocument()
   })
 
   it('renders CompositeStudioUI when authenticated', async () => {

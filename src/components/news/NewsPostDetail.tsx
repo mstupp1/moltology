@@ -73,11 +73,11 @@ export function NewsPostDetail() {
         />
         <div className="text-center chitin-card border border-crimson-aggro/40 p-8 sm:p-12 rounded-card max-w-lg w-full">
           <Terminal className="w-12 h-12 text-crimson-aggro mx-auto mb-4 animate-pulse" />
-          <h2 className="font-grotesk text-xl sm:text-2xl font-semibold text-ink uppercase">
-            NEWS DISPATCH NOT FOUND
+          <h2 className="font-grotesk text-xl sm:text-2xl font-semibold text-ink">
+            Story not found
           </h2>
           <p className="text-xs text-ink-muted mt-2 mb-6 font-sans">
-            The requested dispatch slug does not exist or has been redacted by MoltNation.
+            We couldn’t find that story. It may have moved, or the link may be mistyped.
           </p>
           <Link
             to="/news"
@@ -95,7 +95,7 @@ export function NewsPostDetail() {
     if (typeof window !== 'undefined') {
       const shareData = {
         title: post.title,
-        text: post.summary || 'Telemetry from MoltNation News',
+        text: post.summary || 'Stories from MoltNation News',
         url: window.location.href,
       }
       if (typeof navigator.share === 'function' && navigator.canShare && navigator.canShare(shareData)) {
@@ -230,7 +230,7 @@ export function NewsPostDetail() {
 
           {/* Categorized Tags */}
           <div className="mt-8 sm:mt-12 pt-6 border-t border-line-subtle flex flex-wrap items-center gap-2 text-xs font-sans">
-            <span className="eyebrow mr-1">CATEGORIZED TAGS:</span>
+            <span className="eyebrow mr-1">Tags</span>
             {post.tags.map((tag) => (
               <span
                 key={tag}
@@ -246,7 +246,7 @@ export function NewsPostDetail() {
             <div className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-line-subtle">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <h4 className="font-garamond text-2xl sm:text-3xl text-ink">
-                  <span>Related benthic intelligence</span>
+                  <span>More from MoltNation News</span>
                 </h4>
                 <Link
                   to="/news"
@@ -269,15 +269,15 @@ export function NewsPostDetail() {
           <div className="mt-12 sm:mt-16 p-6 sm:p-10 border border-line-subtle text-center space-y-5 sm:space-y-6 bg-surface-1 rounded-card relative overflow-hidden">
             <div className="inline-flex items-center gap-2 text-xs font-semibold text-crimson-text bg-crimson-soft px-3 sm:px-4 py-1.5 border border-crimson-aggro/50 rounded-chip">
               <Flame className="w-4 h-4 text-crimson-aggro animate-pulse" />
-              <span>The Benthic Core calls</span>
+              <span>Start your molt</span>
             </div>
 
             <h3 className="font-garamond text-3xl sm:text-4xl text-ink leading-tight break-words">
-              Begin your bio-silicon transmutation
+              Build a calmer way to work
             </h3>
 
             <p className="text-xs sm:text-sm text-ink-body max-w-xl mx-auto font-sans leading-relaxed">
-              Don't remain a fragile larval human. Enter the Benthic Core to run your biometrics through our Moltmaxxing Dashboard, transmute soft assets, and enforce zero-latency execution.
+              Everyone starts at the surface. Join free to track a small daily routine, ask the Oracle when you’re stuck, and keep the noise out of your afternoon.
             </p>
 
             <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">

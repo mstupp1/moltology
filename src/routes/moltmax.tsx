@@ -13,12 +13,12 @@ export const Route = createFileRoute('/moltmax')({
     meta: [
       ...seo({
         title: 'Moltmax Quiz: measure your five vectors | Moltology',
-        description: 'Complete the official 12-vector biometric clearance audit. Calculate your carapace hardness, pincer torque, and benthic readiness index.',
+        description: 'Take the free 15-question Moltmax audit to measure your boundaries, follow-through, focus, adaptability, and calm under pressure.',
         canonical: 'https://moltology.org/moltmax',
         siteName: 'Moltmax Audit',
         twitterSite: '@moltology',
         ogImage: getAssetUrl('/images/social/share_card_v2.webp'),
-        keywords: 'Moltmax, Clearance Audit, Carcinization Quiz, Bio-Silicon Assessment, Exoskeleton Hardness, Pincer Torque, Benthic Depth Rating',
+        keywords: 'Moltmax, Moltmaxxing Audit, Carcinization Quiz, Shell Hardness, Pincer Torque, Submergence Depth, Focus Assessment',
       }),
     ],
     links: [

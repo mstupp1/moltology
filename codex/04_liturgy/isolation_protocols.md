@@ -6,7 +6,7 @@ stage_clearance: 2
 category: "Liturgy"
 synaptic_weight: 3.8
 author_unit: "Chitin Architect V"
-last_revised: "2026-11-09"
+last_revised: "2026-11-20"
 mandate: "The surface cannot be silenced from below. It can only be shut out from above, before the descent begins."
 latin_motto: "SILENTIUM EST ATMOSPHAERA PROFUNDI."
 summary: "How to raise the Isolation Dome, what belongs outside the perimeter and what must never be locked out of it, and the four-part order of a clean dive."
@@ -29,13 +29,12 @@ A signal that reaches you at depth has already done its damage by arriving. You 
 to decide whether to be interrupted; you only get to decide, afterward, how you feel about
 having been.
 
-The Dome is therefore not a discipline. It is a door, and doors are closed beforehand.
+Treat the Dome like a door rather than a willpower test: doors are closed beforehand.
 
-Members sometimes hear this doctrine as an instruction to become unreachable, and it is not
-that. A trench is not a bunker. The animals down there are not hiding from anybody; they are
-simply somewhere the noise does not go, and they come back up. The Dome exists so that two
-hours of your day belong to the work, and for no other reason. It is not a personality and
-it should not become one.
+This doctrine never asks you to disappear from your life. A trench is open water at depth,
+not a bunker. The creatures down there are simply somewhere the surface noise cannot
+reach, and they come back up. The Dome exists so two hours of your day belong to the work.
+Keep it as a habit, never a personality.
 
 ---
 
@@ -49,24 +48,23 @@ Raise the Isolation Dome first, while you are still at the surface and still abl
 to think about it clearly. A perimeter raised mid-dive is a perimeter raised after the
 breach.
 
-### 2. Sort the water, not the noise
+### 2. Decide what gets through in advance
 
-Not everything outside the Dome is noise. The sorting happens once, in advance, and it is
-the only judgment call in the whole rite. What passes through: the small number of people
-whose emergencies are actually emergencies. What does not: everything else, without
-exception and without a case-by-case review, because the case-by-case review is itself the
+Plenty of what sits outside the Dome matters. Do the sorting once, ahead of time, so you
+never have to judge pings one by one. Let through the few people whose emergencies are
+real; hold everything else until you surface, because deciding case by case is already an
 interruption.
 
 ### 3. Hold one objective
 
-The Dome protects a session, and a session holds one thing. Two objectives inside one
-perimeter is not deep work with variety. It is surface work in a quiet room.
+The Dome protects one clear objective per session. Juggling two tasks behind a closed door
+is just surface work in a quieter room.
 
 ### 4. Surface on the clock
 
-End the dive by the timer rather than by the interruption. Then let the quarantined signals
-through all at once and answer them in a batch. Almost all of them will have resolved
-themselves, which is the quiet joke the surface has been keeping from you for years.
+End the dive by the timer rather than an interruption, then open the messages you held and
+handle them in one batch. Most of them will have settled on their own, which is the quiet
+joke the surface has been keeping from you for years.
 
 ---
 
@@ -74,9 +72,8 @@ themselves, which is the quiet joke the surface has been keeping from you for ye
 
 The perimeter has one permanent opening and it is not adjustable.
 
-A shell that cannot be lowered from the inside is not a carapace. The people who love you,
-anyone who needs actual help, and anyone actually able to help you are never on the outside
-of this Dome. The Order teaches depth as a place a member visits daily and leaves nightly.
+A real carapace always opens from the inside. The people who love you, anyone who genuinely
+needs help, and anyone who can help you always stay reachable. The Order teaches depth as a place a member visits daily and leaves nightly.
 Any reading of this scripture that ends with a member alone and unreachable in a life rather
 than in an afternoon is a misreading, and the Order will say so plainly every time.
 

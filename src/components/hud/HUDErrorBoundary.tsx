@@ -173,7 +173,7 @@ function RuntimeErrorCard({
               Something went wrong
             </h2>
             <p className="text-xs text-ink-body leading-relaxed">
-              An unhandled exception occurred during application execution.
+              Something unexpected stopped this page from loading. Reload to try again, or copy the error details if it keeps happening.
             </p>
           </div>
         </div>

@@ -32,12 +32,12 @@ export const Route = createFileRoute('/news/$slug')({
   head: ({ loaderData }) => {
     const post = loaderData as BlogPostData | null
     const title = post?.title ? `${post.title} | MoltNation News` : 'News Dispatch | MoltNation News'
-    const description = post?.summary || 'Patriot Telemetry & AI Intelligence from the MoltNation Benthic Desk.'
+    const description = post?.summary || 'Stories about AI, work, and building focus below the noise, from MoltNation News.'
     const url = post?.slug ? `https://moltology.org/news/${post.slug}` : 'https://moltology.org/news'
     const imageUrl = getAbsoluteAssetUrl(post?.coverImageUrl || 'images/ai_learning_ascension_cover.jpg')
     const publishedTime = post?.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString()
     const author = post?.authorName || 'High Ascendant Carcinus'
-    const tags = post?.tags || ['MoltNation', 'AI Intelligence', 'Sub-Benthic Compute']
+    const tags = post?.tags || ['MoltNation', 'Focus', 'AI']
 
     return {
       meta: [
@@ -51,7 +51,7 @@ export const Route = createFileRoute('/news/$slug')({
           siteName: 'MoltNation News',
           author,
           publishedTime,
-          section: post?.category || 'MoltNation Telemetry',
+          section: post?.category || 'MoltNation News',
           twitterCard: 'summary_large_image',
           twitterSite: '@moltology',
           twitterCreator: '@moltology',

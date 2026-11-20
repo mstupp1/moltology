@@ -125,7 +125,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   if (!loaded) {
     return (
       <div aria-busy="true" aria-live="polite">
-        <span className="sr-only">Retrieving member dossier.</span>
+        <span className="sr-only">Loading member profile.</span>
         <HudWorkspaceGhost />
       </div>
     )

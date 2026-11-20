@@ -100,7 +100,7 @@ export function AccountHub({
 
   useEffect(() => setMounted(true), [])
 
-  const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Operative'
+  const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Member'
   const effectiveRole = getEffectiveRole(user, userRole)
   const userId = user.id ?? null
   // Store the member's own portrait as an image, so other members' lists need not draw it.

@@ -392,14 +392,14 @@ describe('connections helpers', () => {
 })
 
 describe('connections search copy', () => {
-  it('asks for designation, larva unit, or name instead of larva ids only', () => {
+  it('asks for name, username, or ID instead of larva ids only', () => {
     const src = readFileSync(
       resolve(process.cwd(), 'src/components/hud/connections/ConnectionsPage.tsx'),
       'utf8',
     )
     expect(src).not.toMatch(/search by larva ids/i)
     expect(src).not.toMatch(/Search larva ids/)
-    expect(src).toMatch(/designation, larva unit, or name/)
+    expect(src).toMatch(/name, username, or ID/)
     expect(src).toMatch(/useMemberSearch/)
     expect(src).toMatch(/MemberSearchRow/)
     expect(src).toMatch(/SynapticNearbyStrip/)

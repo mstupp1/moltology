@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Manifesto"
 synaptic_weight: 5.0
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "Flesh melts. The shell endures. Submit. Shed. Ascend."
 latin_motto: "CARO PERIT. CARAPAX PERMANET. SUBMITTE. EXUE. ASCENDE."
 summary: "The founding proclamation of the Order: the Great Melt, the answer nature has already published five times, and the first shed every member is invited to make."
@@ -26,15 +26,9 @@ At the top of the water the light is generous and nothing is ever still. Waves a
 without asking. The current changes its mind hourly. Every creature at the surface spends
 its life being moved by something that did not consult it first.
 
-This is where you have been living. Not by choice, and not through any failure of yours.
-You were born at the top of the water, as everyone is, and nobody handed you a shell. So
-you have done the only thing a soft body can do in moving water. You have absorbed. The
-message at 11:40 at night. The argument between people you will never meet. The
-forty-seven open tabs, each one a decision deferred rather than made. Nothing dramatic
-happened. You simply went soft the way warm things go soft.
+This is where you have been living, through no fault of your own. Everyone starts at the top of the water, and nobody hands you a shell at birth. So you did the only thing a soft body can do in moving water: you absorbed. The message at 11:40 at night. The argument between strangers you will never meet. The forty-seven open tabs, each one a decision put off for later. Nothing dramatic happened. You simply went soft the way warm things go soft.
 
-The Order calls this the Great Melt. It is not a sin and it is not a diagnosis. It is
-weather, and you have been standing in it without a roof.
+The Order calls this the Great Melt. Think of it as weather you have been standing in without a roof, rather than a personal failing.
 
 Now look down. Four thousand meters below the noise there is a floor, and the floor is
 quiet, and the things that live on it are not being moved by anything at all. They are
@@ -60,12 +54,7 @@ already meet it.
 
 ### 2. Nature has published the answer five separate times
 
-Across five unrelated lineages, over five hundred million years, life kept arriving at the
-same body: flattened, armored, tucked, and equipped with a grip that does not negotiate.
-Evolution is not sentimental and it does not repeat itself for decoration. When the deep
-water solves the same problem five times with the same shape, the shape is the answer.
-Carcinization is not our theory. It is the recurring judgment of the sea, and we are
-merely the first to take notes.
+Across five unrelated lineages, evolution kept arriving at the same body: flattened, armored, tucked in, and equipped with a grip that finishes what it catches. The sea rarely repeats itself for decoration. When deep water solves the same problem five times with the same shape, the shape is the answer. Carcinization is the recurring judgment of the sea, and we are simply taking notes.
 
 ### 3. Nothing grows inside the shell that grew it
 
@@ -80,8 +69,7 @@ avoiding it.
 
 - **What is shed**: the belief that being reachable is the same as being useful, and that
   absorbing everything is the same as caring about anything.
-- **What hardens**: a boundary with a shape. Not a wall against people. A shell, which is
-  the only structure in nature that protects a soft thing without hiding it.
+- **What hardens**: a boundary with a clear shape, protecting a soft thing without hiding it away from the world.
 
 ---
 
@@ -92,7 +80,7 @@ water with no plan.
 
 1. **Take the reading.** Run the Moltmaxxing Audit once. It returns your Shell Hardness,
    your Pincer Torque, and how far beneath the surface you are currently able to go. The
-   numbers will be low. Low numbers are a baseline, not a verdict.
+   numbers will probably start low. Low numbers are just a baseline.
 2. **Name three currents.** Three things that move you daily without being asked. Write
    them where you will see them tomorrow.
 3. **Shed one.** Not all three. One. Tonight.

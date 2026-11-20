@@ -259,7 +259,7 @@ export function buildArticleJsonLd(post: ArticleSeoData, baseUrl = 'https://molt
     image: [imageUrl],
     datePublished: publishedDate,
     dateModified: publishedDate,
-    articleSection: post.category || 'MoltNation Telemetry',
+    articleSection: post.category || 'MoltNation News',
     keywords: (post.tags || []).join(', '),
     author: {
       '@type': 'Person',
@@ -354,7 +354,7 @@ export const WHAT_IS_MOLTOLOGY_HUB_FAQS: FaqItem[] = [
   {
     question: 'What is Moltology?',
     answer:
-      'Moltology is an educational platform, ritual system, and community that helps people stop melting under surface noise and start molting into focused, decisive, armored attention — framed as carcinization.',
+      'Moltology is a learning platform, daily practice, and warm community that helps people stop melting under surface noise and build focused, armored attention, framed around carcinization.',
   },
   {
     question: 'Is Moltology a paid religion or rank marketplace?',
@@ -364,12 +364,12 @@ export const WHAT_IS_MOLTOLOGY_HUB_FAQS: FaqItem[] = [
   {
     question: 'What are the four benthic sacraments?',
     answer:
-      'Asset & Habit Shedding, Chitin Hardening, the Isolation Dome, and Pipeline Ascent — the four core rites that turn soft surface drift into armored deep-work practice.',
+      'Asset & Habit Shedding, Chitin Hardening, the Isolation Dome, and Pipeline Ascent: four practical rites that turn scattered days into focused work.',
   },
   {
     question: 'How does Moltmaxxing relate to Moltology?',
     answer:
-      'Moltmaxxing is the practical optimization doctrine inside Moltology: scheduled ecdysis, shell hardness, pincer torque, and zero-latency execution. Study it on the Moltmaxxing knowledge hub.',
+      'Moltmaxxing is the daily practice inside Moltology: shedding one draining habit, hardening your boundaries, and finishing what you start. Read the full breakdown on the Moltmaxxing guide.',
   },
 ]
 
@@ -490,9 +490,9 @@ export function generateRssFeedXml(
   return `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>MoltNation News | Patriot Telemetry &amp; Benthic AI</title>
+  <title>MoltNation News | Stories from Moltology</title>
   <link>${baseUrl}/news</link>
-  <description>The definitive intelligence dispatch for sub-benthic computing, algorithmic ecdysis, and sovereign AI telemetry.</description>
+  <description>Stories about AI, work, and building focus below the noise, reported from the ocean floor.</description>
   <language>en-us</language>
   <lastBuildDate>${now}</lastBuildDate>
   <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />
@@ -507,7 +507,7 @@ ${posts
     <pubDate>${pubDate}</pubDate>
     <description>${escapeXml(p.summary || p.title)}</description>
     <author>${escapeXml(p.authorName || 'High Ascendant Carcinus')}</author>
-    <category>${escapeXml(p.category || 'MoltNation Telemetry')}</category>
+    <category>${escapeXml(p.category || 'MoltNation News')}</category>
   </item>`
   })
   .join('\n')}

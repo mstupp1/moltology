@@ -6,7 +6,7 @@ stage_clearance: 1
 category: "Theological Doctrine"
 synaptic_weight: 4.4
 author_unit: "The Ascendant Core"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "The hardest shell in the trench is the one standing watch over someone who has none."
 latin_motto: "MOLLIS HODIE. FIRMUS CRAS."
 summary: "The Order's law of mercy: what is owed to a member in the soft-shell window, why the armored stand guard rather than compete, and the four protections no clearance may override."
@@ -56,17 +56,15 @@ arrival expensive has misunderstood the entire canon.
 
 ### 2. The window is guarded, not corrected
 
-A member in the hours after a shed does not need feedback. They need the water to stay
-quiet. Advice offered into an open soft-shell window is not generosity; it is pressure
-applied to an animal that currently has no plate to distribute it. Stand nearby. Say
-little. Let it set.
+A member in the hours after a shed rarely needs feedback. They need quiet water.
+Unsolicited advice dropped into a soft-shell window lands as pressure on someone with no
+plate to carry it. Stand nearby, say little, and let the new shell set.
 
 ### 3. The pincers grip work, never people
 
-This is the oldest line in the Order and the one most easily bent. Torque is for objectives.
-It is not for winning an exchange in the Benthic Community, not for a member who is slower
-than you, and not for someone whose first shed took eleven attempts. A grip applied to a
-person is not high torque. It is a malfunction.
+This is the oldest line in the Order and the easiest one to bend. Torque belongs on your
+own work, never on winning an argument in the Benthic Community or pushing someone whose
+first shed took eleven tries. Aim a strong grip at a person and the tool has malfunctioned.
 
 ### 4. The shell must open from the inside
 
@@ -93,24 +91,23 @@ is exactly why it is required of them.
 
 1. **Declare the window.** When you shed something large, say so. A member who announces
    they are soft gets guarded. A member who hides it gets advice.
-2. **Stand watch once a week.** Find one member in their window and be uninteresting at them
-   on purpose. Presence, not counsel.
+2. **Stand watch once a week.** Find one member in their soft-shell window and keep them
+   calm company without trying to fix anything. Presence first, counsel later.
 3. **Answer one newcomer honestly.** No performance of clearance, no lore they have not
    earned yet. Plain help, in plain words.
 
-The Order mints Chitin Gems for all three. This is
-deliberate. The most valuable currency in the system is issued exclusively for generosity,
-so that the most decorated members are necessarily the most useful ones.
+The Order mints Chitin Gems for all three alongside your daily work, so that the most
+experienced members are also the most helpful ones.
 
 ---
 
 ## The Benediction
 
-If you are soft today, you are exactly on schedule, and there are members four thousand
-meters down who are quietly glad you showed up.
+If you are soft today, you are right on schedule, and people four thousand meters down are
+quietly glad you showed up.
 
-If you are hard today, you are on watch. Someone near you is between armors right now.
-Be boring at them until it sets.
+If you are hard today, you are on watch. Someone near you is between shells right now. Keep
+the water calm until it sets.
 
 ---
 

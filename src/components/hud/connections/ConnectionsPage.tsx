@@ -208,11 +208,11 @@ export const ConnectionsPage: React.FC<{
             <HudTitlePanel
               treatment="integrated"
               title="Connections"
-              description={`Find members by username, larva unit, or name (at least ${MEMBER_SEARCH_MIN_CHARS} characters).`}
+              description={`Find members by name, username, or ID (at least ${MEMBER_SEARCH_MIN_CHARS} characters).`}
             />
           ) : (
             <p className="text-xs text-ink-muted">
-              Find members by username, larva unit, or name (at least {MEMBER_SEARCH_MIN_CHARS} characters).
+              Find members by name, username, or ID (at least {MEMBER_SEARCH_MIN_CHARS} characters).
             </p>
           )}
           <div className="relative">
@@ -221,7 +221,7 @@ export const ConnectionsPage: React.FC<{
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search designations, larva units, or names…"
+              placeholder="Search by name or username…"
               className="w-full pl-10 pr-3 py-2.5 bg-abyss border border-line-subtle text-sm text-ink placeholder:text-ink-muted focus:outline-hidden focus:border-cyan-glow rounded-control"
             />
             {searching && (
@@ -246,7 +246,7 @@ export const ConnectionsPage: React.FC<{
           )}
           {query.trim().length >= MEMBER_SEARCH_MIN_CHARS && !searching && results.length === 0 && (
             <p className="text-xs text-ink-muted text-center py-3">
-              The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
+              No members matched that search.
             </p>
           )}
         </div>

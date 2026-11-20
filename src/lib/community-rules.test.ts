@@ -16,8 +16,8 @@ describe('Community Rules & Guardrails', () => {
 
   it('defines 5 core community rules with critical/high severity', () => {
     expect(COMMUNITY_RULES).toHaveLength(5)
-    expect(COMMUNITY_RULES[0].title).toContain('CIVILITY')
-    expect(COMMUNITY_RULES[4].title).toContain('SAFETY')
+    expect(COMMUNITY_RULES[0].title).toMatch(/civility/i)
+    expect(COMMUNITY_RULES[4].title).toMatch(/safety/i)
   })
 
   it('validates minimum and maximum length constraints for topic titles', () => {

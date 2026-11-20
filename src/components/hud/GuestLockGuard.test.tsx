@@ -28,17 +28,17 @@ describe('GuestLockGuard Component', () => {
     )
 
     // Verify lock card details
-    expect(screen.getByText('MOLT ACADEMY LOCKED')).toBeInTheDocument()
-    expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
+    expect(screen.getByText('Sign in for Molt Academy')).toBeInTheDocument()
+    expect(screen.getByText('Account needed')).toBeInTheDocument()
     expect(screen.getByText('Coursework requires an initiate account.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Sign up to unlock/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Already have an account\? Sign In/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Create a free account/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Already have an account\? Sign in/i })).toBeInTheDocument()
 
     // Verify background content exists under dim blur layer
     expect(screen.getByText('Secret Academy Content')).toBeInTheDocument()
   })
 
-  it('opens AuthModal in signup mode when clicking SIGN UP TO UNLOCK', () => {
+  it('opens AuthModal in signup mode when clicking Create a free account', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(
@@ -47,7 +47,7 @@ describe('GuestLockGuard Component', () => {
       </GuestLockGuard>
     )
 
-    const signUpBtn = screen.getByRole('button', { name: /Sign up to unlock/i })
+    const signUpBtn = screen.getByRole('button', { name: /Create a free account/i })
     fireEvent.click(signUpBtn)
 
     expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('GuestLockGuard Component', () => {
       </GuestLockGuard>
     )
 
-    const signInBtn = screen.getByRole('button', { name: /Already have an account\? Sign In/i })
+    const signInBtn = screen.getByRole('button', { name: /Already have an account\? Sign in/i })
     fireEvent.click(signInBtn)
 
     expect(screen.getByRole('heading', { name: /WELCOME BACK/i })).toBeInTheDocument()
@@ -80,9 +80,9 @@ describe('GuestLockGuard Component', () => {
     )
 
     expect(screen.getByText('Unlocked Biological Specimens')).toBeInTheDocument()
-    expect(screen.queryByText('BENTHIC ARCHIVE LOCKED')).not.toBeInTheDocument()
-    expect(screen.queryByText('RESTRICTED ACCESS')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Sign up to unlock/i })).not.toBeInTheDocument()
+    expect(screen.queryByText('Sign in for Benthic Archive')).not.toBeInTheDocument()
+    expect(screen.queryByText('Account needed')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Create a free account/i })).not.toBeInTheDocument()
   })
 
   it('bypasses guest lock when bypass prop is set to true', () => {
@@ -95,7 +95,7 @@ describe('GuestLockGuard Component', () => {
     )
 
     expect(screen.getByText('Bypassed Studio Content')).toBeInTheDocument()
-    expect(screen.queryByText('CHASSIS CONFIGURATOR LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sign in for Chassis Configurator')).not.toBeInTheDocument()
   })
 
   it('holds the lock overlay for the first-paint empty session shape', () => {
@@ -108,8 +108,8 @@ describe('GuestLockGuard Component', () => {
     )
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(screen.queryByText('LECTURES LOCKED')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Sign up to unlock/i })).not.toBeInTheDocument()
+    expect(screen.queryByText('Sign in for Lectures')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Create a free account/i })).not.toBeInTheDocument()
   })
 
   it('renders default HudWorkspaceGhost when authClient.useSession is pending', () => {
@@ -122,7 +122,7 @@ describe('GuestLockGuard Component', () => {
     )
 
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
-    expect(screen.queryByText('LECTURES LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sign in for Lectures')).not.toBeInTheDocument()
     expect(screen.queryByText('Secret Content')).not.toBeInTheDocument()
   })
 
@@ -139,7 +139,7 @@ describe('GuestLockGuard Component', () => {
     )
 
     expect(screen.getByTestId('custom-archive-skeleton')).toBeInTheDocument()
-    expect(screen.queryByText('BENTHIC ARCHIVE LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sign in for Benthic Archive')).not.toBeInTheDocument()
     expect(screen.queryByText('Archive Content')).not.toBeInTheDocument()
   })
 })

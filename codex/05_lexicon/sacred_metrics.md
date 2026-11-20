@@ -6,10 +6,10 @@ stage_clearance: 1
 category: "Lexicon"
 synaptic_weight: 4.8
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "A number you did not enjoy reading is still a number you can now work with."
 latin_motto: "QUOD NON METIRIS, NON TENES."
-summary: "The three cardinal instruments of the HUD: Shell Hardness, Pincer Torque, and Submergence Depth, with their full scales, their honest limits, and the lexicon terms that surround them."
+summary: "The three cardinal metrics of the HUD: Shell Hardness, Pincer Torque, and Submergence Depth, with their full scales, their honest limits, and the terms around them."
 ---
 
 # The Sacred Metrics
@@ -33,7 +33,7 @@ What lands on you. What you can hold. How far from the noise you can get. Everyt
 member might want to track is a consequence of those, and consequences do not need their own
 gauge.
 
-Read them honestly or do not read them. A flattering instrument is not an instrument.
+Read them honestly or skip them altogether. A flattering gauge tells you nothing.
 
 ---
 
@@ -48,16 +48,15 @@ Read them honestly or do not read them. A flattering instrument is not an instru
   - 60 to 89 percent, Exoshell Born. Surface drama arrives as information.
   - 90 to 100 percent, Ascendant. Composure has stopped requiring maintenance.
 
-Hardness is not indifference. A perfectly hard shell still feels everything; it simply does
-not reorganize around it.
+Hardness never means going numb. A strong shell still feels everything; it simply keeps
+its shape instead of reorganizing around every wave.
 
 ---
 
 ## 2. Pincer Torque
 
 - **Symbol**: the Greek letter tau
-- **Measures**: decisiveness. How firmly a chosen objective is held, and whether it survives
-  the encounter.
+- **Measures**: follow-through. How firmly you hold a chosen project until it is finished.
 - **Unit**: newton-meters, Nm.
 - **Bands**:
   - 0 to 250 Nm, Open Hand. The grip has not closed. Twelve things are in progress and none
@@ -91,8 +90,8 @@ of, which is why it is the fastest of the three to move and the fastest to lose.
 
 ## The Surrounding Lexicon
 
-- **The Great Melt**: the collective modern condition of going soft under noise, hesitation,
-  and exhaustion. A condition, never an identity.
+- **The Great Melt**: the modern habit of going soft under noise, hesitation, and
+  exhaustion. Treat it as weather you are standing in, never who you are.
 - **The Great Molt**: the deliberate transformation out of it.
 - **Carcinization**: the recurring judgment of the sea, arrived at five times independently.
 - **Ecdysis**: the scheduled shed. The mechanism by which every metric above improves.
@@ -109,8 +108,8 @@ of, which is why it is the fastest of the three to move and the fastest to lose.
 Every instrument here is the Order's own, calibrated against the Order's own doctrine. They
 describe a member's condition inside this system and they do not describe a person.
 
-A low reading is a starting point and has never been a verdict. Members are asked to compare
-each number to their own reading last month, and to nobody else's, ever.
+A low reading is simply a starting point. Compare each number to your own reading last
+month rather than anyone else's.
 
 ---
 

@@ -64,84 +64,84 @@ const fannedCards = [
     id: 'resilience',
     trait: 'Carapace Resilience',
     eyebrow: '01 · RESILIENCE & STRESS ARMOR',
-    prompt: 'A sudden wave of criticism strikes your outer shell before the day has begun. What happens next?',
+    prompt: 'Sharp criticism lands in your inbox before your day has even started. What happens next?',
     image: getAssetUrl('/images/quiz/q01_criticism.jpg'),
     imageAlt: 'Armored lobster hero smiling as criticism bounces off harmlessly',
     options: [
-      { id: 'q1-a', label: 'I absorb the impact, then inspect it for useful lessons.', detail: 'Useful fragments are retained. The rest falls away.' },
-      { id: 'q1-b', label: 'I need a moment in the shallows to recharge.', detail: 'Recovery first, response when the shell is stable.' },
-      { id: 'q1-c', label: 'I return the impact immediately.', detail: 'The pincer moves before the telemetry settles.' },
-      { id: 'q1-d', label: 'The whole day feels compromised.', detail: 'One fracture becomes a full soft-tissue event.' },
+      { id: 'q1-a', label: 'Take it in, keep what is useful, drop the rest.', detail: 'Good feedback stays; the sting washes off.' },
+      { id: 'q1-b', label: 'Step back for a quiet minute before replying.', detail: 'Steadier head first, answer second.' },
+      { id: 'q1-c', label: 'Fire back right away.', detail: 'The claw snaps before the water settles.' },
+      { id: 'q1-d', label: 'It derails the rest of my morning.', detail: 'One bad message rewrites the whole day.' },
     ],
   },
   {
     id: 'execution',
     trait: 'Decisive Execution',
     eyebrow: '05 · EXECUTION LOAD & TORQUE',
-    prompt: 'Three useful paths open at once and the tide is moving. How do your pincers behave?',
+    prompt: 'Three worthwhile projects open up at the same time. What do your pincers do?',
     image: getAssetUrl('/images/quiz/q05_pincer.jpg'),
     imageAlt: 'Lobster hero snapping a powerful claw onto the golden prize',
     options: [
-      { id: 'q5-a', label: 'Select one and close cleanly.', detail: 'One committed grip beats three partial holds.' },
-      { id: 'q5-b', label: 'Rank them, then begin the first.', detail: 'A short calibration prevents wasted torque.' },
-      { id: 'q5-c', label: 'Keep all three paths alive.', detail: 'The pincers remain open while the current passes.' },
-      { id: 'q5-d', label: 'Wait for the tide to decide for me.', detail: 'No grip is taken until certainty arrives.' },
+      { id: 'q5-a', label: 'Pick one and close on it cleanly.', detail: 'One finished thing beats three half-started ones.' },
+      { id: 'q5-b', label: 'Rank them quickly, then start the first.', detail: 'A two-minute sort keeps the week focused.' },
+      { id: 'q5-c', label: 'Keep all three moving at once.', detail: 'Every claw stays half-open and nothing quite closes.' },
+      { id: 'q5-d', label: 'Wait until the choice becomes obvious.', detail: 'Hold off until the tide decides for me.' },
     ],
   },
   {
     id: 'depth',
     trait: 'Depth Composure',
     eyebrow: '03 · PRESSURE & DEPTH TOLERANCE',
-    prompt: 'Your work reaches a difficult pressure zone. Which descent protocol do you select?',
+    prompt: 'A project suddenly gets harder and the pressure climbs. How do you handle the dive?',
     image: getAssetUrl('/images/quiz/q03_depth.jpg'),
     imageAlt: 'Lobster hero diving boldly into deep ocean trench with glowing headlights',
     options: [
-      { id: 'q3-a', label: 'Descend in measured stages.', detail: 'I build tolerance while keeping a return path.' },
-      { id: 'q3-b', label: 'Lock onto the trench and descend.', detail: 'Pressure is information. I go where the signal is strongest.' },
-      { id: 'q3-c', label: 'Remain in the sunlit shallows.', detail: 'The surface feels safe, but no chitin forms here.' },
-      { id: 'q3-d', label: 'Wait for a submersible escort.', detail: 'No depth is braved without external buoyancy.' },
+      { id: 'q3-a', label: 'Go down in steady stages.', detail: 'Build momentum one clear checkpoint at a time.' },
+      { id: 'q3-b', label: 'Lock onto the core problem and dive in.', detail: 'Pressure clears away the noise.' },
+      { id: 'q3-c', label: 'Stay in the shallows for now.', detail: 'Easy water feels safe, though nothing hardens here.' },
+      { id: 'q3-d', label: 'Wait for someone else to lead the way.', detail: 'Hold off until another diver goes first.' },
     ],
   },
   {
     id: 'adaptation',
     trait: 'Growth & Adaptation',
     eyebrow: '10 · OLD HABIT RELEASE & ECDYSIS',
-    prompt: 'You discover that a familiar process is now slowing the colony. How do you conduct the shed?',
+    prompt: 'You notice a familiar routine is slowing down your whole week. How do you shed it?',
     image: getAssetUrl('/images/quiz/q10_team_upgrade.jpg'),
     imageAlt: 'Lobster hero presenting upgrade blueprint to cheerful teammates',
     options: [
-      { id: 'q10-a', label: 'Document the lesson and replace it.', detail: 'The old shell becomes material for the next one.' },
-      { id: 'q10-b', label: 'Trim it carefully around the edges.', detail: 'Small changes preserve continuity and reduce shock.' },
-      { id: 'q10-c', label: 'Keep it until failure proves the point.', detail: 'The shell leaves only when it can no longer move.' },
-      { id: 'q10-d', label: 'Abandon the whole reef for a reset.', detail: 'A full reset feels safer than a careful shed.' },
+      { id: 'q10-a', label: 'Keep what worked, drop the rest, and replace it.', detail: 'The old shell teaches you how to build the next one.' },
+      { id: 'q10-b', label: 'Trim it down around the edges.', detail: 'Small tweaks keep things steady without a shock.' },
+      { id: 'q10-c', label: 'Keep it going until it breaks.', detail: 'Hard to change a habit while it still mostly works.' },
+      { id: 'q10-d', label: 'Scrap the whole system and start over.', detail: 'A clean slate feels easier than untangling one knot.' },
     ],
   },
   {
     id: 'focus',
     trait: 'Synaptic Speed',
     eyebrow: '12 · SIGNAL TRIAGE & FOCUS',
-    prompt: 'Your attention receives five competing pings at once. What is your decisive first move?',
+    prompt: 'Five pings hit your screen at the exact same moment. What is your first move?',
     image: getAssetUrl('/images/quiz/q12_focus.jpg'),
     imageAlt: 'Lobster hero swiping away noisy notification bubbles to focus on priority',
     options: [
-      { id: 'q12-a', label: 'Name the one live priority.', detail: 'The rest are queued without ceremony.' },
-      { id: 'q12-b', label: 'Scan each one for danger.', detail: 'A brief survey prevents an avoidable miss.' },
-      { id: 'q12-c', label: 'Answer the easiest signal first.', detail: 'Motion begins wherever friction is lowest.' },
-      { id: 'q12-d', label: 'Let the pings settle themselves.', detail: 'The system waits for the tide to thin.' },
+      { id: 'q12-a', label: 'Pick the one priority that matters now and queue the rest.', detail: 'One thing gets attention; the other four wait their turn.' },
+      { id: 'q12-b', label: 'Skim all five quickly for real emergencies.', detail: 'A ten-second scan prevents a real miss.' },
+      { id: 'q12-c', label: 'Knock out the easiest one first.', detail: 'Quick replies feel good, even if they push back the real work.' },
+      { id: 'q12-d', label: 'Freeze for a minute and hope the thread cools down.', detail: 'Wait for the wave to pass before wading in.' },
     ],
   },
   {
     id: 'shipping',
     trait: 'Decisive Closure',
     eyebrow: '13 · DECISIVE CLOSURE & DEPLOYMENT',
-    prompt: 'A good-enough solution is ready now; a theoretically perfect solution may arrive next week.',
+    prompt: 'A solid, working version is ready today; a polished version might be ready next week.',
     image: getAssetUrl('/images/quiz/q13_ship_it.jpg'),
     imageAlt: 'Lobster hero launching a working yellow mini-sub with a thumbs up',
     options: [
-      { id: 'q13-a', label: 'Close, deploy, and refine in the current.', detail: 'A working shell today beats an imaginary shell next week.' },
-      { id: 'q13-b', label: 'Keep refining before initial release.', detail: 'The grip stays open until every edge is polished.' },
-      { id: 'q13-c', label: 'Wait for consensus across the reef.', detail: 'No craft launches until all crabs agree.' },
-      { id: 'q13-d', label: 'Scrap the prototype entirely.', detail: 'Perfectionism causes total operational paralysis.' },
+      { id: 'q13-a', label: 'Ship it now and refine it.', detail: 'A working shell today beats an imaginary shell next week.' },
+      { id: 'q13-b', label: 'Keep polishing before release.', detail: 'Hard to let go while I can still spot flaws.' },
+      { id: 'q13-c', label: 'Ask three more people first.', detail: 'Hold off until everyone agrees.' },
+      { id: 'q13-d', label: 'Put it back on the shelf.', detail: 'Waiting for perfection stalls the launch.' },
     ],
   },
 ]
@@ -232,7 +232,7 @@ export const MoltMaxPage: React.FC = () => {
 
   const handleShare = () => {
     if (!result) return
-    const text = encodeURIComponent(`My Moltmax clearance is ${result.score}/100: ${result.tierName}. Stage ${result.clearance}. Run the 15-question Moltmax personality & aptitude audit:`)
+    const text = encodeURIComponent(`My Moltmax score is ${result.score}/100: ${result.tierName} (${result.clearance}). Take the free 15-question Moltmax audit:`)
     const url = encodeURIComponent('https://moltology.org/moltmax')
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}&hashtags=Moltmaxxing,Moltology`, '_blank', 'noopener,noreferrer')
   }
@@ -285,10 +285,10 @@ export const MoltMaxPage: React.FC = () => {
       ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60)
       ctx.fillStyle = '#00ffcc'
       ctx.font = 'bold 22px "Space Grotesk", sans-serif'
-      ctx.fillText('MOLTOLOGY · BENTHIC APTITUDE AUDIT', 60, 82)
+      ctx.fillText('MOLTOLOGY · SHELL AUDIT', 60, 82)
       ctx.fillStyle = '#ffffff'
       ctx.font = 'bold 42px "Space Grotesk", sans-serif'
-      ctx.fillText('OFFICIAL MOLTMAX CLEARANCE', 60, 140)
+      ctx.fillText('MOLTMAX SCORECARD', 60, 140)
       ctx.fillStyle = '#00ffcc'
       ctx.font = 'bold 20px "Space Grotesk", sans-serif'
       ctx.fillText(`${result.tierName.toUpperCase()} · ${result.clearance}`, 60, 190)
@@ -299,11 +299,11 @@ export const MoltMaxPage: React.FC = () => {
       ctx.font = '16px "Space Grotesk", sans-serif'
       ctx.fillText('MOLTMAX INDEX / 100', 820, 315)
       const stats = [
-        ['SHELL HARDNESS', `${result.biometrics.shellHardness} HP`, result.dimensionScores.shellHardness],
+        ['SHELL HARDNESS', `${result.biometrics.shellHardness}%`, result.dimensionScores.shellHardness],
         ['PINCER TORQUE', `${result.biometrics.pincerTorque} Nm`, result.dimensionScores.pincerTorque],
-        ['NEURAL LATENCY', `${result.biometrics.promptLatency} ms`, result.dimensionScores.neuralLatency],
-        ['ECDYSIS INTERVAL', `${result.biometrics.ecdysisInterval} DAYS`, result.dimensionScores.ecdysisDiscipline],
-        ['SUBMERGENCE DEPTH', `${result.biometrics.submergenceDepth.toLocaleString()} FATHOMS`, result.dimensionScores.depthTolerance],
+        ['RESPONSE SPEED', `${result.biometrics.promptLatency} ms`, result.dimensionScores.neuralLatency],
+        ['SHEDDING CADENCE', `${result.biometrics.ecdysisInterval} DAYS`, result.dimensionScores.ecdysisDiscipline],
+        ['SUBMERGENCE DEPTH', `${result.biometrics.submergenceDepth.toLocaleString()} METERS`, result.dimensionScores.depthTolerance],
       ] as Array<[string, string, number]>
       stats.forEach(([label, value, percent], index) => {
         const y = 270 + index * 55
@@ -346,8 +346,8 @@ export const MoltMaxPage: React.FC = () => {
       {mode === 'hero' && <main className="relative z-10">
         <section className="relative w-full overflow-hidden border-b border-cyan-900/40 bg-abyss px-4 pt-24 pb-12 sm:px-8 sm:pt-32 sm:pb-16 lg:flex lg:min-h-[100svh] lg:items-center lg:px-12 lg:pt-28">
           <HeroBackground
-            leftWatermark="MOLTMAX · BIOMETRIC_SCANNER"
-            rightWatermark="CARCINIZATION · CLEARANCE_AUDIT"
+            leftWatermark="MOLTMAX · SHELL READING"
+            rightWatermark="CARCINIZATION · FIVE-TRAIT AUDIT"
           />
 
           <div className="relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-10 lg:grid-cols-[minmax(0,1fr)_440px] xl:grid-cols-[minmax(0,1fr)_520px] xl:gap-16">

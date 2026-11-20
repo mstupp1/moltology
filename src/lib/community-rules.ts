@@ -23,42 +23,42 @@ export interface CommunityRule {
 export const COMMUNITY_RULES: CommunityRule[] = [
   {
     id: 1,
-    title: 'CIVILITY & CONSTRUCTIVE DIALOGUE',
-    shortSummary: 'Maintain intellectual rigor and mutual respect across all initiate stages.',
+    title: 'Civility and respect',
+    shortSummary: 'Keep discussions thoughtful and respectful across all experience levels.',
     description:
-      'All posts must contribute meaningfully to discussions on AI, carcinization, software architecture, or Moltology doctrine. Personal attacks, harassment, or malice will result in immediate neural isolation.',
+      'Add something useful to conversations on AI, daily workflows, or Moltology practice. Personal attacks, harassment, or hostility have no place here and will lead to suspension.',
     severity: 'CRITICAL',
   },
   {
     id: 2,
-    title: 'NO SPAM OR LOW-EFFORT FLOODING',
-    shortSummary: 'Quality over noise. Avoid duplicate threads or nonsense content.',
+    title: 'Keep threads useful',
+    shortSummary: 'Check existing threads before starting a new one, and skip low-effort noise.',
     description:
-      'Check existing discussion boards before creating a new topic. Low-effort messages, repetitive single-word posts, or promotional spam are automatically filtered.',
+      'Look through recent discussions before posting a new topic. Duplicate threads, spam links, or off-topic flooding are removed to keep the boards readable.',
     severity: 'HIGH',
   },
   {
     id: 3,
-    title: 'NEURAL & DATA SECURITY',
-    shortSummary: 'Never post API keys, sensitive tokens, or private personal identifiers.',
+    title: 'Protect your privacy and credentials',
+    shortSummary: 'Never share API keys, tokens, passwords, or private personal information.',
     description:
-      'Protect your shell and credentials. Do not share raw authorization tokens, database connection strings, or private initiate credentials in open channels.',
+      'Keep your work and accounts safe. Never post secret keys, database URLs, session tokens, or anyone else’s private details in public threads.',
     severity: 'CRITICAL',
   },
   {
     id: 4,
-    title: 'STAGE PROGRESSION RESPECT',
-    shortSummary: 'Initiates at all stages (Larva to Ascendant) are entitled to learning.',
+    title: 'Honor the Soft-Shell Covenant',
+    shortSummary: 'Every member is learning, from day one onward.',
     description:
-      'Higher stage initiates are encouraged to mentor newer initiates. Gatekeeping, elitism, or misleading advice that sabotages another user\'s growth is strictly prohibited.',
+      'Newcomers at Stage 1 and experienced members at Stage 4 share the same space. Experienced members are expected to help without condescension, and deliberate bad advice is not tolerated.',
     severity: 'MEDIUM',
   },
   {
     id: 5,
-    title: 'SAFETY & POSITIVITY FIRST',
-    shortSummary: 'Non-negotiable core tenet beneath our biomechanical aesthetics.',
+    title: 'Safety comes first',
+    shortSummary: 'Warmth, honesty, and real-world safety come before any theme.',
     description:
-      'Beneath our dark HUD aesthetic, Safety and Positivity are non-negotiable core tenets. Do not promote real-world harm, self-injury, or illegal activities.',
+      'Beneath our ocean setting and humor, basic safety and respect are non-negotiable. Never promote real-world harm, self-harm, or illegal activity.',
     severity: 'CRITICAL',
   },
 ]

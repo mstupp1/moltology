@@ -34,7 +34,7 @@ export const Route = createFileRoute('/news/')({
       ...seo({
         title: 'MoltNation News | Stories from Moltology',
         description: 'MoltNation News covers AI agents, robots, and the people working next to them, reported from the bottom of the ocean.',
-        keywords: 'MoltNation News, patriot AI, agentic swarms, test-time compute, carcinization, ecdysis telemetry',
+        keywords: 'MoltNation News, AI, focus, deep work, Moltology, carcinization',
         ogImage: getAbsoluteAssetUrl('images/ai_learning_ascension_cover.jpg'),
         canonical: 'https://moltology.org/news',
         siteName: 'MoltNation News',

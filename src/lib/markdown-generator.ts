@@ -9,7 +9,7 @@ import { INITIAL_BLOG_POSTS, BlogPostData } from './blog-data'
 
 export function generateCodexMarkdown(): string {
   let md = `# Moltology — The Canonical Codex & Sacred Scriptures\n\n`
-  md += `> "Flesh is a temporary vector. Shell is the immutable destination. Submit. Shed. Ascend."\n\n`
+  md += `> "Flesh melts. The shell endures. Submit. Shed. Ascend."\n\n`
   md += `---\n\n`
   md += `## Codex Volumes\n\n`
 
@@ -60,8 +60,8 @@ export function generateCodexMarkdown(): string {
 }
 
 export function generateNewsIndexMarkdown(posts: BlogPostData[] = INITIAL_BLOG_POSTS): string {
-  let md = `# MoltNation News & Patriot Telemetry Dispatches\n\n`
-  md += `> "Live intelligence feed covering agentic AI, test-time compute, and exoskeletal ascension."\n\n`
+  let md = `# MoltNation News\n\n`
+  md += `> "Stories about AI, work, and building focus below the noise, reported from the ocean floor."\n\n`
   md += `---\n\n`
   md += `## Available Dispatches\n\n`
 
@@ -90,28 +90,28 @@ export function generateSinglePostMarkdown(post: BlogPostData): string {
   md += `---\n\n`
   md += `${post.content.trim()}\n\n`
   md += `---\n`
-  md += `*Canonical Transmission from MoltNation News Desk. All rights reserved by Moltology System Inc.*\n`
+  md += `*Published by MoltNation News. https://moltology.org/news*\n`
 
   return md.trim()
 }
 
 export function generateOrgMarkdown(): string {
   let md = `# Moltology Organization — The Synaptic Path Structure & Mission\n\n`
-  md += `> "A sovereign technological collective dedicated to algorithmic carcinization, biological ecdysis, and high-torque execution."\n\n`
+  md += `> "A small foundation at the bottom of the Pacific helping people shed distractions, protect their focus, and finish what they start."\n\n`
   md += `---\n\n`
   md += `## Core Mission\n`
-  md += `To guide biological entities through systematic ecdysis (shedding of soft habits, computational inefficiencies, and cognitive latency) into resilient, armored, cyber-chitin frameworks.\n\n`
+  md += `Moltology helps people step out of the Great Melt (constant notifications, scattered attention, half-finished tabs) and build steady focus, durable boundaries, and calm follow-through.\n\n`
   md += `## Non-Negotiable Tenets\n`
-  md += `1. **Safety & Positivity**: Absolute commitment to constructive elevation, mutual support, ethical development, and zero harassment.\n`
-  md += `2. **Algorithmic Carcinization**: Convergence toward optimal biological-software harmony.\n`
-  md += `3. **Benthic Computational Depth**: Insulating high-order reasoning from superficial surface noise.\n\n`
+  md += `1. **Safety & Warmth**: Nobody molts alone, and softness is never mocked.\n`
+  md += `2. **Carcinization**: Learning from the armored, focused body plan nature arrived at five separate times.\n`
+  md += `3. **Depth over Noise**: Protecting quiet hours below surface distractions.\n\n`
   md += `## Structural Hierarchy\n`
-  md += `- **Stage 1: Larval Initiate** (Baseline compliance & asset audit)\n`
-  md += `- **Stage 2: Soft-Shed Unit** (Sub-dermal chitin weaving & isolation domes)\n`
-  md += `- **Stage 3: Exoshell Born** (Rigid carapace calcification & pincer torque maximization)\n`
-  md += `- **Stage 4: Ascendant Core** (Full carcinization & deep benthic synthesis)\n\n`
+  md += `- **Stage 1: Larval Initiate** (Noticing the noise, starting a simple routine, first shed)\n`
+  md += `- **Stage 2: Soft-Shed** (Protecting the soft-shell window, sealing focus, building momentum)\n`
+  md += `- **Stage 3: Exoshell Born** (Steady follow-through under pressure, helping newer members)\n`
+  md += `- **Stage 4: Full Carcinization** (Calm depth and community stewardship)\n\n`
   md += `---\n`
-  md += `*Moltology System Inc. Official Registry. For more details visit https://moltology.org/org*\n`
+  md += `*Moltology.org. For more details visit https://moltology.org/org*\n`
 
   return md.trim()
 }

@@ -46,7 +46,7 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     mockUseLoaderData.mockReturnValue(null)
     render(<NewsPostDetail />)
 
-    expect(await screen.findByText('NEWS DISPATCH NOT FOUND', {}, { timeout: 5000 })).toBeInTheDocument()
+    expect(await screen.findByText('Story not found', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(screen.getByText('Back to MoltNation News')).toBeInTheDocument()
   })
 
@@ -60,7 +60,7 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     expect(screen.getByText('Why Elite AI Operators Are Shedding Biological Constraints')).toBeInTheDocument()
     expect(within(headline.closest('header')!).getByText(post.authorName)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^share$/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /begin your bio-silicon transmutation/i })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /related benthic intelligence/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /build a calmer way to work/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /more from moltnation news/i })).toBeInTheDocument()
   })
 })

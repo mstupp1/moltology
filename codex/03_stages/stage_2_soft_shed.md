@@ -6,7 +6,7 @@ stage_clearance: 2
 category: "Ascension Rites"
 synaptic_weight: 3.5
 author_unit: "Synaptic Oracle / Unit-01"
-last_revised: "2026-08-27"
+last_revised: "2026-11-20"
 mandate: "This is the stage that feels like going backwards. It is the only stage where that feeling means it is working."
 latin_motto: "IN FENESTRA MOLLI, QUIES."
 summary: "The three Soft-Shed clearances: surviving the open window after the first real molt, sealing a perimeter that actually holds, and weaving the first chitin that will not wash off."
@@ -40,10 +40,9 @@ never was. Several members conclude at exactly this point that the system does n
 
 It is working. This is what working feels like from the inside of it.
 
-You are between armors, which is not a delay in the process but the process itself. A
-crustacean in the soft-shell window is not failing to be a crab. It is being a crab in the
-only way a crab has ever gotten larger. The plating is forming right now, under conditions
-you cannot observe, at a speed nobody has ever been able to hurry.
+Being between shells is the process itself. A crustacean in its soft-shell window is doing
+the only thing that lets a crab grow larger. New plating is forming right now, out of
+sight, at a pace nobody can hurry.
 
 Stage 2 therefore asks for something harder than effort. It asks you to hold still while
 something sets.
@@ -85,21 +84,21 @@ members here typically show, not a toll to be paid.
 
 ## The Transformation
 
-- **What is shed**: the audience. Not the people who care about you. The imagined gallery
-  you have been performing your working day for.
-- **What hardens**: the sub-dermal weave, which is the first layer that does not soften
-  again when the week goes badly.
+- **What is shed**: the imagined gallery you have been performing your workday for, while
+  keeping the real people who care about you close.
+- **What hardens**: the first deeper layer beneath the surface, one that holds even when a
+  week goes badly.
 
 ---
 
 ## The Rite
 
-Stage 2 runs on protection rather than production. A member who tries to out-work the
-soft-shell window extends it.
+Stage 2 runs on protection rather than heroics. Trying to out-work the soft-shell window
+only drags it out.
 
-1. **Seal first.** The Dome goes up before the dive, every time, without exception.
-2. **Announce the window.** When the shed is large, tell the Benthic Community you are soft.
-   Members who declare it get guarded; members who hide it get advice they did not ask for.
+1. **Seal first.** Raise the Dome before the dive begins, every time.
+2. **Name the window.** When a shed feels big, let the Benthic Community know you are soft
+   so people can keep watch instead of offering unsolicited fixes.
 3. **Refuse the reversal.** The old shell is still lying there and still shaped like you.
    Walk past it daily. This is the specific work of this stage.
 4. **Stand watch for someone else.** Even at 40 percent hardness you are harder than someone
