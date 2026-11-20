@@ -31,6 +31,7 @@ import {
 import { addSleeve, chainWeigh } from './flex'
 import { aimQuaternion, lookQuaternion, type Rig, type Wearable } from './rig'
 import type { Avatar3DLook } from './look'
+import { MOUTH_HOLE } from './mouth-shapes'
 
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z)
 const SIDES = [
@@ -228,19 +229,30 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
 }
 
 /**
- * An open mouth for reactions: a dark oval with a tongue at its floor, on its own bone just
- * under the drawn mouth. It is squashed flat and hidden until a cheer or a gasp opens it.
+ * An open mouth for reactions and speech: a dark oval on its own bone just under the drawn mouth,
+ * squashed flat and hidden until a cheer, a gasp or a spoken word opens it. Speech also shows the
+ * teeth and lifts the tongue (the cartoon mouth shapes in mouth-shapes.ts), so those sit on bones
+ * of their own beside it: they keep their own height however far the oval opens.
  */
 function addOpenMouth(rig: Rig, f: FaceLayout, y: number, normal: Vector3): void {
   const s = f.shell.sAt(y)
   const at = f.shell.point(s, Math.PI / 2).addScaledVector(normal, -0.004)
-  rig.addBone('mouthOpen', f.bone, at, { quaternion: lookQuaternion(normal) })
+  const facing = lookQuaternion(normal)
+  rig.addBone('mouthOpen', f.bone, at, { quaternion: facing })
   const hole = new SphereGeometry(1, 24, 14)
-  hole.scale(0.08, 0.048, 0.016)
+  hole.scale(MOUTH_HOLE.x, MOUTH_HOLE.y, MOUTH_HOLE.z)
   rig.add('mouthOpen', 'mouth', withAo(hole, 0.6))
+  // Rows of teeth: a soft white bar each, flat to the face.
+  for (const name of ['mouthTeethUp', 'mouthTeethLo']) {
+    rig.addBone(name, f.bone, at, { quaternion: facing })
+    const row = new SphereGeometry(1, 20, 8)
+    row.scale(0.05, 0.011, 0.006)
+    rig.add(name, 'teeth', row)
+  }
+  rig.addBone('mouthTongue', f.bone, at, { quaternion: facing })
   const tongue = new SphereGeometry(1, 16, 10)
   tongue.scale(0.042, 0.017, 0.012)
-  rig.add('mouthOpen', 'tongue', placed(withAo(tongue), v(0, -0.02, 0.008)))
+  rig.add('mouthTongue', 'tongue', withAo(tongue))
 }
 
 /** How each mouth curves: rise of the corners, width, a lean to one side, and what shows inside. */

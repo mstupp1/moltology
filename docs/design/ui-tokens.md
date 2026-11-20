@@ -126,7 +126,7 @@ pinned to the bottom.
 faint `surface-2` fill with a `line-subtle` edge), `ghost`, `danger` (alias `sacred`). Inter 13px weight
 500, sentence case, no glow. One `primary` per screen. There are two tab styles and no underline tabs:
 
-- Section tabs, on a header band's title row: `BandSectionNav` (each section has a URL) or
+- Section tabs, below a header band's title: `BandSectionNav` (each section has a URL) or
   `HudTabs` (in-page state). Inter 13px weight 500, the current one a lit `surface-3` tile.
 - In-page view tabs and filters: `pillTabClass()` from `src/components/ui/pillTab.ts`, round
   pills with the current one a lit `surface-3` pill.
@@ -171,30 +171,27 @@ the top of the page panel (rounded to the panel's top corners on desktop, flush 
 the top bar on phones) with a `surface-2` fill and a `line-subtle` bottom divider, so it
 stands apart from the `surface-1` panel. Use it as the first element of every standard page
 (Academy, Certificates, Forum, Shop, Progress, Admin, Logic Atlas, Support, Settings, Search,
-Profile; Character and Codex build
-the same band by hand with `BandHeadingRow`). On desktop the band's title row is `--hud-band-h` (4.5rem, twice
+Profile; Character uses `BandHeadingRow` in its own layout). On desktop the band's title row is `--hud-band-h` (4.5rem, twice
 the 2.25rem row content `--hud-band-row`, padding `--hud-band-pad`) and the floating search pill is
-centred on it, so the title, tabs, actions and pill share one centre line on every page. The pill
+centred on it, so the title, actions and pill share one centre line. The pill
 and avatar medallion are solid, never see-through. Nothing in the title row may be
-taller than 2.25rem (tab tiles `min-h-9`, `HudButton size="sm"`, one-line `BandStat`).
+taller than 2.25rem (`HudButton size="sm"`, one-line `BandStat`).
 
 One band, the same rows on every page:
 
-1. Title row, level with the pill on desktop: the `h1`, then for an area with sibling pages
-   (Character, Academy, Admin, Support, Profile) a thin divider and the section tabs
-   (`sections`: `BandSectionNav` when each section has a URL, `HudTabs` for in-page state). The
-   title is the area's name on every one of its tabs (Character on Customize, Shop and Progress);
-   the current tab is a lit tile. `actions` sit on the right of the same row (Forum's New post,
-   Character's save, or a few figures as `BandStat`) and stop short of the pill
-   (`.hud-pill-clear`, only as wide as the pill reaches into the panel). Admin, with six sections, passes `sectionsBelow` to give its tabs their
-   own row. No eyebrow.
-2. Optional description: one short line. `hideDescriptionOnPhone` drops it where the tabs
+1. The title and page actions share a row level with the desktop pill. Actions such as Forum's
+   New post, Character's save, or a few `BandStat` figures sit on the right. `.hud-pill-clear`
+   reserves space where the pill reaches into the panel.
+2. Section tabs, when present, sit beneath the title on every screen size. Use `BandSectionNav`
+   for sections with URLs and `HudTabs` for in-page state. Keep the area name as the title
+   across sections (Character on Customize, Shop and Progress). The current tab is a lit tile.
+3. Optional description: one short line. `hideDescriptionOnPhone` drops it where the tabs
    and figures already say enough (Shop).
-3. Optional `toolbar`: in-page view tabs as lit tiles (Shop's Gear / Skills / Earn gems / Credits).
+4. Optional `toolbar`: in-page view tabs as lit tiles (Shop's Gear / Skills / Earn gems / Credits).
    Content such as cards, lists or forms always starts below the band.
 
-On phones the title row holds the title and short actions; section tabs get their own row
-under it (scrolling sideways), then figures (`actionsBelowOnPhone`), then the toolbar.
+On phones section tabs scroll sideways when needed. Figures using `actionsBelowOnPhone`
+follow the tabs.
 Pages that open with their own hero instead of a band (Dashboard, another member's profile)
 add `hud-page-hero-top` on the page and `hud-band-hero` on the hero, so the hero is the band:
 it starts at the panel's top edge and runs to its sides (on phones, to the screen edges).
@@ -217,11 +214,17 @@ additional generic title banner.
 Every standard HUD page (everything except the full-screen Oracle) sits inside one
 see-through page panel drawn by `HudLayout`, so pages never add their own outer frame.
 
-- Desktop: `main` carries a `surface-1/[0.45]` scrim and 8px side padding around
-  the panel. The page column (max 1312px) is the panel: `surface-1/[0.68]`,
-  `line-subtle` border, `rounded-panel`, 15px side padding. 8 + 1 + 15 = 24px per
-  side and 1312 - 32 = 1280px of content, the same width pages had before the
-  panel, so keep these in step if any of them changes. It grows with its content (`flex-1 shrink-0`), so
+- Desktop: `main` carries a `surface-1/[0.45]` scrim and a fluid side gutter
+  around the panel, `clamp(8px, 1vw, 24px)`. The page column (max 1632px) is the
+  panel: `surface-1/[0.68]`, `line-subtle` border, `rounded-panel`, 15px side
+  padding, so content tops out at 1600px. Every page shares this one width, so the
+  panel edges and pill never move between pages. Laptops are filled; only big
+  monitors get margins.
+- Page content picks its own width inside the panel. Grids and lists fill it, and
+  use `auto-fill`/`minmax` columns (or add a column at `2xl`) rather than a fixed
+  count, so cards never balloon. Reading text (forum posts, Codex, lessons) caps
+  its line length itself; when a reading column sits beside a rail, let the rail
+  grow instead of leaving a gap between them. It grows with its content (`flex-1 shrink-0`), so
   the frame reaches the bottom of long pages. The top-right pill straddles the
   panel's top edge and sits in its 54px top padding, so content starts right below
   the pill instead of under a reserved bar.

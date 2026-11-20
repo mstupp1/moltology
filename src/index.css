@@ -316,27 +316,42 @@
   user-select: none;
 }
 
-/* Cathode Scanline Effect Disabled for visual clarity */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #030606;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #3a4a49;
-  border-radius: 0px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #ff453a;
-}
-
-::-webkit-scrollbar-corner {
-  background: #030606;
+/* One scrollbar for the whole product (public site and app).
+   Mouse and trackpad devices get a slim branded bar with a clear track, so the lane blends into
+   whatever surface it sits on. Touch devices keep the system overlay bar: styling ::-webkit-scrollbar
+   turns Chrome's overlay bar into a classic one that takes width, which left a dark strip on phones. */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(150, 170, 170, 0.28);
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(150, 170, 170, 0.5);
+    background-clip: padding-box;
+  }
+  /* Firefox has no ::-webkit-scrollbar; give it the same colours. */
+  @supports not selector(::-webkit-scrollbar) {
+    html,
+    .app-scroll-lane {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(150, 170, 170, 0.28) transparent;
+    }
+  }
+  /* The app's main scroller keeps its lane even when a page is short, so the panel never shifts width
+     between pages. Only here, where the bar takes width; overlay bars on touch devices need no lane. */
+  .app-scroll-lane {
+    scrollbar-gutter: stable;
+  }
 }
 
 /* Realistic terminal/input caret blink (sharp 50% on, 50% off cycle) */

@@ -260,9 +260,46 @@ describe('avatar3d', () => {
       character.setTalk(0.2)
       character.update(0.033, 0.1, true)
       expect(mouth.scale.y, race).toBeLessThan(loud)
+      // It closes over a couple of frames, like a drawn mouth, not on the very next one.
       character.setTalk(0)
-      character.update(0.033, 0.133, true)
+      for (let f = 0; f < 3; f++) character.update(0.033, 0.133 + f * 0.033, true)
       expect(mouth.visible, race).toBe(false)
+      character.dispose()
+    }
+  })
+
+  it('makes the cartoon mouth shapes: lips pressed, teeth, rounds and a raised tongue', () => {
+    for (const race of AVATAR_RACES) {
+      const character = buildCharacter(baselineLook(race))
+      const bone = (name: string) => character.rig.bones.get(name)!
+      const settle = (shape: Parameters<typeof character.setTalk>[1]) => {
+        character.setTalk(0.6, shape)
+        for (let f = 0; f < 6; f++) character.update(0.033, 1 + f * 0.033, true)
+      }
+      settle('A')
+      // Pressed lips: one thin dark line with no teeth, not the resting smile.
+      expect(bone('mouthOpen').visible, race).toBe(true)
+      expect(bone('mouthLine').visible, race).toBe(false)
+      expect(bone('mouthTeethUp').visible || bone('mouthTeethLo').visible, race).toBe(false)
+      const pressed = bone('mouthOpen').scale.y
+      settle('B')
+      expect(bone('mouthOpen').scale.y, race).toBeGreaterThan(pressed * 3)
+      expect(bone('mouthTeethUp').visible && bone('mouthTeethLo').visible, race).toBe(true)
+      expect(bone('mouthTongue').visible, race).toBe(false)
+      settle('D')
+      const wide = bone('mouthOpen').scale.clone()
+      const tongueLow = bone('mouthTongue').position.clone()
+      expect(bone('mouthTeethLo').visible, race).toBe(false)
+      settle('F')
+      expect(bone('mouthOpen').scale.x, race).toBeLessThan(wide.x * 0.5)
+      expect(bone('mouthOpen').scale.y, race).toBeLessThan(wide.y)
+      settle('H')
+      // The tongue rises toward the top teeth (up the face, which is along the mouth's own y).
+      expect(bone('mouthTongue').position.distanceTo(tongueLow), race).toBeGreaterThan(0.01)
+      for (const name of ['mouthOpen', 'mouthTeethUp', 'mouthTeethLo', 'mouthTongue']) {
+        const s = bone(name).scale
+        expect(Number.isFinite(s.x + s.y + bone(name).position.y), `${race} ${name}`).toBe(true)
+      }
       character.dispose()
     }
   })

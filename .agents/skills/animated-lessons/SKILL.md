@@ -4,8 +4,8 @@ description: >-
   Write and produce animated lesson shorts starring the site's own 3D characters (Codex
   passages, what Moltology is, moltmaxxing) for Instagram Reels and YouTube Shorts: script
   directed scenes for a solo host or a small cast on a 3D set, voice each speaker with their own
-  Fish voice, render the real three.js characters with talking mouths, camera moves, poses and
-  reactions, then archive and queue through the reel CLI.
+  Fish voice, render the real three.js characters with cartoon lip sync, acting, camera moves,
+  poses and reactions, check nothing clips, then archive and queue through the reel CLI.
   Use for any animated character video, Codex lesson video or 3D character short.
 ---
 
@@ -56,13 +56,20 @@ A short is six to ten scenes (six for a solo host; a dialogue usually needs eigh
 - **Dialogue.** Each line is short and sounds like a person talking. The newcomer asks what a viewer would ask; the host never lectures for more than two lines in a row. Open on the `two` shot so viewers meet both characters, cut to the speaker for most lines, and come back to `two` for the payoff or a reaction. Give the listener something to do with `act` (a think pose, a nod via `snap`, a `poke` at the surprise).
 - **Payoff late.** The doable action lands in scenes 3 to 5. The host demonstrates it with a pose or reaction.
 - **Ending.** Scene 6 gives one website invitation matching the destination, such as "Read the full passage at moltology.org" for a Codex lesson. No save, share, keyword or DM asks.
+- **Acting.** Characters gesture, nod and shift on their own from the voice timing ([Acting](references/lesson-format.md#acting)); don't script every beat. Hand-place a `gesture` only where a specific word needs a specific move, and set `acting: "none"` for a deliberate still moment. Poses and reactions stay hand-written.
 - **Direction.** Use at least four different shots across the six scenes, put a reaction on the word that carries a joke or the payoff, and cut (`"move": "cut"`) on a change of idea. A push-in suits the reveal of the idea; a pull-out suits the ending. Keep the host looking at the camera unless the line is about something else; in a dialogue, characters mostly look at each other (`"look": "other"`) and turn to camera for the line meant for the viewer.
 
 Save the lesson as `tmp/anim-next/lesson.json` (format in the reference; `content/animation/examples/daily-shedding-routine.json` is a complete solo example and `nightly-molt-audit.json` a complete dialogue). Captions, first comment and YouTube copy follow the reels skill (STYLE_GUIDE section 4.3, at most three hashtags, a direct URL in the first comment).
 
-## 5. Boredom check, then a silent render
+## 5. Boredom check, clipping check, then a silent render
 
-Run the playbook's boredom check on the script. Then render without the voice to check the direction cheaply:
+Run the playbook's boredom check on the script. Then rehearse the direction (a few seconds, no frames) and fix every clipping moment it lists ([Clipping check](references/lesson-format.md#clipping-check)):
+
+```bash
+npm run anim:create -- --lesson tmp/anim-next/lesson.json --silent --check
+```
+
+Then render without the voice to check the direction cheaply:
 
 ```bash
 npm run anim:create -- --lesson tmp/anim-next/lesson.json --silent --scale 0.5
@@ -76,7 +83,7 @@ Look at `tmp/anim-<id>/checks/*.jpg` and watch `final.mp4`. Fix shots where the 
 npm run anim:create -- --lesson tmp/anim-next/lesson.json
 ```
 
-This voices each run of lines by one speaker as a take in that speaker's Fish voice (the narrator is `BOOK RECORD REGULAR`, `--voice` to change), joins the takes with a short pause, measures each take frame by frame so only the speaker's mouth moves, renders every frame at 1080x1920 in Chrome on the Mac's GPU, builds one clip per scene over the backdrop with the hook headline, and finishes with the shared reel compositor (subtitles, ambient music, watermark, outro). Takes are cached by their words and voice, so editing one line re-voices only that take; `--reuse-frames` skips the 3D render when only backdrops or the outro changed.
+This voices each run of lines by one speaker as a take in that speaker's Fish voice (the narrator is `BOOK RECORD REGULAR`, `--voice` to change), joins the takes with a short pause, works out the cartoon mouth shape for every frame of each take with Rhubarb Lip Sync ([Lip sync](references/lesson-format.md#lip-sync); fetched once on first use) so only the speaker's mouth moves, adds the acting, rehearses for clipping (a hand-written clip stops the run), renders every frame at 1080x1920 in Chrome on the Mac's GPU, builds one clip per scene over the backdrop with the hook headline, and finishes with the shared reel compositor (subtitles, ambient music, watermark, outro). Takes are cached by their words and voice, so editing one line re-voices only that take; `--reuse-frames` skips the 3D render when only backdrops or the outro changed.
 
 Backdrops: each set's art kit (below) supplies the backdrop. For a one-off look, such as a moonlit study for a night topic, generate a 9:16 plate with the set's `plate` prompt as a starting point and set `backdrop` in the lesson; a scene can override it too. `--no-art` renders without the kit, for comparison.
 
@@ -105,7 +112,7 @@ To change a set's look, edit its prompts in `art.json`, then repeat the steps. A
 
 ## 7. Inspect and queue
 
-Before queueing, watch the final file once with sound on at phone size and run the playbook's phone proof on the stills in `checks/` (frame zero, mid-hook, last hook word, first body phrase, a later moment and the outro). Check that the right mouth moves with each voice, the headline never overlaps the face, the subtitles never cover the eyes, and every reaction lands on its word.
+Before queueing, watch the final file once with sound on at phone size and run the playbook's phone proof on the stills in `checks/` (frame zero, mid-hook, last hook word, first body phrase, a later moment and the outro). Check that the right mouth moves with each voice and its shapes match the sounds (lips shut on M, B and P, a pucker on OO; if a line looks off, run `--mouth-check`, see [Mouth check](references/lesson-format.md#mouth-check)), no claw passes through anyone, the headline never overlaps the face, the subtitles never cover the eyes, and every reaction lands on its word.
 
 Queue the inspected file through the reel CLI, which archives to Google Drive, uploads to Zernio and records the ledgers:
 
