@@ -36,59 +36,81 @@ export function mouthCheckLesson(lesson: Lesson): Lesson {
   }
 }
 
-const clock = (seconds: number) => {
-  // Rounded down, so a label never starts a frame after its shape (frames fall between centiseconds).
-  const cs = Math.floor(seconds * 100 + 1e-6)
-  const h = Math.floor(cs / 360000)
-  const m = Math.floor((cs % 360000) / 6000)
-  const s = Math.floor((cs % 6000) / 100)
-  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs % 100).padStart(2, '0')}`
+/** One stretch of frames with the same shape labels on screen: one label line per speaking member. */
+export interface LabelRun {
+  lines: string[]
+  frames: number
 }
 
-/** Subtitles (ASS) with each speaking member's current shape: big letter, the sounds it is for. */
-export function mouthCheckSubtitles(mouthBy: string[], names: string[], fps: number, width: number, height: number): string {
-  const size = Math.round(height * 0.045)
-  const lines = [
-    '[Script Info]',
-    'ScriptType: v4.00+',
-    `PlayResX: ${width}`,
-    `PlayResY: ${height}`,
-    '',
-    '[V4+ Styles]',
-    'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
-    `Style: Shape,DejaVu Sans,${size},&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,3,2,0,7,40,40,40,1`,
-    '',
-    '[Events]',
-    'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
-  ]
-  mouthBy.forEach((letters, m) => {
-    if (!/[^X]/.test(letters)) return
-    const top = Math.round(height * 0.04 + m * size * 1.6)
-    let from = 0
-    for (let f = 1; f <= letters.length; f++) {
-      if (f < letters.length && letters[f] === letters[from]) continue
-      const shape = letters[from]
-      const text = `${names[m]}  {\\b1}${shape}{\\b0}  ${SHAPE_SOUNDS[shape] ?? ''}`
-      lines.push(`Dialogue: 0,${clock(from / fps)},${clock(f / fps)},Shape,,0,0,${top},,{\\pos(40,${top})}${text}`)
-      from = f
+/**
+ * The label lines frame by frame, as runs: each member who speaks at all gets a line with their
+ * current shape letter and the sounds it is for. Exported for tests.
+ */
+export function mouthCheckLabels(mouthBy: string[], names: string[]): LabelRun[] {
+  const speakers = mouthBy.map((letters, m) => ({ letters, name: names[m] })).filter((s) => /[^X]/.test(s.letters))
+  const length = Math.max(0, ...speakers.map((s) => s.letters.length))
+  const runs: LabelRun[] = []
+  for (let f = 0; f < length; f++) {
+    const lines = speakers.map(({ letters, name }) => {
+      const shape = letters[f] ?? 'X'
+      return `${name}   ${shape}   ${SHAPE_SOUNDS[shape] ?? ''}`
+    })
+    const last = runs[runs.length - 1]
+    if (last && last.lines.join('|') === lines.join('|')) last.frames++
+    else runs.push({ lines, frames: 1 })
+  }
+  return runs
+}
+
+/**
+ * The close-up clip with the voice, the shape labels and the waveform strip, as one video. Labels
+ * are drawn as images and played as an image sequence, so this works with any ffmpeg build (the
+ * Mac's Homebrew one has no subtitle filter).
+ */
+export async function finishMouthCheck(o: { clip: string; audio: string; labels: LabelRun[]; fps: number; outPath: string; width: number; height: number }) {
+  const { createCanvas } = await import('@napi-rs/canvas')
+  const dir = path.resolve(path.dirname(o.outPath), 'labels')
+  fs.rmSync(dir, { recursive: true, force: true })
+  fs.mkdirSync(dir, { recursive: true })
+  const size = Math.round(o.height * 0.03)
+  const pad = Math.round(size * 0.5)
+  const stripH = Math.max(1, ...o.labels.map((r) => r.lines.length)) * Math.round(size * 1.5) + pad * 2
+  const drawn = new Map<string, string>()
+  const list: string[] = []
+  for (const run of o.labels) {
+    const key = run.lines.join('|')
+    let file = drawn.get(key)
+    if (!file) {
+      const canvas = createCanvas(o.width, stripH)
+      const ctx = canvas.getContext('2d')
+      ctx.font = `700 ${size}px -apple-system, "Helvetica Neue", "DejaVu Sans", sans-serif`
+      ctx.textBaseline = 'top'
+      run.lines.forEach((line, i) => {
+        const y = pad + i * Math.round(size * 1.5)
+        const w = ctx.measureText(line).width
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'
+        ctx.fillRect(pad - 12, y - 8, w + 24, size + 16)
+        ctx.fillStyle = '#ffffff'
+        ctx.fillText(line, pad, y)
+      })
+      file = path.join(dir, `${drawn.size}.png`)
+      fs.writeFileSync(file, canvas.toBuffer('image/png'))
+      drawn.set(key, file)
     }
-  })
-  return `${lines.join('\n')}\n`
-}
-
-/** The close-up clip with the voice, the shape letters and the waveform strip, as one video. */
-export async function finishMouthCheck(o: { clip: string; audio: string; subtitles: string; outPath: string; width: number; height: number }) {
-  const ass = path.join(path.dirname(o.outPath), 'mouth-check.ass')
-  fs.writeFileSync(ass, o.subtitles)
+    list.push(`file '${file.replace(/'/g, "'\\''")}'`, `duration ${(run.frames / o.fps).toFixed(6)}`)
+  }
+  // The concat format holds the last image only if it is listed again.
+  if (list.length) list.push(list[list.length - 2])
+  const concat = path.join(dir, 'labels.txt')
+  fs.writeFileSync(concat, `${list.join('\n')}\n`)
   const wave = `${o.width}x${Math.round(o.height * 0.12)}`
-  // Paths inside a filter graph need ':' and '\' escaped.
-  const assArg = ass.replace(/\\/g, '/').replace(/:/g, '\\:')
   const filter = [
-    `[1:a]showwaves=s=${wave}:mode=cline:rate=30:colors=0x7fe3d6,format=rgba,colorchannelmixer=aa=0.85[w]`,
+    `[1:a]showwaves=s=${wave}:mode=cline:rate=${o.fps}:colors=0x7fe3d6,format=rgba,colorchannelmixer=aa=0.85[w]`,
+    `[2:v]fps=${o.fps},format=rgba[l]`,
     `[0:v]scale=${o.width}:${o.height}[v0]`,
     `[v0][w]overlay=0:H-h-${Math.round(o.height * 0.03)}:shortest=1[v1]`,
-    `[v1]ass='${assArg}'[v]`,
+    `[v1][l]overlay=0:${Math.round(o.height * 0.03)}:eof_action=repeat[v]`,
   ].join(';')
-  await execFileAsync('ffmpeg', ['-v', 'error', '-y', '-i', o.clip, '-i', o.audio, '-filter_complex', filter, '-map', '[v]', '-map', '1:a', '-c:v', 'libx264', '-crf', '20', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-shortest', o.outPath])
+  await execFileAsync('ffmpeg', ['-v', 'error', '-y', '-i', o.clip, '-i', o.audio, '-f', 'concat', '-safe', '0', '-i', concat, '-filter_complex', filter, '-map', '[v]', '-map', '1:a', '-c:v', 'libx264', '-crf', '20', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-shortest', o.outPath])
   return o.outPath
 }

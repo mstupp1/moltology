@@ -207,6 +207,31 @@ export function cuesFromWords(words: WordBoundaryEvent[]): MouthCue[] {
   return cues
 }
 
+/** How each key shape is spelled: lips meeting (M, B, P) and teeth on the lip (F, V, PH). */
+const SPELT: Partial<Record<MouthShape, RegExp>> = { A: /[mbp]/, G: /f|v|ph/ }
+
+/**
+ * Rhubarb now and then hears a lip close or an F where the script has none (a hard TH, a breath),
+ * and shown, that reads as a twitch of a grin mid-word. A key shape is kept only when a word said
+ * around it is spelled with one; otherwise it becomes teeth together (B), the shape for most
+ * consonants. Cues with no word near them (pauses) are left alone.
+ */
+export function trustKeyShapes(cues: MouthCue[], words: WordBoundaryEvent[], slack = 0.06): MouthCue[] {
+  const out: MouthCue[] = []
+  for (const cue of cues) {
+    let value = cue.value
+    const spelt = SPELT[value]
+    if (spelt) {
+      const near = words.filter((w) => w.startMs / 1000 - slack < cue.end && w.endMs / 1000 + slack > cue.start)
+      if (near.length && !near.some((w) => spelt.test(w.word.toLowerCase()))) value = 'B'
+    }
+    const last = out[out.length - 1]
+    if (last && last.value === value && Math.abs(last.end - cue.start) < 1e-3) last.end = cue.end
+    else out.push({ ...cue, value })
+  }
+  return out
+}
+
 /** Where a working Rhubarb binary is: RHUBARB_PATH, one fetched before, or a fresh download. */
 async function rhubarbBinary(): Promise<string | null> {
   if (process.env.RHUBARB_PATH) return process.env.RHUBARB_PATH
@@ -276,7 +301,7 @@ export async function mouthForTake(
       cues = await rhubarbCues(take.file, take.text)
       if (cues) fs.writeFileSync(cache, JSON.stringify(cues))
     }
-    if (cues) return { frames: framesFromCues(cues, fps, frames, options), source: 'rhubarb' }
+    if (cues) return { frames: framesFromCues(trustKeyShapes(cues, take.words), fps, frames, options), source: 'rhubarb' }
   }
   return { frames: framesFromCues(cuesFromWords(take.words), fps, frames, options), source: 'words' }
 }

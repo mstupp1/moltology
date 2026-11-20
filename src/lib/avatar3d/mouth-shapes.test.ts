@@ -22,7 +22,7 @@ describe('speech mouth track', () => {
 
   it('lands lip closes shut on their first frame', () => {
     const track = speechMouthTrack('DDDDAADDDD', { fps: 30 })
-    expect(track[4]!.open).toBe(0)
+    expect(track[4]!.open).toBe(MOUTH_PARAMS.A.open)
     expect(track[4]!.press).toBe(1)
   })
 

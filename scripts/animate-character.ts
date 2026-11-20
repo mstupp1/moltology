@@ -21,7 +21,7 @@ import { defaultBackdrop, headlineOverlays, normaliseBackdrop, OUT_H, OUT_W, ren
 import { tokenizeScriptText } from './lib/tts-engine'
 import { setArtFiles, textureUrls } from './lib/character-animation/set-art'
 import { SHOTS } from '../src/lib/avatar3d/scripted'
-import { finishMouthCheck, mouthCheckLesson, mouthCheckSubtitles } from './lib/character-animation/mouth-check'
+import { finishMouthCheck, mouthCheckLabels, mouthCheckLesson } from './lib/character-animation/mouth-check'
 
 /** Same narrator as the reels (scripts/create-reel.ts REEL_NARRATOR_VOICE). */
 const NARRATOR = 'BOOK RECORD REGULAR'
@@ -154,7 +154,8 @@ async function mouthCheck(
   const out = await finishMouthCheck({
     clip,
     audio,
-    subtitles: mouthCheckSubtitles((timeline.mouthBy ?? []).map((m) => m.slice(0, timeline.frames)), names, FPS, OUT_W, OUT_H),
+    labels: mouthCheckLabels((timeline.mouthBy ?? []).map((m) => m.slice(0, timeline.frames)), names),
+    fps: FPS,
     outPath: path.join(dir, 'mouth-check.mp4'),
     width: OUT_W,
     height: OUT_H,

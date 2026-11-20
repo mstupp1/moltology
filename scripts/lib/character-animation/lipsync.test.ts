@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { MOUTH_SHAPES } from '../../../src/lib/avatar3d/mouth-shapes'
 import { estimateWords } from './lesson'
-import { cuesFromWords, emphasisFrames, framesFromCues, LEAD_FRAMES } from './lipsync'
+import { cuesFromWords, emphasisFrames, framesFromCues, LEAD_FRAMES, trustKeyShapes } from './lipsync'
 
 describe('lip sync', () => {
   it('lays timed mouth shapes onto frames, rest where nothing is said', () => {
@@ -119,13 +119,42 @@ describe('lip sync', () => {
   })
 })
 
+describe('trusting Rhubarb', () => {
+  const word = (w: string, startMs: number, endMs: number) => ({ word: w, startMs, endMs, durationMs: endMs - startMs })
+  it('turns a lip close the script cannot have into teeth together', () => {
+    const cues = trustKeyShapes(
+      [
+        { start: 0, end: 0.1, value: 'C' },
+        { start: 0.1, end: 0.17, value: 'A' },
+        { start: 0.17, end: 0.3, value: 'B' },
+        { start: 0.4, end: 0.5, value: 'A' },
+        { start: 0.5, end: 0.7, value: 'C' },
+      ],
+      [word("That's", 0, 200), word('the', 200, 300), word('problem', 400, 800)],
+    )
+    expect(cues.map((c) => c.value).join('')).toBe('CBAC')
+    expect(cues[1]).toMatchObject({ start: 0.1, end: 0.3 })
+  })
+
+  it('keeps an F where the word has one and leaves pauses alone', () => {
+    const cues = trustKeyShapes(
+      [
+        { start: 0, end: 0.1, value: 'G' },
+        { start: 1, end: 1.1, value: 'A' },
+      ],
+      [word('five', 0, 300)],
+    )
+    expect(cues.map((c) => c.value).join('')).toBe('GA')
+  })
+})
+
 describe('mouth check', () => {
-  it('starts each shape label no later than its frame', async () => {
-    const { mouthCheckSubtitles } = await import('./mouth-check')
-    const ass = mouthCheckSubtitles(['X'.repeat(41) + 'DDD' + 'X'.repeat(6)], ['host-crab'], 30, 1080, 1920)
-    const d = ass.split('\n').find((l) => l.includes('}D'))!
-    // Frame 41 is drawn at 1.3667s: the label must already be up by then.
-    expect(d).toContain('0:00:01.36,0:00:01.46')
-    expect(ass).toContain('host-crab  {\\b1}D{\\b0}  AA')
+  it('labels the shape of each speaker, frame by frame, as runs', async () => {
+    const { mouthCheckLabels } = await import('./mouth-check')
+    const runs = mouthCheckLabels(['XXDDDAX', 'XXXXXXX'], ['host-crab', 'junior-lobster'])
+    // The silent member gets no line; runs add up to every frame.
+    expect(runs.map((r) => r.frames)).toEqual([2, 3, 1, 1])
+    expect(runs[1].lines).toEqual(['host-crab   D   AA'])
+    expect(runs[2].lines).toEqual(['host-crab   A   M B P'])
   })
 })

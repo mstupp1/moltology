@@ -36,7 +36,8 @@ export interface MouthParams {
 
 export const MOUTH_PARAMS: Record<MouthShape, MouthParams> = {
   X: { open: 0, width: 1, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0 },
-  A: { open: 0, width: 0.9, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 1, speech: 0 },
+  // Pressed lips are a thin dark line, not the resting smile: a mid-word close must not read as a grin.
+  A: { open: 0.075, width: 0.82, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 1, speech: 0 },
   B: { open: 0.3, width: 1.08, teethUp: 1, teethLo: 1, bite: 0, tongueUp: 0, press: 0, speech: 0 },
   C: { open: 0.58, width: 1.02, teethUp: 0.9, teethLo: 0.35, bite: 0, tongueUp: 0, press: 0, speech: 0 },
   D: { open: 1, width: 1.06, teethUp: 0.75, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0 },
@@ -115,7 +116,8 @@ export function speechMouthTrack(letters: string, options: { fps: number; size?:
     for (let f = run.from; f < run.to; f++) {
       const want = { ...MOUTH_PARAMS[run.shape], speech: 1 }
       const s = size?.[f] ?? 0.5
-      want.open = Math.min(1.25, want.open * (0.72 + 0.56 * s))
+      // Pressed lips stay one thin line whatever the stress.
+      if (run.shape !== 'A') want.open = Math.min(1.3, want.open * (0.62 + 0.76 * s))
       // The first frame of a big change is halfway there, when the new shape holds long enough to
       // land after it (a lip close needs its frames shut, so it only eases in when it holds 3).
       const landsAfter = length >= (run.shape === 'A' ? 3 : 2)

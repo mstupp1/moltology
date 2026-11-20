@@ -455,7 +455,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     const W = MOUTH_HOLE.x * sx
     // A speaking mouth hangs from the top lip like a jaw: the more it opens, the further its centre
     // drops, so the top edge stays near the drawn mouth's line and the bottom does the travelling.
-    const jaw = open ? -0.22 * (H - MOUTH_HOLE.y * 0.3) * m.speech : 0
+    const jaw = open ? -0.22 * Math.max(0, H - MOUTH_HOLE.y * 0.3) * m.speech : 0
     if (mouthRest) mouthBone.position.copy(mouthRest.at).add(partAt.set(0, jaw, 0).applyQuaternion(mouthRest.facing))
     /** How far forward the oval's surface is at height y (in the mouth's own space). */
     const front = (y: number) => MOUTH_HOLE.z * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
