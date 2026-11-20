@@ -352,12 +352,15 @@ export function buildTimeline(
     // A two-shot is framed wider, so it needs less lift to clear the headline; more would strand the
     // pair high above an empty floor.
     const lift = i === 0 && options.hookLift ? options.hookLift * (scene.shot === 'two' ? 0.8 : 1) : 0
-    const camera = { zoom: shot.zoom, tilt: shot.tilt, pan, lift, subject: focus === 'all' ? 0 : index.get(focus)! }
+    // The hook's two-shot comes in a step closer so the pair reads big under the headline. It holds
+    // a resting pose there; later two-shots keep the wider frame so pointing and cheering claws stay in.
+    const zoom = i === 0 && options.hookLift && scene.shot === 'two' ? 0.56 : shot.zoom
+    const camera = { zoom, tilt: shot.tilt, pan, lift, subject: focus === 'all' ? 0 : index.get(focus)! }
     if (move === 'push-in') {
-      cues.push({ t: t0, camera: { ...camera, zoom: shot.zoom * 0.82, cut: true } })
+      cues.push({ t: t0, camera: { ...camera, zoom: zoom * 0.82, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })
     } else if (move === 'pull-out') {
-      cues.push({ t: t0, camera: { ...camera, zoom: shot.zoom * 1.22, cut: true } })
+      cues.push({ t: t0, camera: { ...camera, zoom: zoom * 1.22, cut: true } })
       cues.push({ t: t0 + 0.04, camera: { ...camera, rate: 0.9 } })
     } else cues.push({ t: t0, camera: { ...camera, cut: move === 'cut' } })
 
