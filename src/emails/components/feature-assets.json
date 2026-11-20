@@ -1,7 +1,7 @@
 {
   "dashboard": {
-    "key": "images/email/welcome-dashboard-f7772d5b1f99.jpg",
-    "revision": "f7772d5b1f99",
+    "key": "images/email/welcome-dashboard-09c1de074ced.jpg",
+    "revision": "09c1de074ced",
     "width": 860,
     "height": 430
   },
@@ -12,8 +12,8 @@
     "height": 430
   },
   "forum": {
-    "key": "images/email/welcome-forum-24b4e555df08.jpg",
-    "revision": "24b4e555df08",
+    "key": "images/email/welcome-forum-36531f0703e7.jpg",
+    "revision": "36531f0703e7",
     "width": 860,
     "height": 430
   }

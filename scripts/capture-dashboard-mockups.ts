@@ -233,7 +233,14 @@ async function main() {
         if (target.name.startsWith('moltmax')) {
           await page.getByRole('button', { name: 'Start the quiz', exact: true }).last().click()
           await page.locator('[role=progressbar]').first().waitFor()
+          if (target.isMobile || target.clip) {
+            await page.addStyleTag({ content: 'header:has(nav[aria-label="Main Navigation"]) { display: none !important; }' })
+          }
+          if (target.isMobile) {
+            await page.addStyleTag({ content: 'main:has([role="progressbar"]) { padding-top: 12px !important; }' })
+          }
         }
+        await page.addStyleTag({ content: CAPTURE_CSS })
         await page.evaluate(async () => {
           // Lazy images at the fold edge may never start in a still screenshot; load them now.
           document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((image) => { image.loading = 'eager' })
@@ -242,6 +249,15 @@ async function main() {
             .map((image) => Promise.race([image.decode().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 10000))])))
         })
         await page.waitForTimeout(1500)
+        // The Shop renders many 3D thumbnails in a queue after network requests settle.
+        if (target.name.startsWith('market')) {
+          await page.waitForFunction(() => !Array.from(document.querySelectorAll('[data-testid="gear-icon"]')).some((icon) => {
+            const { top, bottom, left, right } = icon.getBoundingClientRect()
+            if (top >= innerHeight || bottom <= 0 || left >= innerWidth || right <= 0 || !icon.checkVisibility()) return false
+            const image = icon.querySelector<HTMLImageElement>('[data-testid="character-still"]')
+            return !image?.complete || image.naturalWidth === 0 || image.classList.contains('opacity-0')
+          }), undefined, { timeout: 30000 })
+        }
         if (credentials) {
           // Do not publish the development account's display name in marketing images.
           const session = await context.request.get(new URL('/api/auth/get-session', baseUrl).href)
@@ -267,7 +283,6 @@ async function main() {
         if (dialogs.length) throw new Error(`A dialog covers ${target.name}: ${dialogs.join(', ')}`)
         // Park the pointer on empty page edge; the top-left corner shows the collapsed rail's brand tooltip.
         await page.mouse.move(width - 2, Math.round(height / 2))
-        await page.addStyleTag({ content: CAPTURE_CSS })
         const pngPath = path.join(stage, `${target.outputBase}.png`)
         await page.screenshot({ path: pngPath, animations: 'disabled', clip: target.clip ? await clipRegion(page, target.clip, width, height) : undefined })
         await encodeMarketingWebp(pngPath, path.join(stage, `${target.outputBase}.webp`), 90)
