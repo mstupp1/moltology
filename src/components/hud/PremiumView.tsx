@@ -118,7 +118,7 @@ export function PremiumOfferPanel({
   return (
     <div
       data-testid="premium-page"
-      className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative"
+      className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative"
     >
       <HudTitlePanel
         treatment="band"
@@ -158,7 +158,7 @@ export function PremiumOfferPanel({
         </div>
       ) : null}
 
-      <div className="grid items-stretch gap-3 sm:gap-4 lg:gap-5 md:grid-cols-2">
+      <div className="grid items-stretch gap-2 sm:gap-4 lg:gap-5 md:grid-cols-2">
         <section
           aria-labelledby="oracle-plan-lite"
           className="flex flex-col gap-5 rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 lg:p-6"

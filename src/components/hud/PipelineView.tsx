@@ -22,7 +22,7 @@ export default function PipelineView() {
   const stage = STAGE_PIPELINE_DATA.find((item) => item.stageNum === selectedStage)!
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans">
       <HudTitlePanel
         treatment="band"
         accent="cyan"

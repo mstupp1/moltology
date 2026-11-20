@@ -45,7 +45,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5">
       <AcademyCrumbs items={[{ label: detail.title }]} />
 
       <header className={cn(ACADEMY_CARD, 'overflow-hidden grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,300px)]')}>

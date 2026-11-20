@@ -161,7 +161,7 @@ export function LeaderboardPage() {
   const empty = first && entries.length === 0
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8" data-testid="leaderboard-page">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative pb-8" data-testid="leaderboard-page">
       <div>
         <ForumBandCrumbs page="Leaderboard" />
         <HudTitlePanel
@@ -177,7 +177,7 @@ export function LeaderboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 lg:gap-5 items-start">
         <section aria-labelledby="leaderboard-list-heading" className={cn(CARD, 'lg:col-span-8 space-y-3 min-w-0')}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id="leaderboard-list-heading" className={HEADING}>

@@ -173,7 +173,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
   )
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5">
       <AcademyCrumbs
         items={[
           {

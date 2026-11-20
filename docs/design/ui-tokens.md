@@ -95,12 +95,15 @@ One scale, tighter on phones. Use these exact class sets so pages stay in step:
 
 | What | Classes | Phone / sm / lg |
 | --- | --- | --- |
-| Gap between a page's sections | `space-y-3 sm:space-y-4 lg:space-y-5` | 12 / 16 / 20px |
-| Gap between cards in a grid | `gap-3 sm:gap-4 lg:gap-5` | 12 / 16 / 20px |
+| Gap between a page's sections | `space-y-2 sm:space-y-4 lg:space-y-5` | 8 / 16 / 20px |
+| Gap between cards in a grid | `gap-2 sm:gap-4 lg:gap-5` | 8 / 16 / 20px |
+| Gap between stacked list cards (forum posts) | `space-y-1.5 sm:space-y-2` | 6 / 8px |
 | Card padding | `p-3 sm:p-4` | 12 / 16px |
 | Large card or panel padding | `p-3 sm:p-4 lg:p-5` | 12 / 16 / 20px |
 | Hero padding (Dashboard today, Academy, profile header) | `p-4 sm:p-5 lg:p-6` | 16 / 20 / 24px |
 | List rows inside a card | `py-2 sm:py-2.5` | 8 / 10px |
+
+Phone page edges are 8px (HudLayout `px-2`, `--hud-band-x` 0.5rem) and the header band has 10px above and below its title row.
 
 Every standard page starts with the header band (see Page headings), then its sections.
 Pages never wrap themselves in an extra outer card; the page panel is the frame.

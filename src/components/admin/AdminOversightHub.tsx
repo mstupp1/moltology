@@ -79,7 +79,7 @@ export function AdminOversightHub({ tab = 'watch' }: { tab?: AdminTab }) {
 
   const flags = telemetry?.pendingFlags ?? null
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans" data-testid="admin-oversight-hub">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans" data-testid="admin-oversight-hub">
       <HudTitlePanel
         treatment="band"
         title="Admin"

@@ -73,7 +73,7 @@ export function ForumThreadRail({
   const handle = topic.authorHandle?.replace(/^@/, '')
 
   return (
-    <aside className="space-y-3 sm:space-y-4 lg:sticky lg:top-20" aria-label="About this post" data-testid="forum-thread-rail">
+    <aside className="space-y-2 sm:space-y-4 lg:sticky lg:top-20" aria-label="About this post" data-testid="forum-thread-rail">
       <section className={cn(RAIL_CARD, 'space-y-3')}>
         <PersonLink person={topic} className="group flex items-center gap-3">
           <ForumAvatar

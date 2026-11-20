@@ -139,7 +139,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans text-ink">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans text-ink">
       <HudTitlePanel
         treatment="band"
         title={SUPPORT_PAGE_COPY.pageTitle}
@@ -259,12 +259,12 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
 
         {/* Contact support: stacked on phones, form + side column from lg */}
         {activeTab === 'ticket' && (
-          <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="grid gap-2 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_22rem]">
             <section className="rounded-card border border-line-subtle bg-surface-1 p-3 sm:p-4 lg:p-5">
               <SupportTicketForm />
             </section>
 
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-2 sm:space-y-4">
               {latestChangelogs.length > 0 && (
                 <DashboardPanel
                   icon={<GitCommit />}

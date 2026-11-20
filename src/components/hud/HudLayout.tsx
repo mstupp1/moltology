@@ -231,7 +231,7 @@ function HudContent() {
                   ? 'p-0 overflow-hidden'
                   : // app-scroll-lane keeps the scrollbar's lane on mouse devices so short and long pages share
                   // one panel width; touch devices use overlay bars and get no lane (see index.css).
-                  'p-2.5 sm:p-4 md:px-[clamp(8px,1vw,24px)] md:py-6 overflow-y-auto overscroll-y-contain app-scroll-lane'
+                  'px-2 py-2.5 sm:p-4 md:px-[clamp(8px,1vw,24px)] md:py-6 overflow-y-auto overscroll-y-contain app-scroll-lane'
               } ${
                 // Desktop standard pages keep the scene bright around one see-through page panel.
                 // Phones get the full-width panel tint from the backdrop layer above, so main stays clear there.

@@ -237,7 +237,7 @@ function ForumIndexPage() {
 
   return (
     <ForumShell>
-      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
+      <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative pb-8">
         <HudTitlePanel
           treatment="band"
           title="Forum"
@@ -273,8 +273,8 @@ function ForumIndexPage() {
           <span className="text-2xs font-normal text-ink-muted">Top members this week</span>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-start">
-          <div className="lg:col-span-8 space-y-4 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 lg:gap-5 items-start">
+          <div className="lg:col-span-8 space-y-2 sm:space-y-4 min-w-0">
             <InlineTopicComposer
               ref={composerRef}
               showPrompt={false}
@@ -292,7 +292,7 @@ function ForumIndexPage() {
               }}
             />
 
-            <section aria-labelledby="forum-posts-heading" className="min-w-0 space-y-3">
+            <section aria-labelledby="forum-posts-heading" className="min-w-0 space-y-2 sm:space-y-3">
               <header className="space-y-3 rounded-card border border-line-subtle bg-surface-1 hud-sheen p-3 sm:p-4 lg:p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 id="forum-posts-heading" className="font-grotesk text-sm font-semibold text-ink flex items-center gap-2">
@@ -360,7 +360,7 @@ function ForumIndexPage() {
                   )}
                 </div>
               ) : (
-                <div className={`space-y-2 transition-opacity ${loading ? 'opacity-60' : ''}`}>
+                <div className={`space-y-1.5 sm:space-y-2 transition-opacity ${loading ? 'opacity-60' : ''}`}>
                   {visibleTopics.map((topic) => (
                     <ForumTopicRow key={topic.id} topic={topic} />
                   ))}
@@ -377,7 +377,7 @@ function ForumIndexPage() {
             </section>
           </div>
 
-          <aside className="hidden min-w-0 lg:block lg:col-span-4 lg:sticky lg:top-4 space-y-3 sm:space-y-4">
+          <aside className="hidden min-w-0 lg:block lg:col-span-4 lg:sticky lg:top-4 space-y-2 sm:space-y-4">
             <LeaderboardRailCard />
             <ForumBoardNav boards={categoriesState} variant="list" />
           </aside>

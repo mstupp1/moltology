@@ -203,7 +203,7 @@ input[type="range"].dial-range:focus-visible {
  * Outside the panel they fall back to zero, so a band there is a plain full-width block.
  */
 [data-hud-page-panel] {
-  --hud-band-x: 0.625rem;
+  --hud-band-x: 0.5rem;
   --hud-band-top: 0.625rem;
 }
 @media (min-width: 640px) {
@@ -258,6 +258,13 @@ input[type="range"].dial-range:focus-visible {
 }
 .hud-title-band-top {
   padding-top: 0.625rem;
+}
+/* Phones keep the band a little tighter. */
+@media (max-width: 639px) {
+  .hud-title-band {
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
 }
 /* Align the section tabs' first tile with the title. */
 .hud-band-sections > * {

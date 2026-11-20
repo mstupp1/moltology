@@ -133,7 +133,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
 
   if (error || !profile) {
     return (
-      <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative">
+      <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative">
         <div className="rounded-card p-5 border border-crimson-aggro/40 bg-surface-crimson hud-sheen text-crimson-text">
           <h1 className="font-grotesk text-sm font-semibold">Profile unavailable</h1>
           <p className="text-xs mt-2 text-ink-muted">{error || 'Member not found.'}</p>
@@ -155,7 +155,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
   const auditTaken = sheet.source === 'audit' && profile.moltmax?.score != null
 
   return (
-    <div className={cn('space-y-3 sm:space-y-4 lg:space-y-5 font-sans relative', opensPage && 'hud-page-hero-top')}>
+    <div className={cn('space-y-2 sm:space-y-4 lg:space-y-5 font-sans relative', opensPage && 'hud-page-hero-top')}>
       <section
         aria-labelledby="member-name"
         className={cn(

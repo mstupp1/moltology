@@ -74,7 +74,7 @@ export function HudWorkspaceGhost() {
  */
 export function DashboardGhost() {
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5 font-sans select-none animate-in fade-in duration-150" data-testid="dashboard-ghost">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans select-none animate-in fade-in duration-150" data-testid="dashboard-ghost">
       <div className="rounded-card border border-line-subtle bg-surface-1 overflow-hidden">
         <div className="relative p-4 sm:p-5 lg:p-6 lg:p-8 min-h-[330px] sm:min-h-[300px] space-y-5">
           <div className="absolute right-0 top-0 w-2/5 h-full bg-surface-2/40" />
@@ -93,7 +93,7 @@ export function DashboardGhost() {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-2 sm:gap-4 lg:gap-5">
         {Array.from({ length: 3 }).map((_, i) => (
           <HudGhostCard key={i} variant="neutral" lines={3} className={GHOST_CARD} />
         ))}
