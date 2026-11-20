@@ -854,29 +854,31 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   }
 
   // 3. Generate CTA Outro Video
-  const ctaDuration = options.ctaDurationSeconds || 2.5
-  const outroVideoPath = path.join(tempDir, 'cta-outro.mp4')
-  if (options.customOutroVideoPath && fs.existsSync(options.customOutroVideoPath)) {
-    console.log(`   • Normalizing animated CTA outro clip (${ctaDuration}s)...`)
-    await normalizeVideoClip(options.customOutroVideoPath, outroVideoPath, ctaDuration, 'none', false)
-  } else {
-    console.log(`   • Rendering branded CTA outro card (${ctaDuration}s)...`)
-    await renderCtaOutroVideo(
-      outroVideoPath,
-      ctaDuration,
-      options.ctaHeadline,
-      options.ctaSubheadline,
-      options.ctaUrl,
-      {
-        mascot: options.mascot,
-        ctaBadge: options.ctaBadge,
-        ctaActionText: options.ctaActionText,
-        ctaTexture: options.ctaTexture,
-        customImagePath: options.customOutroImagePath,
-      }
-    )
+  const ctaDuration = options.ctaDurationSeconds ?? 2.5
+  if (ctaDuration > 0) {
+    const outroVideoPath = path.join(tempDir, 'cta-outro.mp4')
+    if (options.customOutroVideoPath && fs.existsSync(options.customOutroVideoPath)) {
+      console.log(`   • Normalizing animated CTA outro clip (${ctaDuration}s)...`)
+      await normalizeVideoClip(options.customOutroVideoPath, outroVideoPath, ctaDuration, 'none', false)
+    } else {
+      console.log(`   • Rendering branded CTA outro card (${ctaDuration}s)...`)
+      await renderCtaOutroVideo(
+        outroVideoPath,
+        ctaDuration,
+        options.ctaHeadline,
+        options.ctaSubheadline,
+        options.ctaUrl,
+        {
+          mascot: options.mascot,
+          ctaBadge: options.ctaBadge,
+          ctaActionText: options.ctaActionText,
+          ctaTexture: options.ctaTexture,
+          customImagePath: options.customOutroImagePath,
+        }
+      )
+    }
+    normalizedClips.push(outroVideoPath)
   }
-  normalizedClips.push(outroVideoPath)
 
   // 4. Concatenate video clips into base timeline
   const concatListPath = path.join(tempDir, 'concat-list.txt')
@@ -940,7 +942,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       }
 
       // Don't show captions into the CTA outro card
-      const maxCaptionSec = Math.max(0, totalSceneDuration - 0.1)
+      const maxCaptionSec = ctaDuration > 0 ? Math.max(0, totalSceneDuration - 0.1) : totalSceneDuration
       if (startSec >= maxCaptionSec) continue
       endSec = Math.min(endSec, maxCaptionSec)
 
@@ -1069,14 +1071,14 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
 
   console.log(`   • Mixing voiceover audio and ambient benthic soundtrack...`)
 
-  if (fs.existsSync(bgAudioPath)) {
+  const bgVolume = options.backgroundAudioVolume ?? 0.14
+  if (fs.existsSync(bgAudioPath) && bgVolume > 0) {
     // Dynamic starting point selection across rich harmonic timestamps in benthic-ambient-loop.mp3
     const curatedOffsets = [0, 18, 36, 54, 72, 95, 120, 145]
     const bgOffset =
       options.backgroundAudioOffsetSeconds !== undefined
         ? options.backgroundAudioOffsetSeconds
         : curatedOffsets[Math.floor(Math.random() * curatedOffsets.length)]
-    const bgVolume = options.backgroundAudioVolume ?? 0.14
     console.log(`   • Benthic audio track parameters: volume=${bgVolume}, startOffset=${bgOffset}s`)
 
     const ffmpegBgArgs: string[] = []
@@ -1087,7 +1089,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     // Mix Voiceover (input 1, padded to the full video so the music runs under the outro) + ambient BG (input 2).
     // BG sits under the voice, swells to 2x over 1.2s once the narration ends, with a 0.8s entrance and 1.5s ending fade.
     const fadeInDuration = 0.8
-    const fadeOutDuration = 1.5
+    const fadeOutDuration = ctaDuration > 0 ? 1.5 : 0.35
     const fadeOutStart = Math.max(0, totalVideoDuration - fadeOutDuration)
 
     await runFfmpeg([
@@ -1120,13 +1122,19 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       finalOutputPath,
     ])
   } else {
-    // Voiceover only
+    // Voiceover only (pad trailing silence to match total video duration)
     await runFfmpeg([
       '-y',
       '-i',
       videoWithOverlaysPath,
       '-i',
       options.voiceoverPath,
+      '-map',
+      '0:v',
+      '-map',
+      '1:a',
+      '-af',
+      `apad=whole_dur=${totalVideoDuration.toFixed(3)}`,
       '-c:v',
       'copy',
       '-c:a',

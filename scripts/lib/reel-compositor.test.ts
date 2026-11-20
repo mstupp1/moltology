@@ -103,5 +103,38 @@ describe('Reel Compositor Rendering', () => {
     expect(getColorGradingFilter('none')).toBe('')
     expect(getColorGradingFilter('auto')).toBe('')
   })
+
+  it('supports hard-cut reels with ctaDurationSeconds=0 and backgroundAudioVolume=0', async () => {
+    const { execFileSync } = await import('node:child_process')
+    const { compositeReel } = await import('./reel-compositor')
+    const dir = path.resolve(process.cwd(), `tmp/test_hard_cut_${Date.now()}`)
+    fs.mkdirSync(dir, { recursive: true })
+    const clip = path.join(dir, 'clip.mp4')
+    const vo = path.join(dir, 'vo.mp3')
+    const out = path.join(dir, 'final.mp4')
+    try {
+      execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=black:s=540x960:r=30:d=1.2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', clip])
+      execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=0.9', '-c:a', 'libmp3lame', vo])
+      const res = await compositeReel({
+        videoClips: [clip],
+        clipDurations: [1.2],
+        voiceoverPath: vo,
+        words: [
+          { word: 'Test', startMs: 100, endMs: 400, durationMs: 300 },
+          { word: 'line.', startMs: 450, endMs: 800, durationMs: 350 },
+        ],
+        outputPath: out,
+        colorGrading: 'none',
+        ctaDurationSeconds: 0,
+        backgroundAudioVolume: 0,
+        tempDir: path.join(dir, 'build'),
+      })
+      expect(fs.existsSync(out)).toBe(true)
+      expect(res.durationSeconds).toBeGreaterThanOrEqual(1.1)
+      expect(res.durationSeconds).toBeLessThan(1.8)
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true })
+    }
+  }, 15000)
 })
 

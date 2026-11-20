@@ -7,6 +7,7 @@ import { talkFromSamples } from './talk'
 
 const example: Lesson = JSON.parse(fs.readFileSync(path.resolve('content/animation/examples/daily-shedding-routine.json'), 'utf8'))
 const dialogue: Lesson = JSON.parse(fs.readFileSync(path.resolve('content/animation/examples/nightly-molt-audit.json'), 'utf8'))
+const sketch: Lesson = JSON.parse(fs.readFileSync(path.resolve('content/animation/examples/walking-forward.json'), 'utf8'))
 
 describe('animated lessons', () => {
   it('accepts the example lesson and resolves its host from the cast', () => {
@@ -151,5 +152,35 @@ describe('animated lessons', () => {
     const { timeline } = buildTimeline(dialogue, looks, words, [[], []], { width: 540, height: 960, fps: 30, mouthBy: ['XAB'.repeat(5000), 'D'] })
     expect(timeline.mouthBy?.[0]).toHaveLength(timeline.frames)
     expect(timeline.mouthBy?.[1]).toBe('D')
+  })
+
+  it('validates comedy sketch lessons with 3 characters and hard-cut draft metadata', () => {
+    expect(lessonProblems(sketch)).toEqual([])
+    expect(castOf(sketch).map((c) => c.id)).toEqual(['vera', 'sol', 'moss'])
+    const draft = reelDraftFrom(sketch)
+    expect(draft.format).toBe('animated-sketch')
+    expect(draft.cast).toEqual(['vera', 'sol', 'moss'])
+    expect(draft.loudness).toBe(4)
+    expect(draft.queueId).toBe('6b00c2052c18af30956c81c9')
+    expect(draft.scenePrompts).toHaveLength(6)
+
+    // Sketch allows 4 scenes and shorter word counts, while short keeps 6-scene / 40-word minimums
+    const shortSketch: Lesson = {
+      ...sketch,
+      scenes: sketch.scenes.slice(0, 4),
+    }
+    expect(lessonProblems(shortSketch)).toEqual([])
+    const tooFewForShort: Lesson = { ...shortSketch, format: 'short' }
+    expect(lessonProblems(tooFewForShort)).toContain('a short has six to ten scenes')
+    expect(lessonProblems({ ...sketch, scenes: sketch.scenes.slice(0, 3) })).toContain('a sketch has four to ten scenes')
+
+    const looks = Object.fromEntries(castOf(sketch).map((c) => [c.id, castLook(c.id)]))
+    const words = estimateWords(narrationOf(sketch))
+    const { timeline } = buildTimeline(sketch, looks, words, [[], [], []], { width: 540, height: 960, fps: 30, tail: 0.3 })
+    expect(timeline.cast?.map((c) => ({ x: c.x, z: c.z ?? 0 }))).toEqual([
+      { x: 1.15, z: 0.15 },
+      { x: -1.15, z: 0.15 },
+      { x: 0, z: -0.85 },
+    ])
   })
 })

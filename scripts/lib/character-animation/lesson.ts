@@ -23,6 +23,16 @@ export const MARKS = ['left', 'center', 'right'] as const
 export type Mark = (typeof MARKS)[number]
 /** Where each mark stands on the floor, in world units. */
 const MARK_X: Record<Mark, number> = { left: -1.05, center: 0, right: 1.05 }
+
+/** Stage coordinates for a cast member: 3-character casts pull center slightly back in a shallow V so feet never clip. */
+export function markPosition(mark: Mark, castCount: number): { x: number; z: number } {
+  if (castCount >= 3) {
+    if (mark === 'left') return { x: -1.15, z: 0.15 }
+    if (mark === 'right') return { x: 1.15, z: 0.15 }
+    return { x: 0, z: -0.85 }
+  }
+  return { x: MARK_X[mark], z: 0 }
+}
 /** The narrator: a voice with no body, so no mouth moves while it speaks. */
 export const NARRATOR = 'narrator'
 
@@ -93,7 +103,7 @@ export interface Lesson {
   topic: string
   series: string
   episode: number
-  format: 'short'
+  format: 'short' | 'sketch'
   /** Cast id from content/characters/cast.json: the main character. */
   host: string
   /**
@@ -119,8 +129,18 @@ export interface Lesson {
   youtubeDescription: string
   youtubeTags?: string[]
   ctaGoal?: string
-  /** Outro card image (ImageGen), relative to the lesson file. */
+  /** Outro card image (ImageGen), relative to the lesson file, or 'none' for a hard cut on the punchline. */
   outro?: string
+  /** Playbook loudness (1-5) for the continuity ledger. */
+  loudness?: number
+  /** Pause between speakers in seconds (default 0.35 for lessons, 0.14 for comedy sketches). */
+  turnGap?: number
+  /** Seconds of picture after the last word (default 0.8 for lessons, 0.3 for comedy sketches). */
+  tail?: number
+  /** Ambient music volume (default 0.14 for lessons, 0 for dry comedy sketches). */
+  bgVolume?: number
+  /** Optional Zernio queue ID override saved into draft.json. */
+  queueId?: string
 }
 
 export interface CastMember {
@@ -186,8 +206,14 @@ export function lessonProblems(lesson: Lesson): string[] {
   for (const key of ['id', 'title', 'topic', 'series', 'host', 'hookHeadline', 'caption', 'firstComment', 'youtubeTitle', 'youtubeDescription'] as const) {
     if (typeof lesson[key] !== 'string' || !lesson[key].trim()) problems.push(`needs ${key}`)
   }
-  if (lesson.format !== 'short') problems.push('format must be "short" (long form is not built yet)')
-  if (!Array.isArray(lesson.scenes) || lesson.scenes.length < 6 || lesson.scenes.length > 10) problems.push('a short has six to ten scenes')
+  if (lesson.format !== 'short' && lesson.format !== 'sketch') {
+    problems.push('format must be "short" or "sketch" (long form is not built yet)')
+  }
+  const isSketch = lesson.format === 'sketch'
+  const minScenes = isSketch ? 4 : 6
+  if (!Array.isArray(lesson.scenes) || lesson.scenes.length < minScenes || lesson.scenes.length > 10) {
+    problems.push(isSketch ? 'a sketch has four to ten scenes' : 'a short has six to ten scenes')
+  }
   const cast = castOf(lesson)
   const ids = cast.map((c) => c.id)
   if (!ids.includes(lesson.host)) problems.push('cast must include the host')
@@ -233,7 +259,13 @@ export function lessonProblems(lesson: Lesson): string[] {
   if (lesson.hookHeadline && first.trim() !== lesson.hookHeadline.trim()) problems.push('scene 1 must be exactly the hookHeadline (put the rest of the line in scene 2)')
   if (lesson.hookHeadline && wordsOf(lesson.hookHeadline).length >= 14) problems.push('hookHeadline must be under 14 words')
   const words = wordsOf(narrationOf({ scenes })).length
-  if (words < 40 || words > 80) problems.push(`narration is ${words} words; aim for 50 to 65 (up to 75 for a dialogue)`)
+  if (isSketch ? words < 18 || words > 65 : words < 40 || words > 80) {
+    problems.push(
+      isSketch
+        ? `narration is ${words} words; aim for 25 to 55 for a comedy sketch`
+        : `narration is ${words} words; aim for 50 to 65 (up to 75 for a dialogue)`,
+    )
+  }
   return problems
 }
 
@@ -325,7 +357,7 @@ export function buildTimeline(
   const fps = options.fps
   const cast = castOf(lesson)
   const index = new Map(cast.map((c, i) => [c.id, i]))
-  const xOf = (id: string) => MARK_X[cast[index.get(id)!].at]
+  const xOf = (id: string) => markPosition(cast[index.get(id)!].at, cast.length).x
   const lastWord = words.length ? words[words.length - 1].endMs / 1000 : 0
   const longest = Math.max(0, ...talkBy.map((t) => t.length))
   const duration = Math.max(lastWord + (options.tail ?? 0.8), longest / fps)
@@ -356,7 +388,7 @@ export function buildTimeline(
     const focus = scene.focus ?? (scene.shot === 'two' && !solo ? 'all' : speaker !== NARRATOR ? speaker : solo ? lesson.host : 'all')
     const shot = SHOTS[scene.shot]
     // Centre the camera on its subject (or between everyone), then nudge for the frame setting.
-    const centre = focus === 'all' ? cast.reduce((sum, c) => sum + MARK_X[c.at], 0) / cast.length : xOf(focus)
+    const centre = focus === 'all' ? cast.reduce((sum, c) => sum + markPosition(c.at, cast.length).x, 0) / cast.length : xOf(focus)
     const pan = centre + PAN[scene.frame ?? 'center']
     // The opening shot looks a little higher, so the characters stand lower in the frame and the
     // hook headline has room above them. It holds for the whole first scene and goes on the cut to
@@ -410,7 +442,10 @@ export function buildTimeline(
   })
   cues.push(...actingCues(lesson, words, windows, cues, xOf))
   cues.sort((a, b) => a.t - b.t)
-  const castLooks = cast.map((c) => ({ look: { ...looks[c.id], pose: firstPose(c.id) }, x: MARK_X[c.at] }))
+  const castLooks = cast.map((c) => {
+    const pos = markPosition(c.at, cast.length)
+    return { look: { ...looks[c.id], pose: firstPose(c.id) }, x: pos.x, ...(pos.z ? { z: pos.z } : {}) }
+  })
   const tracks = cast.map((_, i) => (talkBy[i] ?? []).slice(0, frames))
   return {
     timeline: {
@@ -567,7 +602,10 @@ export function reelDraftFrom(lesson: Lesson): Record<string, unknown> {
     topic: lesson.topic,
     series: lesson.series,
     episode: lesson.episode,
-    format: 'animated-lesson',
+    format: lesson.format === 'sketch' ? 'animated-sketch' : 'animated-lesson',
+    cast: castOf(lesson).map((c) => c.id),
+    ...(lesson.loudness !== undefined ? { loudness: lesson.loudness } : {}),
+    ...(lesson.queueId ? { queueId: lesson.queueId } : {}),
     hookHeadline: lesson.hookHeadline,
     narrationScript: narrationOf(lesson),
     // reel:create stores exactly six scene prompts; longer dialogues fold neighbouring scenes together.

@@ -1,0 +1,151 @@
+{
+  "id": "crab-logic-ep01-walking-forward",
+  "title": "Why crabs refuse to walk forward",
+  "topic": "Crab Logic Ep. 1: Sol tries walking straight forward like a surface human; Vera and Moss explain why sideways is undefeated",
+  "series": "Crab Logic",
+  "episode": 1,
+  "format": "sketch",
+  "loudness": 4,
+  "set": "open-water",
+  "outro": "none",
+  "turnGap": 0.14,
+  "tail": 0.3,
+  "bgVolume": 0,
+  "queueId": "6b00c2052c18af30956c81c9",
+  "host": "vera",
+  "cast": [
+    {
+      "id": "sol",
+      "at": "left"
+    },
+    {
+      "id": "moss",
+      "at": "center"
+    },
+    {
+      "id": "vera",
+      "at": "right"
+    }
+  ],
+  "hookHeadline": "I tried walking straight forward like a surface human today.",
+  "scenes": [
+    {
+      "speaker": "sol",
+      "line": "I tried walking straight forward like a surface human today.",
+      "shot": "two",
+      "pose": "strut",
+      "look": "camera",
+      "act": {
+        "moss": {
+          "pose": "rest",
+          "look": "left"
+        },
+        "vera": {
+          "pose": "rest",
+          "look": "left"
+        }
+      },
+      "description": "Three-shot on the sea floor: Sol stands proudly in a strut while Moss and Vera stare sideways at him."
+    },
+    {
+      "speaker": "vera",
+      "line": "Why would you walk straight toward your problems?",
+      "shot": "close",
+      "move": "cut",
+      "pose": "ready",
+      "look": "left",
+      "description": "Close-up on Vera looking left across the sand, deeply unimpressed."
+    },
+    {
+      "speaker": "sol",
+      "line": "It felt bold. Very exposed. I hated every second.",
+      "shot": "close",
+      "move": "cut",
+      "pose": "shrug",
+      "look": "right",
+      "react": [
+        {
+          "kind": "poke",
+          "word": 4
+        }
+      ],
+      "description": "Close-up on Sol shrugging and flinching at the word 'exposed'."
+    },
+    {
+      "speaker": "moss",
+      "line": "Sideways is undefeated.",
+      "shot": "close",
+      "move": "cut",
+      "pose": "rest",
+      "look": "camera",
+      "acting": "calm",
+      "act": {
+        "sol": {
+          "pose": "rest",
+          "acting": "none",
+          "look": "right"
+        },
+        "vera": {
+          "pose": "rest",
+          "acting": "none",
+          "look": "left"
+        }
+      },
+      "description": "Close-up on Moss facing the camera calmly."
+    },
+    {
+      "speaker": "moss",
+      "line": "You can leave any conversation without turning around.",
+      "shot": "close",
+      "move": "push-in",
+      "pose": "rest",
+      "look": "camera",
+      "acting": "calm",
+      "act": {
+        "sol": {
+          "pose": "rest",
+          "acting": "none",
+          "look": "right"
+        },
+        "vera": {
+          "pose": "rest",
+          "acting": "none",
+          "look": "left"
+        }
+      },
+      "description": "Slow push-in on Moss delivering deadpan crustacean wisdom."
+    },
+    {
+      "speaker": "vera",
+      "line": "Evolution got it right five times.",
+      "shot": "extreme",
+      "move": "cut",
+      "pose": "point",
+      "look": "camera",
+      "react": [
+        {
+          "kind": "snap",
+          "word": 4,
+          "side": -1
+        }
+      ],
+      "description": "Extreme close-up on Vera snapping straight into the lens right before the hard cut."
+    }
+  ],
+  "caption": "Walking straight forward is a design flaw.\n\nSol tried it once. Never again.\n\n#CrabLogic #CrustaceanHumor #Moltology",
+  "hashtags": [
+    "#CrabLogic",
+    "#CrustaceanHumor",
+    "#Moltology"
+  ],
+  "firstComment": "More crustacean logic: https://moltology.org",
+  "youtubeTitle": "Why crabs refuse to walk forward #shorts",
+  "youtubeDescription": "Sol tried walking straight forward like a surface human. Moss and Vera had notes.\n\nMore crustacean logic: https://moltology.org",
+  "youtubeTags": [
+    "crab logic",
+    "comedy shorts",
+    "3d animation",
+    "moltology"
+  ],
+  "ctaGoal": "homepage"
+}
