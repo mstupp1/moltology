@@ -50,7 +50,7 @@ This section is for Claude Code sessions on Myles's Mac, which have the OpenAI C
 
 ## Logic Atlas
 
-Business rules and decisions live in [docs/logic/](docs/logic/) and render for staff at `/admin/logic`. After merging changes to thresholds, access, economy, screening, moderation, or data handling, refresh it with [logic-atlas](.agents/skills/logic-atlas/SKILL.md).
+Business rules and decisions live in [docs/logic/](docs/logic/) and render for staff at `/admin?tab=logic`. After merging changes to thresholds, access, economy, screening, moderation, or data handling, refresh it with [logic-atlas](.agents/skills/logic-atlas/SKILL.md).
 
 ## UI completion
 

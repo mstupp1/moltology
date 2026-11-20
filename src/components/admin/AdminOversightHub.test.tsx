@@ -113,7 +113,7 @@ describe('Admin access and oversight hub', () => {
     expect(screen.getByTestId('admin-sectors')).toBeInTheDocument()
     expect(screen.getByTestId('band-section-watch')).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: /Composite Studio/i })).toHaveAttribute('href', '/render/composite')
-    expect(screen.getByRole('link', { name: /Logic Atlas/i })).toHaveAttribute('href', '/admin/logic')
+    expect(screen.getByRole('link', { name: /Logic Atlas/i })).toHaveAttribute('href', '/admin?tab=logic')
     expect(screen.queryByRole('link', { name: /Store settings/i })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Storefront/i })).toHaveAttribute('href', '/store')
   })
