@@ -275,10 +275,8 @@ input[type="range"].dial-range:focus-visible {
     padding-bottom: 0.625rem;
   }
 }
-/* Align the section tabs' first tile with the title. */
-.hud-band-sections > * {
-  margin-left: 0;
-}
+/* Section tabs keep BandSectionNav's -ml-2.5 so the first tab's label, not its tile edge,
+   lines up with the title. */
 /* Room for the floating search pill at the end of a band's title row (desktop only). */
 .hud-pill-clear {
   display: none;
