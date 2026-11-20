@@ -425,11 +425,11 @@ export function MarketShopPage() {
     <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans pb-2">
       {/* The Character band (title, wallet, tabs) is drawn by the /character layout route. */}
       <div className="space-y-2">
-        <p className="max-w-2xl text-xs text-ink-muted leading-relaxed max-md:hidden">
-          {tab === 'skills'
-            ? 'Methods the Oracle can walk you through. Pick one in the chat box, or let the Oracle reach for it.'
-            : 'Gear for your character. Rarer versions come with bigger stats and stranger abilities.'}
-        </p>
+        {tab === 'skills' ? (
+          <p className="max-w-2xl text-xs text-ink-muted leading-relaxed max-md:hidden">
+            Methods the Oracle can walk you through. Pick one in the chat box, or let the Oracle reach for it.
+          </p>
+        ) : null}
         <div role="tablist" aria-label="Market sections" className="flex gap-1">
           {TABS.map((t) => (
             <button
