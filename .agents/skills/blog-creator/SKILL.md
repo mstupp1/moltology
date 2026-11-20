@@ -129,7 +129,7 @@ STYLE_GUIDE §4.5 requires `Title: Subtitle` (the page splits at the first colon
 title: "Specific Claim or Real Name: Plain Subtitle With the Target Query"
 slug: "target-query-slug"
 summary: "1-2 sentences. The first states the thesis plainly with the target query; the second, if needed, adds the proving detail."
-category: "TELEMETRY" # Options: TELEMETRY, SWARM ARCHITECTURE, DEEP RESEARCH, SACRED DOCTRINE, PATRIOT TELEMETRY
+category: "TELEMETRY" # Options: TELEMETRY, SWARM ARCHITECTURE, DEEP RESEARCH, SACRED DOCTRINE
 tags:
   - "target query" # First tag is the Step 1 target query
   - "Embodiment"
@@ -279,6 +279,12 @@ npx tsx scripts/ingest.ts content/news/<slug>.md --commit
 4. Executes `git add content/news/<slug>.md content/news/blog-history.json && git commit -m "feat(news): publish <slug> and update continuity ledger"`.
 
 **Result:** Verify that the article is live in production, images are on S3, and the continuity ledger is updated and committed. Follow the shared worktree hygiene checks before claiming the tree is clean; the ingest commit alone does not cover other run-owned changes.
+
+#### Rewriting Already-Published Dispatches
+When revising an existing article in `content/news/<slug>.md`:
+* Keep `slug`, `publishedAt`, and existing S3 image URLs intact so published `/news/<slug>` links and media never break.
+* Reconcile the ledger with `npm run blog:sync-history` and validate with `npx tsx scripts/ingest.ts content/news/<slug>.md --dry-run`.
+* Do not re-ingest into Neon (`PROD_DATABASE_URL` or `--dev`) until the user reviews and approves the rewritten markdown.
 
 ---
 

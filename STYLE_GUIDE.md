@@ -3,7 +3,7 @@
 How to write every human-facing string: product UI, HUD readouts, news, changelogs, social,
 forum, and onboarding. Terms, voices, and the economy live in
 [BRAND_BIBLE.md](BRAND_BIBLE.md). This guide wins on voice, bans, and formatting.
-_Last Revised: 2026-10-23_
+_Last Revised: 2026-11-20_
 
 ---
 
@@ -49,6 +49,9 @@ the hooks, the pitch-three step, the boredom check and the cut list.
    validation, toasts, permission prompts, settings, and admin screens say exactly what
    happened in ordinary words (see §3.4).
 9. **Keep it short.** Cut every word that isn't earning its shell.
+10. **Say what it is directly.** Avoid stacking "Not X. Y." or "It is not X. It is Y."
+    contrasts. One crisp contrast per piece lands; three in a row sound stiff and
+    formulaic.
 
 ---
 
@@ -144,13 +147,17 @@ Never mock the starting state.
 State the absurd truth flatly, ground it in one everyday detail, end with the practical
 step.
 
-### 3.4 Utility copy (buttons, toasts, errors, forms, empty states)
+### 3.4 Utility copy (buttons, auth, locks, search, errors, empty states)
 
 - Buttons name the action: "Start the Molt", "Shed This", "Save username".
 - Toasts say what happened: "Profile saved.", "Link copied.", "Notifications enabled."
 - Errors say what failed and what to do: "Could not save changes. Please try again." Never
   "The tide is strong. Loose grip noted."
 - Validation states the exact constraint: "Username must be 3 to 20 characters."
+- Auth screens, guest locks, member search, loading states, and community rules stay
+  plain English. Avoid developer phrasing ("persist your session", "saved state",
+  "unhandled exception", "dossier") and theatrical labels ("THIS TERMINAL", "Operative",
+  "neural isolation") on functional UI.
 - Empty states can be warm: "No distractions here. The deep is quiet and waiting."
 - Readouts show a real metric and value: SHELL HARDNESS · 61% · EXOSHELL BORN.
 - Currency names are always correct. Don't add economy lines to HUD strings; mention what

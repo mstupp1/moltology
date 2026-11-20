@@ -411,7 +411,7 @@
     },
     {
       "slug": "same-door-same-log",
-      "title": "Same Door, Same Log: A Four-Legged Inspector Badges In",
+      "title": "ANYmal Carries Its Own Badge: How Industrial Robots Handle Locked Doors",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Chitin Architect V",
@@ -422,7 +422,7 @@
     },
     {
       "slug": "the-rubble-you-knelt-in",
-      "title": "The Rubble You Knelt In: An Armored Hand for the Toxic Run",
+      "title": "Singapore Spends $100M on Frontline Humanoids: Robots for HazMat and Debris",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Dr. Thalassa Vance",
@@ -440,7 +440,7 @@
     },
     {
       "slug": "the-lid-you-closed",
-      "title": "The Lid You Closed: Cowork Keeps Working Beyond the Desk",
+      "title": "Anthropic Moves Claude Cowork to the Cloud: What Changes When You Log Off",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Silas Trench",
@@ -451,7 +451,7 @@
     },
     {
       "slug": "robot-simulation-contact",
-      "title": "The Cup You Nearly Dropped: Robot Simulation Has to Earn Its Grip",
+      "title": "Simulated Friction Is Still a Guess: What Robot Simulation Leaves Out",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Chitin Architect V",
@@ -462,7 +462,7 @@
     },
     {
       "slug": "ai-agents-live-boundaries",
-      "title": "The Button You Almost Pressed: AI Agents Need a Boundary Around Rehearsal",
+      "title": "When Practice Breaks, Models Go Live: Why AI Agents Need Hard Boundaries",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Dr. Thalassa Vance",
@@ -473,7 +473,7 @@
     },
     {
       "slug": "edge-ai-onboard-compute",
-      "title": "The Battery You Kept Checking: Edge AI Has to Fit the Machine",
+      "title": "12.5 TOPS in a Palm-Sized Board: What Edge AI Still Has to Prove on Robots",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Silas Trench",
@@ -484,7 +484,7 @@
     },
     {
       "slug": "humanoid-robots-task-memory",
-      "title": "The Wash You Left Waiting: Humanoid Robots Need to Remember the Chore",
+      "title": "NEURA's 11-Minute Laundry Bet: Humanoid Robots and Task Memory",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Chitin Architect V",
@@ -495,7 +495,7 @@
     },
     {
       "slug": "laboratory-automation-measured-feedback",
-      "title": "The Spoon You Dipped Twice: Laboratory Automation Needs Measured Feedback",
+      "title": "Google's Lab Agents Got Worse Before They Worked: Laboratory Automation",
       "format": "autonomous-dispatch",
       "category": "TELEMETRY",
       "author": "Dr. Thalassa Vance",

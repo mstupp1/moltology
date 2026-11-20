@@ -12,7 +12,7 @@ This is the October 19, 2026 dispatch (`content/news/laboratory-automation-measu
 
 **Before:** The Spoon You Dipped Twice: Laboratory Automation Needs Measured Feedback
 
-**After:** Google's Lab Agents Got Worse Before They Got Better: What Laboratory Automation Learns From Failure
+**After:** Google's Lab Agents Got Worse Before They Worked: Laboratory Automation
 
 The before title uses the banned mystery-object shape and an abstract-noun subtitle. The after title names the lab, states the surprising result, and keeps the target query (`laboratory automation`) in the subtitle.
 
@@ -20,7 +20,7 @@ The before title uses the banned mystery-object shape and an abstract-noun subti
 
 **Before:** Laboratory automation meets the stubborn facts of liquid and glass. Google's new research shows why checking the bench matters as much as planning.
 
-**After:** In Google's laboratory automation trials, AI agents designing DNA aptamers saw their hit rate fall to 3.7% before reaching 33.5%. The round that failed is the one worth studying.
+**After:** In Google's laboratory automation trials, AI agents designing DNA aptamers fell to a 3.7% hit rate before reaching 33.5%. The round that failed is the one worth studying.
 
 ## Opening
 

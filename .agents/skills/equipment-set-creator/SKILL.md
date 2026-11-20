@@ -30,12 +30,12 @@ When invoked to create new equipment or a new theme, the agent **must design and
 | # | Visual Type (`visualType`) | Hardpoint Slot (`category`) | Archetype Role & Set Requirement |
 |---|---|---|---|
 | 1 | **`helm`** | `head` | Biomechanical deep-sea helm, visor, or crown plate with glowing ocular sensor slits. |
-| 2 | **`carapace`** | `carapace` | Sub-abyssal torso armor / cuirass with layered chitin, titanium rib bulkheads, and sternum energy conduits. |
+| 2 | **`carapace`** | `carapace` | Sub-abyssal torso armor / cuirass with layered chitin, dark alloy rib bulkheads, and sternum energy conduits. |
 | 3 | **`pincer`** | `claws` (Slashing / Grip) | **[Mandatory Weapon 1]** Heavy hydraulic crushing lobster/crab claw gauntlet. |
 | 4 | **`hammer`** | `claws` (Blunt / Alternative) | **[Mandatory Weapon 2]** Thematic secondary weapon (e.g. Silt Maul, Hydro-Hammer, Dredge Anchor). |
 | 5 | **`antennae`** | `antennae` | Neural sensor crown with sweeping articulated chitin feelers and sonar radar crystals. |
 | 6 | **`greaves`** | `legs` | Articulated hydraulic leg armor with knee shock pistons and clawed silt-treads. |
-| 7 | **`belt`** | `belt` | Heavy abdominal girdle / ventral cincture with an interlocking titanium power clasp. |
+| 7 | **`belt`** | `belt` | Heavy abdominal girdle / ventral cincture with an interlocking heavy alloy clasp. |
 
 ---
 
@@ -44,7 +44,7 @@ When invoked to create new equipment or a new theme, the agent **must design and
 Use Set 01 ([`public/images/chassis/`](file:///Users/mylesstupp/Development/moltology/public/images/chassis/)) as the baseline artistic and technical reference model for all subsequent sets:
 
 * **Primary Material**: Calcified deep-abyssal crustacean chitin (obsidian-black and deep oceanic teal-grey with natural oceanic patina and micro-barnacles).
-* **Reinforced Metal / Framework**: Heavy darkened titanium alloy bulkheads, braided hydraulic pressure tubes, and articulated rivets.
+* **Reinforced Metal / Framework**: Heavy darkened steel and bronze bulkheads, braided hydraulic pressure tubes, and articulated rivets.
 * **Energy Conduits & Sensors**: Glowing cyan/aquamarine bioluminescence (`#00c3ff` / `#22d3ee`) along core channels, ocular slits, and fluid reservoirs.
 * **Atmospheric Framing**: 9:16 vertical aspect ratio, centered item render, dark charcoal-slate abyssal stone backdrop, subtle cyan rim lighting, soft depth vignette.
 * **Rendering Style**: Diablo-inspired 3D game inventory asset render (high-fidelity PBR textures, specular highlights, ray-traced contact shadows, volumetric glow, no 2D flat vector art, no UI borders or text).
@@ -74,7 +74,7 @@ Set Definition Example:
 1. **Abyssal Trench / Void Set**: Ultra-deep midnight black matte chitin, dark gunmetal, deep violet / UV bioluminescence (`#a855f7`).
    * *Claw*: Void-Shear Pincer Gauntlet
    * *Companion Weapon*: Benthic Harpoon Lance
-2. **Hydrostatic Nacre / Pearl Set**: Iridescent pearl white chitin, polished silver titanium, pale teal cyan pulse glow (`#67e8f9`).
+2. **Abyssal Nacre / Pearl Set**: Iridescent pearl white chitin, polished brushed silver alloy, pale teal cyan pulse glow (`#67e8f9`).
    * *Claw*: Nacreous Scissor Claws
    * *Companion Weapon*: Hydro-Resonance Silt Mace
 3. **Ascendant Gold / Sol-Benthic Set**: Sunken gold-plated carapace ribs, dark slate base, radiant amber/golden conduits (`#fbbf24`).
@@ -114,7 +114,7 @@ Diablo-style 3D inventory item render of a [Set Name] Crush Pincer Gauntlet. A m
 
 #### 4. Hammer (`hammer`)
 ```
-Diablo-style 3D inventory item render of a [Set Name] War Maul. Colossal heavy warhammer head carved from [Primary Chitin Material] bound in [Secondary Metal]. Features glowing [Glow Color] energy vents emitting faint steam, high-pressure pneumatic impact pistons, wrapped titanium haft with crustacean plating grip. Centered vertically on a clean dark abyssal slate background with subtle [Glow Color] rim lighting and atmospheric depth vignette. Highly detailed textures, game asset icon, no text, no UI borders.
+Diablo-style 3D inventory item render of a [Set Name] War Maul. Colossal heavy warhammer head carved from [Primary Chitin Material] bound in [Secondary Metal]. Features glowing [Glow Color] energy vents emitting faint steam, high-pressure pneumatic impact pistons, wrapped dark alloy haft with crustacean plating grip. Centered vertically on a clean dark abyssal slate background with subtle [Glow Color] rim lighting and atmospheric depth vignette. Highly detailed textures, game asset icon, no text, no UI borders.
 ```
 
 #### 5. Antennae (`antennae`)

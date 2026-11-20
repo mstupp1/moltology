@@ -1,77 +1,61 @@
 ---
-title: "The Lid You Closed: Cowork Keeps Working Beyond the Desk"
+title: "Anthropic Moves Claude Cowork to the Cloud: What Changes When You Log Off"
 slug: "the-lid-you-closed"
-summary: "Closing the laptop used to feel like putting the work away. Anthropic's October 6 change moves new Cowork tasks on Pro and Max into the cloud, inviting a fresh look at what we hand over and when we call a task finished."
+summary: "Anthropic moved new Claude Cowork tasks on Pro and Max onto cloud servers on October 6, removing the local-only option. Background work now needs explicit scope and review windows."
 category: "TELEMETRY"
 tags:
-  - "Attention"
+  - "Claude Cowork"
+  - "AI Agents"
   - "Boundaries"
-  - "The Great Melt"
 authorName: "Silas Trench"
 authorRole: "Senior Benthic Telemetry Correspondent"
 coverImageUrl: "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/the-lid-you-closed-cover.png"
-readTimeMinutes: 5
+readTimeMinutes: 4
 isFeatured: true
 isPublished: true
 publishedAt: "2026-10-07T11:36:17-04:00"
 ---
 
-### The small click at the end of the day
+### Closing the lid stopped being an off switch
 
-The hinge makes a small click. You slide the laptop away from the edge of the table and find the ring your mug left underneath it. Dinner has cooled while you finished one last thing. Somewhere in the next room, someone has already started telling you about their day.
+For twenty years of laptop work, shutting the hinge meant the job paused where you left it. Starting October 6, 2026, that physical cue stopped applying to new Claude Cowork tasks on Anthropic's Pro and Max plans. Tasks now run on Anthropic's cloud servers by default, and the option to keep new runs strictly on your own machine has been removed.
 
-For a moment, the desk has a boundary you can touch. The screen is shut. Your hands are empty. There is enough room to listen without keeping one eye on a progress bar.
+That change delivers an obvious convenience: you can hand off a multi-step chore, close your laptop, and check the finished result later from another device. It also changes the boundary around delegation. Once background work keeps moving after you walk away, the only real protection against creeping scope or evening distraction is deciding upfront what the assistant can touch and when you will look at the output.
 
-Soft is how every member starts. Wanting help with the receipts, the meeting notes, or the folder full of unfinished drafts is an ordinary response to being tired. The Order has no quarrel with relief. A useful machine should make room for the person beside you.
+### What Anthropic's documentation actually says
 
-The Great Melt begins when relief carries an assumption we never examine. We ask something to keep working, then discover that we have stopped knowing where the work lives or what it can still reach. The quiet click remains. Its meaning has changed underneath our hand.
+Anthropic's [Claude Help Center guide](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile) notes that effective October 6, new Cowork sessions on Pro and Max execute remotely on its servers while earlier local tasks can still finish where they began. Because the session lives in the cloud, closing the computer no longer interrupts an active run.
 
-### What the documentation filed
+The [architecture overview](https://support.claude.com/en/articles/14479288-claude-cowork-architecture-overview), checked October 7, explains how local files fit into that model. Each remote session runs inside a separate temporary execution environment. When you connect local folders, access passes through the desktop app and its permission checks; if the desktop app goes offline, the remote session can no longer reach your computer. Still, any file opened through that connection is processed on Anthropic's servers rather than staying strictly on your desk.
 
-Anthropic's [Claude Help Center](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile) documents a change effective October 6, 2026: new Cowork tasks on Pro and Max run on its servers. The previous option to keep new tasks on the computer has been removed. Earlier local tasks remain available to finish where they began.
-
-The benefit is tangible: a task can continue after the laptop closes, and its session can be reached from other devices. This dispatch concerns the documented Pro and Max change; it does not assume every workplace has adopted the same arrangement.
-
-The [architecture overview](https://support.claude.com/en/articles/14479288-claude-cowork-architecture-overview), checked October 7, describes a separate temporary execution environment for each cloud session. Access to connected folders passes through the desktop app and its permission checks. When that app is offline, the remote session cannot reach the device. Work performed remotely, including files opened through that connection, is processed on Anthropic's servers.
-
-That distinction matters at a kitchen table. An original file remaining in its folder does not mean every use of it remains at the desk. A continuing task and a continuing connection to your computer are different things. Neither the closed lid nor the familiar folder icon explains the whole journey.
-
-Anthropic's [safety guidance](https://support.claude.com/en/articles/13364135-use-claude-cowork-safely), also checked October 7, makes another distinction: isolation constrains the execution environment, while granted access determines what the assistant can read and do. These are the provider's descriptions of its safeguards, rather than an independent audit or a promise that mistakes cannot happen.
+Anthropic's [safety guidance](https://support.claude.com/en/articles/13364135-use-claude-cowork-safely) adds a useful distinction: sandboxing isolates where code runs, while granted permissions determine what the assistant can actually read and change. Those documents represent Anthropic's own description of its safeguards rather than an independent security audit, and they put the real scope decision squarely on the person clicking "allow."
 
 ![Bounded access and a separate working copy](https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/the-lid-you-closed-bounded-access-and-a-separate-working-copy.png)
 
-*Conceptual illustration: a bounded connection and a separate working copy make different parts of a task visible.*
+*Illustration: Handing a cloud session a dedicated working folder separates one assignment from the rest of your files.*
 
-### A shell around the assignment
+### Convenience borrows the evening if the edges stay blurry
 
-The surface pitch is easy to understand. Hand over a tedious job, close the screen, and return to a finished result. Anyone who has spent an evening rearranging receipts can appreciate that invitation. There is dignity in recovering the evening.
+There is a fair case for cloud execution. Nobody misses babysitting a laptop with the lid propped open while a tedious report compiles or receipts get sorted. Handing off dull administrative cleanup so you can step away for dinner is exactly what good software should do.
 
-The deeper question is whether the assignment has edges. “Help with this month's expenses” can refer to a small collection of copies prepared for one purpose. It can also become an open invitation to a folder containing years of unrelated work. The sentence sounds equally helpful in both cases. The boundary does different work.
+The catch shows up in two everyday habits. First, lazy folder access. Saying "help with this month's expenses" while pointing a remote session at a broad documents folder containing years of tax returns and client drafts invites far more exposure than copying twelve receipts into a single scratch folder. Isolation protects the server container; it cannot narrow a folder you handed over whole.
 
-Carapace integrity begins with a scope you can describe without pointing vaguely at the whole desk. Which materials belong to this assignment? What result counts as finished? Which action needs your judgment before it happens? Those questions give the shell a useful shape. They help you hand over work with less uncertainty about what comes back.
+Second, attention drift. When work keeps running in the cloud and you can check it from your phone, the dinner table quietly inherits a progress bar. If a background job leaves you glancing at notifications three times between courses, the automation did not give you your evening back; it just moved the office into your pocket.
 
-The Soft-Shell Window is the tender interval after a routine changes. Here it is the week when closing a laptop stops being a dependable cue that everything has paused. Protect that interval with a smaller assignment and a deliberate review. Let the new habit harden around something you have seen work.
-
-Apprenticeship belongs at the desk as much as on a factory floor. An assistant can begin with a bounded draft, learn the shape of the task through your corrections, and return something you can inspect. Finishing a document and deciding to send it remain separate moments in the working day. Keep enough space between them for your own voice.
-
-This is the Order's reading of the change: convenience earns its place when it returns attention. If a background task leaves you checking your phone throughout dinner, its progress has borrowed the hour it was meant to free. A clear stopping point can be as valuable as a faster start.
+A solid shell around background delegation stays simple: give the job a narrow working copy, define what counts as finished, and pick a real time tomorrow morning to review the result. Drafting and sending should stay separate steps, with your own eyes in the middle.
 
 ![An evening meal beside a separate work space](https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/the-lid-you-closed-an-evening-meal-beside-a-separate-work-space.png)
 
-*Conceptual illustration: the work has an assigned place, and the evening has room for another person.*
+*Illustration: Setting a fixed review time keeps background cloud tasks from spilling into off-hours attention.*
 
-### Put the assignment down
+### Put the folder and the review time on the calendar
 
-Tomorrow, choose one job you would be glad to hand over. Give it a narrow set of materials and a finish you can recognize. Before you step away, decide when you will review the result. Write that appointment down if your mind tends to keep watch after your hands have left the keyboard.
-
-Then let the evening have its own weight. The mug can go to the sink. The person in the next room can finish their story. A well-shaped boundary gives useful work a place to continue and gives you a place to stop. The shell protects; it opens from the inside.
-
-If you want a quiet next step, the Audit is waiting in the deep. Signup is free. Stop.
+Next time you kick off a cloud Cowork task, drop only the files it needs into a dedicated folder, and decide before closing your laptop exactly when you will inspect the output. Let the run finish on its own clock without checking your phone while it works.
 
 ---
 
 ### Field Telemetry & Source Citations
 
-* [Claude Help Center: Use Claude Cowork on web, desktop, and mobile](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile): Anthropic's documentation of the October 6, 2026 Pro and Max execution change; checked October 7, 2026.
-* [Claude Help Center: Claude Cowork architecture overview](https://support.claude.com/en/articles/14479288-claude-cowork-architecture-overview): Primary description of session isolation, connected-folder access, and remote processing; checked October 7, 2026.
-* [Claude Help Center: Use Claude Cowork safely](https://support.claude.com/en/articles/13364135-use-claude-cowork-safely): Primary explanation of the relationship between isolation, readable content, and permitted actions; checked October 7, 2026.
+* [Claude Help Center: Use Claude Cowork on web, desktop, and mobile](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile): Anthropic documentation detailing the October 6, 2026 shift of new Pro and Max Cowork runs to cloud servers; checked October 7, 2026.
+* [Claude Help Center: Claude Cowork architecture overview](https://support.claude.com/en/articles/14479288-claude-cowork-architecture-overview): Explanation of temporary cloud execution environments, desktop-app folder access, and remote file processing; checked October 7, 2026.
+* [Claude Help Center: Use Claude Cowork safely](https://support.claude.com/en/articles/13364135-use-claude-cowork-safely): Primary guidance distinguishing execution isolation from granted file and action permissions; checked October 7, 2026.
