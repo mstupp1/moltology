@@ -49,6 +49,28 @@ export type Reaction = 'poke' | 'snap' | 'equip' | 'celebrate'
 /** How long each reaction runs, in seconds. */
 export const REACTION_SECONDS: Record<Reaction, number> = { poke: 0.75, snap: 0.6, equip: 0.9, celebrate: 1.7 }
 
+/** Talking gestures for scripted animation (character.ts plays them over the pose). */
+export const GESTURES = ['beat', 'open', 'offer', 'tilt', 'nod', 'shift'] as const
+export type Gesture = (typeof GESTURES)[number]
+
+/** How long each gesture runs, in seconds. */
+export const GESTURE_SECONDS: Record<Gesture, number> = { beat: 0.6, open: 1.1, offer: 1.2, tilt: 1.3, nod: 0.8, shift: 1.6 }
+
+/**
+ * The shape of a gesture over p in 0..1: a slight pull back the other way, a quick rise to the
+ * full gesture a third of the way in, then a slow settle back to the pose with no hard stop.
+ */
+export function gestureCurve(p: number): number {
+  if (p <= 0 || p >= 1) return 0
+  if (p < 0.1) return -0.12 * Math.sin((p / 0.1) * Math.PI)
+  if (p < 0.32) {
+    const q = (p - 0.1) / 0.22
+    return 1 - (1 - q) ** 3
+  }
+  const q = (p - 0.32) / 0.68
+  return 0.5 + 0.5 * Math.cos(q * Math.PI)
+}
+
 /** A steady number in 0..1 for a whole number, so idle timing varies without being random. */
 export function jitter(n: number): number {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453

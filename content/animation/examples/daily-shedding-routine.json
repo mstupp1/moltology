@@ -18,10 +18,10 @@
     },
     {
       "line": "The Codex calls it the Daily Shedding Routine. It's short.",
-      "description": "Close on the host, thinking, then a small shrug at 'It's short'.",
+      "description": "Close on the host, then a small shrug at 'It's short'.",
       "shot": "close",
       "move": "push-in",
-      "pose": "think"
+      "pose": "shrug"
     },
     {
       "line": "Morning: before any feed or inbox, name the one thing that matters, and start it first.",

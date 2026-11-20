@@ -5,7 +5,8 @@
  */
 import type { AvatarPose } from '../avatar/traits'
 import type { Avatar3DLook } from './look'
-import type { Reaction } from './motion'
+import type { Gesture, Reaction } from './motion'
+import { isMouthShape } from './mouth-shapes'
 import { buildSet, type SetArt, type SetName } from './sets'
 import type { Stage } from './stage'
 
@@ -14,7 +15,7 @@ export const SHOTS = {
   /** The whole figure, feet to antennae. */
   wide: { zoom: 1, tilt: 0.04 },
   /** Two or three characters side by side, all in frame. */
-  two: { zoom: 0.58, tilt: 0.05 },
+  two: { zoom: 0.5, tilt: 0.05 },
   /** Knees up: the everyday talking shot. */
   medium: { zoom: 1.35, tilt: 0.06 },
   /** Head and shoulders. */
@@ -52,7 +53,13 @@ export interface TimelineCue {
   who?: number
   camera?: CameraCue
   pose?: AvatarPose
+  /** Land the pose at once instead of blending (on a camera cut, where a blend would only show as a sweep). */
+  snap?: boolean
   react?: { kind: Reaction; side?: 1 | -1 }
+  /** A talking gesture over the pose; `amount` scales it (1 full). */
+  gesture?: { kind: Gesture; side?: 1 | -1; amount?: number }
+  /** Added by the acting pass rather than written by hand, so the clipping guard may tone it down. */
+  auto?: boolean
   /** Turn of the whole character in radians (0 faces the viewer). */
   yaw?: number
   /** Slow turntable speed in radians per second (0 stops it). */
@@ -79,6 +86,11 @@ export interface AnimationTimeline {
    */
   cast?: { look: Avatar3DLook; x: number; z?: number; yaw?: number }[]
   talkBy?: number[][]
+  /**
+   * Cartoon mouth shapes per frame for each member, in cast order: one letter a frame from
+   * MOUTH_SHAPES (X rest). Without a track a member's mouth just opens with its speech level.
+   */
+  mouthBy?: string[]
   /** Set dressing in front of the backdrop. */
   set?: SetName
   /** Painted textures and the cut-out layer for the set (see sets.ts). */
@@ -90,7 +102,10 @@ export interface AnimationTimeline {
  * fire on the first frame at or after their time. The stage needs to be made with `manual: true`
  * and `preserveDrawingBuffer: true` so each frame can be read back.
  */
-export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
+/** What a timeline needs from a stage: the real one draws, a rehearsal (rehearse.ts) only moves. */
+export type TimelineStage = Pick<Stage, 'setCast' | 'setLook' | 'setProps' | 'member' | 'setCamera' | 'setMemberYaw' | 'setSpin' | 'step'>
+
+export function timelinePlayer(stage: TimelineStage, timeline: AnimationTimeline, options: { set?: boolean } = {}) {
   const cues = [...timeline.cues].sort((a, b) => a.t - b.t)
   const dt = 1 / timeline.fps
   let next = 0
@@ -98,14 +113,18 @@ export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
   const members = timeline.cast?.length ?? 1
   if (timeline.cast?.length) stage.setCast(timeline.cast)
   else stage.setLook(timeline.look, true)
-  const set = timeline.set ? buildSet(timeline.set, timeline.setArt) : null
+  // Claws stay out of bodies, their own and each other's.
+  const everyone = Array.from({ length: members }, (_, m) => stage.member(m)).filter((c): c is NonNullable<typeof c> => Boolean(c))
+  for (const c of everyone) c.avoidContacts(true, everyone.filter((o) => o !== c).flatMap((o) => o.contacts()))
+  const set = timeline.set && options.set !== false ? buildSet(timeline.set, timeline.setArt) : null
   if (set) stage.setProps(set.root)
   const apply = (cue: TimelineCue) => {
     const who = cue.who ?? 0
     const character = stage.member(who)
     if (cue.camera) stage.setCamera(cue.camera)
-    if (cue.pose) character?.setPose(cue.pose)
+    if (cue.pose) character?.setPose(cue.pose, cue.snap)
     if (cue.react) character?.react(cue.react.kind, cue.react.side)
+    if (cue.gesture) character?.gesture(cue.gesture.kind, cue.gesture.side, cue.gesture.amount)
     if (cue.yaw !== undefined) stage.setMemberYaw(who, cue.yaw)
     if (cue.spin !== undefined) stage.setSpin(cue.spin)
     if (cue.look !== undefined) character?.lookAt(cue.look)
@@ -113,7 +132,7 @@ export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
   return {
     /** Resolves when the set's art has loaded; wait for it before the first frame. */
     ready: set?.ready ?? Promise.resolve(),
-    /** Draw frame `index` (the next one in order). */
+    /** Draw frame `index` (the next one in order); frames skipped over are moved through, not drawn. */
     seek(index: number) {
       if (index <= drawn) throw new Error(`Frames must be drawn in order (asked for ${index} after ${drawn})`)
       while (drawn < index) {
@@ -122,10 +141,11 @@ export function timelinePlayer(stage: Stage, timeline: AnimationTimeline) {
         while (next < cues.length && cues[next].t <= t + 1e-6) apply(cues[next++])
         for (let m = 0; m < members; m++) {
           const track = timeline.talkBy ? timeline.talkBy[m] : m === 0 ? timeline.talk : undefined
-          stage.member(m)?.setTalk(track?.[drawn] ?? 0)
+          const shape = timeline.mouthBy?.[m]?.[drawn]
+          stage.member(m)?.setTalk(track?.[drawn] ?? 0, isMouthShape(shape) ? shape : null)
         }
         set?.update(t)
-        stage.step(dt)
+        stage.step(dt, drawn === index)
       }
     },
   }
