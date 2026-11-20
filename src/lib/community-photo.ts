@@ -13,18 +13,20 @@ import { avatarStillHash, shortHash, STILL_VERSION } from './avatar-still'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 
 /** Bump when the photo's layout, lighting or framing changes, so the next visit retakes it. */
-export const PHOTO_VERSION = 2
+export const PHOTO_VERSION = 3
 export const COMMUNITY_PHOTO_ID = 'forum'
 export const PHOTO_WIDTH = 1800
-export const PHOTO_HEIGHT = 720
+export const PHOTO_HEIGHT = 600
 /** A photo is retaken at most this often, however often the cast changes. */
 export const RETAKE_AFTER_MS = 24 * 60 * 60 * 1000
-/** A 1800×720 WebP of the group is a few hundred kilobytes at most. */
+/** A 1800×600 WebP of the group is a few hundred kilobytes at most. */
 export const MAX_PHOTO_BYTES = 1_500_000
 /** Most characters in one photo. Past this, the earliest members to join are shown. */
 export const MAX_CAST = 48
-/** Characters in one row of the photo. */
-export const ROW_SIZE = 8
+/** Most characters in one row of the photo. Rows are as wide as it takes to fill the frame. */
+export const ROW_SIZE = 14
+/** Fewest characters in one row, so a small cast still stands in rows and fills the height. */
+const MIN_ROW_SIZE = 3
 
 /** Where a member's head is in the photo, as fractions of the image's width and height. */
 export interface CommunityPhotoSpot {
@@ -121,10 +123,10 @@ function wobble(text: string): number {
 }
 
 /** How many stand in each row, front first: alternating a full row and one place shorter. */
-export function rowSizes(count: number): number[] {
+export function rowSizes(count: number, rowSize = ROW_SIZE): number[] {
   if (count <= 0) return []
-  let rows = Math.ceil(count / ROW_SIZE)
-  while (rows * ROW_SIZE - Math.floor(rows / 2) < count) rows++
+  let rows = Math.ceil(count / rowSize)
+  while (rows * rowSize - Math.floor(rows / 2) < count) rows++
   const full = Math.ceil((count + Math.floor(rows / 2)) / rows)
   const sizes: number[] = []
   let left = count
@@ -168,14 +170,14 @@ function hidden(back: { x: number; y: number; fig: Figure }, front: { x: number;
  * back row on a step just high enough to show its faces, and faces sitting between the heads in
  * front. Returns one placement per figure, in the order given.
  */
-export function arrangeGroup(figures: readonly Figure[]): Placement[] {
+export function arrangeGroup(figures: readonly Figure[], rowSize = ROW_SIZE): Placement[] {
   if (!figures.length) return []
   const byHeight = [...figures].sort((a, b) => a.height - b.height || (a.id < b.id ? -1 : 1))
   const placed = new Map<string, Placement>()
   let front: { x: number; y: number; fig: Figure }[] = []
   let used = 0
   let lastY = 0
-  rowSizes(figures.length).forEach((size, row) => {
+  rowSizes(figures.length, rowSize).forEach((size, row) => {
     const members = middleOut(byHeight.slice(used, used + size).reverse())
     used += size
     // Squeeze neighbours together by their widths, a little more or less for each pair.
@@ -233,4 +235,34 @@ export function arrangeGroup(figures: readonly Figure[]): Placement[] {
     lastY = y
   })
   return figures.map((f) => placed.get(f.id)!)
+}
+
+/** Width over height of the group as the camera sees it, looking down a little at the back rows. */
+export function groupAspect(figures: readonly Figure[], layout: readonly Placement[]): number {
+  let left = Infinity
+  let right = -Infinity
+  let top = -Infinity
+  let deep = 0
+  layout.forEach((p, i) => {
+    left = Math.min(left, p.x - figures[i].width / 2)
+    right = Math.max(right, p.x + figures[i].width / 2)
+    top = Math.max(top, p.y + figures[i].height)
+    deep = Math.max(deep, -p.z)
+  })
+  return (right - left) / (top + deep * CAMERA_DROP * 2)
+}
+
+/**
+ * Arrange the group in rows as wide as it takes for its shape to match the photo's, so the
+ * characters fill the frame edge to edge instead of leaving dark space at the sides.
+ */
+export function arrangeToFill(figures: readonly Figure[], aspect = PHOTO_WIDTH / PHOTO_HEIGHT): Placement[] {
+  let best: { layout: Placement[]; miss: number } | null = null
+  const most = Math.min(ROW_SIZE, figures.length)
+  for (let size = Math.min(MIN_ROW_SIZE, most); size <= most; size++) {
+    const layout = arrangeGroup(figures, size)
+    const miss = Math.abs(Math.log(groupAspect(figures, layout) / aspect))
+    if (!best || miss < best.miss - 1e-6) best = { layout, miss }
+  }
+  return best?.layout ?? []
 }

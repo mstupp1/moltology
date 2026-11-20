@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { profiles } from '../db/schema'
-import { arrangeGroup, castHash, photoDue, photoKey, photoPose, PHOTO_HEIGHT, PHOTO_WIDTH, RETAKE_AFTER_MS, ROW_SIZE, rowSizes, type Figure } from './community-photo'
+import { arrangeGroup, arrangeToFill, castHash, photoDue, photoKey, photoPose, PHOTO_HEIGHT, PHOTO_WIDTH, RETAKE_AFTER_MS, ROW_SIZE, rowSizes, type Figure } from './community-photo'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 
 const crab: LobsterAvatarConfig = { style: 'critters', seed: 'a', race: 'crab', shellColor: 'cobalt' }
@@ -175,5 +175,15 @@ describe('community photo server', () => {
     expect(await save({ castHash: hash, image, spots: [spots[0], { ...spots[1], x: 4 }] })).toEqual({ saved: false, reason: 'bad-spots' })
 
     await expect(saveCommunityPhotoHandler({ data: { castHash: hash, image, spots }, context: {} }, upload, ok.db)).rejects.toThrow(/Unauthenticated/)
+  })
+})
+
+describe('arrangeToFill', () => {
+  it('stands a group in wider rows for a wider photo', () => {
+    const cast = Array.from({ length: 25 }, (_, i) => ({ id: `m${i}`, height: 2 + (i % 5) * 0.2, width: 1.6, face: 1.3, head: 0.5 }))
+    const rows = (aspect: number) => Math.max(...arrangeToFill(cast, aspect).map((p) => p.row)) + 1
+    expect(rows(4)).toBeLessThan(rows(1.5))
+    expect(arrangeToFill(cast)).toHaveLength(25)
+    expect(arrangeToFill([])).toEqual([])
   })
 })

@@ -117,7 +117,8 @@ export function CommunityPhoto() {
   return (
     <section
       aria-labelledby="community-photo-heading"
-      className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1"
+      // Runs edge to edge under the page band, flush with the panel's sides (hud-band-hero).
+      className="hud-band-hero hud-band-hero-joined relative overflow-hidden border-line-subtle bg-surface-1"
       data-testid="community-photo"
     >
       <div
@@ -127,7 +128,7 @@ export function CommunityPhoto() {
         }}
       >
         <div
-          className="relative mx-auto w-full max-w-[920px]"
+          className="relative w-full"
           style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
           onPointerLeave={(e) => {
             if (e.pointerType === 'mouse') setPicked(null)

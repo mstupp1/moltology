@@ -170,7 +170,11 @@ const COMING_SOON_STEPS = [
 /** The whole home page when nothing is published yet: what the Academy is, and what is coming. */
 function AcademyComingSoon() {
   return (
-    <section className={cn(ACADEMY_CARD, 'overflow-hidden')} aria-labelledby="academy-coming-soon">
+    // Runs edge to edge under the page band, flush with the panel's sides (hud-band-hero).
+    <section
+      className={cn(ACADEMY_CARD, 'hud-band-hero hud-band-hero-joined overflow-hidden')}
+      aria-labelledby="academy-coming-soon"
+    >
       <div className="relative p-5 sm:p-8 space-y-3 border-b border-line-subtle">
         <span
           className="absolute inset-0 opacity-60 bg-[radial-gradient(ellipse_at_top_right,rgba(0,195,255,0.12),transparent_55%)]"
@@ -276,7 +280,7 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
   const certificatePreview = [...data.certificates].sort((a, b) => Number(b.earned) - Number(a.earned)).slice(0, 4)
 
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
       <HudTitlePanel treatment="band" title="Academy" sections={<AcademyNav current="catalog" />} />
 
       {nothingPublished ? (
