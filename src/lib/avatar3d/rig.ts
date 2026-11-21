@@ -29,6 +29,8 @@ export interface SocketInfo {
   radius: number
   /** Height from the socket up to the crown, for gear that arches over the head. */
   rise?: number
+  /** Where the socket sits, in character space. */
+  at?: Vector3
 }
 
 /**
@@ -262,7 +264,7 @@ export class Rig {
     node.position.copy(at).sub(r.position).applyQuaternion(inv)
     node.quaternion.copy(inv).multiply(worldQuaternion)
     this.bone(bone).add(node)
-    this.sockets.set(name, { node, radius, rise })
+    this.sockets.set(name, { node, radius, rise, at: at.clone() })
   }
 
   /** Merge each bone's parts into one mesh per material and add them to the scene graph. */

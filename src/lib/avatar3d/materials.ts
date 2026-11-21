@@ -182,7 +182,7 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         float a3Work = 0.5;
         float a3Height = 0.5;
         float a3Cut = 0.0;
-        #define A3_ENGRAVE_FREQ 0.9
+        #define A3_ENGRAVE_FREQ 0.6
         vec2 a3dH = vec2(0.0);
         ${NOISE_GLSL}
         ${TRIPLANAR_GLSL}`,
@@ -196,14 +196,16 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         // Engraving: the same size on every material, cut in and inlaid with the trim colour.
         vec3 a3Ep = vWork * A3_ENGRAVE_FREQ;
         float a3Eng = texture2D(uEngraveMap, a3Ep.yz).r * a3TriW.x + texture2D(uEngraveMap, a3Ep.xz + 0.29).r * a3TriW.y + texture2D(uEngraveMap, a3Ep.xy + 0.53).r * a3TriW.z;
+        // Tone on tone: cut in and only lightly touched with the trim colour, so it reads up close
+        // without taking over the piece.
         a3Cut = uEngraveOn * smoothstep(0.35, 0.65, a3Eng);
-        a3Height = mix(0.5, a3Tile, uWorkOn) - a3Cut * 0.35;
+        a3Height = mix(0.5, a3Tile, uWorkOn) - a3Cut * 0.2;
         a3dH = vec2(dFdx(a3Height), dFdy(a3Height));
         if (uWorkOn < 0.5) {${coded}
         } else {
           diffuseColor.rgb *= 1.0 - ${look.pits.toFixed(2)} * smoothstep(0.5, 0.1, a3Tile);
         }
-        diffuseColor.rgb = mix(diffuseColor.rgb, uEngrave, a3Cut * 0.85);`,
+        diffuseColor.rgb = mix(diffuseColor.rgb * (1.0 - a3Cut * 0.18), uEngrave, a3Cut * 0.16);`,
       )
       .replace(
         '#include <roughnessmap_fragment>',
@@ -211,12 +213,12 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         roughnessFactor = uWorkOn > 0.5
           ? clamp(roughnessFactor + ${look.rough.toFixed(2)} * (0.5 - a3Height), 0.05, 1.0)
           : clamp(roughnessFactor + ${kind === 'metal' ? '0.3 * (a3Work - 0.5)' : kind === 'cloth' ? '-0.1 * a3Work' : '0.0'}, 0.05, 1.0);
-        roughnessFactor = mix(roughnessFactor, 0.22, a3Cut);`,
+        roughnessFactor = mix(roughnessFactor, 0.22, a3Cut * 0.4);`,
       )
       .replace(
         '#include <metalnessmap_fragment>',
         `#include <metalnessmap_fragment>
-        metalnessFactor = mix(metalnessFactor, 0.9, a3Cut);`,
+        metalnessFactor = mix(metalnessFactor, 0.9, a3Cut * 0.3);`,
       )
       .replace(
         '#include <normal_fragment_maps>',
@@ -232,7 +234,7 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         }`,
       )
   }
-  material.customProgramCacheKey = () => `avatar3d-gear-${kind}-2`
+  material.customProgramCacheKey = () => `avatar3d-gear-${kind}-4`
   return material
 }
 
