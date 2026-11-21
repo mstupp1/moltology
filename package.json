@@ -64,6 +64,7 @@
     "anim:create": "tsx scripts/animate-character.ts",
     "anim:art": "tsx scripts/anim-art.ts",
     "cast:render": "tsx scripts/render-cast.ts",
+    "avatar:textures": "tsx scripts/avatar3d/pack-textures.ts",
     "shorts:create": "tsx scripts/create-reel.ts",
     "video:create": "tsx scripts/create-reel.ts",
     "db:setup": "npm run db:migrate && npm run db:rls && npm run db:seed",

@@ -4,6 +4,7 @@
  */
 import { createStage, type Stage } from '../../../src/lib/avatar3d/stage'
 import { timelinePlayer, type AnimationTimeline } from '../../../src/lib/avatar3d/scripted'
+import { preloadTextures, TEXTURE_MARKINGS } from '../../../src/lib/avatar3d/textures'
 
 declare global {
   interface Window {
@@ -20,6 +21,8 @@ let canvas: HTMLCanvasElement | null = null
 
 window.__anim = {
   async setup(timeline, options) {
+    // Shell textures arrive as data URLs (render.ts); load them all before the first frame.
+    await Promise.all(TEXTURE_MARKINGS.map((marking) => preloadTextures({ marking })))
     canvas = document.createElement('canvas')
     canvas.width = timeline.width
     canvas.height = timeline.height

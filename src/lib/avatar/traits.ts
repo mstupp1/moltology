@@ -55,7 +55,9 @@ export const SHELL_FINISH_LABELS: Readonly<Record<ShellFinish, string>> = {
   glow: 'Bioluminescent',
 }
 
-export const SHELL_MARKINGS = ['none', 'spots', 'freckles', 'bands', 'tiger', 'stardust', 'calico', 'split', 'circuit'] as const
+export const SHELL_MARKINGS = ['none', 'spots', 'freckles', 'bands', 'tiger', 'stardust', 'calico', 'split', 'circuit', 'lace', 'tide', 'camo', 'glyph'] as const
+/** Seeded (never customised) characters roll from the original set, so adding markings never changes an existing member's look. */
+export const SEEDED_MARKINGS = SHELL_MARKINGS.slice(0, 9)
 export type ShellMarking = (typeof SHELL_MARKINGS)[number]
 export const SHELL_MARKING_LABELS: Readonly<Record<ShellMarking, string>> = {
   none: 'Clean',
@@ -67,6 +69,10 @@ export const SHELL_MARKING_LABELS: Readonly<Record<ShellMarking, string>> = {
   calico: 'Calico',
   split: 'Split',
   circuit: 'Circuit',
+  lace: 'Coral lace',
+  tide: 'Tide rings',
+  camo: 'Reef camo',
+  glyph: 'Glyphs',
 }
 
 export const AVATAR_MOUTHS = ['grin', 'smile', 'beam', 'smirk', 'tongue', 'fang', 'oh', 'frown', 'wobble'] as const
