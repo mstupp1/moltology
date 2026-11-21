@@ -18,8 +18,8 @@ has to tile cleanly. It never wraps a specific body part.
 
 ## Who does what
 
-- **Codex on Myles's Mac** generates the raw images: Luna at low effort,
-  `/codex:rescue --background --model gpt-6-luna --effort low <brief>`. Use medium effort only if it has to pick between references.
+- **Codex on Myles's Mac** generates the raw images: Luna at low effort, one `codex exec` call per image with write access
+  (see AGENTS.md, "Handing work to the Codex agent"): `codex exec -m gpt-6-luna -c model_reasoning_effort="low" -s workspace-write --skip-git-repo-check "<prompt> Save it as tmp/avatar-textures/inbox/<file>.png. Do not read repo docs." </dev/null`.
 - **Claude** writes the brief, runs `npm run avatar:textures`, renders the before/after board and reviews.
 
 Raw images go to `tmp/avatar-textures/inbox/` (git-ignored). Only the packed output is committed.
