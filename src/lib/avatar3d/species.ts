@@ -143,7 +143,7 @@ interface LidPose {
 const EXPRESSIONS: Record<Expression, LidPose & { right?: Partial<LidPose> }> = {
   open: { up: 54, lo: 76, browLift: 0.012 },
   // The default look: open enough to read as bright and awake, still a touch softer than `open`.
-  relaxed: { up: 50, lo: 52 },
+  relaxed: { up: 37, lo: 52 },
   cheerful_squint: { up: 36, lo: 14, browLift: 0.01 },
   focused: { up: 16, lo: 60, roll: 7, browTilt: 9, browLift: -0.004 },
   chill: { up: 4, lo: 70, browLift: -0.006 },
@@ -190,7 +190,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     const theta = Math.PI / 2 - s * spread
     const surface = f.shell.point(sEye, theta)
     const normal = f.shell.normal(sEye, theta)
-    const centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.42)
+    const centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.3)
     // Eyes face more forward than the shell does, so both read from the front.
     const facing = normal.clone().multiplyScalar(0.45).add(v(0, 0.06, 0.55)).normalize()
     const socket = rig.addBone(`eyeSocket${tag}`, f.bone, centre, { quaternion: lookQuaternion(facing) })
