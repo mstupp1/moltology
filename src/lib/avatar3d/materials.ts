@@ -4,13 +4,13 @@
  * the shell in any pose. Most markings are drawn in code; a few, and the shell's fine surface,
  * come from small greyscale textures (textures.ts) sampled the same way.
  */
-import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Material, type Texture, Vector2, Vector4 } from 'three'
+import { BufferAttribute, Color, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Material, type Object3D, type Texture, Vector2, Vector3, Vector4 } from 'three'
 import { OCCLUDERS } from './flex'
 import type { ShellFinish, ShellMarking, ShellPalette } from '../avatar/traits'
 import { SHELL_PALETTE_MAP } from '../avatar/traits'
 import { EYE_COLOR_SWATCH, type AvatarEyeColor } from '../avatar/parts'
 import type { MaterialSlot } from './rig'
-import { detailOnUniform, detailUniform, engravingMask, FLAT_DETAIL, gearTile, isTextureMarking, markingMask, NO_MARK, shellDetail, type GearSurface } from './textures'
+import { detailOnUniform, detailSlopeUniform, detailUniform, engravingMask, FLAT_DETAIL, gearTile, isTextureMarking, markingMask, NO_MARK, shellDetail, slopeOn, type GearSurface } from './textures'
 
 const MARKING_INDEX: Record<ShellMarking, number> = {
   none: 0,
@@ -98,6 +98,30 @@ const TRIPLANAR_GLSL = /* glsl */ `
     vec3 w = pow(abs(n), vec3(6.0));
     return w / max(w.x + w.y + w.z, 1e-5);
   }
+  // A packed height tile (textures.ts: R height, G and B its slope) sampled triplanar at p, given
+  // in tiles. Returns the height and, in .yzw, its slope along p per tile. \`sloped\` is 0 for a
+  // plain placeholder, whose G and B are not slopes.
+  vec4 a3TriTile(sampler2D map, vec3 p, vec3 w, vec3 o, float sloped) {
+    vec3 tx = texture2D(map, p.yz + o.x).rgb;
+    vec3 ty = texture2D(map, p.xz + o.y).rgb;
+    vec3 tz = texture2D(map, p.xy + o.z).rgb;
+    vec2 kx = tx.gb * sloped;
+    vec2 ky = ty.gb * sloped;
+    vec2 kz = tz.gb * sloped;
+    return vec4(tx.r * w.x + ty.r * w.y + tz.r * w.z, vec3(0.0, kx) * w.x + vec3(ky.x, 0.0, ky.y) * w.y + vec3(kz, 0.0) * w.z);
+  }
+`
+
+/**
+ * Specular anti-aliasing: where the bumped normal turns a lot within one pixel, widen the
+ * highlight to cover it, so fine bumps read as a soft sheen instead of glitter that crawls as
+ * the character moves (Kaplanyan and Hoffman's filtered roughness).
+ */
+const SPECULAR_AA_GLSL = /* glsl */ `
+  {
+    vec3 a3dN = fwidth(normal - nonPerturbedNormal);
+    roughnessFactor = sqrt(min(roughnessFactor * roughnessFactor + min(2.0 * dot(a3dN, a3dN), 0.18), 1.0));
+  }
 `
 
 /** Gear's look by material. Each has its own height tile; the code-drawn surface stands in until it loads. */
@@ -126,25 +150,31 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
   const uniforms = {
     uWorkMap: { value: FLAT_DETAIL as Texture },
     uWorkOn: { value: 0 },
+    uWorkSloped: { value: 0 },
     uEngraveMap: { value: NO_MARK as Texture },
     uEngraveOn: { value: 0 },
+    uEngraveSloped: { value: 0 },
     uEngrave: { value: new Color(options.engrave ?? '#000000') },
   }
   const tile = gearTile(kind, (t) => {
     uniforms.uWorkMap.value = t
+    uniforms.uWorkSloped.value = slopeOn(t)
     uniforms.uWorkOn.value = 1
   })
   if (tile !== FLAT_DETAIL) {
     uniforms.uWorkMap.value = tile
+    uniforms.uWorkSloped.value = slopeOn(tile)
     uniforms.uWorkOn.value = 1
   }
   if (options.engrave) {
     const mask = engravingMask((t) => {
       uniforms.uEngraveMap.value = t
+      uniforms.uEngraveSloped.value = slopeOn(t)
       uniforms.uEngraveOn.value = 1
     })
     if (mask !== NO_MARK) {
       uniforms.uEngraveMap.value = mask
+      uniforms.uEngraveSloped.value = slopeOn(mask)
       uniforms.uEngraveOn.value = 1
     }
   }
@@ -165,11 +195,12 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms)
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWork;\nvarying vec3 vWorkRaw;')
+      .replace('#include <common>', '#include <common>\nattribute vec3 workPos;\nvarying vec3 vWork;\nvarying vec3 vWorkRaw;')
       .replace(
         '#include <begin_vertex>',
         // The tile is sized to the piece as drawn, so a hat scaled onto a small head is not coarser.
-        '#include <begin_vertex>\nvWorkRaw = position;\nvWork = position * length(modelMatrix[0].xyz);',
+        // That size is fixed when the character is built (bakeWorkPos), so breathing never slides it.
+        '#include <begin_vertex>\nvWorkRaw = position;\nvWork = workPos;',
       )
     shader.fragmentShader = shader.fragmentShader
       .replace(
@@ -177,8 +208,8 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         `#include <common>
         varying vec3 vWork;
         varying vec3 vWorkRaw;
-        uniform sampler2D uWorkMap; uniform float uWorkOn;
-        uniform sampler2D uEngraveMap; uniform float uEngraveOn; uniform vec3 uEngrave;
+        uniform sampler2D uWorkMap; uniform float uWorkOn; uniform float uWorkSloped;
+        uniform sampler2D uEngraveMap; uniform float uEngraveOn; uniform float uEngraveSloped; uniform vec3 uEngrave;
         float a3Work = 0.5;
         float a3Height = 0.5;
         float a3Cut = 0.0;
@@ -190,17 +221,22 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-        vec3 a3TriW = a3TriWeights(normalize(cross(dFdx(vWork), dFdy(vWork))));
-        vec3 a3Wp = vWork * ${look.freq.toFixed(1)};
-        float a3Tile = texture2D(uWorkMap, a3Wp.yz).r * a3TriW.x + texture2D(uWorkMap, a3Wp.xz + 0.37).r * a3TriW.y + texture2D(uWorkMap, a3Wp.xy + 0.71).r * a3TriW.z;
+        vec3 a3WdX = dFdx(vWork);
+        vec3 a3WdY = dFdy(vWork);
+        vec3 a3TriW = a3TriWeights(normalize(cross(a3WdX, a3WdY)));
+        vec4 a3T = a3TriTile(uWorkMap, vWork * ${look.freq.toFixed(1)}, a3TriW, vec3(0.0, 0.37, 0.71), uWorkSloped);
+        float a3Tile = a3T.x;
         // Engraving: the same size on every material, cut in and inlaid with the trim colour.
-        vec3 a3Ep = vWork * A3_ENGRAVE_FREQ;
-        float a3Eng = texture2D(uEngraveMap, a3Ep.yz).r * a3TriW.x + texture2D(uEngraveMap, a3Ep.xz + 0.29).r * a3TriW.y + texture2D(uEngraveMap, a3Ep.xy + 0.53).r * a3TriW.z;
+        vec4 a3E = a3TriTile(uEngraveMap, vWork * A3_ENGRAVE_FREQ, a3TriW, vec3(0.0, 0.29, 0.53), uEngraveSloped);
         // Tone on tone: cut in and only lightly touched with the trim colour, so it reads up close
         // without taking over the piece.
-        a3Cut = uEngraveOn * smoothstep(0.35, 0.65, a3Eng);
+        a3Cut = uEngraveOn * smoothstep(0.35, 0.65, a3E.x);
         a3Height = mix(0.5, a3Tile, uWorkOn) - a3Cut * 0.2;
-        a3dH = vec2(dFdx(a3Height), dFdy(a3Height));
+        // The height's slope on the piece itself, carried onto the screen through how the piece
+        // lies there. (Taking it from neighbouring pixels made the bumps crawl as the piece moved.)
+        float a3CutT = clamp((a3E.x - 0.35) / 0.3, 0.0, 1.0);
+        vec3 a3HGrad = a3T.yzw * ${look.freq.toFixed(1)} * uWorkOn - a3E.yzw * A3_ENGRAVE_FREQ * uEngraveOn * 6.0 * a3CutT * (1.0 - a3CutT) / 0.3 * 0.2;
+        a3dH = vec2(dot(a3HGrad, a3WdX), dot(a3HGrad, a3WdY));
         if (uWorkOn < 0.5) {${coded}
         } else {
           diffuseColor.rgb *= 1.0 - ${look.pits.toFixed(2)} * smoothstep(0.5, 0.1, a3Tile);
@@ -220,6 +256,7 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         `#include <metalnessmap_fragment>
         metalnessFactor = mix(metalnessFactor, 0.9, a3Cut * 0.3);`,
       )
+      .replace('#include <lights_physical_fragment>', `${SPECULAR_AA_GLSL}\n#include <lights_physical_fragment>`)
       .replace(
         '#include <normal_fragment_maps>',
         `#include <normal_fragment_maps>
@@ -234,8 +271,33 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         }`,
       )
   }
-  material.customProgramCacheKey = () => `avatar3d-gear-${kind}-4`
+  material.customProgramCacheKey = () => `avatar3d-gear-${kind}-5`
   return material
+}
+
+/**
+ * Fix where each gear surface samples its tiles: the piece's own points at the size they are drawn
+ * on the finished character (a hat scaled onto a small head is not coarser). Called once the
+ * character is built and standing at rest, so breathing and other live scaling never slide the
+ * texture across the piece.
+ */
+export function bakeWorkPos(root: Object3D): void {
+  root.updateMatrixWorld(true)
+  const scale = new Vector3()
+  root.traverse((o) => {
+    if (!(o instanceof Mesh)) return
+    if (!([o.material].flat() as Material[]).some((m) => m.userData.workUniforms)) return
+    const pos = o.geometry.getAttribute('position')
+    if (!pos) return
+    const s = scale.setFromMatrixScale(o.matrixWorld).x
+    const out = new Float32Array(pos.count * 3)
+    for (let i = 0; i < pos.count; i++) {
+      out[i * 3] = pos.getX(i) * s
+      out[i * 3 + 1] = pos.getY(i) * s
+      out[i * 3 + 2] = pos.getZ(i) * s
+    }
+    o.geometry.setAttribute('workPos', new BufferAttribute(out, 3))
+  })
 }
 
 export interface ShellMaterialOptions {
@@ -326,6 +388,7 @@ const shellUniforms = () => ({
   // Shared by every shell, so the tile is swapped in once when it arrives.
   uDetailMap: detailUniform,
   uDetailOn: detailOnUniform,
+  uDetailSloped: detailSlopeUniform,
 })
 
 /** Let a character's shell materials shade themselves with its own occluder spheres. */
@@ -371,7 +434,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         uniform float uThin; uniform float uWet;
         uniform vec3 uShade; uniform vec3 uMark; uniform vec3 uSplit; uniform vec3 uSoft;
         uniform int uMarking; uniform float uMarkScale; uniform float uGrain; uniform float uDetail; uniform float uGlow; uniform float uMarkGlow;
-        uniform sampler2D uMarkMap; uniform sampler2D uDetailMap; uniform float uDetailOn;
+        uniform sampler2D uMarkMap; uniform sampler2D uDetailMap; uniform float uDetailOn; uniform float uDetailSloped;
         // Shell detail tiles about every 0.18 units; image markings about every 1.3.
         #define A3_DETAIL_FREQ 5.5
         #define A3_MARK_FREQ 0.75
@@ -382,23 +445,30 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         float a3Pebble = 0.0;
         float a3Height = 0.5;
         vec2 a3dH = vec2(0.0);
+        // How the rest position changes across one pixel: carries slopes taken on the shell onto the screen.
+        vec3 a3RdX = vec3(0.0);
+        vec3 a3RdY = vec3(0.0);
         ${NOISE_GLSL}
         ${TRIPLANAR_GLSL}`,
       )
       .replace(
         '#include <color_fragment>',
         `
+        a3RdX = dFdx(vRest);
+        a3RdY = dFdy(vRest);
         float a3Ao = vColor.r;
         a3Soft = 1.0 - vColor.g;
         a3Pebble = vColor.b * uDetail;
         // Which way the shell faces at rest, for the tiling textures: they stay put however it moves.
-        vec3 a3TriW = a3TriWeights(normalize(cross(dFdx(vRest), dFdy(vRest))));
-        // Fine shell surface from the detail tile (a height map).
-        vec3 a3Dp = vRest * A3_DETAIL_FREQ;
+        vec3 a3TriW = a3TriWeights(normalize(cross(a3RdX, a3RdY)));
+        // Fine shell surface from the detail tile (a height map packed with its slope).
         float a3DetailAmt = uDetailOn * mix(0.2, 1.0, uDetail * uDetail) * (1.0 - a3Soft * 0.6);
-        a3Height = mix(0.5, texture2D(uDetailMap, a3Dp.yz).r * a3TriW.x + texture2D(uDetailMap, a3Dp.xz + 0.37).r * a3TriW.y + texture2D(uDetailMap, a3Dp.xy + 0.71).r * a3TriW.z, a3DetailAmt);
-        // Its slope on screen, for the bump below (taken here, where every pixel runs the same code).
-        a3dH = vec2(dFdx(a3Height), dFdy(a3Height));
+        vec4 a3DT = a3TriTile(uDetailMap, vRest * A3_DETAIL_FREQ, a3TriW, vec3(0.0, 0.37, 0.71), uDetailSloped);
+        a3Height = mix(0.5, a3DT.x, a3DetailAmt);
+        // Its slope on screen, for the bump below: taken on the shell and carried through how the
+        // shell lies on screen, so the bumps stay glued on as it moves (neighbouring pixels made them crawl).
+        vec3 a3HGrad = a3DT.yzw * A3_DETAIL_FREQ * a3DetailAmt;
+        a3dH = vec2(dot(a3HGrad, a3RdX), dot(a3HGrad, a3RdY));
         // Image markings: the mask's three looks blended, then sharpened back to a clean edge.
         vec3 a3Mp = vRest * uMarkScale * A3_MARK_FREQ;
         float a3MarkTex = texture2D(uMarkMap, a3Mp.yz).r * a3TriW.x + texture2D(uMarkMap, a3Mp.xz + 0.29).r * a3TriW.y + texture2D(uMarkMap, a3Mp.xy + 0.53).r * a3TriW.z;
@@ -432,21 +502,29 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         // Fine leathery grain, so highlights break up the way they do on the painted references.
         vec3 a3Bump = vec3(a3Noise(vRest * 120.0 + 11.0), a3Noise(vRest * 120.0 + 37.0), a3Noise(vRest * 120.0 + 71.0)) - 0.5;
         normal = normalize(normal + a3Bump * uGrain * mix(1.1, 0.6, uDetailOn));
-        // The detail tile's ridges and pores catch the light (screen-space bump, as three's bumpMap).
+        // The detail tile's ridges and pores catch the light (bump as three's bumpMap does it, from
+        // the slope worked out above).
+        vec3 a3Sx = dFdx(-vViewPosition);
+        vec3 a3Sy = dFdy(-vViewPosition);
         {
-          vec3 a3Sx = dFdx(-vViewPosition);
-          vec3 a3Sy = dFdy(-vViewPosition);
           vec3 a3R1 = cross(a3Sy, normal);
           vec3 a3R2 = cross(normal, a3Sx);
           float a3Det = dot(a3Sx, a3R1);
           vec3 a3Grad = sign(a3Det) * (a3dH.x * a3R1 + a3dH.y * a3R2) * A3_DETAIL_BUMP;
           normal = normalize(abs(a3Det) * normal - a3Grad);
         }
-        // Pebbled shell: the surface tips away from each lump, strongest on the claws.
+        // Pebbled shell: the surface tips away from each lump, strongest on the claws. The lumps'
+        // slope is in rest space, so it is carried onto the screen the same way as the tile's, and
+        // the lumps turn with the claw instead of staying lit from one fixed side.
         if (a3Pebble > 0.01) {
           vec3 a3P = vRest * 30.0 + 5.0;
           vec3 a3Slope = vec3(a3Noise(a3P + vec3(0.5, 0.0, 0.0)) - a3Noise(a3P - vec3(0.5, 0.0, 0.0)), a3Noise(a3P + vec3(0.0, 0.5, 0.0)) - a3Noise(a3P - vec3(0.0, 0.5, 0.0)), a3Noise(a3P + vec3(0.0, 0.0, 0.5)) - a3Noise(a3P - vec3(0.0, 0.0, 0.5)));
-          normal = normalize(normal - (viewMatrix * vec4(a3Slope, 0.0)).xyz * a3Pebble * 0.42);
+          vec2 a3dL = vec2(dot(a3Slope, a3RdX), dot(a3Slope, a3RdY)) * 30.0;
+          vec3 a3R1 = cross(a3Sy, normal);
+          vec3 a3R2 = cross(normal, a3Sx);
+          float a3Det = dot(a3Sx, a3R1);
+          vec3 a3Grad = sign(a3Det) * (a3dL.x * a3R1 + a3dL.y * a3R2) * (a3Pebble * 0.42 / 30.0);
+          normal = normalize(abs(a3Det) * normal - a3Grad);
         }
         // Undersides sink toward the shade colour, which gives the forms weight without an occlusion pass.
         float a3Under = smoothstep(0.25, -0.95, inverseTransformDirection(normal, viewMatrix).y);
@@ -454,7 +532,8 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
       )
       .replace(
         '#include <lights_physical_fragment>',
-        `#include <lights_physical_fragment>
+        `${SPECULAR_AA_GLSL}
+        #include <lights_physical_fragment>
         #ifdef USE_CLEARCOAT
         // Wet shell: the clear coat is sharper in patches, as if water has beaded there.
         material.clearcoatRoughness = clamp(material.clearcoatRoughness * mix(1.0, 0.35 + 1.1 * a3Noise(vRest * 9.0 + 13.0), uWet), 0.03, 1.0);
@@ -504,7 +583,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-9'
+  material.customProgramCacheKey = () => 'avatar3d-shell-10'
   return material
 }
 

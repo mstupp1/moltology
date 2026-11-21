@@ -160,6 +160,12 @@ describe('avatar3d', () => {
     for (const item of ALL_EQUIPMENT_CATALOG) expect(supportsEquipment(item.appearanceKey || item.slug), item.slug).toBe(true)
     const character = buildCharacter({ ...baselineLook('crab'), pose: 'cheer', equipment: STARTER_CHARACTER_EQUIPMENT })
     expect(gearMeshes(character.root).length).toBeGreaterThan(6)
+    // Every textured gear surface samples from a fixed, baked position (no live scale).
+    for (const mesh of gearMeshes(character.root)) {
+      if (!([mesh.material].flat() as { userData: Record<string, unknown> }[]).some((m) => m.userData.workUniforms)) continue
+      const work = mesh.geometry.getAttribute('workPos')
+      expect(work?.count, mesh.name).toBe(mesh.geometry.getAttribute('position').count)
+    }
     character.dispose()
   })
 

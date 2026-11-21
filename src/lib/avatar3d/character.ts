@@ -11,7 +11,7 @@ import { loftDetail } from './loft'
 import { bakeOcclusion, prepareBake, type BakeOptions } from './bake'
 import { BODY, bodySpheres, SWINGS, type BodySphere } from './collide'
 import { buildOccluders, buildSprings, type Spring } from './flex'
-import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
+import { bakeWorkPos, buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
 import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, legTap, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
 import { blendMouth, LIP_TUBE, MOUTH_HOLE, MOUTH_PARAMS, mouthParams, type MouthParams, type MouthShape } from './mouth-shapes'
 import { POSES, poseExtras, poseTargets } from './poses'
@@ -309,6 +309,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const stature = applyStature(rig, look.heightScale, built.height)
   // The bendy parts are built once the legs have their final length.
   rig.finalizeSkinned(materials)
+  // Gear tiles are sized to the finished, resting character, so live scaling never slides them.
+  bakeWorkPos(rig.root)
   const occluders = buildOccluders(rig)
   shadeWith(materials, occluders.spheres, occluders.count)
   prepareBake(rig.root, rig.bones)
