@@ -2,9 +2,10 @@
  * Gear. Every item is built for a socket of radius 1 and scaled to the socket it lands on, so
  * one hat fits any head shape or species. Items carry their own materials.
  */
-import { Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, type Material } from 'three'
+import { CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
 import type { AvatarAccessory } from '../avatar/traits'
 import type { Rig, SocketInfo } from './rig'
+import { workedSurface } from './materials'
 
 export interface GearItem {
   dispose: () => void
@@ -46,12 +47,72 @@ function item(socket: string, build: (add: (geo: Mesh['geometry'], material: Mat
   }
 }
 
-const metal = (color: string, roughness = 0.24) => new MeshPhysicalMaterial({ color: new Color(color), metalness: 1, roughness, clearcoat: 0.3 })
+const metal = (color: string, roughness = 0.24) => workedSurface(new MeshPhysicalMaterial({ color: new Color(color), metalness: 1, roughness, clearcoat: 0.3 }), 'metal')
 const gloss = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 })
 const darker = (hex: string, by: number) => `#${new Color(hex).multiplyScalar(1 - by).getHexString()}`
-const cloth = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.9, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color('#ffffff') })
+const cloth = (color: string) => workedSurface(new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.9, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color('#ffffff') }), 'cloth')
 
-const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearColours) => SocketGear>> = {
+/** The visor's lens: an ellipse round the head axis, in face-socket units. */
+interface VisorFit {
+  /** Height of the lens centre and the lens itself. */
+  y: number
+  h: number
+  /** Depth of the head axis, and the ellipse's half width and half depth. */
+  cz: number
+  a: number
+  b: number
+}
+
+const VISOR_FALLBACK: VisorFit = { y: 0.02, h: 0.62, cz: -0.98, a: 1.12, b: 1.12 }
+
+/**
+ * Size the visor to this head: wide and deep enough to pass in front of both eyes (lids included)
+ * and outside the shell at every height the lens covers, with a small gap so it never clips.
+ */
+function visorFit(rig: Rig): VisorFit | null {
+  const face = rig.sockets.get('face')
+  const head = rig.wear?.head
+  if (!face?.at || !head) return null
+  const r = face.radius
+  const local = (p: Vector3) => p.clone().sub(face.at!).divideScalar(r)
+  const eyes = (['L', 'R'] as const).flatMap((tag) => {
+    const socket = rig.bones.get(`eyeSocket${tag}`)
+    if (!socket || !rig.bones.has(`eye${tag}`)) return []
+    const centre = local(rig.restWorldOf(`eye${tag}`).position)
+    const size = (head.eyeRadius * 1.12) / r
+    return [{ centre, wide: size * socket.scale.x, high: size * socket.scale.y }]
+  })
+  if (!eyes.length) return null
+  const y = eyes.reduce((s, e) => s + e.centre.y, 0) / eyes.length
+  const h = Math.min(...eyes.map((e) => e.high)) * 1.5
+  const pts: { x: number; z: number }[] = []
+  for (const e of eyes) {
+    for (let i = 0; i < 24; i++) {
+      const t = (i / 24) * Math.PI * 2
+      pts.push({ x: e.centre.x + Math.cos(t) * e.wide, z: e.centre.z + Math.sin(t) * e.wide })
+    }
+  }
+  const atHeight = (dy: number) => head.loft.sAt(face.at!.y + (y + dy) * r)
+  const mid = atHeight(0)
+  const cz = (local(head.loft.point(mid, 0)).z + local(head.loft.point(mid, Math.PI)).z) / 2
+  for (const dy of [-h / 2, 0, h / 2]) {
+    const s = atHeight(dy)
+    for (let i = 0; i <= 24; i++) {
+      const p = local(head.loft.point(s, (i / 24) * Math.PI))
+      pts.push({ x: p.x, z: p.z })
+    }
+  }
+  const gap = 0.05
+  const a = Math.max(...pts.map((p) => Math.abs(p.x))) + gap
+  let b = 0
+  for (const p of pts) {
+    const k = 1 - (p.x / a) ** 2
+    if (k > 0.05 && p.z > cz) b = Math.max(b, (p.z - cz) / Math.sqrt(k))
+  }
+  return { y, h, cz, a, b: b + gap }
+}
+
+const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearColours, rig?: Rig) => SocketGear>> = {
   crown: (_s, c) =>
     item('head', (add) => {
       const gold = metal(c?.material ?? '#f5b93a')
@@ -153,17 +214,34 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearC
       mic.translate(0.67, -0.22, 0.71)
       add(mic, dark)
     }),
-  visor: (_s, c) =>
+  visor: (_s, c, rig) =>
     item('face', (add) => {
       const glass = new MeshPhysicalMaterial({ color: new Color(c?.accent ?? '#22d3ee'), emissive: new Color(c ? darker(c.accent, 0.35) : '#0b8fa6'), emissiveIntensity: 0.9, roughness: 0.1, transparent: true, opacity: 0.55, side: 2, depthWrite: false })
-      const band = new CylinderGeometry(1.12, 1.12, 0.62, 40, 1, true, -1.05, 2.1)
-      band.translate(0, 0.02, -0.98)
+      const frameMat = gloss(c ? darker(c.material, 0.35) : '#1c2430')
+      const fit = (rig && visorFit(rig)) || VISOR_FALLBACK
+      // A wraparound lens on an ellipse round the head, clear of the eyes and the shell.
+      const sweep = 1.05
+      const band = new CylinderGeometry(1, 1, fit.h, 48, 1, true, -sweep, sweep * 2)
+      band.scale(fit.a, 1, fit.b)
+      band.translate(0, fit.y, fit.cz)
       add(band, glass).castShadow = false
-      const frame = new TorusGeometry(1.13, 0.045, 8, 40, 2.1)
-      frame.rotateX(Math.PI / 2)
-      frame.rotateY(Math.PI / 2 + 1.05)
-      frame.translate(0, 0.34, -0.98)
-      add(frame, gloss(c ? darker(c.material, 0.35) : '#1c2430'))
+      const rim = (y: number) => {
+        const pts: Vector3[] = []
+        for (let i = 0; i <= 32; i++) {
+          const t = -sweep + (i / 32) * sweep * 2
+          pts.push(new Vector3(Math.sin(t) * fit.a, y, fit.cz + Math.cos(t) * fit.b))
+        }
+        return new TubeGeometry(new CatmullRomCurve3(pts), 64, 0.045, 8, false)
+      }
+      add(rim(fit.y + fit.h / 2), frameMat)
+      add(rim(fit.y - fit.h / 2), frameMat)
+      // Strap stubs where the lens ends, running back along the sides.
+      for (const side of [-1, 1]) {
+        const end = new SphereGeometry(0.07, 12, 10)
+        end.scale(0.8, fit.h * 6, 1)
+        end.translate(side * Math.sin(sweep) * fit.a, fit.y, fit.cz + Math.cos(sweep) * fit.b)
+        add(end, frameMat)
+      }
     }),
 }
 
@@ -174,7 +252,7 @@ export const SUPPORTED_ACCESSORIES = Object.keys(HEAD_GEAR) as AvatarAccessory[]
 export function equipAccessory(rig: Rig, accessory: AvatarAccessory, colours?: GearColours): GearItem | null {
   const make = HEAD_GEAR[accessory]
   if (!make) return null
-  const gear = make(rig.sockets.get('ears'), colours)
+  const gear = make(rig.sockets.get('ears'), colours, rig)
   const socket = rig.sockets.get(gear.socket)
   if (!socket) return null
   gear.node.scale.setScalar(socket.radius)

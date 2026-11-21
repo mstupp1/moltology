@@ -10,7 +10,7 @@ import type { ShellFinish, ShellMarking, ShellPalette } from '../avatar/traits'
 import { SHELL_PALETTE_MAP } from '../avatar/traits'
 import { EYE_COLOR_SWATCH, type AvatarEyeColor } from '../avatar/parts'
 import type { MaterialSlot } from './rig'
-import { detailOnUniform, detailUniform, isTextureMarking, markingMask, NO_MARK, shellDetail } from './textures'
+import { detailOnUniform, detailUniform, engravingMask, FLAT_DETAIL, gearTile, isTextureMarking, markingMask, NO_MARK, shellDetail, type GearSurface } from './textures'
 
 const MARKING_INDEX: Record<ShellMarking, number> = {
   none: 0,
@@ -100,39 +100,141 @@ const TRIPLANAR_GLSL = /* glsl */ `
   }
 `
 
+/** Gear's look by material. Each has its own height tile; the code-drawn surface stands in until it loads. */
+const GEAR_SURFACE_LOOK: Record<GearSurface, { freq: number; bump: number; pits: number; rough: number }> = {
+  // freq: tiles per unit of the piece's own size; bump: how strongly the tile catches light.
+  metal: { freq: 3, bump: 0.006, pits: 0.1, rough: 0.25 },
+  cloth: { freq: 5, bump: 0.008, pits: 0.18, rough: 0.1 },
+  leather: { freq: 3.5, bump: 0.006, pits: 0.14, rough: 0.15 },
+  coral: { freq: 2.5, bump: 0.009, pits: 0.22, rough: 0.2 },
+  bone: { freq: 2, bump: 0.003, pits: 0.06, rough: 0.12 },
+}
+
+export interface WorkedOptions {
+  /** Trim colour for the engraving rare and better gear carries (left out: none). */
+  engrave?: string
+}
+
 /**
- * Give a gear material a worked surface, drawn in the shader from each point's own position so it
- * needs no textures: `metal` is brushed along its length with a slightly uneven tone, `cloth` is
- * a fine weave.
+ * Give a gear material a worked surface from its material's height tile (textures.ts), sampled
+ * triplanar from each point's own position so it stays put as the piece moves. Until the tile has
+ * loaded (or if it never does) the surface is drawn in code: `metal` brushed, `cloth` woven, the rest
+ * plain. Rare and better gear can add an engraving inlaid in its trim colour.
  */
-export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind: 'metal' | 'cloth'): T {
+export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind: GearSurface, options: WorkedOptions = {}): T {
+  const look = GEAR_SURFACE_LOOK[kind]
+  const uniforms = {
+    uWorkMap: { value: FLAT_DETAIL as Texture },
+    uWorkOn: { value: 0 },
+    uEngraveMap: { value: NO_MARK as Texture },
+    uEngraveOn: { value: 0 },
+    uEngrave: { value: new Color(options.engrave ?? '#000000') },
+  }
+  const tile = gearTile(kind, (t) => {
+    uniforms.uWorkMap.value = t
+    uniforms.uWorkOn.value = 1
+  })
+  if (tile !== FLAT_DETAIL) {
+    uniforms.uWorkMap.value = tile
+    uniforms.uWorkOn.value = 1
+  }
+  if (options.engrave) {
+    const mask = engravingMask((t) => {
+      uniforms.uEngraveMap.value = t
+      uniforms.uEngraveOn.value = 1
+    })
+    if (mask !== NO_MARK) {
+      uniforms.uEngraveMap.value = mask
+      uniforms.uEngraveOn.value = 1
+    }
+  }
+  material.userData.workUniforms = uniforms
+  const coded =
+    kind === 'metal'
+      ? `
+        // Brushed along the piece, with soft patches where the tone shifts like worked metal.
+        a3Work = a3Noise(vec3(vWorkRaw.x * 14.0, vWorkRaw.y * 260.0, vWorkRaw.z * 14.0)) * 0.7 + a3Noise(vWorkRaw * 420.0) * 0.3;
+        diffuseColor.rgb *= 0.93 + 0.14 * a3Noise(vWorkRaw * 11.0 + 2.0) + 0.05 * (a3Work - 0.5);`
+      : kind === 'cloth'
+        ? `
+        // Over and under threads.
+        vec3 a3Thread = vWorkRaw * 380.0;
+        a3Work = (sin(a3Thread.x + a3Thread.z) * sin(a3Thread.y)) * 0.5 + 0.5;
+        diffuseColor.rgb *= 0.88 + 0.2 * a3Work;`
+        : ''
   material.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms)
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWork;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWork = position;')
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWork;\nvarying vec3 vWorkRaw;')
+      .replace(
+        '#include <begin_vertex>',
+        // The tile is sized to the piece as drawn, so a hat scaled onto a small head is not coarser.
+        '#include <begin_vertex>\nvWorkRaw = position;\nvWork = position * length(modelMatrix[0].xyz);',
+      )
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\nvarying vec3 vWork;\nfloat a3Work = 0.0;\n${NOISE_GLSL}`)
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vWork;
+        varying vec3 vWorkRaw;
+        uniform sampler2D uWorkMap; uniform float uWorkOn;
+        uniform sampler2D uEngraveMap; uniform float uEngraveOn; uniform vec3 uEngrave;
+        float a3Work = 0.5;
+        float a3Height = 0.5;
+        float a3Cut = 0.0;
+        #define A3_ENGRAVE_FREQ 0.6
+        vec2 a3dH = vec2(0.0);
+        ${NOISE_GLSL}
+        ${TRIPLANAR_GLSL}`,
+      )
       .replace(
         '#include <color_fragment>',
-        kind === 'metal'
-          ? `#include <color_fragment>
-        // Brushed along the piece, with soft patches where the tone shifts like worked metal.
-        a3Work = a3Noise(vec3(vWork.x * 14.0, vWork.y * 260.0, vWork.z * 14.0)) * 0.7 + a3Noise(vWork * 420.0) * 0.3;
-        diffuseColor.rgb *= 0.93 + 0.14 * a3Noise(vWork * 11.0 + 2.0) + 0.05 * (a3Work - 0.5);`
-          : `#include <color_fragment>
-        // Over and under threads.
-        vec3 a3Thread = vWork * 380.0;
-        a3Work = (sin(a3Thread.x + a3Thread.z) * sin(a3Thread.y)) * 0.5 + 0.5;
-        diffuseColor.rgb *= 0.88 + 0.2 * a3Work;`,
+        `#include <color_fragment>
+        vec3 a3TriW = a3TriWeights(normalize(cross(dFdx(vWork), dFdy(vWork))));
+        vec3 a3Wp = vWork * ${look.freq.toFixed(1)};
+        float a3Tile = texture2D(uWorkMap, a3Wp.yz).r * a3TriW.x + texture2D(uWorkMap, a3Wp.xz + 0.37).r * a3TriW.y + texture2D(uWorkMap, a3Wp.xy + 0.71).r * a3TriW.z;
+        // Engraving: the same size on every material, cut in and inlaid with the trim colour.
+        vec3 a3Ep = vWork * A3_ENGRAVE_FREQ;
+        float a3Eng = texture2D(uEngraveMap, a3Ep.yz).r * a3TriW.x + texture2D(uEngraveMap, a3Ep.xz + 0.29).r * a3TriW.y + texture2D(uEngraveMap, a3Ep.xy + 0.53).r * a3TriW.z;
+        // Tone on tone: cut in and only lightly touched with the trim colour, so it reads up close
+        // without taking over the piece.
+        a3Cut = uEngraveOn * smoothstep(0.35, 0.65, a3Eng);
+        a3Height = mix(0.5, a3Tile, uWorkOn) - a3Cut * 0.2;
+        a3dH = vec2(dFdx(a3Height), dFdy(a3Height));
+        if (uWorkOn < 0.5) {${coded}
+        } else {
+          diffuseColor.rgb *= 1.0 - ${look.pits.toFixed(2)} * smoothstep(0.5, 0.1, a3Tile);
+        }
+        diffuseColor.rgb = mix(diffuseColor.rgb * (1.0 - a3Cut * 0.18), uEngrave, a3Cut * 0.16);`,
       )
       .replace(
         '#include <roughnessmap_fragment>',
-        kind === 'metal'
-          ? '#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + 0.3 * (a3Work - 0.5), 0.05, 1.0);'
-          : '#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor - 0.1 * a3Work, 0.05, 1.0);',
+        `#include <roughnessmap_fragment>
+        roughnessFactor = uWorkOn > 0.5
+          ? clamp(roughnessFactor + ${look.rough.toFixed(2)} * (0.5 - a3Height), 0.05, 1.0)
+          : clamp(roughnessFactor + ${kind === 'metal' ? '0.3 * (a3Work - 0.5)' : kind === 'cloth' ? '-0.1 * a3Work' : '0.0'}, 0.05, 1.0);
+        roughnessFactor = mix(roughnessFactor, 0.22, a3Cut * 0.4);`,
+      )
+      .replace(
+        '#include <metalnessmap_fragment>',
+        `#include <metalnessmap_fragment>
+        metalnessFactor = mix(metalnessFactor, 0.9, a3Cut * 0.3);`,
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        `#include <normal_fragment_maps>
+        {
+          vec3 a3Sx = dFdx(-vViewPosition);
+          vec3 a3Sy = dFdy(-vViewPosition);
+          vec3 a3R1 = cross(a3Sy, normal);
+          vec3 a3R2 = cross(normal, a3Sx);
+          float a3Det = dot(a3Sx, a3R1);
+          vec3 a3Grad = sign(a3Det) * (a3dH.x * a3R1 + a3dH.y * a3R2) * ${look.bump.toFixed(4)};
+          normal = normalize(abs(a3Det) * normal - a3Grad);
+        }`,
       )
   }
-  material.customProgramCacheKey = () => `avatar3d-gear-${kind}-1`
+  material.customProgramCacheKey = () => `avatar3d-gear-${kind}-4`
   return material
 }
 

@@ -9,7 +9,7 @@ import { build } from 'esbuild'
 import type { AnimationTimeline } from '../../../src/lib/avatar3d/scripted'
 import { resolveChromeExecutable } from '../composite-renderer'
 import { S3_BASE_URL } from '../../../src/lib/assets'
-import { TEXTURE_MARKINGS, TEXTURE_PREFIX, TEXTURE_VERSION } from '../../../src/lib/avatar3d/textures'
+import { GEAR_SURFACES, TEXTURE_MARKINGS, TEXTURE_PREFIX, TEXTURE_VERSION } from '../../../src/lib/avatar3d/textures'
 
 /**
  * The shell textures as data URLs, for a page with no site to fetch them from (see textures.ts):
@@ -17,7 +17,7 @@ import { TEXTURE_MARKINGS, TEXTURE_PREFIX, TEXTURE_VERSION } from '../../../src/
  */
 async function textureScript(): Promise<string> {
   const dir = path.resolve(process.cwd(), `tmp/avatar-textures/out/v${TEXTURE_VERSION}`)
-  const names = ['shell-detail', ...TEXTURE_MARKINGS.map((m) => `marking-${m}`)]
+  const names = ['shell-detail', ...TEXTURE_MARKINGS.map((m) => `marking-${m}`), ...GEAR_SURFACES.map((g) => `gear-${g}`), 'gear-engraving']
   const files: Record<string, string> = {}
   for (const name of names) {
     const local = path.join(dir, `${name}.webp`)

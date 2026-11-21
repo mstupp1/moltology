@@ -2,6 +2,7 @@
 import type { EquipmentCategory } from '../../db/schema'
 import type { AvatarAccessory } from './traits'
 import { TIER_FINISH, mixHex, parseVariantKey } from '../gear-variants'
+import type { GearSurface } from '../avatar3d/textures'
 
 export interface EquipmentVisual {
   key: string
@@ -12,6 +13,25 @@ export interface EquipmentVisual {
   construction: number
   motif: 'plate' | 'rib' | 'vent' | 'crown' | 'hammer' | 'crusher' | 'slim' | 'mitten' | 'sensor'
   accessory?: AvatarAccessory
+  /** What the main plates are made of, for their surface texture (default metal). */
+  surface: GearSurface
+}
+
+/** Pieces whose plates are not metal. Starter gear is grown chitin; deep-water pieces are coral. */
+const SURFACE: Readonly<Record<string, GearSurface>> = {
+  'larval-plate-vest': 'bone',
+  'training-pincers': 'bone',
+  'silt-walker-greaves': 'bone',
+  'larval-feelers': 'bone',
+  'soft-shell-visor': 'bone',
+  'silt-maul': 'bone',
+  'creator-crusher': 'bone',
+  'larval-chitin-cincture': 'leather',
+  'silt-tension-vent-sash': 'leather',
+  'creator-mitten': 'leather',
+  'abyssal-ward-shell': 'coral',
+  'oracle-dome-lattice': 'coral',
+  'ascendant-signal-crown': 'coral',
 }
 const rows: Array<
   [
@@ -62,7 +82,7 @@ const rows: Array<
 export const EQUIPMENT_VISUALS: Readonly<Record<string, EquipmentVisual>> = Object.fromEntries(
   rows.map(([key, category, material, trim, accent, construction, motif, accessory]) => [
     key,
-    { key, category, material, trim, accent, construction, motif, accessory },
+    { key, category, material, trim, accent, construction, motif, accessory, surface: SURFACE[key] ?? 'metal' },
   ]),
 )
 const variantVisuals = new Map<string, EquipmentVisual | undefined>()

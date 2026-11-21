@@ -10,12 +10,14 @@
  * - shell-detail: height, with the large shapes removed so the tile never shows as a repeat. The
  *   shader works out the slope itself.
  * - marking-<name>: the mask, lossless so its edges stay clean.
+ * - gear-<surface>: a gear material's height tile, like the shell's (`--gear metal=<file>`).
+ * - gear-engraving: the engraving mask shown on rare and better gear (`--engraving <file>`).
  */
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
-import { TEXTURE_MARKINGS, TEXTURE_PREFIX, TEXTURE_VERSION, type TextureMarking } from '../../src/lib/avatar3d/textures'
+import { GEAR_SURFACES, TEXTURE_MARKINGS, TEXTURE_PREFIX, TEXTURE_VERSION, type TextureMarking } from '../../src/lib/avatar3d/textures'
 
 const INBOX = path.resolve('tmp/avatar-textures/inbox')
 /** Packed files, also read by the content renderer (scripts/lib/character-animation/render.ts). */
@@ -112,6 +114,11 @@ async function writeGrey(name: string, f: Field, lossless: boolean): Promise<num
 }
 
 async function packShell(file: string): Promise<void> {
+  await packHeight('shell-detail', file)
+}
+
+/** A height tile (the shell's, or a gear material's): lossy greyscale, large shapes removed. */
+async function packHeight(name: string, file: string): Promise<void> {
   // Work at 1024 and shrink last, so the cross-fade stays smooth.
   let f = tile(await readGrey(file, 1024))
   // Take out the large shapes: they are what would show as a repeating pattern on the shell.
@@ -119,8 +126,8 @@ async function packShell(file: string): Promise<void> {
   f = { n: f.n, v: f.v.map((x, i) => x - broad.v[i] + 0.5) }
   f = level(f)
   for (const { px, suffix } of SIZES) {
-    const bytes = await writeGrey(`shell-detail${suffix}`, await shrink(f, px), false)
-    console.log(`shell-detail${suffix}.webp  ${px}px  ${(bytes / 1024).toFixed(0)} KB`)
+    const bytes = await writeGrey(`${name}${suffix}`, await shrink(f, px), false)
+    console.log(`${name}${suffix}.webp  ${px}px  ${(bytes / 1024).toFixed(0)} KB`)
   }
 }
 
@@ -161,6 +168,11 @@ function otsu(f: Field): number {
 }
 
 async function packMarking(name: TextureMarking, file: string): Promise<void> {
+  await packMask(`marking-${name}`, file)
+}
+
+/** A two-tone mask (a marking, or the gear engraving): lossless so its edges stay clean. */
+async function packMask(name: string, file: string): Promise<void> {
   // A slight blur first, so hatching or halftone in the drawing reads as solid shapes.
   let f = blur(tile(await readGrey(file, 1024)), 1)
   f = level(f, 0.02, 0.98)
@@ -173,8 +185,8 @@ async function packMarking(name: TextureMarking, file: string): Promise<void> {
   for (const x of f.v) covered += x
   for (const { px, suffix } of SIZES) {
     const small = await shrink(f, px)
-    const bytes = await writeGrey(`marking-${name}${suffix}`, small, true)
-    console.log(`marking-${name}${suffix}.webp  ${px}px  ${(bytes / 1024).toFixed(0)} KB  ${Math.round((covered / f.v.length) * 100)}% covered`)
+    const bytes = await writeGrey(`${name}${suffix}`, small, true)
+    console.log(`${name}${suffix}.webp  ${px}px  ${(bytes / 1024).toFixed(0)} KB  ${Math.round((covered / f.v.length) * 100)}% covered`)
   }
 }
 
@@ -199,10 +211,18 @@ async function main(): Promise<void> {
       if (!(TEXTURE_MARKINGS as readonly string[]).includes(name) || !file) throw new Error(`--marking wants <${TEXTURE_MARKINGS.join('|')}>=<file>, got ${args[i]}`)
       await packMarking(name as TextureMarking, file)
       did++
+    } else if (args[i] === '--gear') {
+      const [name, file] = (args[++i] ?? '').split('=')
+      if (!(GEAR_SURFACES as readonly string[]).includes(name) || !file) throw new Error(`--gear wants <${GEAR_SURFACES.join('|')}>=<file>, got ${args[i]}`)
+      await packHeight(`gear-${name}`, file)
+      did++
+    } else if (args[i] === '--engraving') {
+      await packMask('gear-engraving', args[++i])
+      did++
     }
   }
   if (!did) {
-    console.log('Usage: npm run avatar:textures -- --shell <file> --marking <name>=<file> ...')
+    console.log('Usage: npm run avatar:textures -- --shell <file> --marking <name>=<file> --gear <surface>=<file> --engraving <file> ...')
     console.log(`Files are read from ${path.relative(process.cwd(), INBOX)}; markings: ${TEXTURE_MARKINGS.join(', ')}`)
     process.exitCode = 1
   }

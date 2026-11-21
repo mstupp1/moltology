@@ -64,11 +64,26 @@ Common ending for every marking prompt:
 - **reef-camo**: Disruptive camouflage of organic rounded blotches with irregular edges, some blotches merging, some with small satellite spots, sizes from 1/20 to 1/6 of the tile.
 - Avoid script or glyph patterns: tried 2026-11-21, they came out sparse and read as emoji (smileys, wifi arcs) on the shell.
 
+### Gear materials (height maps)
+
+Use the shell detail rules (greyscale height, white is high, flat shadowless light, seamless 1024 tile).
+
+- **gear-metal**: Hammered metal plate: overlapping shallow round hammer dents of varied size (1/20 to 1/10 of the tile), with very fine scattered scratches. No rivets, no seams, no edges.
+- **gear-cloth**: Close woven fabric: an even, tight basket weave of slightly irregular threads, with a few faint slubs. About 40 threads across the tile.
+- **gear-leather**: Tooled leather grain: fine pebbled grain with soft, branching creases, like the surface of a worn leather belt. No stitching, no edges.
+- **gear-coral**: Coral surface: dense small round polyp cups and pits packed together (like star coral), each about 1/30 of the tile, with thin ridges between them.
+- **gear-bone**: Polished bone or old chitin: mostly smooth with faint long fibrous streaks running one way and a sprinkling of tiny pores. Very subtle.
+
+### Gear engraving (mask)
+
+- **gear-engraving**: Ornate engraved filigree for armour: thin flowing scrollwork lines with curls, small leaves and dots, evenly spread, like engraving on a sword guard. Lines only, no filled shapes, no text or symbols. Use the marking mask ending, but roughly 20-30% white.
+
 ## Packing and publishing
 
 ```bash
 npm run avatar:textures -- --shell shell-detail-a.png \
   --marking lace=marking-coral-lace-a.png --marking tide=marking-tide-rings-b.png ...
+npm run avatar:textures -- --gear metal=gear-metal-a.png --gear cloth=gear-cloth-b.png ... --engraving gear-engraving-a.png
 npm run avatar:textures -- --publish     # on the Mac: uploads to the asset bucket
 ```
 

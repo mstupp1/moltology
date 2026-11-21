@@ -115,12 +115,16 @@ class Kit {
 
   finish(): GearItem {
     const v = this.visual
+    const rarity = parseVariantKey(v.key).rarity
+    // Rare and better pieces carry an engraving inlaid in their trim colour.
+    const engrave = rarity === 'rare' || rarity === 'epic' || rarity === 'legendary' ? v.trim : undefined
+    const plateMetal = v.surface === 'metal' ? 0.6 : 0.05
     const materials: Record<Tone, Material> = {
-      plate: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), metalness: 0.6, roughness: 0.4, clearcoat: 0.45, clearcoatRoughness: 0.3 }), 'metal'),
+      plate: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), metalness: plateMetal, roughness: v.surface === 'metal' ? 0.4 : 0.5, clearcoat: 0.45, clearcoatRoughness: 0.3 }), v.surface, { engrave }),
       trim: new MeshPhysicalMaterial({ color: new Color(v.trim), metalness: 0.9, roughness: 0.26 }),
       accent: new MeshPhysicalMaterial({ color: new Color(v.accent), emissive: new Color(v.accent), emissiveIntensity: 0.85, roughness: 0.3 }),
       cloth: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.92, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color(v.trim) }), 'cloth'),
-      dark: workedSurface(new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.4, roughness: 0.55 }), 'metal'),
+      dark: workedSurface(new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.15, roughness: 0.6 }), 'leather'),
     }
     const meshes: Mesh[] = []
     for (const { bone, tone: t, geos } of this.parts.values()) {

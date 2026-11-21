@@ -16,6 +16,10 @@ import { getAssetUrl } from '../assets'
 export const TEXTURE_MARKINGS = ['lace', 'tide', 'camo'] as const satisfies readonly ShellMarking[]
 export type TextureMarking = (typeof TEXTURE_MARKINGS)[number]
 
+/** Gear surfaces with their own height tile (gear-<surface>.webp). */
+export const GEAR_SURFACES = ['metal', 'cloth', 'leather', 'coral', 'bone'] as const
+export type GearSurface = (typeof GEAR_SURFACES)[number]
+
 export const isTextureMarking = (m: ShellMarking | undefined): m is TextureMarking => (TEXTURE_MARKINGS as readonly string[]).includes(m ?? '')
 
 /** Bump when a texture file changes, and publish the new set under the new folder. */
@@ -108,9 +112,25 @@ export function markingMask(marking: TextureMarking, onLoad: (t: Texture) => voi
   return texture(`marking-${marking}`, NO_MARK, onLoad)
 }
 
+/** A gear material's height tile; `onLoad` swaps it in when it arrives later. */
+export function gearTile(surface: GearSurface, onLoad: (t: Texture) => void): Texture {
+  return texture(`gear-${surface}`, FLAT_DETAIL, onLoad)
+}
+
+/** The engraving shown on rare and better gear. */
+export function engravingMask(onLoad: (t: Texture) => void): Texture {
+  return texture('gear-engraving', NO_MARK, onLoad)
+}
+
 /** Start loading what this look needs and wait until it is in (or has failed). */
-export async function preloadTextures(look: { marking?: ShellMarking }): Promise<void> {
+export async function preloadTextures(look: { marking?: ShellMarking; equipment?: object; accessory?: string }): Promise<void> {
   shellDetail()
   if (isTextureMarking(look.marking)) markingMask(look.marking, () => undefined)
+  // Gear: every surface, since one piece can use several (they are small and cached).
+  const wearsGear = (look.equipment && Object.values(look.equipment).some(Boolean)) || (look.accessory && look.accessory !== 'none')
+  if (wearsGear) {
+    for (const surface of GEAR_SURFACES) gearTile(surface, () => undefined)
+    engravingMask(() => undefined)
+  }
   await Promise.all([...pending])
 }
