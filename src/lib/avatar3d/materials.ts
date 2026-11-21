@@ -420,6 +420,10 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
         a3Eye = mix(vec3(0.02, 0.015, 0.02), a3Eye, smoothstep(a3Pupil - 0.012, a3Pupil + 0.012, a3Rho));
         a3Dark = 1.0 - smoothstep(a3Pupil - 0.012, a3Pupil + 0.012, a3Rho);
         a3Highlight = 1.0 - smoothstep(0.095, 0.11, length(a3At - a3Pupil * vec2(-0.5, 0.7)));
+        // The lids sit over the eye and shade it where they meet it: a soft shadow under the upper
+        // lid, a fainter one over the lower, so the eye reads as set into the face, not laid on it.
+        float a3Lid = smoothstep(0.25, 0.92, a3Dir.y) * 0.42 + smoothstep(-0.45, -0.95, a3Dir.y) * 0.18;
+        a3Eye *= 1.0 - a3Lid * (1.0 - a3Dark);
         diffuseColor.rgb = mix(a3Eye, vec3(1.0), a3Highlight);
         `,
       )
@@ -427,7 +431,7 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, a3Dark);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(0.9) * a3Highlight;')
   }
-  material.customProgramCacheKey = () => 'avatar3d-eye-5'
+  material.customProgramCacheKey = () => 'avatar3d-eye-6'
   return material
 }
 

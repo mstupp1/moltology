@@ -8,6 +8,9 @@
 /** Half-sizes of the open-mouth oval at a scale of 1 (species.ts builds it this size). */
 export const MOUTH_HOLE = { x: 0.08, y: 0.048, z: 0.016 } as const
 
+/** The lip round the open mouth is built as a ring this oval's size, its tube this share of it across. */
+export const LIP_TUBE = 0.12
+
 /**
  * X rest (the character's own drawn mouth) · A lips pressed (M, B, P) · B teeth together, lips
  * apart (most consonants: K, S, T, EE) · C open (EH, AE) · D wide open (AA) · E rounded (AO, ER)

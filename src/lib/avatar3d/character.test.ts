@@ -14,6 +14,15 @@ import { REACTION_SECONDS } from './motion'
 import { POSES } from './poses'
 import { keySampler } from './loft'
 
+type Built = ReturnType<typeof buildCharacter>
+
+/** Width and height of the open mouth as drawn now (it is shaped point by point, not by its bone's scale). */
+function openMouthSize(character: Built): Vector3 {
+  const hole = character.rig.bones.get('mouthOpen')!.children.find((c) => c.name.endsWith(':mouth')) as Mesh
+  hole.geometry.computeBoundingBox()
+  return hole.geometry.boundingBox!.getSize(new Vector3())
+}
+
 const SOCKETS = ['head', 'ears', 'face', 'back', 'chest', 'waist', 'clawL', 'clawR', 'wristL', 'wristR', 'footL', 'footR']
 
 /** Meshes that belong to equipped gear: armour plates and anything mounted on a socket. */
@@ -276,19 +285,62 @@ describe('avatar3d', () => {
     for (const race of AVATAR_RACES) {
       const character = buildCharacter(baselineLook(race))
       const mouth = character.rig.bones.get('mouthOpen')!
+      const size = () => openMouthSize(character)
       character.update(0.033, 0.033, true)
       expect(mouth.visible, race).toBe(false)
       character.setTalk(1)
       character.update(0.033, 0.066, true)
       expect(mouth.visible, race).toBe(true)
-      const loud = mouth.scale.y
+      const loud = size().y
       character.setTalk(0.2)
       character.update(0.033, 0.1, true)
-      expect(mouth.scale.y, race).toBeLessThan(loud)
+      expect(size().y, race).toBeLessThan(loud)
       // It closes over a couple of frames, like a drawn mouth, not on the very next one.
       character.setTalk(0)
       for (let f = 0; f < 3; f++) character.update(0.033, 0.133 + f * 0.033, true)
       expect(mouth.visible, race).toBe(false)
+      character.dispose()
+    }
+  })
+
+  it('frames every species and head shape so the face fills the portrait about the same', () => {
+    const share: Record<string, number[]> = {}
+    for (const race of AVATAR_RACES) {
+      for (const headShape of AVATAR_HEAD_SHAPES) {
+        const character = buildCharacter({ ...baselineLook(race), headShape })
+        const eye = character.rig.restWorldOf('eyeSocketL').position
+        ;(share[race] ??= []).push((2 * Math.abs(eye.x)) / character.portrait.size)
+        character.dispose()
+      }
+    }
+    const all = Object.values(share).flat()
+    const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length
+    // Crabs used to show their faces at about three quarters of a lobster's size, wide heads less.
+    expect(mean(share.crab) / mean(share.lobster)).toBeGreaterThan(0.92)
+    expect(mean(share.crab) / mean(share.lobster)).toBeLessThan(1.12)
+    expect(Math.min(...all) / Math.max(...all)).toBeGreaterThan(0.74)
+  })
+
+  it('lays the open mouth on the curve of the face, ringed by a lip', () => {
+    for (const race of AVATAR_RACES) {
+      const character = buildCharacter(baselineLook(race))
+      character.setTalk(0.6, 'D')
+      for (let f = 0; f < 6; f++) character.update(0.033, 1 + f * 0.033, true)
+      const bone = character.rig.bones.get('mouthOpen')!
+      const hole = bone.children.find((c) => c.name.endsWith(':mouth')) as Mesh
+      const lip = bone.children.find((c) => c.name.endsWith(':shell')) as Mesh
+      expect(lip, race).toBeTruthy()
+      // The far left and right of the opening fall back with the head, not out in a flat plane.
+      const pos = hole.geometry.getAttribute('position')
+      let edge = 0
+      for (let i = 0; i < pos.count; i++) if (Math.abs(pos.getX(i)) > Math.abs(pos.getX(edge))) edge = i
+      expect(pos.getZ(edge), race).toBeLessThan(-0.003)
+      // The lip goes all the way round the opening.
+      lip.geometry.computeBoundingBox()
+      const lipSize = lip.geometry.boundingBox!.getSize(new Vector3())
+      const holeSize = openMouthSize(character)
+      expect(lipSize.x, race).toBeGreaterThan(holeSize.x)
+      expect(lipSize.y, race).toBeGreaterThan(holeSize.y)
       character.dispose()
     }
   })
@@ -306,18 +358,18 @@ describe('avatar3d', () => {
       expect(bone('mouthOpen').visible, race).toBe(true)
       expect(bone('mouthLine').visible, race).toBe(false)
       expect(bone('mouthTeethUp').visible || bone('mouthTeethLo').visible, race).toBe(false)
-      const pressed = bone('mouthOpen').scale.y
+      const pressed = openMouthSize(character).y
       settle('B')
-      expect(bone('mouthOpen').scale.y, race).toBeGreaterThan(pressed * 3)
+      expect(openMouthSize(character).y, race).toBeGreaterThan(pressed * 3)
       expect(bone('mouthTeethUp').visible && bone('mouthTeethLo').visible, race).toBe(true)
       expect(bone('mouthTongue').visible, race).toBe(false)
       settle('D')
-      const wide = bone('mouthOpen').scale.clone()
+      const wide = openMouthSize(character)
       const tongueLow = bone('mouthTongue').position.clone()
       expect(bone('mouthTeethLo').visible, race).toBe(false)
       settle('F')
-      expect(bone('mouthOpen').scale.x, race).toBeLessThan(wide.x * 0.5)
-      expect(bone('mouthOpen').scale.y, race).toBeLessThan(wide.y)
+      expect(openMouthSize(character).x, race).toBeLessThan(wide.x * 0.5)
+      expect(openMouthSize(character).y, race).toBeLessThan(wide.y)
       settle('H')
       // The tongue rises toward the top teeth (up the face, which is along the mouth's own y).
       expect(bone('mouthTongue').position.distanceTo(tongueLow), race).toBeGreaterThan(0.01)
