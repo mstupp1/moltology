@@ -682,8 +682,9 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
         '#include <color_fragment>',
         `
         vec3 a3Dir = normalize(vEye);
-        // Distance from the eye's axis as it appears on the widened eye, in eye radii.
-        vec2 a3At = a3Dir.xy * uStretch;
+        // Distance from the iris centre as it appears on the widened eye, in eye radii. The iris sits
+        // a touch below the eye's axis, so its top clears the upper lid.
+        vec2 a3At = a3Dir.xy * uStretch + vec2(0.0, 0.06);
         float a3Rho = a3Dir.z > 0.0 ? length(a3At) : 9.0;
         float a3Iris = 0.68;
         float a3Pupil = 0.36 * uPupil;
@@ -711,7 +712,7 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
         a3Highlight = 1.0 - smoothstep(0.085, 0.1, length(a3At - a3Pupil * vec2(-0.5, 0.7)));
         a3Highlight = max(a3Highlight, 0.7 * (1.0 - smoothstep(0.035, 0.05, length(a3At - vec2(0.2, -0.24)))));
         {
-          vec2 a3Q = a3At - vec2(-0.05, 0.62);
+          vec2 a3Q = a3At - vec2(-0.05, 0.84);
           a3Q.y += 0.35 * a3Q.x * a3Q.x;
           float a3Win = (1.0 - smoothstep(0.42, 0.6, abs(a3Q.x))) * (1.0 - smoothstep(0.05, 0.12, abs(a3Q.y)));
           a3Highlight = max(a3Highlight, 0.32 * a3Win * step(0.0, a3Dir.z));
@@ -727,7 +728,7 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, a3Dark);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(0.9) * a3Highlight;')
   }
-  material.customProgramCacheKey = () => 'avatar3d-eye-8'
+  material.customProgramCacheKey = () => 'avatar3d-eye-9'
   return material
 }
 
