@@ -12,7 +12,7 @@ import { bakeOcclusion, prepareBake, type BakeOptions } from './bake'
 import { BODY, bodySpheres, SWINGS, type BodySphere } from './collide'
 import { buildOccluders, buildSprings, type Spring } from './flex'
 import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
-import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
+import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, legTap, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
 import { blendMouth, MOUTH_HOLE, MOUTH_PARAMS, mouthParams, type MouthParams, type MouthShape } from './mouth-shapes'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
@@ -60,6 +60,10 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a))
 const X = new Vector3(1, 0, 0)
 const Zaxis = new Vector3(0, 0, 1)
 const Yaxis = new Vector3(0, 1, 0)
+/** Which way a turn about a middle leg's own Z lifts the left one (the right is mirrored). */
+const LEG_UP = 1
+/** How long a middle leg's lift-and-tap fidget takes, in seconds. */
+const LEG_TAP_SECONDS = 0.9
 
 export interface Character3D {
   root: Group
@@ -268,6 +272,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   prepareBake(rig.root, rig.bones)
   const fan = TAIL_FAN.map((_, i) => `tailFan${i}`).filter((name) => rig.bones.has(name))
   const swimmerets = SWIMMERETS.flatMap((_, i) => [`swimmeret${i}L`, `swimmeret${i}R`]).filter((name) => rig.bones.has(name))
+  // The short middle legs, front pair first, each as its three segments (hip, knee, tip).
+  const sideLegs = [1, 2].flatMap((i) =>
+    (['L', 'R'] as const).map((tag) => ({ k: i - 1, tag, s: tag === 'L' ? 1 : -1, seg: ['a', 'b', 'c'].map((j) => `sideLeg${i}${j}${tag}`) })),
+  ).filter((leg) => leg.seg.every((name) => rig.bones.has(name)))
 
   // Legs are solved from the hips to where the feet stand, so the hips can sink, shift and
   // bounce while the feet stay planted. Everything here is in the character's own space.
@@ -594,6 +602,18 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     }
   }
 
+  /**
+   * Move one middle leg, in radians: `swing` forward (+) or back at the hip, `raise` up towards the
+   * body, `bend` folding the knee in and `tip` curling the last segment under.
+   */
+  const legPose = (leg: (typeof sideLegs)[number], swing: number, raise: number, bend: number, tip: number) => {
+    const [a, b, c] = leg.seg
+    overlay(a, X, swing)
+    overlay(a, Zaxis, leg.s * LEG_UP * raise)
+    overlay(b, Zaxis, leg.s * LEG_UP * bend)
+    overlay(c, Zaxis, leg.s * LEG_UP * tip)
+  }
+
   /** Open the pincer and clap it shut `count` times over p in 0..1. Returns the opening in radians. */
   const snapping = (p: number, count: number) => {
     const each = (p * count) % 1
@@ -671,6 +691,34 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       // The fan breathes open and shut a little, and the swimmerets paddle in a slow wave.
       fanSpread += Math.sin(time * 0.8) * 0.025 * m.tail
       swimmerets.forEach((name, k) => overlay(name, X, Math.sin(time * 3.2 - Math.floor(k / 2) * 0.9) * 0.18))
+      // The middle legs: a slow ripple that runs front to back (each side out of step with the
+      // other), and now and then one leg lifts, taps the ground and settles.
+      let fidget = -1
+      let fidgetP = 0
+      if (m.fidgetEvery && sideLegs.length) {
+        const n = Math.floor(time / m.fidgetEvery)
+        const since = time - n * m.fidgetEvery - jitter(n + 0.7) * m.fidgetEvery * 0.4
+        if (since > 0 && since < LEG_TAP_SECONDS) {
+          fidget = Math.floor(jitter(n + 0.2) * sideLegs.length)
+          fidgetP = since / LEG_TAP_SECONDS
+        }
+      }
+      sideLegs.forEach((leg, i) => {
+        const phase = time * 0.85 - leg.k * 1.2 + (leg.s > 0 ? 0 : 2.1)
+        const a = 0.06 * m.legs
+        let swing = Math.sin(phase) * a
+        let raise = Math.sin(phase + 1.3) * a * 0.4 + m.tuck
+        let bend = Math.sin(phase + 0.8) * a * 0.8 + m.tuck * 1.4
+        let tip = Math.sin(phase + 1.7) * a * 0.7
+        if (i === fidget) {
+          const up = legTap(fidgetP)
+          raise += 0.32 * up
+          bend += 0.28 * up
+          tip -= 0.18 * arc(fidgetP)
+          swing += 0.08 * Math.sin(fidgetP * Math.PI * 2)
+        }
+        legPose(leg, swing, raise, bend, tip)
+      })
       if (m.snapEvery) {
         const n = Math.floor(time / m.snapEvery)
         const since = time - n * m.snapEvery - jitter(n) * m.snapEvery * 0.5
@@ -739,6 +787,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
             overlay(`thumb${tag}`, Zaxis, -s * 0.45 * arc(p))
             overlay(`antenna${tag}`, X, Math.sin(p * 26) * 0.16 * (1 - p))
           }
+          // The middle legs snatch in under the body and ease back out.
+          const tuck = p < 0.15 ? p / 0.15 : 1 - (p - 0.15) / 0.85
+          for (const leg of sideLegs) legPose(leg, 0, 0.3 * tuck, 0.4 * tuck, 0.2 * tuck)
         } else if (reaction.kind === 'snap') {
           const s = reaction.side
           const tag = s === 1 ? 'L' : 'R'
@@ -775,6 +826,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           browUp += 0.016 * held
           fanSpread += 0.14 * held
           fanCurl = held
+          // A happy scuttle: the middle legs patter in a quick wave, front to back.
+          for (const leg of sideLegs) {
+            const step = Math.sin(p * 46 - leg.k * 1.6 + (leg.s > 0 ? 0 : Math.PI))
+            legPose(leg, 0.16 * step * held, 0.14 * Math.max(0, step) * held, 0.1 * held, 0)
+          }
         }
       }
       // Talking gestures: each plays once on its own clock, over the pose and the idle motion.
