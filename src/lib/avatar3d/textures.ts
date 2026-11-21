@@ -16,6 +16,10 @@ import { getAssetUrl } from '../assets'
 export const TEXTURE_MARKINGS = ['lace', 'tide', 'camo'] as const satisfies readonly ShellMarking[]
 export type TextureMarking = (typeof TEXTURE_MARKINGS)[number]
 
+/** Gear surfaces with their own height tile (gear-<surface>.webp). */
+export const GEAR_SURFACES = ['metal', 'cloth', 'leather', 'coral', 'bone'] as const
+export type GearSurface = (typeof GEAR_SURFACES)[number]
+
 export const isTextureMarking = (m: ShellMarking | undefined): m is TextureMarking => (TEXTURE_MARKINGS as readonly string[]).includes(m ?? '')
 
 /** Bump when a texture file changes, and publish the new set under the new folder. */
