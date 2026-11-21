@@ -1,14 +1,16 @@
 /**
  * Materials. One physically based shell material carries the palette, finish and marking; the
  * marking is painted in the shader from each vertex's rest position, so patterns stay glued to
- * the shell in any pose and need no textures.
+ * the shell in any pose. Most markings are drawn in code; a few, and the shell's fine surface,
+ * come from small greyscale textures (textures.ts) sampled the same way.
  */
-import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Material, Vector2, Vector4 } from 'three'
+import { Color, MeshPhysicalMaterial, MeshStandardMaterial, type Material, type Texture, Vector2, Vector4 } from 'three'
 import { OCCLUDERS } from './flex'
 import type { ShellFinish, ShellMarking, ShellPalette } from '../avatar/traits'
 import { SHELL_PALETTE_MAP } from '../avatar/traits'
 import { EYE_COLOR_SWATCH, type AvatarEyeColor } from '../avatar/parts'
 import type { MaterialSlot } from './rig'
+import { detailOnUniform, detailUniform, isTextureMarking, markingMask, NO_MARK, shellDetail } from './textures'
 
 const MARKING_INDEX: Record<ShellMarking, number> = {
   none: 0,
@@ -20,6 +22,10 @@ const MARKING_INDEX: Record<ShellMarking, number> = {
   calico: 6,
   split: 7,
   circuit: 8,
+  // Drawn from an image mask (uMarkMap).
+  lace: 9,
+  tide: 9,
+  camo: 9,
 }
 
 export const NOISE_GLSL = /* glsl */ `
@@ -83,6 +89,14 @@ export const NOISE_GLSL = /* glsl */ `
       return smoothstep(0.05, 0.02, e);
     }
     return 0.0;
+  }
+`
+
+/** Sampling a tiling texture from a 3D point: one look along each axis, blended by which way the surface faces. */
+const TRIPLANAR_GLSL = /* glsl */ `
+  vec3 a3TriWeights(vec3 n) {
+    vec3 w = pow(abs(n), vec3(6.0));
+    return w / max(w.x + w.y + w.z, 1e-5);
   }
 `
 
@@ -162,6 +176,14 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   u.uSplit.value.set(o.splitBase ?? o.base)
   u.uSoft.value.set(o.soft ?? o.shade)
   u.uMarking.value = MARKING_INDEX[o.marking ?? 'none']
+  const marking = o.marking
+  material.userData.marking = marking
+  u.uMarkMap.value = isTextureMarking(marking)
+    ? markingMask(marking, (mask) => {
+        // Still the same marking once it arrives (a repaint may have changed it meanwhile).
+        if (material.userData.marking === marking) u.uMarkMap.value = mask
+      })
+    : NO_MARK
   u.uMarkScale.value = 1 / Math.min(1.8, Math.max(0.5, o.markingScale ?? 1))
   u.uGrain.value = o.grain ?? (finish === 'chrome' ? 0.015 : 0.07)
   // Polished finishes keep a smoother shell, so their reflections stay clean.
@@ -198,6 +220,10 @@ const shellUniforms = () => ({
   uBaked: { value: 0 },
   uThin: { value: 0 },
   uWet: { value: 0 },
+  uMarkMap: { value: NO_MARK as Texture },
+  // Shared by every shell, so the tile is swapped in once when it arrives.
+  uDetailMap: detailUniform,
+  uDetailOn: detailOnUniform,
 })
 
 /** Let a character's shell materials shade themselves with its own occluder spheres. */
@@ -214,6 +240,7 @@ export function shadeWith(materials: Record<MaterialSlot, Material>, spheres: Ve
 
 export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
   const material = new MeshPhysicalMaterial({ vertexColors: true })
+  shellDetail()
   const uniforms = shellUniforms()
   material.userData.uniforms = uniforms
   // Every mesh drawn with it carries a `bake` attribute (bake.ts).
@@ -242,11 +269,19 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         uniform float uThin; uniform float uWet;
         uniform vec3 uShade; uniform vec3 uMark; uniform vec3 uSplit; uniform vec3 uSoft;
         uniform int uMarking; uniform float uMarkScale; uniform float uGrain; uniform float uDetail; uniform float uGlow; uniform float uMarkGlow;
+        uniform sampler2D uMarkMap; uniform sampler2D uDetailMap; uniform float uDetailOn;
+        // Shell detail tiles about every 0.18 units; image markings about every 1.3.
+        #define A3_DETAIL_FREQ 5.5
+        #define A3_MARK_FREQ 0.75
+        #define A3_DETAIL_BUMP 0.0045
         #define A3_BAKE_STRENGTH ${BAKE_STRENGTH.toFixed(2)}
         float a3Mask = 0.0;
         float a3Soft = 0.0;
         float a3Pebble = 0.0;
-        ${NOISE_GLSL}`,
+        float a3Height = 0.5;
+        vec2 a3dH = vec2(0.0);
+        ${NOISE_GLSL}
+        ${TRIPLANAR_GLSL}`,
       )
       .replace(
         '#include <color_fragment>',
@@ -254,10 +289,22 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         float a3Ao = vColor.r;
         a3Soft = 1.0 - vColor.g;
         a3Pebble = vColor.b * uDetail;
+        // Which way the shell faces at rest, for the tiling textures: they stay put however it moves.
+        vec3 a3TriW = a3TriWeights(normalize(cross(dFdx(vRest), dFdy(vRest))));
+        // Fine shell surface from the detail tile (a height map).
+        vec3 a3Dp = vRest * A3_DETAIL_FREQ;
+        float a3DetailAmt = uDetailOn * mix(0.2, 1.0, uDetail * uDetail) * (1.0 - a3Soft * 0.6);
+        a3Height = mix(0.5, texture2D(uDetailMap, a3Dp.yz).r * a3TriW.x + texture2D(uDetailMap, a3Dp.xz + 0.37).r * a3TriW.y + texture2D(uDetailMap, a3Dp.xy + 0.71).r * a3TriW.z, a3DetailAmt);
+        // Its slope on screen, for the bump below (taken here, where every pixel runs the same code).
+        a3dH = vec2(dFdx(a3Height), dFdy(a3Height));
+        // Image markings: the mask's three looks blended, then sharpened back to a clean edge.
+        vec3 a3Mp = vRest * uMarkScale * A3_MARK_FREQ;
+        float a3MarkTex = texture2D(uMarkMap, a3Mp.yz).r * a3TriW.x + texture2D(uMarkMap, a3Mp.xz + 0.29).r * a3TriW.y + texture2D(uMarkMap, a3Mp.xy + 0.53).r * a3TriW.z;
         vec3 a3Tint = diffuse;
         // The partner colour takes the viewer's right half, as in the 2D drawing.
         if (uMarking == 7 && vRest.x > 0.0) a3Tint = uSplit;
-        a3Mask = uMarking == 7 ? 0.0 : a3Marking(uMarking, vRest * uMarkScale) * (1.0 - a3Soft);
+        a3Mask = uMarking == 7 ? 0.0 : uMarking == 9 ? smoothstep(0.38, 0.62, a3MarkTex) : a3Marking(uMarking, vRest * uMarkScale);
+        a3Mask *= 1.0 - a3Soft;
         a3Tint = mix(a3Tint, uMark, a3Mask);
         // Shell is never one flat colour: it is a little darker and blotchier along the back and
         // on top, and paler underneath.
@@ -269,6 +316,8 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         a3Tint *= 1.0 - a3Pebble * 0.09 * (1.0 - smoothstep(0.25, 0.6, a3Lump));
         float a3Grain = a3Noise(vRest * 90.0) * 0.6 + a3Noise(vRest * 240.0) * 0.4;
         a3Tint *= 1.0 + uGrain * (a3Grain - 0.5);
+        // Pores and pits from the detail tile sit a little darker.
+        a3Tint *= 1.0 - 0.08 * smoothstep(0.5, 0.15, a3Height);
         // Joints are soft, pale membrane, not shell.
         a3Tint = mix(a3Tint, uSoft, a3Soft * 0.8);
         // Creases take the palette's shade colour instead of going grey.
@@ -280,7 +329,17 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         `#include <normal_fragment_maps>
         // Fine leathery grain, so highlights break up the way they do on the painted references.
         vec3 a3Bump = vec3(a3Noise(vRest * 120.0 + 11.0), a3Noise(vRest * 120.0 + 37.0), a3Noise(vRest * 120.0 + 71.0)) - 0.5;
-        normal = normalize(normal + a3Bump * uGrain * 1.1);
+        normal = normalize(normal + a3Bump * uGrain * mix(1.1, 0.6, uDetailOn));
+        // The detail tile's ridges and pores catch the light (screen-space bump, as three's bumpMap).
+        {
+          vec3 a3Sx = dFdx(-vViewPosition);
+          vec3 a3Sy = dFdy(-vViewPosition);
+          vec3 a3R1 = cross(a3Sy, normal);
+          vec3 a3R2 = cross(normal, a3Sx);
+          float a3Det = dot(a3Sx, a3R1);
+          vec3 a3Grad = sign(a3Det) * (a3dH.x * a3R1 + a3dH.y * a3R2) * A3_DETAIL_BUMP;
+          normal = normalize(abs(a3Det) * normal - a3Grad);
+        }
         // Pebbled shell: the surface tips away from each lump, strongest on the claws.
         if (a3Pebble > 0.01) {
           vec3 a3P = vRest * 30.0 + 5.0;
@@ -302,7 +361,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
       .replace(
         '#include <roughnessmap_fragment>',
         `#include <roughnessmap_fragment>
-        roughnessFactor = clamp(roughnessFactor + uGrain * 1.6 * (a3Grain - 0.5) + a3Soft * 0.3 + a3Pebble * 0.1 * (0.5 - a3Lump), 0.04, 1.0);`,
+        roughnessFactor = clamp(roughnessFactor + uGrain * 1.6 * (a3Grain - 0.5) + a3Soft * 0.3 + a3Pebble * 0.1 * (0.5 - a3Lump) + 0.12 * (0.5 - a3Height), 0.04, 1.0);`,
       )
       .replace(
         '#include <aomap_fragment>',
@@ -343,7 +402,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-8'
+  material.customProgramCacheKey = () => 'avatar3d-shell-9'
   return material
 }
 

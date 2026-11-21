@@ -83,7 +83,7 @@ function breathe(): Promise<void> {
 async function run(): Promise<void> {
   running = true
   try {
-    const { Avatar3DUnavailable, lookFromConfig, renderStill } = await import('./avatar3d')
+    const { Avatar3DUnavailable, lookFromConfig, preloadTextures, renderStill } = await import('./avatar3d')
     while (queue.length) {
       const job = queue.shift()!
       if (job.wanted <= 0) {
@@ -91,7 +91,14 @@ async function run(): Promise<void> {
         continue
       }
       try {
-        const url = renderStill(lookFromConfig(job.config), job.px, job.shot)
+        const look = lookFromConfig(job.config)
+        // The shell's textures, so the still is final and is kept that way.
+        await preloadTextures(look)
+        if (job.wanted <= 0) {
+          job.resolve(null)
+          continue
+        }
+        const url = renderStill(look, job.px, job.shot)
         job.resolve(url)
         void keep(job.key, url)
       } catch (error) {

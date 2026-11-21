@@ -4,6 +4,7 @@ const renderStill = vi.hoisted(() => vi.fn((_look: unknown, px: number, shot: st
 vi.mock('./avatar3d', () => ({
   Avatar3DUnavailable: class extends Error {},
   lookFromConfig: (config: unknown) => config,
+  preloadTextures: async () => undefined,
   renderStill,
 }))
 

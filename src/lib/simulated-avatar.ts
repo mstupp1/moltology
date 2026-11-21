@@ -20,6 +20,7 @@ import {
   LOBSTER_PUPIL_VARIANTS,
   SHELL_FINISHES,
   SHELL_MARKINGS,
+  SEEDED_MARKINGS,
   SHELL_PALETTES,
   lockAvatarConfig,
   pickFrom,
@@ -54,7 +55,7 @@ export interface SimulatedLookHint {
 export function rollSimulatedAvatarConfig(seed: string = randomLobsterSeed(), hint: SimulatedLookHint = {}): SimulatedAvatarConfig {
   const rng = seededRandom(`${seed}:simulated-look`)
   const shellColor = hint.shellColor ?? pickFrom(rng, SHELL_IDS)
-  const marking = rng() < 0.25 ? 'none' : pickFrom(rng, SHELL_MARKINGS)
+  const marking = rng() < 0.25 ? 'none' : pickFrom(rng, SEEDED_MARKINGS)
   const config: LobsterAvatarConfig = {
     style: LOBSTER_AVATAR_STYLE,
     seed,
