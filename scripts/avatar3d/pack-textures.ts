@@ -126,8 +126,11 @@ async function packShell(file: string): Promise<void> {
 async function shrink(f: Field, px: number): Promise<Field> {
   if (f.n === px) return f
   const buf = Buffer.from(f.v.map((x) => Math.round(x * 255)))
-  const { data } = await sharp(buf, { raw: { width: f.n, height: f.n, channels: 1 } }).resize(px, px, { kernel: 'lanczos3' }).raw().toBuffer({ resolveWithObject: true })
-  return { n: px, v: Float32Array.from(data, (x) => x / 255) }
+  // sharp hands a one-channel image back as RGB after a resize: read one channel per pixel.
+  const { data, info } = await sharp(buf, { raw: { width: f.n, height: f.n, channels: 1 } }).resize(px, px, { kernel: 'lanczos3' }).raw().toBuffer({ resolveWithObject: true })
+  const v = new Float32Array(px * px)
+  for (let i = 0; i < v.length; i++) v[i] = data[i * info.channels] / 255
+  return { n: px, v }
 }
 
 /** The cut that best splits the values into two groups (Otsu). */
