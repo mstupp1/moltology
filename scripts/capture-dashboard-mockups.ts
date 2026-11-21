@@ -241,6 +241,7 @@ async function main() {
           }
         }
         await page.addStyleTag({ content: CAPTURE_CSS })
+        if (target.scrollPast) await scrollPast(page, target.scrollPast)
         await page.evaluate(async () => {
           // Lazy images at the fold edge may never start in a still screenshot; load them now.
           document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((image) => { image.loading = 'eager' })
@@ -322,6 +323,20 @@ async function main() {
 }
 
 /** The padded element box, grown to the viewport's aspect ratio and kept inside the viewport. */
+/** Scroll the element's scrolling container until only its bottom `keep` pixels show at the top. */
+async function scrollPast(page: Page, { selector, keep }: NonNullable<CaptureTarget['scrollPast']>) {
+  const banner = page.locator(selector).first()
+  await banner.waitFor({ timeout: 15000 })
+  await banner.evaluate((node, keepPx) => {
+    let scroller = node.parentElement
+    while (scroller && !(scroller.scrollHeight > scroller.clientHeight && /auto|scroll/.test(getComputedStyle(scroller).overflowY))) scroller = scroller.parentElement
+    const target = scroller ?? document.scrollingElement!
+    const top = scroller ? scroller.getBoundingClientRect().top : 0
+    target.scrollTop += node.getBoundingClientRect().bottom - top - keepPx
+  }, keep)
+  await page.waitForTimeout(300)
+}
+
 async function clipRegion(page: Page, clip: NonNullable<CaptureTarget['clip']>, width: number, height: number) {
   const box = await page.locator(clip.selector).first().evaluate((node, closest) => {
     const element = (closest ? node.closest(closest) : node) ?? node
