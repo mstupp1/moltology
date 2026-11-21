@@ -4,7 +4,7 @@
  * the shell in any pose. Most markings are drawn in code; a few, and the shell's fine surface,
  * come from small greyscale textures (textures.ts) sampled the same way.
  */
-import { BufferAttribute, Color, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Material, type Object3D, type Texture, Vector2, Vector3, Vector4 } from 'three'
+import { BufferAttribute, Color, ShaderChunk, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Material, type Object3D, type Texture, Vector2, Vector3, Vector4 } from 'three'
 import { OCCLUDERS } from './flex'
 import type { ShellFinish, ShellMarking, ShellPalette } from '../avatar/traits'
 import { SHELL_PALETTE_MAP } from '../avatar/traits'
@@ -327,10 +327,11 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   const finish = o.finish ?? 'satin'
   material.color.set(o.base)
   material.sheenColor.set(o.highlight)
-  // A wet shell: a thin, fairly tight clear coat over the satin, broken up a little in the shader.
-  Object.assign(material, { roughness: 0.5, metalness: 0, clearcoat: 0.42, clearcoatRoughness: 0.26, sheen: 0.55, sheenRoughness: 0.55, iridescence: 0, iridescenceIOR: 1.3, envMapIntensity: 1 })
+  // Soft plastic clay: a smooth satin body under a tight, glossy clear coat, so highlights sit
+  // on top as one clean sheen. The bounce light from the studio picture comes up a little too.
+  Object.assign(material, { roughness: 0.4, metalness: 0, clearcoat: 0.75, clearcoatRoughness: 0.14, sheen: 0.3, sheenRoughness: 0.55, iridescence: 0, iridescenceIOR: 1.3, envMapIntensity: 1.35 })
   if (finish === 'glossy') Object.assign(material, { roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.07 })
-  if (finish === 'pearl') Object.assign(material, { roughness: 0.34, clearcoat: 0.7, clearcoatRoughness: 0.2, iridescence: 1, iridescenceIOR: 1.6 })
+  if (finish === 'pearl') Object.assign(material, { roughness: 0.34, clearcoat: 0.75, clearcoatRoughness: 0.14, iridescence: 1, iridescenceIOR: 1.6 })
   // Polished metal that still reads as the shell's colour: not a full mirror, which shows the
   // room as blotches on rounded shells.
   if (finish === 'chrome') Object.assign(material, { roughness: 0.2, metalness: 0.45, clearcoat: 1, clearcoatRoughness: 0.05, sheen: 0, envMapIntensity: 2.2 })
@@ -349,9 +350,9 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
       })
     : NO_MARK
   u.uMarkScale.value = 1 / Math.min(1.8, Math.max(0.5, o.markingScale ?? 1))
-  u.uGrain.value = o.grain ?? (finish === 'chrome' ? 0.015 : 0.07)
+  u.uGrain.value = (o.grain ?? (finish === 'chrome' ? 0.015 : 0.07)) * CLAY_GRAIN
   // Polished finishes keep a smoother shell, so their reflections stay clean.
-  u.uDetail.value = (o.detail ?? 1) * (finish === 'chrome' ? 0.3 : finish === 'glossy' || finish === 'pearl' ? 0.6 : 1)
+  u.uDetail.value = (o.detail ?? 1) * (finish === 'chrome' ? 0.3 : finish === 'glossy' || finish === 'pearl' ? 0.6 : 1) * CLAY_DETAIL
   u.uGlow.value = finish === 'glow' ? 0.45 : 0
   u.uMarkGlow.value = o.marking === 'circuit' ? 0.35 : 0
   u.uThin.value = o.thin ? 1 : 0
@@ -359,6 +360,39 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   u.uWet.value = (o.detail ?? 1) === 0 ? 0 : finish === 'chrome' ? 0.4 : 1
   // A change of finish can switch shader features on or off.
   material.needsUpdate = true
+}
+
+/**
+ * The shell reads as smooth plastic clay, not leathery: the fine grain, pebbles, mottling and
+ * detail tile all stay, but faint (shares of their full strength).
+ */
+const CLAY_GRAIN = 0.3
+const CLAY_DETAIL = 0.35
+
+const DIRECT_DIFFUSE = `float dotNL = saturate( dot( geometryNormal, directLight.direction ) );
+	vec3 irradiance = dotNL * directLight.color;`
+
+/**
+ * three's physical lighting with the key light's diffuse wrapped a little past the shadow edge,
+ * plus (with `band`) a richer, deeper band of the surface's own colour where light turns to
+ * shadow: the look of light soaking into the surface and coming back out, without a
+ * subsurface pass. Highlights and the clear coat still use the true angle.
+ */
+function wrappedLighting(band: number): string {
+  const chunk = ShaderChunk.lights_physical_pars_fragment
+  if (!chunk.includes(DIRECT_DIFFUSE)) throw new Error('avatar3d: three lighting chunk changed; update wrappedLighting')
+  return chunk.replace(
+    DIRECT_DIFFUSE,
+    `float a3NL = dot( geometryNormal, directLight.direction );
+	float dotNL = saturate( a3NL );
+	vec3 irradiance = saturate( ( a3NL + 0.32 ) / 1.32 ) * directLight.color;
+	${
+    band > 0
+      ? `vec3 a3Deep = material.diffuseColor * material.diffuseColor / max( max( material.diffuseColor.r, max( material.diffuseColor.g, material.diffuseColor.b ) ), 0.05 );
+	irradiance += directLight.color * a3Deep * smoothstep( -0.45, 0.05, a3NL ) * smoothstep( 0.45, 0.0, a3NL ) * ${band.toFixed(2)};`
+      : ''
+  }`,
+  )
 }
 
 /** How strongly the baked shading darkens (1 is the full measured amount). */
@@ -421,6 +455,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         '#include <project_vertex>\nvA3World = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvA3Normal = normalize(mat3(modelMatrix) * objectNormal);',
       )
     shader.fragmentShader = shader.fragmentShader
+      .replace('#include <lights_physical_pars_fragment>', wrappedLighting(0.55))
       .replace(
         '#include <common>',
         `#include <common>
@@ -462,7 +497,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         // Which way the shell faces at rest, for the tiling textures: they stay put however it moves.
         vec3 a3TriW = a3TriWeights(normalize(cross(a3RdX, a3RdY)));
         // Fine shell surface from the detail tile (a height map packed with its slope).
-        float a3DetailAmt = uDetailOn * mix(0.2, 1.0, uDetail * uDetail) * (1.0 - a3Soft * 0.6);
+        float a3DetailAmt = uDetailOn * ${CLAY_DETAIL.toFixed(2)} * mix(0.2, 1.0, uDetail * uDetail) * (1.0 - a3Soft * 0.6);
         vec4 a3DT = a3TriTile(uDetailMap, vRest * A3_DETAIL_FREQ, a3TriW, vec3(0.0, 0.37, 0.71), uDetailSloped);
         a3Height = mix(0.5, a3DT.x, a3DetailAmt);
         // Its slope on screen, for the bump below: taken on the shell and carried through how the
@@ -501,7 +536,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         `#include <normal_fragment_maps>
         // Fine leathery grain, so highlights break up the way they do on the painted references.
         vec3 a3Bump = vec3(a3Noise(vRest * 120.0 + 11.0), a3Noise(vRest * 120.0 + 37.0), a3Noise(vRest * 120.0 + 71.0)) - 0.5;
-        normal = normalize(normal + a3Bump * uGrain * mix(1.1, 0.6, uDetailOn));
+        normal = normalize(normal + a3Bump * uGrain * mix(1.1, 0.6, uDetailOn * ${CLAY_DETAIL.toFixed(2)}));
         // The detail tile's ridges and pores catch the light (bump as three's bumpMap does it, from
         // the slope worked out above).
         vec3 a3Sx = dFdx(-vViewPosition);
@@ -580,10 +615,16 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-        totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;`,
+        totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;
+        // Soft rim: a bright edge round the silhouette, stronger on the tops of forms, so the
+        // character lifts off the background.
+        {
+          float a3Fr = pow(1.0 - saturate(dot(normal, normalize(vViewPosition))), 3.0);
+          totalEmissiveRadiance += mix(diffuseColor.rgb, vec3(1.0), 0.3) * a3Fr * 0.22 * (0.5 + 0.5 * normal.y);
+        }`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-10'
+  material.customProgramCacheKey = () => 'avatar3d-shell-11'
   return material
 }
 
@@ -610,8 +651,9 @@ export function paintEye(material: MeshPhysicalMaterial, color: AvatarEyeColor, 
 
 export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [number, number] = [1, 1]): MeshPhysicalMaterial {
   const swatch = eyeSwatch(color)
-  // Matte enough that the room does not print window shapes on the eye; the highlight is painted.
-  const material = new MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.4, clearcoat: 0.1, clearcoatRoughness: 0.4, envMapIntensity: 0.25 })
+  // Glass over the eye: a tight clear coat picks up the studio's lights as soft reflections. The
+  // crisp catchlights and the window reflection are painted, so they never smear into blotches.
+  const material = new MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.025, envMapIntensity: 1.6 })
   const uniforms = {
     uInner: { value: new Color(swatch.inner) },
     uMid: { value: new Color(swatch.mid) },
@@ -627,6 +669,7 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
       .replace('#include <common>', '#include <common>\nvarying vec3 vEye;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvEye = position;')
     shader.fragmentShader = shader.fragmentShader
+      .replace('#include <lights_physical_pars_fragment>', wrappedLighting(0))
       .replace(
         '#include <common>',
         `#include <common>
@@ -654,12 +697,25 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
         // Lit from above: the lower half of the iris catches the light.
         a3Col *= 0.68 + 0.22 * smoothstep(0.5, -0.6, a3At.y / a3Iris);
         a3Col = mix(a3Col, uRing, smoothstep(0.72, 1.0, a3T) * 0.9);
-        // Soft warm shade toward the back of the white, as if the lids shadow it.
-        vec3 a3White = mix(vec3(1.0), vec3(0.84, 0.79, 0.8), smoothstep(0.75, 1.25, a3Rho));
+        // Light through the lens: the iris glows on the side away from the light.
+        a3Col += mix(uMid, uInner, 0.6) * 0.55 * smoothstep(0.2, 0.95, a3T) * smoothstep(0.1, -0.7, a3At.y / a3Iris) * smoothstep(-0.2, 0.6, a3At.x / a3Iris + 0.3);
+        // Soft warm shade toward the back of the white, as if the lids shadow it, and a faint
+        // darker ring where the white meets the iris.
+        vec3 a3White = mix(vec3(1.0, 0.995, 1.0), vec3(0.86, 0.8, 0.82), smoothstep(0.85, 1.3, a3Rho));
+        a3White *= 1.0 - 0.22 * (1.0 - smoothstep(a3Iris, a3Iris + 0.1, a3Rho));
         vec3 a3Eye = mix(a3Col, a3White, smoothstep(a3Iris - 0.012, a3Iris + 0.012, a3Rho));
         a3Eye = mix(vec3(0.02, 0.015, 0.02), a3Eye, smoothstep(a3Pupil - 0.012, a3Pupil + 0.012, a3Rho));
         a3Dark = 1.0 - smoothstep(a3Pupil - 0.012, a3Pupil + 0.012, a3Rho);
-        a3Highlight = 1.0 - smoothstep(0.095, 0.11, length(a3At - a3Pupil * vec2(-0.5, 0.7)));
+        // One crisp catchlight on the pupil's upper edge, a small second one low on the iris, and a
+        // soft window reflection curving over the top of the cornea: what makes the eye read as glass.
+        a3Highlight = 1.0 - smoothstep(0.085, 0.1, length(a3At - a3Pupil * vec2(-0.5, 0.7)));
+        a3Highlight = max(a3Highlight, 0.7 * (1.0 - smoothstep(0.035, 0.05, length(a3At - vec2(0.2, -0.24)))));
+        {
+          vec2 a3Q = a3At - vec2(-0.05, 0.62);
+          a3Q.y += 0.35 * a3Q.x * a3Q.x;
+          float a3Win = (1.0 - smoothstep(0.42, 0.6, abs(a3Q.x))) * (1.0 - smoothstep(0.05, 0.12, abs(a3Q.y)));
+          a3Highlight = max(a3Highlight, 0.32 * a3Win * step(0.0, a3Dir.z));
+        }
         // The lids sit over the eye and shade it where they meet it: a soft shadow under the upper
         // lid, a fainter one over the lower, so the eye reads as set into the face, not laid on it.
         float a3Lid = smoothstep(0.25, 0.92, a3Dir.y) * 0.42 + smoothstep(-0.45, -0.95, a3Dir.y) * 0.18;
@@ -671,7 +727,7 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, a3Dark);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(0.9) * a3Highlight;')
   }
-  material.customProgramCacheKey = () => 'avatar3d-eye-6'
+  material.customProgramCacheKey = () => 'avatar3d-eye-7'
   return material
 }
 
