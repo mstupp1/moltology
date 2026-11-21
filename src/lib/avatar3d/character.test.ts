@@ -228,6 +228,31 @@ describe('avatar3d', () => {
     }
   })
 
+  it('keeps the middle legs alive while idling, each out of step, and still for stills', () => {
+    for (const race of AVATAR_RACES) {
+      const character = buildCharacter({ ...baselineLook(race), temperament: 'calm' })
+      const names = ['sideLeg1aL', 'sideLeg2aL', 'sideLeg1aR', 'sideLeg2aR']
+      const at = (time: number, idle = true) => {
+        character.update(1 / 60, time, idle)
+        return names.map((name) => character.rig.bone(name).quaternion.clone())
+      }
+      const held = at(0, false)
+      expect(at(10, false).every((q, i) => q.angleTo(held[i]) < 1e-6)).toBe(true)
+      const a = at(2)
+      const b = at(3.5)
+      for (let i = 0; i < names.length; i++) {
+        const moved = a[i].angleTo(b[i])
+        // Moving, but only a little: well under ten degrees.
+        expect(moved).toBeGreaterThan(0.005)
+        expect(moved).toBeLessThan(0.17)
+      }
+      // No two legs hold the same offset from rest at the same moment.
+      const offsets = a.map((q, i) => q.angleTo(held[i]))
+      expect(new Set(offsets.map((o) => o.toFixed(4))).size).toBe(names.length)
+      character.dispose()
+    }
+  })
+
   it('plays a reaction and then returns to the pose it was holding', () => {
     const character = buildCharacter({ ...baselineLook('lobster'), pose: 'wave' })
     const pose = () => [...character.rig.bones.values()].map((b) => b.quaternion.clone())

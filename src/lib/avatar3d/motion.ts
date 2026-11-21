@@ -28,6 +28,13 @@ export interface Mood {
   /** Antenna and tail movement, as multiples of the calm amount. */
   antennae: number
   tail: number
+  /**
+   * The short middle legs: how much they ripple (a multiple of the calm amount), seconds between
+   * one leg lifting for a tap (0 for never), and how far they are drawn in under the body (radians).
+   */
+  legs: number
+  fidgetEvery: number
+  tuck: number
   /** Standing posture: chest lean forward (radians), arms held out from the body (radians), hips sunk (fraction of leg). */
   lean: number
   arms: number
@@ -37,11 +44,11 @@ export interface Mood {
 }
 
 export const MOODS: Record<AvatarTemperament, Mood> = {
-  calm: { breathRate: 1.5, breathDepth: 1, sway: 0.012, swayRate: 0.45, bounce: 0, bounceRate: 0, tilt: 0.012, glance: 9, glanceEvery: 5.5, glanceHold: 1.1, blinkEvery: 4.2, snapEvery: 0, antennae: 1, tail: 1, lean: 0, arms: 0, sink: 0, follow: 0.85 },
-  lively: { breathRate: 2.6, breathDepth: 1.3, sway: 0.02, swayRate: 1.1, bounce: 0.014, bounceRate: 5.2, tilt: 0.03, glance: 15, glanceEvery: 2.2, glanceHold: 0.6, blinkEvery: 2.8, snapEvery: 6.5, antennae: 2.2, tail: 2.4, lean: -0.02, arms: 0.05, sink: 0, follow: 1 },
-  shy: { breathRate: 1.9, breathDepth: 0.8, sway: 0.008, swayRate: 0.6, bounce: 0, bounceRate: 0, tilt: 0.02, glance: 13, glanceEvery: 3.1, glanceHold: 0.45, blinkEvery: 2.2, snapEvery: 0, antennae: 0.7, tail: 0.5, lean: 0.085, arms: -0.1, sink: 0.035, follow: 0.45 },
-  proud: { breathRate: 1.2, breathDepth: 1.5, sway: 0.016, swayRate: 0.3, bounce: 0, bounceRate: 0, tilt: 0.008, glance: 6, glanceEvery: 7, glanceHold: 1.6, blinkEvery: 5.5, snapEvery: 0, antennae: 0.8, tail: 0.8, lean: -0.075, arms: 0.09, sink: -0.01, follow: 0.6 },
-  goofy: { breathRate: 2, breathDepth: 1.1, sway: 0.034, swayRate: 0.9, bounce: 0.006, bounceRate: 3.6, tilt: 0.085, glance: 20, glanceEvery: 2.8, glanceHold: 0.9, blinkEvery: 3.4, snapEvery: 4.2, antennae: 2.6, tail: 3, lean: 0.01, arms: 0.04, sink: 0.01, follow: 1 },
+  calm: { breathRate: 1.5, breathDepth: 1, sway: 0.012, swayRate: 0.45, bounce: 0, bounceRate: 0, tilt: 0.012, glance: 9, glanceEvery: 5.5, glanceHold: 1.1, blinkEvery: 4.2, snapEvery: 0, antennae: 1, tail: 1, legs: 1, fidgetEvery: 6.5, tuck: 0, lean: 0, arms: 0, sink: 0, follow: 0.85 },
+  lively: { breathRate: 2.6, breathDepth: 1.3, sway: 0.02, swayRate: 1.1, bounce: 0.014, bounceRate: 5.2, tilt: 0.03, glance: 15, glanceEvery: 2.2, glanceHold: 0.6, blinkEvery: 2.8, snapEvery: 6.5, antennae: 2.2, tail: 2.4, legs: 1.6, fidgetEvery: 3.2, tuck: 0, lean: -0.02, arms: 0.05, sink: 0, follow: 1 },
+  shy: { breathRate: 1.9, breathDepth: 0.8, sway: 0.008, swayRate: 0.6, bounce: 0, bounceRate: 0, tilt: 0.02, glance: 13, glanceEvery: 3.1, glanceHold: 0.45, blinkEvery: 2.2, snapEvery: 0, antennae: 0.7, tail: 0.5, legs: 0.6, fidgetEvery: 5, tuck: 0.14, lean: 0.085, arms: -0.1, sink: 0.035, follow: 0.45 },
+  proud: { breathRate: 1.2, breathDepth: 1.5, sway: 0.016, swayRate: 0.3, bounce: 0, bounceRate: 0, tilt: 0.008, glance: 6, glanceEvery: 7, glanceHold: 1.6, blinkEvery: 5.5, snapEvery: 0, antennae: 0.8, tail: 0.8, legs: 0.7, fidgetEvery: 9, tuck: -0.05, lean: -0.075, arms: 0.09, sink: -0.01, follow: 0.6 },
+  goofy: { breathRate: 2, breathDepth: 1.1, sway: 0.034, swayRate: 0.9, bounce: 0.006, bounceRate: 3.6, tilt: 0.085, glance: 20, glanceEvery: 2.8, glanceHold: 0.9, blinkEvery: 3.4, snapEvery: 4.2, antennae: 2.6, tail: 3, legs: 2, fidgetEvery: 2.6, tuck: 0, lean: 0.01, arms: 0.04, sink: 0.01, follow: 1 },
 }
 
 export type Reaction = 'poke' | 'snap' | 'equip' | 'celebrate'
@@ -75,6 +82,22 @@ export function gestureCurve(p: number): number {
 export function jitter(n: number): number {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453
   return x - Math.floor(x)
+}
+
+/**
+ * A leg lifting to tap the ground over p in 0..1, as a share of its full lift: up, a quick tap
+ * down, half way back up, then down to rest.
+ */
+export function legTap(p: number): number {
+  const ease = (from: number, to: number, a: number, b: number) => {
+    const q = (p - a) / (b - a)
+    return from + (to - from) * (0.5 - 0.5 * Math.cos(q * Math.PI))
+  }
+  if (p <= 0 || p >= 1) return 0
+  if (p < 0.35) return ease(0, 1, 0, 0.35)
+  if (p < 0.47) return ease(1, 0.12, 0.35, 0.47)
+  if (p < 0.62) return ease(0.12, 0.45, 0.47, 0.62)
+  return ease(0.45, 0, 0.62, 1)
 }
 
 /** 0 → 1 → 0 over p in 0..1. */
