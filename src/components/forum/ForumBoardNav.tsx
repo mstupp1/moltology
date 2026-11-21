@@ -60,7 +60,7 @@ function postCount(count: number) {
 
 /**
  * The board directory. `list` is the desktop rail: one row per board with its colour dot,
- * description and counts. `strip` is the phone version: swipeable tiles with a hidden scrollbar.
+ * description and counts. `strip` is the phone version: one row of swipeable board chips (dot, name, post count).
  */
 export function ForumBoardNav({
   boards,
@@ -79,29 +79,28 @@ export function ForumBoardNav({
   if (variant === 'strip') {
     return (
       <HorizontalScroll as="nav" aria-label="Boards" className={cn('min-w-0 overflow-x-auto no-scrollbar -mx-1 px-1', className)} data-testid="forum-board-strip">
-        <ul className="flex items-stretch gap-2 w-max py-1">
+        <ul className="flex items-center gap-2 w-max py-1">
           {boards.map((board) => (
-            <li key={board.id} className="min-w-0">
+            <li key={board.id}>
               <Link
                 to="/forum/$categorySlug"
                 params={{ categorySlug: board.slug }}
                 aria-current={board.slug === current ? 'page' : undefined}
+                aria-label={`${board.name}, ${postCount(board.topicCount)}`}
                 className={cn(
-                  'flex flex-col gap-1 w-36 min-w-0 h-full p-3 rounded-card border border-line-subtle transition-colors',
-                  board.slug === current ? 'bg-surface-3 shadow-nav-current' : 'bg-surface-1 hud-sheen hover:bg-surface-2 hover:border-line',
+                  'flex items-center gap-2 h-9 pl-3 pr-2.5 rounded-control border whitespace-nowrap transition-colors',
+                  board.slug === current ? 'bg-surface-3 border-line shadow-nav-current' : 'bg-surface-1 border-line-subtle hover:bg-surface-2 hover:border-line',
                   FOCUS,
                 )}
               >
-                <span className="flex items-center gap-1.5 min-w-0">
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: board.color }} aria-hidden="true" />
-                  <span className="text-xs font-semibold text-ink leading-snug line-clamp-2">{board.name}</span>
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: board.color }} aria-hidden="true" />
+                <span className="text-xs font-semibold text-ink">{board.name}</span>
+                <span className="min-w-5 rounded-full bg-abyss/50 px-1.5 text-center text-2xs leading-5 text-ink-muted tabular-nums" aria-hidden="true">
+                  {board.topicCount}
                 </span>
-                <span className="mt-auto flex flex-wrap items-center justify-between gap-2 text-2xs text-ink-muted tabular-nums">
-                  <span>{postCount(board.topicCount)}</span>
-                  {board.unreadCount && board.unreadCount > 0 ? (
-                    <ForumUnreadMark label={formatForumUnreadCount(board.unreadCount)} />
-                  ) : null}
-                </span>
+                {board.unreadCount && board.unreadCount > 0 ? (
+                  <ForumUnreadMark label={formatForumUnreadCount(board.unreadCount)} />
+                ) : null}
               </Link>
             </li>
           ))}

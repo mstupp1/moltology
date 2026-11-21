@@ -12,7 +12,18 @@ export interface CaptureTarget {
    * (or its nearest `closest` ancestor), padded, then widened to the viewport's aspect ratio.
    */
   clip?: { selector: string; closest?: string; pad: number }
+  /**
+   * Scroll the page down until only the bottom `keep` pixels of the element matching `selector`
+   * are left at the top of the viewport, so a tall banner doesn't fill the shot.
+   */
+  scrollPast?: { selector: string; keep: number }
 }
+
+/**
+ * The forum's group photo runs edge to edge and fills most of a desktop fold, which leaves no
+ * room for the boards and posts. Desktop shots scroll it away, keeping its "Community" strip.
+ */
+const FORUM_SCROLL: CaptureTarget['scrollPast'] = { selector: '[data-testid="community-photo"]', keep: 44 }
 
 /**
  * Homepage body shots sit in a ~690px frame, so a full 1760px desktop reads as a thumbnail.
@@ -34,10 +45,12 @@ export const REGISTERED_TARGETS: Record<string, CaptureTarget> = Object.fromEntr
       scaleFactor: device === 'mobile' ? 3 : 2,
       isMobile: device === 'mobile',
       outputBase: `${sector.id}_${device}_preview`,
+      ...(sector.id === 'forum' && device === 'desktop' ? { scrollPast: FORUM_SCROLL } : {}),
     })),
     ...(['dashboard', 'forum', 'oracle', 'moltmax'].includes(sector.id) ? [{
       name: `${sector.id}_feature`, route: `${sector.route}?view=main`,
       windowSize: '1120,700', scaleFactor: 2, outputBase: `${sector.id}_feature_preview`,
+      ...(sector.id === 'forum' ? { scrollPast: FORUM_SCROLL } : {}),
       ...FEATURE_FRAMING[sector.id],
     }] : []),
   ]).map((target) => [target.name, target]),

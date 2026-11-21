@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { profiles } from '../db/schema'
-import { arrangeGroup, arrangeToFill, castHash, photoDue, photoKey, photoPose, PHOTO_HEIGHT, PHOTO_WIDTH, RETAKE_AFTER_MS, ROW_SIZE, rowSizes, type Figure } from './community-photo'
+import { arrangeGroup, arrangeToFill, castHash, photoDue, photoKey, photoPose, photoSmallKey, PHOTO_HEIGHT, PHOTO_SMALL_HEIGHT, PHOTO_SMALL_WIDTH, PHOTO_WIDTH, RETAKE_AFTER_MS, ROW_SIZE, rowSizes, type Figure } from './community-photo'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 
 const crab: LobsterAvatarConfig = { style: 'critters', seed: 'a', race: 'crab', shellColor: 'cobalt' }
@@ -149,6 +149,10 @@ describe('community photo server', () => {
     expect(fresh.due).toBe(false)
     expect(fresh.cast).toBeUndefined()
     expect(fresh.photo?.url).toBe(`/media/${photoKey(hash)}`)
+    expect(fresh.photo?.smallUrl).toBe(`/media/${photoSmallKey(hash)}`)
+    // An older photo, drawn before the half size copy existed, has none.
+    const older = await getCommunityPhotoHandler(undefined, fakeDb({ ...current, imageKey: 'community/photo-v3-x.webp', width: 1800, height: 600 }).db)
+    expect(older.photo?.smallUrl).toBeUndefined()
     // A member who has gone is no longer named.
     expect(fresh.photo?.spots).toEqual([{ id: 'a', x: 0.3, y: 0.4, r: 0.03, name: 'Ada', profile: 'Ada' }])
   })
@@ -157,24 +161,27 @@ describe('community photo server', () => {
     const { saveCommunityPhotoHandler, loadCast } = await import('./server/community-photo')
     const hash = castHash(await loadCast(fakeDb(null).db))
     const image = dataUrl(webp(PHOTO_WIDTH, PHOTO_HEIGHT))
+    const smallImage = dataUrl(webp(PHOTO_SMALL_WIDTH, PHOTO_SMALL_HEIGHT))
     const spots = [{ id: 'a', x: 0.3, y: 0.4, r: 0.03 }, { id: 'b', x: 0.6, y: 0.4, r: 0.03 }]
     const context = { user: { sub: 'a' } }
 
     const ok = fakeDb(null)
     const upload = vi.fn(async () => {})
-    expect(await saveCommunityPhotoHandler({ data: { castHash: hash, image, spots }, context }, upload, ok.db)).toEqual({ saved: true })
+    expect(await saveCommunityPhotoHandler({ data: { castHash: hash, image, smallImage, spots }, context }, upload, ok.db)).toEqual({ saved: true })
     expect(upload).toHaveBeenCalledWith(expect.objectContaining({ key: photoKey(hash), contentType: 'image/webp' }))
+    expect(upload).toHaveBeenCalledWith(expect.objectContaining({ key: photoSmallKey(hash), contentType: 'image/webp' }))
     expect(ok.upsert).toHaveBeenCalled()
 
     const save = (data: Parameters<typeof saveCommunityPhotoHandler>[0]['data'], photo: Record<string, unknown> | null = null) =>
       saveCommunityPhotoHandler({ data, context }, vi.fn(async () => {}), fakeDb(photo).db)
-    expect(await save({ castHash: 'other', image, spots })).toEqual({ saved: false, reason: 'cast-changed' })
-    expect(await save({ castHash: hash, image, spots }, { castHash: hash, takenAt: new Date() })).toEqual({ saved: false, reason: 'not-due' })
-    expect(await save({ castHash: hash, image: dataUrl(webp(256, 256)), spots })).toEqual({ saved: false, reason: 'not-an-image' })
-    expect(await save({ castHash: hash, image, spots: [spots[0], { ...spots[1], id: 'stranger' }] })).toEqual({ saved: false, reason: 'bad-spots' })
-    expect(await save({ castHash: hash, image, spots: [spots[0], { ...spots[1], x: 4 }] })).toEqual({ saved: false, reason: 'bad-spots' })
+    expect(await save({ castHash: 'other', image, smallImage, spots })).toEqual({ saved: false, reason: 'cast-changed' })
+    expect(await save({ castHash: hash, image, smallImage, spots }, { castHash: hash, takenAt: new Date() })).toEqual({ saved: false, reason: 'not-due' })
+    expect(await save({ castHash: hash, image: dataUrl(webp(256, 256)), smallImage, spots })).toEqual({ saved: false, reason: 'not-an-image' })
+    expect(await save({ castHash: hash, image, smallImage: image, spots })).toEqual({ saved: false, reason: 'not-an-image' })
+    expect(await save({ castHash: hash, image, smallImage, spots: [spots[0], { ...spots[1], id: 'stranger' }] })).toEqual({ saved: false, reason: 'bad-spots' })
+    expect(await save({ castHash: hash, image, smallImage, spots: [spots[0], { ...spots[1], x: 4 }] })).toEqual({ saved: false, reason: 'bad-spots' })
 
-    await expect(saveCommunityPhotoHandler({ data: { castHash: hash, image, spots }, context: {} }, upload, ok.db)).rejects.toThrow(/Unauthenticated/)
+    await expect(saveCommunityPhotoHandler({ data: { castHash: hash, image, smallImage, spots }, context: {} }, upload, ok.db)).rejects.toThrow(/Unauthenticated/)
   })
 })
 

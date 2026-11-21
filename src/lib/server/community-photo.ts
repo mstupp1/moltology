@@ -12,10 +12,14 @@ import {
   COMMUNITY_PHOTO_ID,
   MAX_CAST,
   MAX_PHOTO_BYTES,
+  MAX_SMALL_PHOTO_BYTES,
   PHOTO_HEIGHT,
+  PHOTO_SMALL_HEIGHT,
+  PHOTO_SMALL_WIDTH,
   PHOTO_WIDTH,
   photoDue,
   photoKey,
+  photoSmallKey,
   type CastMember,
   type CommunityPhotoSpot,
   type CommunityPhotoState,
@@ -76,6 +80,8 @@ export async function getCommunityPhotoHandler(_args?: unknown, db: Db = getDb()
   const photo = row
     ? {
         url: `/media/${row.imageKey}`,
+        // Photos drawn at the current size have a half size copy stored beside them.
+        ...(row.width === PHOTO_WIDTH && row.imageKey === photoKey(row.castHash) ? { smallUrl: `/media/${photoSmallKey(row.castHash)}` } : {}),
         width: row.width,
         height: row.height,
         takenAt: row.takenAt.toISOString(),
@@ -95,6 +101,8 @@ export interface SaveCommunityPhotoInput {
   castHash: string
   /** The photo as a WebP data URL, drawn by the visitor's browser. */
   image: string
+  /** The same photo at half size, for phones and 1x screens. */
+  smallImage: string
   spots: CommunityPhotoSpot[]
 }
 
@@ -103,14 +111,17 @@ export interface SaveCommunityPhotoResult {
   reason?: 'not-due' | 'cast-changed' | 'not-an-image' | 'bad-spots' | 'storage-unavailable'
 }
 
+const FULL = { width: PHOTO_WIDTH, height: PHOTO_HEIGHT, maxBytes: MAX_PHOTO_BYTES }
+const SMALL = { width: PHOTO_SMALL_WIDTH, height: PHOTO_SMALL_HEIGHT, maxBytes: MAX_SMALL_PHOTO_BYTES }
+
 /** The WebP bytes inside a data URL, or null unless it is a photo of exactly the right size. */
-export function photoBytes(image: string): Uint8Array | null {
+export function photoBytes(image: string, expected: { width: number; height: number; maxBytes: number } = FULL): Uint8Array | null {
   const match = /^data:image\/webp;base64,([A-Za-z0-9+/=]+)$/.exec(image)
   if (!match) return null
   const bytes = new Uint8Array(Buffer.from(match[1], 'base64'))
-  if (bytes.length > MAX_PHOTO_BYTES) return null
+  if (bytes.length > expected.maxBytes) return null
   const size = webpSize(bytes)
-  return size && size.width === PHOTO_WIDTH && size.height === PHOTO_HEIGHT ? bytes : null
+  return size && size.width === expected.width && size.height === expected.height ? bytes : null
 }
 
 type Upload = (params: { key: string; body: Uint8Array; contentType: string }) => Promise<void>
@@ -134,7 +145,8 @@ export async function saveCommunityPhotoHandler(
   if (!photoDue(row, hash)) return { saved: false, reason: 'not-due' }
 
   const bytes = photoBytes(data.image)
-  if (!bytes) return { saved: false, reason: 'not-an-image' }
+  const smallBytes = typeof data.smallImage === 'string' ? photoBytes(data.smallImage, SMALL) : null
+  if (!bytes || !smallBytes) return { saved: false, reason: 'not-an-image' }
   const ids = new Set(cast.map((m) => m.id))
   const inRange = (n: number) => Number.isFinite(n) && n >= 0 && n <= 1
   const spots = data.spots.map(({ id, x, y, r }) => ({ id, x, y, r }))
@@ -145,6 +157,8 @@ export async function saveCommunityPhotoHandler(
   const key = photoKey(hash)
   try {
     const send = upload ?? (await import('../s3-client')).uploadObject
+    // The small copy goes first, so the photo row never points at a full size image without one.
+    await send({ key: photoSmallKey(hash), body: smallBytes, contentType: 'image/webp' })
     await send({ key, body: bytes, contentType: 'image/webp' })
   } catch (error) {
     console.warn('[community-photo] photo not stored:', error instanceof Error ? error.message : error)
