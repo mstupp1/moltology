@@ -103,11 +103,11 @@ const TRIPLANAR_GLSL = /* glsl */ `
 /** Gear's look by material. Each has its own height tile; the code-drawn surface stands in until it loads. */
 const GEAR_SURFACE_LOOK: Record<GearSurface, { freq: number; bump: number; pits: number; rough: number }> = {
   // freq: tiles per unit of the piece's own size; bump: how strongly the tile catches light.
-  metal: { freq: 9, bump: 0.006, pits: 0.1, rough: 0.25 },
-  cloth: { freq: 14, bump: 0.008, pits: 0.18, rough: 0.1 },
-  leather: { freq: 10, bump: 0.006, pits: 0.14, rough: 0.15 },
-  coral: { freq: 7, bump: 0.009, pits: 0.22, rough: 0.2 },
-  bone: { freq: 6, bump: 0.003, pits: 0.06, rough: 0.12 },
+  metal: { freq: 3, bump: 0.006, pits: 0.1, rough: 0.25 },
+  cloth: { freq: 5, bump: 0.008, pits: 0.18, rough: 0.1 },
+  leather: { freq: 3.5, bump: 0.006, pits: 0.14, rough: 0.15 },
+  coral: { freq: 2.5, bump: 0.009, pits: 0.22, rough: 0.2 },
+  bone: { freq: 2, bump: 0.003, pits: 0.06, rough: 0.12 },
 }
 
 export interface WorkedOptions {
@@ -182,6 +182,7 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         float a3Work = 0.5;
         float a3Height = 0.5;
         float a3Cut = 0.0;
+        #define A3_ENGRAVE_FREQ 0.9
         vec2 a3dH = vec2(0.0);
         ${NOISE_GLSL}
         ${TRIPLANAR_GLSL}`,
@@ -192,8 +193,8 @@ export function workedSurface<T extends MeshPhysicalMaterial>(material: T, kind:
         vec3 a3TriW = a3TriWeights(normalize(cross(dFdx(vWork), dFdy(vWork))));
         vec3 a3Wp = vWork * ${look.freq.toFixed(1)};
         float a3Tile = texture2D(uWorkMap, a3Wp.yz).r * a3TriW.x + texture2D(uWorkMap, a3Wp.xz + 0.37).r * a3TriW.y + texture2D(uWorkMap, a3Wp.xy + 0.71).r * a3TriW.z;
-        // Engraving: half the scale of the surface, cut in and inlaid with the trim colour.
-        vec3 a3Ep = vWork * ${(look.freq * 0.35).toFixed(2)};
+        // Engraving: the same size on every material, cut in and inlaid with the trim colour.
+        vec3 a3Ep = vWork * A3_ENGRAVE_FREQ;
         float a3Eng = texture2D(uEngraveMap, a3Ep.yz).r * a3TriW.x + texture2D(uEngraveMap, a3Ep.xz + 0.29).r * a3TriW.y + texture2D(uEngraveMap, a3Ep.xy + 0.53).r * a3TriW.z;
         a3Cut = uEngraveOn * smoothstep(0.35, 0.65, a3Eng);
         a3Height = mix(0.5, a3Tile, uWorkOn) - a3Cut * 0.35;
