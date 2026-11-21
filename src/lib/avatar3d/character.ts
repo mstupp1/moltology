@@ -13,7 +13,7 @@ import { BODY, bodySpheres, SWINGS, type BodySphere } from './collide'
 import { buildOccluders, buildSprings, type Spring } from './flex'
 import { buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
 import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, legTap, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
-import { blendMouth, MOUTH_HOLE, MOUTH_PARAMS, mouthParams, type MouthParams, type MouthShape } from './mouth-shapes'
+import { blendMouth, LIP_TUBE, MOUTH_HOLE, MOUTH_PARAMS, mouthParams, type MouthParams, type MouthShape } from './mouth-shapes'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
 import { buildCrab, buildLobster, EYE_STRETCH, SWIMMERETS, TAIL_FAN, type FaceRig } from './species'
@@ -157,6 +157,35 @@ const FOCUS: Record<string, { on: string[]; size: number; yaw: number }> = {
  * Portraits frame the head as the 2D ones do: it fills most of the circle, sits centred with a
  * little shoulder below it, and a hat gets some headroom.
  */
+/** A mouth piece shaped point by point (character.ts placeMouth): its built points and normals. */
+interface Bendable {
+  pos: BufferAttribute
+  nor: BufferAttribute
+  base: Float32Array
+  baseNormal: Float32Array
+}
+
+/** How flat the open mouth lies: a share of its built depth, so it reads as an opening, not a bump. */
+const MOUTH_SINK = 0.35
+/** The open mouth is anchored a hair inside the shell; this brings its rim back up to the skin. */
+const MOUTH_LIFT = 0.0036
+/** Half thickness of the lip round an open mouth. */
+const LIP_THICK = 0.0085
+
+/** The mesh of one material on a bone, made ready to be shaped point by point. */
+function bendable(bone: Object3D | null, slot?: string): Bendable | null {
+  const mesh = bone?.children.find((c): c is Mesh => (c as Mesh).isMesh && (!slot || c.name.endsWith(`:${slot}`)))
+  if (!mesh) return null
+  // It changes size as it opens, so its built bounds are no guide to whether it is on screen.
+  mesh.frustumCulled = false
+  const pos = mesh.geometry.getAttribute('position') as BufferAttribute
+  const nor = mesh.geometry.getAttribute('normal') as BufferAttribute
+  return { pos, nor, base: Float32Array.from(pos.array as Float32Array), baseNormal: Float32Array.from(nor.array as Float32Array) }
+}
+
+/** How much of a portrait the face (eyes across, brows to mouth) takes up, as on a baseline lobster. */
+const FACE_SHARE = { w: 0.54, h: 0.48 }
+
 function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean, lift = 0): Character3D['portrait'] {
   const head = rig.wear?.head
   if (!head) return { y: (height * 0.8 + lift) * scale, size: 1.2 * scale }
@@ -164,9 +193,22 @@ function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean, li
   for (let i = 0; i <= 24; i++) half = Math.max(half, head.loft.key(i / 24).r)
   const bottom = head.loft.key(1).d
   const tall = head.top - bottom
-  const size = Math.max((half * 2) / 0.8, tall / 0.84) * (hat ? 1.16 : 1)
+  const shellFit = Math.max((half * 2) / 0.8, tall / 0.84)
+  // A crab's face is a small part of a wide shell, so framing the shell left its face looking far
+  // away next to a lobster's. Frame on the face too (eyes across, brows to mouth) at the share of
+  // the picture a lobster's face fills, and take the closer of the two within reason.
+  const eye = rig.restWorldOf('eyeSocketL').position
+  const brow = rig.restWorldOf('browL').position
+  const mouth = rig.restWorldOf('mouthLine').position
+  const faceW = 2 * Math.abs(eye.x) + 2.4 * head.eyeRadius
+  const faceH = brow.y + 0.3 * head.eyeRadius - (mouth.y - 0.03)
+  const faceFit = Math.max(faceW / FACE_SHARE.w, faceH / FACE_SHARE.h)
+  const size = Math.min(shellFit, Math.max(faceFit, shellFit * 0.72)) * (hat ? 1.16 : 1)
   const mid = (head.top + bottom) / 2
-  const y = Math.max(mid - size * 0.05, head.top - size * 0.47) + (hat ? size * 0.06 : 0)
+  const faceMid = (brow.y + mouth.y) / 2
+  const shellY = Math.max(mid - size * 0.05, head.top - size * 0.47)
+  // Closer in, the face (not the middle of the shell) is what sits in the middle of the picture.
+  const y = Math.max(shellY + (faceMid - size * 0.04 - shellY) * Math.min(1, (shellFit - size) / (shellFit * 0.2)), head.top - size * 0.47) + (hat ? size * 0.06 : 0)
   return { y: (y + lift) * scale, size: size * scale }
 }
 
@@ -390,8 +432,63 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   // mouth faces, to be placed against the oval as it opens.
   const mouthParts = (['mouthTeethUp', 'mouthTeethLo', 'mouthTongue'] as const).map((name) => {
     const bone = rig.bones.get(name) ?? null
-    return bone ? { bone, rest: bone.position.clone(), facing: bone.quaternion.clone() } : null
+    return bone ? { bone, rest: bone.position.clone(), facing: bone.quaternion.clone(), mesh: bendable(bone) } : null
   })
+  const mouthShape = { hole: bendable(mouthBone, 'mouth'), lip: bendable(mouthBone, 'shell') }
+  /**
+   * The open mouth follows the face. Its pieces are sized here, vertex by vertex, rather than by
+   * scaling their bones, so each point can also fall back with the curve of the head
+   * (face.mouthBend): from the side the mouth stays on the face instead of standing off it like a
+   * flat sticker. A few hundred points, and only while the mouth is open.
+   */
+  const bendPart = (part: Bendable | null, sx: number, sy: number, sz: number, ox: number, oy: number) => {
+    if (!part) return
+    const { pos, nor, base, baseNormal } = part
+    const bx = face.mouthBend.x
+    for (let i = 0; i < pos.count; i++) {
+      const x = base[i * 3] * sx
+      const y = base[i * 3 + 1] * sy
+      const X = x + ox
+      const Y = y + oy
+      const by = Y > 0 ? face.mouthBend.up : face.mouthBend.down
+      pos.setXYZ(i, x, y, MOUTH_LIFT + base[i * 3 + 2] * sz - bx * X * X - by * Y * Y)
+      // The scaled ellipsoid's normal, tipped back as the head curves away.
+      const nz = baseNormal[i * 3 + 2] / sz
+      partAt.set(baseNormal[i * 3] / sx + 2 * bx * X * Math.abs(nz), baseNormal[i * 3 + 1] / sy + 2 * by * Y * Math.abs(nz), nz).normalize()
+      nor.setXYZ(i, partAt.x, partAt.y, partAt.z)
+    }
+    pos.needsUpdate = true
+    nor.needsUpdate = true
+  }
+  /** The lip: a soft roll of shell round the opening, the same oval as the open mouth. */
+  const shapeLip = (W: number, H: number, oy: number) => {
+    const part = mouthShape.lip
+    if (!part) return
+    const { pos, nor, base } = part
+    const bx = face.mouthBend.x
+    const t = LIP_THICK
+    for (let i = 0; i < pos.count; i++) {
+      // Back to the ring it was built as: round the oval (u), across the tube (ring, -1 to 1) and
+      // out of the face (out, -1 to 1).
+      const ux = base[i * 3] / MOUTH_HOLE.x
+      const uy = base[i * 3 + 1] / MOUTH_HOLE.y
+      const u = Math.atan2(uy, ux)
+      const ring = (Math.hypot(ux, uy) - 1) / LIP_TUBE
+      const out = base[i * 3 + 2] / (MOUTH_HOLE.x * LIP_TUBE)
+      const cu = Math.cos(u)
+      const su = Math.sin(u)
+      const x = (W + t * ring) * cu
+      const y = (H + t * ring) * su
+      const X = x
+      const Y = y + oy
+      const by = Y > 0 ? face.mouthBend.up : face.mouthBend.down
+      pos.setXYZ(i, x, y, 0.004 + out * t * 0.55 - bx * X * X - by * Y * Y)
+      partAt.set(cu * ring + 2 * bx * X, su * ring + 2 * by * Y, Math.max(0.2, out)).normalize()
+      nor.setXYZ(i, partAt.x, partAt.y, partAt.z)
+    }
+    pos.needsUpdate = true
+    nor.needsUpdate = true
+  }
   const mouthNow = mouthParams('X')
   const mouthWant = mouthParams('X')
   const mouthRest = mouthBone ? { at: mouthBone.position.clone(), facing: mouthBone.quaternion.clone() } : null
@@ -458,30 +555,33 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     const big = 1 + 0.3 * m.speech
     const sx = m.width * 1.2 * big
     const sy = Math.max(m.open * big, 1e-3)
-    mouthBone.scale.set(sx, sy, 1)
     const H = MOUTH_HOLE.y * sy
     const W = MOUTH_HOLE.x * sx
     // A speaking mouth hangs from the top lip like a jaw: the more it opens, the further its centre
     // drops, so the top edge stays near the drawn mouth's line and the bottom does the travelling.
     const jaw = open ? -0.22 * Math.max(0, H - MOUTH_HOLE.y * 0.3) * m.speech : 0
     if (mouthRest) mouthBone.position.copy(mouthRest.at).add(partAt.set(0, jaw, 0).applyQuaternion(mouthRest.facing))
+    if (open) {
+      bendPart(mouthShape.hole, sx, sy, MOUTH_SINK, 0, jaw)
+      shapeLip(W, H, jaw)
+    }
     /** How far forward the oval's surface is at height y (in the mouth's own space). */
-    const front = (y: number) => MOUTH_HOLE.z * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
+    const front = (y: number) => MOUTH_HOLE.z * MOUTH_SINK * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
     /** Width of the oval at height y. */
     const across = (y: number) => W * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
     const place = (part: (typeof mouthParts)[number], y: number, z: number, scale: [number, number]) => {
       if (!part) return
       part.bone.visible = open && scale[1] > 0.04
       part.bone.position.copy(part.rest).add(partAt.set(0, y + jaw, z).applyQuaternion(part.facing))
-      part.bone.scale.set(Math.max(scale[0], 1e-3), Math.max(scale[1], 1e-3), 1)
+      if (part.bone.visible) bendPart(part.mesh, Math.max(scale[0], 1e-3), Math.max(scale[1], 1e-3), MOUTH_SINK, 0, y + jaw)
     }
     // Each row of teeth tucks under the top or bottom of the oval and is as wide as the oval is there.
     const row = (amount: number) => Math.min(0.011, H * 0.5) * amount
     const up = row(m.teethUp)
     const yUp = H - up - m.bite * Math.max(0, H - up - 0.004)
-    place(mouthParts[0], yUp, Math.max(0.006, front(yUp) - 0.003), [(0.94 * across(yUp)) / 0.05, up / 0.011])
+    place(mouthParts[0], yUp, Math.max(0.0045, front(yUp) - 0.001), [(0.94 * across(yUp)) / 0.05, up / 0.011])
     const lo = row(m.teethLo)
-    place(mouthParts[1], -H + lo, Math.max(0.006, front(-H + lo) - 0.003), [(0.94 * across(-H + lo)) / 0.05, lo / 0.011])
+    place(mouthParts[1], -H + lo, Math.max(0.0045, front(-H + lo) - 0.001), [(0.94 * across(-H + lo)) / 0.05, lo / 0.011])
     // The tongue lies on the floor of the mouth, or rises to touch the top teeth.
     const th = Math.min(0.017, H * 0.42)
     const floor = -H + th * 0.95
@@ -762,6 +862,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       let closed = since < 0.16 ? Math.sin((since / 0.16) * Math.PI) : 0
       let wide = 0
       let squint = 0
+      // Bright eyes: the upper lids lift off a sleepy resting look (a cheer, being pleased).
+      let bright = 0
 
       if (reaction) {
         if (reaction.start === null) reaction.start = time
@@ -800,6 +902,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           // Concentrating on the snap: brows knit, teeth set.
           browKnit = 0.22 * arc(p)
           browUp -= 0.005 * arc(p)
+          // A wince on the snap itself.
+          squint = 0.45 * Math.max(0, 1 - Math.abs(p - 0.3) / 0.25)
           mouthOpen = 0.3 * arc(p)
         } else if (reaction.kind === 'equip') {
           // Tries it on: a look down, a little bob and a turn each way to see it.
@@ -808,6 +912,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           overlay('pelvis', Yaxis, Math.sin(p * Math.PI * 2) * 0.06)
           eyePitch += 10 * arc(p)
           squint = 0.6 * arc(p)
+          bright = 0.6 * arc(p)
           // Pleased with it: a small open smile and raised brows.
           mouthOpen = 0.35 * arc(p)
           mouthRound = 0.4
@@ -818,10 +923,12 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           const up = 0.1 * hops(p, 2)
           dy += up
           lift = up
-          squint = arc(p)
           overlay('tail', X, Math.sin(p * 22) * 0.2)
-          // A big open cheer, held for most of it.
+          // A big open cheer, held for most of it, with happy eyes: lids up, cheeks pushing the
+          // lower lids into a smile.
           const held = Math.min(1, p * 6, (1 - p) * 5)
+          squint = held
+          bright = held
           mouthOpen = held
           browUp += 0.016 * held
           fanSpread += 0.14 * held
@@ -902,7 +1009,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       squash = -0.1 * closed + 0.12 * wide - 0.07 * squint
       for (const tag of ['L', 'R'] as const) {
         const open = face.lidOpen[tag]
-        overlay(`lidUp${tag}`, X, (open + 0.12) * closed - Math.max(0, 1.25 - open) * 0.5 * wide)
+        overlay(`lidUp${tag}`, X, (open + 0.12) * closed - Math.max(0, 1.25 - open) * (0.5 * wide + 0.55 * bright))
         overlay(`lidLo${tag}`, X, -0.25 * closed - 0.3 * squint + 0.2 * wide)
       }
     }

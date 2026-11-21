@@ -390,7 +390,10 @@ export function bellyPlates(host: Loft, o: BellyOptions): BufferGeometry {
       host.point(s, theta, p)
       host.normal(s, theta, n)
       const edge = Math.pow(Math.max(1 - a * a, 0), 0.35)
-      const h = o.lift * (edge * (0.35 + 0.65 * plate) * (0.4 + 0.6 * close) - 0.3)
+      // The rim rests just on the shell rather than sinking into it: a panel that dives under the
+      // shell meets it wherever their triangles cross, a jagged stair-step edge. Lying on top, its
+      // own smooth outline is the edge.
+      const h = Math.max(o.lift * 0.08, o.lift * (edge * (0.35 + 0.65 * plate) * (0.4 + 0.6 * close) - 0.3))
       p.addScaledVector(n, h)
       positions.set([p.x, p.y, p.z], vi * 3)
       const ao = 0.5 + 0.5 * Math.min(1, plate * 1.2) * (0.55 + 0.45 * edge)

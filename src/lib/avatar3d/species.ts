@@ -4,7 +4,7 @@
  * plates, seated eyes with lids and brows. Units: feet on y = 0, facing +Z, the character's
  * left on +X; a baseline lobster's head tops out near 1.76.
  */
-import { CatmullRomCurve3, Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
+import { CatmullRomCurve3, Matrix4, Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
 import type { AvatarAntennae, AvatarBuild, AvatarClaws, AvatarHeadShape, AvatarMouth } from '../avatar/traits'
 import type { Expression } from '../avatar/parts'
 import { loft, uprightFrame, withLoftDetail, type Loft, type LoftKey } from './loft'
@@ -31,7 +31,7 @@ import {
 import { addSleeve, chainWeigh } from './flex'
 import { aimQuaternion, lookQuaternion, type Rig, type Wearable } from './rig'
 import type { Avatar3DLook } from './look'
-import { MOUTH_HOLE } from './mouth-shapes'
+import { LIP_TUBE, MOUTH_HOLE } from './mouth-shapes'
 
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z)
 const SIDES = [
@@ -105,6 +105,12 @@ function headFit(keys: LoftKey[], shape: { top: number; bottom: number; tall: nu
 export interface FaceRig {
   /** Upper lid opening per eye, in radians, so blinks can return to it. */
   lidOpen: Record<'L' | 'R', number>
+  /**
+   * How the face curves away round the open mouth, in its own space: the shell falls back by
+   * x * across² plus up * height² above the mouth's middle (down below it) from the plane the
+   * mouth faces, so the open mouth can follow it.
+   */
+  mouthBend: { x: number; up: number; down: number }
 }
 
 interface FaceLayout {
@@ -177,6 +183,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     else hi = mid
   }
   const spread = (lo + hi) / 2
+  const eyes: EyeSpot[] = []
 
   for (const { s, tag } of SIDES) {
     const theta = Math.PI / 2 - s * spread
@@ -187,6 +194,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     const facing = normal.clone().multiplyScalar(0.45).add(v(0, 0.06, 0.55)).normalize()
     const socket = rig.addBone(`eyeSocket${tag}`, f.bone, centre, { quaternion: lookQuaternion(facing) })
     socket.scale.copy(eyeScale)
+    eyes.push({ centre, toEye: lookQuaternion(facing).invert(), wide, high, radius: f.eyeRadius })
     const pose: LidPose = tag === 'R' ? { ...expression, ...expression.right } : expression
 
     const eye = rig.addBone(`eye${tag}`, `eyeSocket${tag}`, centre, { quaternion: lookQuaternion(facing) })
@@ -224,9 +232,40 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     rest.position.copy(brow.position)
   }
 
-  addMouth(rig, look.mouth, f)
-  return { lidOpen }
+  const mouthBend = addMouth(rig, look.mouth, f, eyeClearance(eyes))
+  return { lidOpen, mouthBend }
 }
+
+/** Where an eye sits, for keeping the mouth clear of it. */
+interface EyeSpot {
+  centre: Vector3
+  /** Turns character space into the eye socket's own (z out of the eye). */
+  toEye: Quaternion
+  wide: number
+  high: number
+  radius: number
+}
+
+/**
+ * How clear of the eyes a point on the face is, in eye radii past the lower lid's rim: negative
+ * means it would show on the lid (or poke through the eye) from some angle. Measured across the
+ * socket's own face, so an oval eye counts as the oval it is.
+ */
+function eyeClearance(eyes: EyeSpot[]): (p: Vector3) => number {
+  const d = new Vector3()
+  return (p) => {
+    let least = Infinity
+    for (const e of eyes) {
+      d.copy(p).sub(e.centre).applyQuaternion(e.toEye)
+      const across = Math.hypot(d.x / e.wide, d.y / e.high, d.z) / e.radius
+      least = Math.min(least, across - LID_REACH)
+    }
+    return least
+  }
+}
+
+/** The lid's outer edge (radius 1.07 plus its rim) and a sliver more, in eye radii. */
+const LID_REACH = 1.14
 
 /**
  * An open mouth for reactions and speech: a dark oval on its own bone just under the drawn mouth,
@@ -234,7 +273,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
  * teeth and lifts the tongue (the cartoon mouth shapes in mouth-shapes.ts), so those sit on bones
  * of their own beside it: they keep their own height however far the oval opens.
  */
-function addOpenMouth(rig: Rig, f: FaceLayout, y: number, normal: Vector3): void {
+function addOpenMouth(rig: Rig, f: FaceLayout, y: number, normal: Vector3): FaceRig['mouthBend'] {
   const s = f.shell.sAt(y)
   const at = f.shell.point(s, Math.PI / 2).addScaledVector(normal, -0.004)
   const facing = lookQuaternion(normal)
@@ -242,6 +281,23 @@ function addOpenMouth(rig: Rig, f: FaceLayout, y: number, normal: Vector3): void
   const hole = new SphereGeometry(1, 24, 14)
   hole.scale(MOUTH_HOLE.x, MOUTH_HOLE.y, MOUTH_HOLE.z)
   rig.add('mouthOpen', 'mouth', withAo(hole, 0.6))
+  // A soft lip all round the open mouth, in the shell's own colour, so it reads as an opening in
+  // the face rather than a dark shape laid on it. Built the open mouth's size; the character shapes it.
+  const lip = new TorusGeometry(1, LIP_TUBE, 8, 40)
+  lip.scale(MOUTH_HOLE.x, MOUTH_HOLE.y, MOUTH_HOLE.x)
+  rig.add('mouthOpen', 'shell', withAo(lip, 0.82))
+
+  // How far the shell falls back from the mouth's plane to either side and above and below it.
+  const toMouth = facing.clone().invert()
+  const fall = (p: Vector3) => {
+    const d = p.sub(at).applyQuaternion(toMouth)
+    return { across: Math.hypot(d.x, d.y), back: 0.004 - d.z }
+  }
+  const side = fall(f.shell.point(s, Math.PI / 2 - 0.16))
+  const up = fall(f.shell.point(f.shell.sAt(y + 0.05), Math.PI / 2))
+  const down = fall(f.shell.point(f.shell.sAt(y - 0.05), Math.PI / 2))
+  // Above the mouth an egg-shaped face can come forward again, so up and down keep their sign.
+  const bend = { x: Math.max(0, side.back) / side.across ** 2, up: up.back / up.across ** 2, down: down.back / down.across ** 2 }
   // Rows of teeth: a soft white bar each, flat to the face.
   for (const name of ['mouthTeethUp', 'mouthTeethLo']) {
     rig.addBone(name, f.bone, at, { quaternion: facing })
@@ -253,6 +309,7 @@ function addOpenMouth(rig: Rig, f: FaceLayout, y: number, normal: Vector3): void
   const tongue = new SphereGeometry(1, 16, 10)
   tongue.scale(0.042, 0.017, 0.012)
   rig.add('mouthTongue', 'tongue', withAo(tongue))
+  return bend
 }
 
 /** How each mouth curves: rise of the corners, width, a lean to one side, and what shows inside. */
@@ -268,27 +325,49 @@ const MOUTHS: Record<AvatarMouth, { rise: number; width: number; skew?: number; 
   wobble: { rise: 0.004, width: 0.95, wave: 0.014 },
 }
 
-function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
-  const m = MOUTHS[kind]
+function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout, clearance: (p: Vector3) => number = () => Infinity): FaceRig['mouthBend'] {
+  const m = { ...MOUTHS[kind] }
   const lineY = (a: number) => f.mouthY + m.rise * (a * a - 0.55) + (m.skew ?? 0) * a + (m.wave ?? 0) * Math.sin(a * 7)
   const theta = (a: number) => Math.PI / 2 - a * f.mouthHalf * m.width
   const at = (a: number, lift = 0.004) => {
     const s = f.shell.sAt(lineY(a))
     return f.shell.point(s, theta(a)).addScaledVector(f.shell.normal(s, theta(a)), lift)
   }
+  /** Top of the cheek crease at one corner of the smile (`reach` is how far up it runs). */
+  const creaseTop = (side: number, reach: number) => {
+    const end = at(side)
+    const along = theta(side) - side * 0.03
+    const sp = f.shell.sAt(end.y + reach + 0.012)
+    return f.shell.point(sp, along)
+  }
+  // Keep the smile's corners and creases off the eyes: on a wide or boxy head, or a big grin, they
+  // would otherwise run up into the lower lid. Flatten and narrow the smile a step at a time until
+  // its corners clear the lids, then shorten the creases to fit.
+  const base = { rise: m.rise, width: m.width, skew: m.skew ?? 0 }
+  const clear = (a: number) => clearance(at(a, 0)) > 0.04
+  for (let k = 1; k >= 0.5 && !(clear(1) && clear(-1)); k -= 0.05) {
+    m.rise = base.rise * k
+    m.skew = base.skew * k
+    m.width = base.width * (0.8 + 0.2 * k)
+  }
+  let reach = 0.03
+  if (m.rise > 0.02) {
+    while (reach > 0.008 && Math.min(clearance(creaseTop(1, reach)), clearance(creaseTop(-1, reach))) < -0.05) reach -= 0.004
+  }
   const sMid = f.shell.sAt(f.mouthY)
   const normal = f.shell.normal(sMid, Math.PI / 2)
-  addOpenMouth(rig, f, m.round ? f.mouthY : lineY(0) - 0.012, normal)
+  const bend = addOpenMouth(rig, f, m.round ? f.mouthY : lineY(0) - 0.012, normal)
   // The drawn mouth sits on its own bone so it can give way to the open one in a reaction.
   rig.addBone('mouthLine', f.bone, at(0, 0))
   if (m.round) {
     const o = new SphereGeometry(0.034, 20, 14)
     o.scale(0.9, 1.15, 0.3)
     rig.addWorld('mouthLine', 'mouth', placed(withAo(o), at(0, 0), lookQuaternion(normal)))
-    return
+    return bend
   }
   const line = Array.from({ length: 13 }, (_, i) => at((i / 12) * 2 - 1))
   rig.addWorld('mouthLine', 'mouth', ridge(line, normal, 0.0095, 0.008, 36))
+  pressIn(rig, f, Array.from({ length: 25 }, (_, i) => at((i / 24) * 2 - 1, 0)), 0.026)
 
   // Things inside or hanging from the mouth are thin patches laid on the shell between two curves.
   const patch = (slot: 'mouth' | 'teeth' | 'tongue', a0: number, a1: number, upper: (a: number) => number, lower: (a: number) => number, lift: number) =>
@@ -315,11 +394,11 @@ function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
   if (m.fang) patch('teeth', 0.3, 0.52, (a) => lineY(a) - 0.002, (a) => lineY(a) - 0.002 - 0.05 * (1 - Math.abs((a - 0.41) / 0.11)), 0.006)
 
   // Cheek creases where the smile ends.
-  if (m.rise > 0.02) {
+  if (m.rise > 0.02 && reach > 0.008) {
     for (const s of [1, -1]) {
       const end = at(s)
       const sEnd = f.shell.sAt(end.y)
-      const crease = [-0.03, 0, 0.03].map((dy, i) => {
+      const crease = [-0.03, 0, reach].map((dy, i) => {
         const along = theta(s) - s * (0.03 + (i === 1 ? 0.035 : 0))
         const sp = f.shell.sAt(end.y + dy + 0.012)
         return f.shell.point(sp, along).addScaledVector(f.shell.normal(sp, along), 0.003)
@@ -327,6 +406,48 @@ function addMouth(rig: Rig, kind: AvatarMouth, f: FaceLayout): void {
       rig.addWorld('mouthLine', 'mouth', ridge(crease, f.shell.normal(sEnd, theta(s)), 0.006, 0.005, 10))
     }
   }
+  return bend
+}
+
+/**
+ * Shade a soft groove into the head along the drawn mouth, as if the line were pressed into the
+ * shell: the shell's own shading (vertex colour red) darkens within `width` of the line. Built once
+ * with the body, so it costs nothing to draw.
+ */
+function pressIn(rig: Rig, f: FaceLayout, line: Vector3[], width: number): void {
+  const geo = f.shell.geometry
+  const pos = geo.getAttribute('position')
+  const col = geo.getAttribute('color')
+  // The shell has already been moved into its bone's space; bring the line there too.
+  const r = rig.restWorldOf(f.bone)
+  const toBone = new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1)).invert()
+  const pts = line.map((p) => p.clone().applyMatrix4(toBone))
+  let lo = new Vector3(Infinity, Infinity, Infinity)
+  let hi = new Vector3(-Infinity, -Infinity, -Infinity)
+  for (const p of pts) {
+    lo = lo.min(p)
+    hi = hi.max(p)
+  }
+  lo.subScalar(width)
+  hi.addScalar(width)
+  const q = new Vector3()
+  const seg = new Vector3()
+  const rel = new Vector3()
+  for (let i = 0; i < pos.count; i++) {
+    q.fromBufferAttribute(pos, i)
+    if (q.x < lo.x || q.y < lo.y || q.z < lo.z || q.x > hi.x || q.y > hi.y || q.z > hi.z) continue
+    let near = Infinity
+    for (let k = 0; k < pts.length - 1; k++) {
+      seg.subVectors(pts[k + 1], pts[k])
+      rel.subVectors(q, pts[k])
+      const t = Math.min(1, Math.max(0, rel.dot(seg) / Math.max(seg.lengthSq(), 1e-12)))
+      near = Math.min(near, rel.addScaledVector(seg, -t).length())
+    }
+    if (near >= width) continue
+    const t = 1 - near / width
+    col.setX(i, col.getX(i) * (1 - 0.3 * t * t * (3 - 2 * t)))
+  }
+  col.needsUpdate = true
 }
 
 interface ArmLayout {
