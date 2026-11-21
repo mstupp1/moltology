@@ -11,6 +11,7 @@
  *   shader works out the slope itself.
  * - marking-<name>: the mask, lossless so its edges stay clean.
  */
+import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
