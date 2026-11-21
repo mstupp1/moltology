@@ -29,9 +29,11 @@ type Field = { n: number; v: Float32Array }
 
 async function readGrey(file: string, px: number): Promise<Field> {
   const full = path.isAbsolute(file) ? file : path.join(INBOX, file)
-  const { data } = await sharp(full).greyscale().resize(px, px, { fit: 'cover' }).raw().toBuffer({ resolveWithObject: true })
+  // Images often carry an alpha channel (or come back as RGB): drop it and read one channel per
+  // pixel, stepping by however many the decoder returned.
+  const { data, info } = await sharp(full).flatten({ background: '#000000' }).greyscale().resize(px, px, { fit: 'cover' }).raw().toBuffer({ resolveWithObject: true })
   const v = new Float32Array(px * px)
-  for (let i = 0; i < v.length; i++) v[i] = data[i] / 255
+  for (let i = 0; i < v.length; i++) v[i] = data[i * info.channels] / 255
   return { n: px, v }
 }
 
@@ -128,12 +130,41 @@ async function shrink(f: Field, px: number): Promise<Field> {
   return { n: px, v: Float32Array.from(data, (x) => x / 255) }
 }
 
+/** The cut that best splits the values into two groups (Otsu). */
+function otsu(f: Field): number {
+  const bins = new Array(256).fill(0)
+  for (const x of f.v) bins[Math.min(255, Math.max(0, Math.round(x * 255)))]++
+  const total = f.v.length
+  let sum = 0
+  for (let i = 0; i < 256; i++) sum += i * bins[i]
+  let below = 0
+  let sumBelow = 0
+  let best = 0
+  let cut = 128
+  for (let i = 0; i < 256; i++) {
+    below += bins[i]
+    if (!below || below === total) continue
+    sumBelow += i * bins[i]
+    const ma = sumBelow / below
+    const mb = (sum - sumBelow) / (total - below)
+    const between = below * (total - below) * (ma - mb) ** 2
+    if (between > best) {
+      best = between
+      cut = i
+    }
+  }
+  return cut / 255
+}
+
 async function packMarking(name: TextureMarking, file: string): Promise<void> {
-  let f = tile(await readGrey(file, 1024))
+  // A slight blur first, so hatching or halftone in the drawing reads as solid shapes.
+  let f = blur(tile(await readGrey(file, 1024)), 1)
   f = level(f, 0.02, 0.98)
-  // Back to a clean two-tone edge after the cross-fade: the threshold sits where the mask covers
-  // as much of the tile as the drawing did.
-  f = { n: f.n, v: f.v.map((x) => Math.min(1, Math.max(0, (x - 0.5) * 4 + 0.5))) }
+  // A clean two-tone mask: grey areas go to whichever side they are nearer. The soft edge comes
+  // from the shrink to 512 px.
+  const cut = otsu(f)
+  f = { n: f.n, v: f.v.map((x) => (x > cut ? 1 : 0)) }
+  f = blur(f, 1)
   let covered = 0
   for (const x of f.v) covered += x
   for (const { px, suffix } of SIZES) {
