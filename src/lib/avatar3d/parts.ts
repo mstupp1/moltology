@@ -319,16 +319,21 @@ export function eyeball(radius: number): BufferGeometry {
 }
 
 /**
- * Half-shell eyelid around +Y with a thick rim along its edge. Rotating it about X slides the
- * edge over the eye. `lower` flips it for the bottom lid.
+ * Eyelid: the front half of a shell around +Y with a thick rim along its edge, facing +Z.
+ * Rotating it about X slides the edge over the eye. The lid only wraps the front of the eye
+ * (a little past each corner), so the upper and lower rims meet at the corners instead of
+ * crossing behind the eye. `lower` turns it upside down for the bottom lid, still facing front.
  */
 export function eyelid(radius: number, lower = false): BufferGeometry {
-  const cap = new SphereGeometry(radius * 1.07, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2)
-  const rim = new TorusGeometry(radius * 1.07, radius * (lower ? 0.075 : 0.095), 10, 36)
+  // A little past half way round, so the two lids overlap at the corners with no gap.
+  const over = 0.14
+  const cap = new SphereGeometry(radius * 1.07, 28, 14, -over, Math.PI + 2 * over, 0, Math.PI / 2)
+  const rim = new TorusGeometry(radius * 1.07, radius * (lower ? 0.075 : 0.095), 10, 24, Math.PI + 2 * over)
+  rim.rotateZ(-over)
   rim.rotateX(Math.PI / 2)
   // The rim is shaded darker, so the lid edge reads as a line against the eye.
   const geo = merge([withAo(cap), withAo(rim, 0.55)])
-  if (lower) geo.rotateX(Math.PI)
+  if (lower) geo.rotateZ(Math.PI)
   return geo
 }
 
