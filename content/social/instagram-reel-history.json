@@ -2568,6 +2568,52 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-11-20T22:21:19.006Z"
+    },
+    {
+      "id": "reel-1795270281056",
+      "topic": "The Isolation Protocols (Codex SCR-031): close the door before you start instead of trying to ignore pings mid-work",
+      "hookHeadline": "If my phone buzzes while I work, I'll just ignore it.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "juno, bo (animated 3D cast)",
+      "narrationScript": "If my phone buzzes while I work, I'll just ignore it. That never works. Seeing the ping is already the interruption. What if someone has a real emergency? Pick who gets through before you start. Mute everything else. That's the Isolation Dome: one task, two hours, check pings on the timer. My inbox survives two hours without me? Most of it solves itself. Wait. That actually sounds nice. Read the Isolation Protocols at moltology.org.",
+      "series": "Codex Lessons",
+      "episode": 3,
+      "format": "animated-lesson",
+      "cast": [
+        "juno",
+        "bo"
+      ],
+      "loudness": 3,
+      "archivePath": "Social Archive/2026/11/reel-fe891148c6e0a814c5284327",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795270282317_3801d8d7a44ed3b3_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 33.833333,
+      "status": "queued",
+      "scheduledFor": "2026-11-26T23:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6b01a68d002593e7944ea5ba",
+      "zernioYouTubePostId": "6b01a68d002593e7944ea5ba",
+      "zernioPostId": "6b01a68d002593e7944ea5ba",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "The full passage: https://moltology.org/codex/scr-031",
+      "caption": "If your phone buzzes while you work, you will not just ignore it.\n\nSeeing the ping is already the interruption. Pick who gets through for real emergencies before you start, mute everything else, hold one task for two hours, and check the rest on the timer. Most of it solves itself.\n\nRead the Isolation Protocols at moltology.org.",
+      "hashtags": [
+        "#deepwork",
+        "#focus",
+        "#productivity"
+      ],
+      "ctaGoal": "codex",
+      "commentTriggerKeyword": "CODEX",
+      "commentTriggerUrl": "https://moltology.org/codex",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-21T14:11:27.392Z"
     }
   ]
 }
