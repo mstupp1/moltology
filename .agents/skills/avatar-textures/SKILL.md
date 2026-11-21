@@ -18,8 +18,9 @@ has to tile cleanly. It never wraps a specific body part.
 
 ## Who does what
 
-- **Codex on Myles's Mac** generates the raw images: Luna at low effort, one `codex exec` call per image with write access
-  (see AGENTS.md, "Handing work to the Codex agent"): `codex exec -m gpt-6-luna -c model_reasoning_effort="low" -s workspace-write --skip-git-repo-check "<prompt> Save it as tmp/avatar-textures/inbox/<file>.png. Do not read repo docs." </dev/null`.
+- **Codex on Myles's Mac** generates the raw images through the Codex CLI on Luna at low effort, as AGENTS.md
+  ("Handing work to the Codex agent") says: one `codex exec` call per image, each told to copy its image to
+  `tmp/avatar-textures/inbox/<file>.png`. Square images come back at about 1254 px; the packing script resizes them.
 - **Claude** writes the brief, runs `npm run avatar:textures`, renders the before/after board and reviews.
 
 Raw images go to `tmp/avatar-textures/inbox/` (git-ignored). Only the packed output is committed.
