@@ -142,7 +142,8 @@ interface LidPose {
 
 const EXPRESSIONS: Record<Expression, LidPose & { right?: Partial<LidPose> }> = {
   open: { up: 54, lo: 76, browLift: 0.012 },
-  relaxed: { up: 24, lo: 52 },
+  // The default look: open enough to read as bright and awake, still a touch softer than `open`.
+  relaxed: { up: 44, lo: 52 },
   cheerful_squint: { up: 36, lo: 14, browLift: 0.01 },
   focused: { up: 16, lo: 60, roll: 7, browTilt: 9, browLift: -0.004 },
   chill: { up: 4, lo: 70, browLift: -0.006 },

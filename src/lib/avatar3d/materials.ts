@@ -685,8 +685,8 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
         // Distance from the eye's axis as it appears on the widened eye, in eye radii.
         vec2 a3At = a3Dir.xy * uStretch;
         float a3Rho = a3Dir.z > 0.0 ? length(a3At) : 9.0;
-        float a3Iris = 0.6;
-        float a3Pupil = 0.31 * uPupil;
+        float a3Iris = 0.68;
+        float a3Pupil = 0.36 * uPupil;
         float a3T = clamp((a3Rho - a3Pupil) / (a3Iris - a3Pupil), 0.0, 1.0);
         float a3Angle = atan(a3At.y, a3At.x);
         float a3Spoke = pow(sin(a3Angle * 19.0) * 0.5 + 0.5, 2.0) * 0.6 + pow(sin(a3Angle * 43.0 + 1.3) * 0.5 + 0.5, 3.0) * 0.4;
@@ -727,7 +727,7 @@ export function eyeMaterial(color: AvatarEyeColor, pupilScale = 1, stretch: [num
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, a3Dark);')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(0.9) * a3Highlight;')
   }
-  material.customProgramCacheKey = () => 'avatar3d-eye-7'
+  material.customProgramCacheKey = () => 'avatar3d-eye-8'
   return material
 }
 
