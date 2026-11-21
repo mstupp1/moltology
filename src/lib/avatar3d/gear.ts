@@ -5,6 +5,7 @@
 import { Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, type Material } from 'three'
 import type { AvatarAccessory } from '../avatar/traits'
 import type { Rig, SocketInfo } from './rig'
+import { workedSurface } from './materials'
 
 export interface GearItem {
   dispose: () => void
@@ -46,10 +47,10 @@ function item(socket: string, build: (add: (geo: Mesh['geometry'], material: Mat
   }
 }
 
-const metal = (color: string, roughness = 0.24) => new MeshPhysicalMaterial({ color: new Color(color), metalness: 1, roughness, clearcoat: 0.3 })
+const metal = (color: string, roughness = 0.24) => workedSurface(new MeshPhysicalMaterial({ color: new Color(color), metalness: 1, roughness, clearcoat: 0.3 }), 'metal')
 const gloss = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 })
 const darker = (hex: string, by: number) => `#${new Color(hex).multiplyScalar(1 - by).getHexString()}`
-const cloth = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.9, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color('#ffffff') })
+const cloth = (color: string) => workedSurface(new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.9, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color('#ffffff') }), 'cloth')
 
 const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearColours) => SocketGear>> = {
   crown: (_s, c) =>

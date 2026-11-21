@@ -22,7 +22,7 @@ let canvas: HTMLCanvasElement | null = null
 window.__anim = {
   async setup(timeline, options) {
     // Shell textures arrive as data URLs (render.ts); load them all before the first frame.
-    await Promise.all(TEXTURE_MARKINGS.map((marking) => preloadTextures({ marking })))
+    await Promise.all(TEXTURE_MARKINGS.map((marking) => preloadTextures({ marking, accessory: 'crown' })))
     canvas = document.createElement('canvas')
     canvas.width = timeline.width
     canvas.height = timeline.height
