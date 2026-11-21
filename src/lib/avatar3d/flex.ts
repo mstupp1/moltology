@@ -215,11 +215,15 @@ export interface Spring {
   damping: number
   /** Furthest it may swing from the pose, in radians. */
   limit: number
+  /** How hard a kick moves it (0 ignores kicks). */
+  kick?: number
 }
 
 export interface Springs {
   /** Advance by dt seconds. `live` false snaps every spring to its pose (stills, reduced motion). */
   update: (dt: number, live: boolean) => void
+  /** Push every loose tip with a velocity (world units/s), scaled by each spring's `kick`. */
+  kick: (velocity: Vector3) => void
 }
 
 export function buildSprings(list: Spring[]): Springs {
@@ -232,6 +236,9 @@ export function buildSprings(list: Spring[]): Springs {
   const world = new Quaternion()
   const parentWorld = new Quaternion()
   return {
+    kick(velocity) {
+      for (let i = 0; i < list.length; i++) if (state[i].ready && list[i].kick) state[i].v.addScaledVector(velocity, list[i].kick!)
+    },
     update(dt, live) {
       for (let i = 0; i < list.length; i++) {
         const s = list[i]

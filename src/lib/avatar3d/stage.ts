@@ -23,10 +23,10 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three'
-import type { Object3D } from 'three'
+import type { Material, Object3D } from 'three'
 import type { AvatarPose } from '../avatar/traits'
 import { buildCharacter, type Character3D } from './character'
-import { bakedLightTexture } from './stage-light'
+import { bakedLightTexture, KEY_WITH_PANELS } from './stage-light'
 import type { BakeOptions } from './bake'
 import { lookChange, type Avatar3DLook } from './look'
 import { withLoftDetail } from './loft'
@@ -176,6 +176,17 @@ const TILT_MIN = -0.12
 const TILT_MAX = 0.6
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x))
 
+/**
+ * Dither every material under `root`: a few levels of noise below one 8-bit step, so the dark
+ * gradients (floor glow, halo, shaded coats) do not show bands. Must run before first draw.
+ */
+function dither(root: Object3D): void {
+  root.traverse((node) => {
+    const material = (node as Mesh).material as Material | Material[] | undefined
+    for (const m of Array.isArray(material) ? material : material ? [material] : []) m.dithering = true
+  })
+}
+
 export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {}): Stage {
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: options.preserveDrawingBuffer })
   const low = options.quality === 'low'
@@ -203,7 +214,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
 
   const camera = new PerspectiveCamera(26, 1, 0.1, 50)
 
-  const key = new DirectionalLight(0xfff4e8, cinematic ? 3 : 3.2)
+  const key = new DirectionalLight(0xfff4e8, (cinematic ? 3 : 3.2) * KEY_WITH_PANELS)
   key.position.set(2.2, 3.4, 4.4)
   key.castShadow = true
   key.shadow.mapSize.set(low ? 512 : 1024, low ? 512 : 1024)
@@ -242,6 +253,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   halo.renderOrder = -1
   halo.visible = false
   scene.add(halo)
+  dither(scene)
   let glowing = false
   const lightHalo = (look: Avatar3DLook, height: number) => {
     glowing = look.finish === 'glow'
@@ -602,6 +614,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       retired?.root.removeFromParent()
       // A live character on a phone is built from slightly coarser meshes; stills choose their own detail.
       character = low && !options.manual ? withLoftDetail(0.8, () => buildCharacter(look)) : buildCharacter(look)
+      dither(character.root)
       scene.add(character.root)
       // Bake its creases once, in the pose it stands in. Phones look from fewer directions.
       character.bake(renderer, options.bake ?? (low && !options.manual ? { directions: 24, size: 384 } : undefined))
@@ -696,6 +709,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       yaw = first.yaw ?? 0
       for (const m of rest) {
         const built = buildCharacter(m.look)
+        dither(built.root)
         scene.add(built.root)
         const shadow = new Mesh(blob.geometry.clone(), (blob.material as MeshBasicMaterial).clone())
         shadow.rotation.x = -Math.PI / 2
@@ -719,7 +733,10 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     setProps(next) {
       if (props) freeProps(props)
       props = next
-      if (props) scene.add(props)
+      if (props) {
+        dither(props)
+        scene.add(props)
+      }
       // A set has its own floor: the studio's glowing ring would float on it.
       if (ring) ring.visible = !props
       wake()
