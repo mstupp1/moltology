@@ -13,7 +13,7 @@ import type { ShellMarking } from '../avatar/traits'
 import { getAssetUrl } from '../assets'
 
 /** Markings drawn from an image mask instead of in the shader. */
-export const TEXTURE_MARKINGS = ['lace', 'tide', 'camo', 'glyph'] as const satisfies readonly ShellMarking[]
+export const TEXTURE_MARKINGS = ['lace', 'tide', 'camo'] as const satisfies readonly ShellMarking[]
 export type TextureMarking = (typeof TEXTURE_MARKINGS)[number]
 
 export const isTextureMarking = (m: ShellMarking | undefined): m is TextureMarking => (TEXTURE_MARKINGS as readonly string[]).includes(m ?? '')

@@ -26,7 +26,6 @@ const MARKING_INDEX: Record<ShellMarking, number> = {
   lace: 9,
   tide: 9,
   camo: 9,
-  glyph: 9,
 }
 
 export const NOISE_GLSL = /* glsl */ `

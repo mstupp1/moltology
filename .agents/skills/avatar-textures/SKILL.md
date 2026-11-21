@@ -62,7 +62,7 @@ Common ending for every marking prompt:
 - **coral-lace**: A net of thin branching coral-like lines that join into irregular rounded cells, like lace coral or a sea fan. Lines vary from thin to medium; cells about 1/8 to 1/5 of the tile.
 - **tide-rings**: Clusters of concentric wavy rings, like agate bands or ripples on sand, 4 to 6 overlapping ring clusters, ring bands of uneven width.
 - **reef-camo**: Disruptive camouflage of organic rounded blotches with irregular edges, some blotches merging, some with small satellite spots, sizes from 1/20 to 1/6 of the tile.
-- **glyph-script**: Rows of small invented abstract glyphs, like an unknown carved script or shell markings, made of short strokes, dots and arcs. Must not resemble any real alphabet, letters or numbers. Glyphs about 1/16 of the tile, loosely spaced, slightly irregular rows.
+- Avoid script or glyph patterns: tried 2026-11-21, they came out sparse and read as emoji (smileys, wifi arcs) on the shell.
 
 ## Packing and publishing
 
