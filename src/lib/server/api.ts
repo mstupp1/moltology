@@ -1321,7 +1321,9 @@ export const saveCommunityPhotoFn = createServerFn({ method: 'POST' })
         token: z.string().optional(),
         userId: z.string().optional(),
         castHash: z.string().min(1).max(32),
-        image: z.string().min(32).max(2_100_000),
+        // Base64 of the 2 MB full size photo and the 800 KB half size copy.
+        image: z.string().min(32).max(2_700_000),
+        smallImage: z.string().min(32).max(1_100_000),
         spots: z
           .array(z.object({ id: z.string().min(1).max(64), x: z.number(), y: z.number(), r: z.number() }))
           .max(64),

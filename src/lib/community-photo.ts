@@ -13,14 +13,22 @@ import { avatarStillHash, shortHash, STILL_VERSION } from './avatar-still'
 import type { LobsterAvatarConfig } from './lobster-avatar'
 
 /** Bump when the photo's layout, lighting or framing changes, so the next visit retakes it. */
-export const PHOTO_VERSION = 3
+export const PHOTO_VERSION = 4
 export const COMMUNITY_PHOTO_ID = 'forum'
-export const PHOTO_WIDTH = 1800
-export const PHOTO_HEIGHT = 600
+/**
+ * Drawn at twice the size it shows on a wide desktop, so it stays sharp on retina screens. A half
+ * size copy is stored beside it for phones and 1x screens (see `photoSmallKey`).
+ */
+export const PHOTO_WIDTH = 3600
+export const PHOTO_HEIGHT = 1200
+export const PHOTO_SMALL_WIDTH = 1800
+export const PHOTO_SMALL_HEIGHT = 600
 /** A photo is retaken at most this often, however often the cast changes. */
 export const RETAKE_AFTER_MS = 24 * 60 * 60 * 1000
-/** A 1800×600 WebP of the group is a few hundred kilobytes at most. */
-export const MAX_PHOTO_BYTES = 1_500_000
+/** A 3600×1200 WebP of the group is well under a megabyte; the cap leaves room for a big cast. */
+export const MAX_PHOTO_BYTES = 2_000_000
+/** The half size copy. Both together stay under the 4.5 MB request limit once base64 encoded. */
+export const MAX_SMALL_PHOTO_BYTES = 800_000
 /** Most characters in one photo. Past this, the earliest members to join are shown. */
 export const MAX_CAST = 48
 /** Most characters in one row of the photo. Rows are as wide as it takes to fill the frame. */
@@ -48,6 +56,8 @@ export interface CastMember {
 
 export interface CommunityPhoto {
   url: string
+  /** The half size copy, for phones and 1x screens. Missing on a photo drawn in this browser. */
+  smallUrl?: string
   width: number
   height: number
   takenAt: string
@@ -77,6 +87,10 @@ export function castHash(cast: readonly Pick<CastMember, 'id' | 'config'>[]): st
 
 export function photoKey(hash: string): string {
   return `community/photo-v${PHOTO_VERSION}-${hash}.webp`
+}
+
+export function photoSmallKey(hash: string): string {
+  return `community/photo-v${PHOTO_VERSION}-${hash}-sm.webp`
 }
 
 /** The stored photo should be retaken: there is none yet, or the cast changed and it is old enough. */

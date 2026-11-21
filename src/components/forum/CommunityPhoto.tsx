@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { Users } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { can3D, mark3DUnavailable } from '@/lib/avatar3d-support'
-import { PHOTO_HEIGHT, PHOTO_WIDTH, type CommunityPhoto as Photo, type CommunityPhotoState } from '@/lib/community-photo'
+import { PHOTO_HEIGHT, PHOTO_SMALL_HEIGHT, PHOTO_SMALL_WIDTH, PHOTO_WIDTH, type CommunityPhoto as Photo, type CommunityPhotoState } from '@/lib/community-photo'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { useAppQuery, useAppQueryClient } from '@/lib/query/account'
 import { FRESH } from '@/lib/query/content'
@@ -52,7 +52,7 @@ function useRetake(state: CommunityPhotoState | undefined, userId: string | null
       rememberTry(hash)
       try {
         const { renderGroupPhoto } = await import('@/lib/avatar3d/group')
-        const shot = await renderGroupPhoto(cast, PHOTO_WIDTH, PHOTO_HEIGHT, abort.signal)
+        const shot = await renderGroupPhoto(cast, PHOTO_WIDTH, PHOTO_HEIGHT, abort.signal, { width: PHOTO_SMALL_WIDTH, height: PHOTO_SMALL_HEIGHT })
         if (!shot) return
         const byId = new Map(cast.map((m) => [m.id, m]))
         setFresh({
@@ -67,7 +67,7 @@ function useRetake(state: CommunityPhotoState | undefined, userId: string | null
           })),
         })
         // Browsers that cannot write WebP hand back a PNG: shown here, but not stored.
-        if (!shot.image.startsWith('data:image/webp')) return
+        if (!shot.image.startsWith('data:image/webp') || !shot.smallImage) return
         const token = await getAuthJWTToken()
         const { saveCommunityPhotoFn } = await import('@/lib/server/api')
         const result = await saveCommunityPhotoFn({
@@ -76,6 +76,7 @@ function useRetake(state: CommunityPhotoState | undefined, userId: string | null
             token: token ?? undefined,
             castHash: hash,
             image: shot.image,
+            smallImage: shot.smallImage,
             spots: shot.spots,
           },
         })
@@ -112,7 +113,8 @@ export function CommunityPhoto() {
   const [picked, setPicked] = useState<string | null>(null)
 
   if (!photo) return null
-  const ready = loaded === photo.url
+  const shown = photo.smallUrl ?? photo.url
+  const ready = loaded === shown
 
   return (
     <section
@@ -136,16 +138,19 @@ export function CommunityPhoto() {
         >
           {!ready && <div className="absolute inset-0 animate-pulse bg-surface-2/40" aria-hidden="true" />}
           <img
-            src={photo.url}
+            src={photo.smallUrl ?? photo.url}
+            // Phones and 1x screens take the half size copy; retina desktops the full one.
+            srcSet={photo.smallUrl ? `${photo.smallUrl} ${PHOTO_SMALL_WIDTH}w, ${photo.url} ${photo.width}w` : undefined}
+            sizes={photo.smallUrl ? '(min-width: 1024px) 1312px, 100vw' : undefined}
             alt={`Group photo of ${photo.spots.length} members' characters`}
             width={photo.width}
             height={photo.height}
             decoding="async"
             ref={(img) => {
               // A cached image can finish before React listens for its load event.
-              if (img?.complete && img.naturalWidth) setLoaded(photo.url)
+              if (img?.complete && img.naturalWidth) setLoaded(shown)
             }}
-            onLoad={() => setLoaded(photo.url)}
+            onLoad={() => setLoaded(shown)}
             className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
           />
           {ready &&

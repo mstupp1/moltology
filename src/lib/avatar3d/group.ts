@@ -38,6 +38,8 @@ export interface GroupMember {
 export interface GroupPhoto {
   /** The photo as a data URL: WebP where the browser can write it, otherwise PNG. */
   image: string
+  /** The same photo at `small` size, when one was asked for. */
+  smallImage?: string
   spots: CommunityPhotoSpot[]
 }
 
@@ -91,11 +93,31 @@ function drawnBox(canvas: HTMLCanvasElement): { left: number; top: number; right
   return { left: left * scale, top: top * scale, right: (right + 1) * scale, bottom: (bottom + 1) * scale }
 }
 
+/** A smaller WebP copy of what is on `canvas`, scaled down smoothly. */
+function shrink(canvas: HTMLCanvasElement, width: number, height: number): string | undefined {
+  const copy = document.createElement('canvas')
+  copy.width = width
+  copy.height = height
+  const ctx = copy.getContext('2d')
+  if (!ctx) return undefined
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
+  ctx.drawImage(canvas, 0, 0, width, height)
+  const image = copy.toDataURL('image/webp', 0.88)
+  return image.startsWith('data:image/webp') ? image : undefined
+}
+
 /**
  * Draw the group photo at `width`×`height`. Members stand in the order given, the first in the
  * front row. Returns the image and where each member's head landed in it.
  */
-export async function renderGroupPhoto(members: readonly GroupMember[], width: number, height: number, signal?: AbortSignal): Promise<GroupPhoto | null> {
+export async function renderGroupPhoto(
+  members: readonly GroupMember[],
+  width: number,
+  height: number,
+  signal?: AbortSignal,
+  small?: { width: number; height: number },
+): Promise<GroupPhoto | null> {
   if (!members.length) return null
   const canvas = document.createElement('canvas')
   canvas.width = width
@@ -243,8 +265,9 @@ export async function renderGroupPhoto(members: readonly GroupMember[], width: n
         renderer.render(scene, camera)
       }
     }
-    let image = canvas.toDataURL('image/webp', 0.86)
+    let image = canvas.toDataURL('image/webp', 0.9)
     if (!image.startsWith('data:image/webp')) image = canvas.toDataURL('image/png')
+    const smallImage = small ? shrink(canvas, small.width, small.height) : undefined
 
     const clamp01 = (n: number) => Math.min(1, Math.max(0, n))
     const edge = new Vector3()
@@ -258,7 +281,7 @@ export async function renderGroupPhoto(members: readonly GroupMember[], width: n
         r: clamp01(Math.abs(edge.x - p.x) / 2),
       }
     })
-    return { image, spots: out }
+    return { image, smallImage, spots: out }
   } finally {
     for (const c of built) c.dispose()
     for (const d of disposables) d.dispose()
