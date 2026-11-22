@@ -295,6 +295,38 @@ export const BENEFIT_PAGES: BenefitSummary[] = [
     indexed: false,
     updated: '2026-11-22',
   },
+  {
+    slug: 'synergy',
+    topic: 'Synergy',
+    kit: 'platform',
+    blurb: 'Eight habits stacked into one daily system.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'ai-swarms',
+    topic: 'AI swarms',
+    kit: 'platform',
+    blurb: 'An AI guide, a forum full of people and a daily plan.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'cyber',
+    topic: 'Cyber',
+    kit: 'platform',
+    blurb: 'Screen time rules you set in advance, then keep.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'adaptive',
+    topic: 'Adaptive',
+    kit: 'platform',
+    blurb: 'Practice dropping old routines before they stop fitting.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
 ]
 
 export const BENEFITS_HUB_PATH = '/benefits'
