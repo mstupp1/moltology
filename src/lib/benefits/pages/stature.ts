@@ -30,12 +30,12 @@ const page: BenefitPage = {
   related: ['charisma', 'communication', 'fashion'],
   faqs: [
     {
-      question: 'How to have presence while seated?',
+      question: 'Can I have presence while seated?',
       answer:
-        'Sit in a position that is comfortable for you and give the speaker your attention. Set the unrelated task aside, greet them and listen before answering. Use whatever position and movement suit your access needs.',
+        'Yes. Sit in a position that is comfortable for you and give the speaker your attention. Set the unrelated task aside, greet them and listen before answering. Use whatever position and movement suit your access needs.',
     },
     {
-      question: 'How to have presence during a meeting?',
+      question: 'How do I have more presence in meetings?',
       answer:
         'Arrive knowing the point you want to discuss. Listen to what has already been said, then make that point in a clear sentence. Ask for a moment to think if the question needs one.',
     },

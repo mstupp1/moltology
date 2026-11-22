@@ -31,14 +31,14 @@ const page: BenefitPage = {
   related: ['charisma', 'fashion', 'beauty'],
   faqs: [
     {
-      question: 'How to be more attractive in conversation?',
+      question: 'What makes someone attractive in conversation?',
       answer:
-        'Give the conversation your attention. Ask a question you want answered, listen to the reply and share something honest about yourself. Put the phone away while you talk, including when the story takes a detour.',
+        'Attention, mostly. Ask a question you want answered, listen to the reply and share something honest about yourself. Put the phone away while you talk, including when the story takes a detour.',
     },
     {
-      question: 'How to be more attractive as a quiet person?',
+      question: 'Can a quiet person be more attractive?',
       answer:
-        'Keep your own speaking style. Say hello, ask about a shared interest and give your opinion when you have one. You can leave a pause in the conversation without apologizing for it.',
+        'Yes, and without becoming loud. Say hello, ask about a shared interest and give your opinion when you have one. You can leave a pause in the conversation without apologizing for it.',
     },
     {
       question: 'What does confident body language look like?',
@@ -53,7 +53,7 @@ const page: BenefitPage = {
     {
       question: 'Why does my phone distract me during a conversation?',
       answer:
-        'Habit, boredom and waiting for a message are all possible reasons. Put the phone in a bag and choose when to check it next. Use Reset your focus to clear a distraction during your day too.',
+        'Habit, boredom and waiting for a message are all possible reasons. Put the phone in a bag and choose when to check it next. If you are waiting on one call, say so once instead of glancing at the screen all evening.',
     },
     {
       question: 'Does the Moltmax quiz score my appearance?',

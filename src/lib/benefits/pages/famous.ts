@@ -30,12 +30,12 @@ const page: BenefitPage = {
   related: ['community', 'communication', 'charisma'],
   faqs: [
     {
-      question: 'How to stand out in an online community?',
+      question: 'How do I stand out in an online community?',
       answer:
         'Start by learning what people there are working on. Answer an open question with a clear example, share a relevant source or describe a mistake someone else could avoid. Read the replies already posted before adding yours.',
     },
     {
-      question: 'How to stand out when everyone posts the same advice?',
+      question: 'How can I stand out when everyone posts the same advice?',
       answer:
         'Give the detail the general advice leaves out. Name the step you tried, show a short example and say where you got stuck. Leave a claim out if you cannot explain where it came from.',
     },
@@ -47,7 +47,7 @@ const page: BenefitPage = {
     {
       question: 'Is daily posting necessary in an online community?',
       answer:
-        'No. Post when you have something relevant to add and time to read the discussion. Moltology asks you to help a member as a daily task; a short welcome counts as an act of help too.',
+        'No. Post when you have something relevant to add and time to read the discussion. One useful reply does more for your name than five posts nobody needed.',
     },
     {
       question: 'When should I share a project I am still working on?',

@@ -24,7 +24,7 @@ const page: BenefitPage = {
   },
   reveal: {
     headline: 'Leave a little care in the details.',
-    body: 'Start with the daily task that asks you to help someone.',
+    body: 'Start with Help a member, the task that faces outward.',
     screenshot: 'dashboard',
   },
   related: ['fashion', 'empathy', 'charisma'],
@@ -37,7 +37,7 @@ const page: BenefitPage = {
     {
       question: 'How do you practice inner beauty each day?',
       answer:
-        'Start with a small act of care you can actually do. Ask your friend about the appointment they mentioned, or give someone time to finish a difficult sentence. The Help a member task asks for that care in the forum.',
+        'Pick a small act of care you can do today. Ask your friend about the appointment they mentioned, or give someone time to finish a difficult sentence. Moltology’s Help a member task is the same habit, on the forum.',
     },
     {
       question: 'Can I be kind and still say no?',
@@ -50,9 +50,9 @@ const page: BenefitPage = {
         'Listening belongs in how you treat people throughout the day. Put down the phone, hear the full story and ask a question about what they said. Save your similar story for after they finish theirs.',
     },
     {
-      question: 'Does my character need to look like me?',
+      question: 'Is inner beauty more important than looks?',
       answer:
-        'No. Your character has its own appearance and wardrobe. Use the 3D view to look at it; keep your real appearance out of any comparison with the model.',
+        'They are different things, and you do not have to pick one. Looks are what people notice first. Inner beauty is what they remember after a long conversation, a returned favor or a hard week.',
     },
     {
       question: 'Which small gestures show thoughtfulness?',
@@ -64,7 +64,7 @@ const page: BenefitPage = {
     hero: {
       season: 'The beauty issue · Daily care',
       headline: 'Make inner beauty part of the routine.',
-      sub: 'Keep the serum. Add a little care for the person on the other side of your phone. Moltology asks you to sit quietly, keep a commitment and help someone each day. Your character takes the model booking. You take the daily practice.',
+      sub: 'Keep the serum. Add a little care for the person on the other side of your phone. The routine: sit quietly, keep a commitment, help someone. Your character takes the model booking. You take the daily practice.',
       cta: 'Begin your routine, free',
       image: {
         src: '/images/benefits/beauty/hero.jpg?v=2',
