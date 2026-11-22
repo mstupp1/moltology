@@ -1,0 +1,31 @@
+import { describe, expect, it } from 'vitest'
+import { BENEFIT_PAGES } from '../../src/lib/benefits/summaries'
+import type { BenefitPage } from '../../src/lib/benefits/types'
+import { checkBenefitPages } from './benefit-pages-check'
+
+const modules = import.meta.glob<{ default: BenefitPage }>('../../src/lib/benefits/pages/*.ts', { eager: true })
+const pages = Object.values(modules).map((mod) => mod.default)
+
+describe('benefit pages', () => {
+  it('pass the content and SEO rules', () => {
+    const errors = checkBenefitPages(BENEFIT_PAGES, pages).filter((issue) => issue.level === 'error')
+    expect(errors).toEqual([])
+  })
+
+  it('flags long titles, missing disclaimers and copy shared between pages', () => {
+    const libido = pages.find((page) => page.slug === 'libido')!
+    const broken = {
+      ...libido,
+      title: 'A title that is far too long to fit in a search result snippet | Moltology',
+      disclaimer: undefined,
+    } as BenefitPage
+    const twin = { ...libido, slug: 'twin', topic: 'Twin', related: ['libido', 'spirituality'] } as BenefitPage
+    const rules = checkBenefitPages(
+      [...BENEFIT_PAGES, { slug: 'twin', topic: 'Twin', kit: 'clinic', blurb: '', indexed: false, updated: libido.updated }],
+      [broken, twin, ...pages.filter((page) => page.slug !== 'libido')],
+    ).map((issue) => `${issue.slug}:${issue.rule}`)
+    expect(rules).toContain('libido:title-length')
+    expect(rules).toContain('libido:disclaimer')
+    expect(rules).toContain('twin:duplicate-copy')
+  })
+})

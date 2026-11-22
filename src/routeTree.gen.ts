@@ -56,6 +56,8 @@ import { Route as HudSearchRouteImport } from './routes/_hud/search'
 import { Route as HudSettingsRouteImport } from './routes/_hud/settings'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as BenefitsIndexRouteImport } from './routes/benefits/index'
+import { Route as BenefitsSlugRouteImport } from './routes/benefits/$slug'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
@@ -336,6 +338,16 @@ const HudSupportRoute = HudSupportRouteImport.update({
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BenefitsIndexRoute = BenefitsIndexRouteImport.update({
+  id: '/benefits/',
+  path: '/benefits/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BenefitsSlugRoute = BenefitsSlugRouteImport.update({
+  id: '/benefits/$slug',
+  path: '/benefits/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -631,6 +643,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof HudSettingsRoute
   '/support': typeof HudSupportRoute
   '/api/chat': typeof ApiChatRoute
+  '/benefits/$slug': typeof BenefitsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/i/$referrerId': typeof IReferrerIdRoute
@@ -643,6 +656,7 @@ export interface FileRoutesByFullPath {
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
+  '/benefits/': typeof BenefitsIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/lectures/': typeof LecturesIndexRoute
@@ -721,6 +735,7 @@ export interface FileRoutesByTo {
   '/settings': typeof HudSettingsRoute
   '/support': typeof HudSupportRoute
   '/api/chat': typeof ApiChatRoute
+  '/benefits/$slug': typeof BenefitsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/i/$referrerId': typeof IReferrerIdRoute
@@ -733,6 +748,7 @@ export interface FileRoutesByTo {
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
+  '/benefits': typeof BenefitsIndexRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
   '/lectures': typeof LecturesIndexRoute
@@ -816,6 +832,7 @@ export interface FileRoutesById {
   '/_hud/settings': typeof HudSettingsRoute
   '/_hud/support': typeof HudSupportRoute
   '/api/chat': typeof ApiChatRoute
+  '/benefits/$slug': typeof BenefitsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/i/$referrerId': typeof IReferrerIdRoute
@@ -828,6 +845,7 @@ export interface FileRoutesById {
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
+  '/benefits/': typeof BenefitsIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/lectures/': typeof LecturesIndexRoute
@@ -913,6 +931,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/support'
     | '/api/chat'
+    | '/benefits/$slug'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/i/$referrerId'
@@ -925,6 +944,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
+    | '/benefits/'
     | '/blog/'
     | '/changelog/'
     | '/lectures/'
@@ -1003,6 +1023,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/support'
     | '/api/chat'
+    | '/benefits/$slug'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/i/$referrerId'
@@ -1015,6 +1036,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
+    | '/benefits'
     | '/blog'
     | '/changelog'
     | '/lectures'
@@ -1097,6 +1119,7 @@ export interface FileRouteTypes {
     | '/_hud/settings'
     | '/_hud/support'
     | '/api/chat'
+    | '/benefits/$slug'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/i/$referrerId'
@@ -1109,6 +1132,7 @@ export interface FileRouteTypes {
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
+    | '/benefits/'
     | '/blog/'
     | '/changelog/'
     | '/lectures/'
@@ -1183,6 +1207,7 @@ export interface RootRouteChildren {
   WatchRoute: typeof WatchRoute
   WhatIsMoltologyRoute: typeof WhatIsMoltologyRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
+  BenefitsSlugRoute: typeof BenefitsSlugRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
   IReferrerIdRoute: typeof IReferrerIdRoute
@@ -1190,6 +1215,7 @@ export interface RootRouteChildren {
   NewsSlugRoute: typeof NewsSlugRoute
   NewsChar123slugChar125DotmdRoute: typeof NewsChar123slugChar125DotmdRoute
   RenderCompositeRoute: typeof RenderCompositeRoute
+  BenefitsIndexRoute: typeof BenefitsIndexRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ChangelogIndexRoute: typeof ChangelogIndexRoute
   LecturesIndexRoute: typeof LecturesIndexRoute
@@ -1532,6 +1558,20 @@ declare module '@tanstack/react-router' {
       path: '/api/chat'
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/benefits/': {
+      id: '/benefits/'
+      path: '/benefits'
+      fullPath: '/benefits/'
+      preLoaderRoute: typeof BenefitsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/benefits/$slug': {
+      id: '/benefits/$slug'
+      path: '/benefits/$slug'
+      fullPath: '/benefits/$slug'
+      preLoaderRoute: typeof BenefitsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -2063,6 +2103,7 @@ const rootRouteChildren: RootRouteChildren = {
   WatchRoute: WatchRoute,
   WhatIsMoltologyRoute: WhatIsMoltologyRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
+  BenefitsSlugRoute: BenefitsSlugRoute,
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
   IReferrerIdRoute: IReferrerIdRoute,
@@ -2070,6 +2111,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewsSlugRoute: NewsSlugRoute,
   NewsChar123slugChar125DotmdRoute: NewsChar123slugChar125DotmdRoute,
   RenderCompositeRoute: RenderCompositeRoute,
+  BenefitsIndexRoute: BenefitsIndexRoute,
   BlogIndexRoute: BlogIndexRoute,
   ChangelogIndexRoute: ChangelogIndexRoute,
   LecturesIndexRoute: LecturesIndexRoute,
