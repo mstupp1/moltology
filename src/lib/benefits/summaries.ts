@@ -52,6 +52,11 @@ export function findBenefitSummary(slug: string): BenefitSummary | undefined {
   return BENEFIT_PAGES.find((page) => page.slug === slug)
 }
 
+/** Every page keeps its hero at this bucket key; the gallery uses it as the thumbnail. */
+export function benefitHeroSrc(slug: string) {
+  return `/images/benefits/${slug}/hero.jpg`
+}
+
 export const INDEXED_BENEFIT_PAGES = BENEFIT_PAGES.filter((page) => page.indexed)
 
 /** Sitemap rows for the approved benefit pages, plus the hub once any page is approved. */

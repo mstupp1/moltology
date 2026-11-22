@@ -5,7 +5,8 @@ import { PublicHeader } from '@/components/PublicHeader'
 import { MainFooter } from '@/components/MainFooter'
 import { AuthModal } from '@/components/AuthModal'
 import { PublicHeaderChromeProvider } from '@/components/public-header-chrome'
-import { BENEFIT_KITS, BENEFIT_PAGES } from '@/lib/benefits/registry'
+import { getAssetUrl } from '@/lib/assets'
+import { BENEFIT_KITS, BENEFIT_PAGES, benefitHeroSrc } from '@/lib/benefits/registry'
 import './benefits.css'
 
 /** The index of every benefit page, in the normal Moltology look, each card tinted like its costume. */
@@ -30,7 +31,8 @@ export function BenefitsHubPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-ink-body">
             Moltology is one free practice: eight small tasks a day, readings, an AI guide and a community. Each page below
-            looks at it from a different angle, dressed like the industry that usually sells that benefit.
+            looks at it from a different angle, dressed like the industry that usually sells that benefit. Tap one to
+            see the whole costume.
           </p>
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {BENEFIT_PAGES.map((item) => (
@@ -41,7 +43,16 @@ export function BenefitsHubPage() {
                   className="group flex h-full flex-col overflow-hidden rounded-card border border-line-subtle bg-surface-1 hover:border-line-strong transition-colors"
                 >
                   <span className="benefit-swatch" data-kit={item.kit} aria-hidden="true">
-                    <span>{item.topic}</span>
+                    <img
+                      src={getAssetUrl(benefitHeroSrc(item.slug))}
+                      alt=""
+                      width={640}
+                      height={400}
+                      loading="lazy"
+                      decoding="async"
+                      className="benefit-swatch-img"
+                    />
+                    <span className="benefit-swatch-label">{item.topic}</span>
                   </span>
                   <span className="flex flex-1 flex-col p-5">
                     <span className="text-xs text-ink-muted">{BENEFIT_KITS[item.kit].industry}</span>
