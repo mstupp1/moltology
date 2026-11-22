@@ -42,4 +42,15 @@ describe('benefit pages', () => {
     expect(rules).toContain(`${first.slug}:claim`)
     expect(rules).toContain(`${second.slug}:hook-reused`)
   })
+  it('flags keyword-style FAQ questions, answers that point at the page and British spelling', () => {
+    const [first, ...rest] = pages
+    const noisy = {
+      ...first,
+      faqs: [...first.faqs, { question: 'How to stay calm?', answer: 'Read the linked passage and practise daily.' }],
+    } as BenefitPage
+    const rules = checkBenefitPages(BENEFIT_PAGES, [noisy, ...rest]).map((issue) => `${issue.slug}:${issue.rule}`)
+    expect(rules).toContain(`${first.slug}:faq-grammar`)
+    expect(rules).toContain(`${first.slug}:faq-standalone`)
+    expect(rules).toContain(`${first.slug}:spelling`)
+  })
 })

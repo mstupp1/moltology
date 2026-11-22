@@ -7,7 +7,7 @@ const page: BenefitPage = {
   query: 'how to get smarter',
   title: 'How to get smarter: go beyond the bookmark | Moltology',
   description:
-    'Asking how to get smarter? Choose something you cannot explain yet. Moltology asks you to learn one hard thing, check your answer and record the practice.',
+    'Asking how to get smarter? Choose something you cannot explain yet. Moltology gives you a daily task for it: learn one hard thing, then check your answer.',
   keywords: 'how to get smarter, learning habits, active recall, study routine, learn something hard',
   indexed: false,
   updated: '2026-11-22',
@@ -32,7 +32,7 @@ const page: BenefitPage = {
     {
       question: 'How can I get smarter about a new subject?',
       answer:
-        'Start with the basics you cannot explain yet. Pick a beginner source and work through an example before adding another resource. In Moltology, Learn something hard is the daily invitation to do that work on purpose.',
+        'Learn the basics you cannot explain yet. Pick a beginner source and work through an example before adding another resource. In Moltology, Learn something hard is the daily invitation to do that work on purpose.',
     },
     {
       question: 'Can reading help when I want to get smarter?',
@@ -63,8 +63,8 @@ const page: BenefitPage = {
   content: {
     hero: {
       eyebrow: 'Learning plan · no entry requirements',
-      headline: 'How to get smarter, beyond the saved reading list.',
-      sub: 'Your bookmarks have had enough time to prepare. Pick something you want to understand and do the difficult part. Moltology asks for one hard lesson in your daily routine.',
+      headline: 'How to get smarter: open the hard chapter.',
+      sub: 'Your bookmarks have had enough time to prepare. Pick something you want to understand and do the difficult part. Moltology puts one hard lesson in your day, every day.',
       checks: ['Bring your own subject', 'Start at your level', 'Check off the work'],
       cta: 'Start your learning routine',
       image: {
@@ -80,7 +80,7 @@ const page: BenefitPage = {
       intro: 'Start with the bit you skipped. The next lesson can be a paragraph, a diagram or a problem that needs another attempt.',
       items: [
         'The article is saved, but the question is still unanswered',
-        'You recognise the term until someone asks you to explain it',
+        'You recognize the term until someone asks you to explain it',
         'The worked example looks easy with the answer beside it',
         'You skip the diagram and hope the next page explains it',
         'A new reading list takes the place of opening the old one',
@@ -98,7 +98,7 @@ const page: BenefitPage = {
       title: 'Make room for the hard lesson',
       intro: 'Choose a reading for the part of studying you keep putting off. Bring your own book, course or practice problem.',
       items: [
-        { name: 'Open the difficult bit', tag: 'For familiar feeds', body: 'The Learn something hard verse asks for deliberate study. Pick the explanation you keep scrolling past and follow it with a pencil.', href: '/codex/scr-030#verse-4' },
+        { name: 'Open the difficult bit', tag: 'For familiar feeds', body: 'The verse behind Learn something hard is blunt: learn one difficult thing on purpose. Pick the explanation you keep scrolling past and follow it with a pencil.', href: '/codex/scr-030#verse-4' },
         { name: 'Choose one question', tag: 'For long reading lists', body: 'Read the instruction behind Pick your one thing. Choose which question matters today before browsing another shelf of possible subjects.', href: '/codex/scr-030#verse-3' },
         { name: 'Stay with the problem', tag: 'For busy desks', body: 'Use the work protocol to arrange an uninterrupted session. Keep your reference material close and unrelated messages for afterward.', href: '/codex/scr-031' },
       ],

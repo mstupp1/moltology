@@ -13,7 +13,18 @@ export interface BenefitIssue {
 }
 
 /** Topics that imitate health or money sites must carry a plain disclaimer line. */
-export const SENSITIVE_TOPICS = new Set(['libido', 'hardness', 'sexy', 'financial', 'investing', 'generational'])
+export const SENSITIVE_TOPICS = new Set([
+  'libido',
+  'hardness',
+  'sexy',
+  'financial',
+  'investing',
+  'generational',
+  'clarity',
+  'energy',
+  'zest',
+  'emotional',
+])
 
 /** Lines Myles asked to keep out of copy, and AI tells that make pages read as generated. */
 export const BANNED_PHRASES = [
@@ -35,6 +46,12 @@ export const BANNED_PHRASES = [
  */
 export const FAQ_INTENT_BANNED =
   /\b(cost|costs|free|fees?|price|pricing|trial|demo|preview|sandbox|try it|try a|look around|before (i|signing|joining)|read before|see it before)\b/i
+
+/** FAQ answers render alone in Google, so they cannot point at the page around them. */
+export const FAQ_POINTER = /\b(the linked|linked (above|below)|see (above|below)|(shown|listed) (above|below)|on this page|this page)\b/i
+
+/** Stems of British spellings; site copy is US English. */
+export const BRITISH_SPELLING = /\b(practis(e|ed|es|ing)|apologis(e|ed|es|ing)|organis(e|ed|es|ing|ation)|recognis(e|ed|es|ing)|realis(e|ed|es|ing|ation)|favour\w*|colour\w*|behaviour\w*|defence|centre)\b/i
 
 /** Claims the skill bans: invented member outcomes, promises and overreach. */
 export const CLAIM_BANS: { pattern: RegExp; why: string }[] = [
@@ -149,6 +166,11 @@ export function checkBenefitPages(
     }
 
     for (const faq of page.faqs) {
+      if (/^how to\b/i.test(faq.question)) {
+        add(slug, 'faq-grammar', `"${faq.question}" reads as a keyword, not a question; write "How can I…" or "How do I…"`)
+      }
+      const pointer = faq.answer.match(FAQ_POINTER)
+      if (pointer) add(slug, 'faq-standalone', `FAQ answer says "${pointer[0]}"; answers show in search results without the page`)
       if (FAQ_INTENT_BANNED.test(faq.question)) {
         add(slug, 'faq-intent', `"${faq.question}" belongs to the reveal (cost, sign-up, demo); ask about the topic instead`)
       }
@@ -191,6 +213,11 @@ export function checkBenefitPages(
       if (match) add(slug, 'claim', `"${match[0]}": ${why}`)
     }
     const noOpeners = sentences(copy).filter((sentence) => /^(no|not)\b/.test(sentence)).length
+    const asks = copy.match(/\basks (you to|for)\b/gi)?.length ?? 0
+    if (asks > 3) add(slug, 'asks-tic', `"asks you to/for" appears ${asks} times; name the task and say the action instead`, 'warning')
+    if (/\bMoltology asks\b/.test(copy)) add(slug, 'asks-tic', '"Moltology asks…" reads as a disclaimer; say what to do', 'warning')
+    const british = copy.match(BRITISH_SPELLING)
+    if (british) add(slug, 'spelling', `"${british[0]}…": use US spelling`, 'warning')
     if (noOpeners > 3) add(slug, 'no-contrast', `${noOpeners} sentences open with "No"/"Not"; vary the shape`, 'warning')
     const wordCount = words(copy).length
     if (wordCount < LIMITS.wordsMin) add(slug, 'thin', `Only ${wordCount} words of page copy (want ${LIMITS.wordsMin}+)`)

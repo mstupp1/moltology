@@ -12,7 +12,7 @@ const page: BenefitPage = {
   indexed: false,
   updated: '2026-11-22',
   disclaimer:
-    'This practice concerns emotional boundaries, not mental health treatment; seek professional support if distress interferes with daily life.',
+    'Moltology is a free practice and community, not mental health care. If distress is getting in the way of daily life, talk to a professional.',
   shareImage: {
     src: '/images/benefits/hardness/share.jpg?v=2',
     alt: 'A crab with a closed notebook at a cream table, photographed in soft telehealth campaign light',
@@ -22,7 +22,7 @@ const page: BenefitPage = {
   hook: {
     label: 'Shell Hardness, from The Sacred Metrics',
     href: '/codex/scr-040#verse-2',
-    text: 'Shell Hardness is the Codex reading about boundaries and composure. It asks you to keep your shape when a difficult message arrives. Read it with one recent conversation in mind, then write the answer you actually mean to give.',
+    text: 'Shell Hardness is the Codex reading about boundaries and composure. Its point is simple: a strong shell still feels everything, it just keeps its shape. Read it with one recent conversation in mind, then write the answer you mean to give.',
   },
   reveal: {
     headline: 'Kindness can come with office hours.',
@@ -34,7 +34,7 @@ const page: BenefitPage = {
     {
       question: 'How can I toughen up without being rude?',
       answer:
-        'Start with a small, polite refusal that names your limit: “I can read one page, but I cannot review the whole report.” Leave the long apology out. Use an everyday request for practice.',
+        'Use a small, polite refusal that names your limit: “I can read one page, but I cannot review the whole report.” Leave the long apology out. Use an everyday request for practice.',
     },
     {
       question: 'Does learning how to toughen up mean hiding my feelings?',
@@ -44,7 +44,7 @@ const page: BenefitPage = {
     {
       question: 'What is a good way to handle criticism at work?',
       answer:
-        'Ask for a concrete example of what needs changing. Write down the correction and check it against the work. If the feedback is vague, ask a follow-up question before drafting a defence of your entire career.',
+        'Ask for a concrete example of what needs changing. Write down the correction and check it against the work. If the feedback is vague, ask a follow-up question before drafting a defense of your entire career.',
     },
     {
       question: 'How can I say no without a long explanation?',
@@ -54,20 +54,20 @@ const page: BenefitPage = {
     {
       question: 'Should I answer an upsetting message straight away?',
       answer:
-        'Usually, you can pause unless the message needs urgent action. Read it once, put the phone down and draft your response elsewhere. Check that the reply answers the actual request before sending it.',
+        'Usually not. Unless it needs urgent action, read it once, put the phone down and draft your reply somewhere else. Before you send it, check that it answers what was asked.',
     },
     {
-      question: 'What does the Shell character stat mean?',
+      question: 'What makes a conversation replay in your head?',
       answer:
-        'Shell is a stat on your character associated with boundaries and resilience. The Codex calls the idea Shell Hardness. Use the reading as a prompt for your next conversation; keep the character number in the game.',
+        'Usually because part of it still feels unfinished. Write down what was said and whether anything needs doing about it. If there is an action, put it on tomorrow’s list; if there is none, the replay has no job left. Then switch to something that uses your hands, like cooking or a walk.',
     },
   ],
   content: {
     hero: {
       eyebrow: 'Personal assessment · no appointment',
       headline: 'Toughen up. Keep the kind part.',
-      sub: 'One blunt message does not need your whole afternoon. Moltology asks you to pause, set a boundary and return to what you were doing. Start with a reading and a daily practice.',
-      checks: ['Join at no charge', 'Start with one boundary', 'Read at your pace'],
+      sub: 'One blunt message does not need your whole afternoon. Pause, say what you can offer and get back to what you were doing. Your plan starts with a short reading and eight daily tasks.',
+      checks: ['Free, no card', 'Start with one boundary', 'Read at your pace'],
       cta: 'Start your boundary plan',
       image: {
         src: '/images/benefits/hardness/hero.jpg?v=2',
@@ -101,7 +101,7 @@ const page: BenefitPage = {
       intro: 'These readings belong to the same practice. Choose the one that fits the conversation in front of you.',
       items: [
         { name: 'The sharp remark', tag: 'For criticism', body: 'Read about Shell Hardness. Separate the correction you can use from the tone you do not need to copy.', href: '/codex/scr-040#verse-2' },
-        { name: 'The extra favour', tag: 'For a full calendar', body: 'Pick your one thing asks you to name what matters today. Check that commitment before adding somebody else’s deadline.', href: '/codex/scr-030#verse-3' },
+        { name: 'The extra favor', tag: 'For a full calendar', body: 'Name what matters today in Pick your one thing. Check it before you accept somebody else’s deadline.', href: '/codex/scr-030#verse-3' },
         { name: 'The reply never sent', tag: 'For evening replays', body: 'Use Let one thing go to name a conversation you are done rehearsing. Stop editing the imaginary follow-up.', href: '/codex/scr-032' },
       ],
     },
@@ -112,7 +112,7 @@ const page: BenefitPage = {
       rows: [
         { label: 'The request', us: 'Check what is being asked', them: 'Assume you must handle it' },
         { label: 'Your calendar', us: 'Look before committing', them: 'Find room somehow' },
-        { label: 'Your answer', us: 'Say what you can offer', them: 'Apologise for having limits' },
+        { label: 'Your answer', us: 'Say what you can offer', them: 'Apologize for having limits' },
         { label: 'The next step', us: 'Go back to your work', them: 'Watch for their reaction' },
       ],
     },

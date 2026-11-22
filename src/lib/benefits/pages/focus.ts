@@ -49,7 +49,7 @@ const page: BenefitPage = {
     {
       question: 'Can I do deep work if I need to stay available?',
       answer:
-        'Yes. Tell people when you plan to check messages, and agree on a way to reach you for something urgent. Choose a work session that fits your responsibilities, as the protocol asks.',
+        'Yes. Tell people when you plan to check messages, and agree on a way to reach you for something urgent. A shorter block you can protect beats a long one you keep breaking.',
     },
     {
       question: 'Where should I start when a project feels too big?',
@@ -102,7 +102,7 @@ const page: BenefitPage = {
       items: [
         { name: 'Too much on the list', tag: 'Choose first', body: 'Start with Pick your one thing. Name today’s priority before arranging tabs, notebooks or a very convincing new folder system.', href: '/codex/scr-030#verse-3' },
         { name: 'Too much coming in', tag: 'Prepare the desk', body: 'Follow the Isolation Protocols before Do deep work. Decide what gets through while you work and what waits until the end.', href: '/codex/scr-031' },
-        { name: 'A loose end at lunch', tag: 'Pause and restart', body: 'Reset your focus asks you to clear one distraction. Answer the nagging message or close the spare tab, then choose what comes next.', href: '/codex/scr-030#verse-5' },
+        { name: 'A loose end at lunch', tag: 'Pause and restart', body: 'At noon, clear one distraction: answer the nagging message or close the spare tab. Then pick the next useful move.', href: '/codex/scr-030#verse-5' },
       ],
     },
     compare: {

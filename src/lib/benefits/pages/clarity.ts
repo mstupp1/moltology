@@ -22,7 +22,7 @@ const page: BenefitPage = {
   hook: {
     label: 'Sit in silence: the morning Codex reading',
     href: '/codex/scr-030#verse-2',
-    text: 'The reading behind Sit in silence asks for a look at yesterday before opening feeds or messages. Leave the inbox closed, sit quietly and read back over what happened. Start with the day you actually had, including the part that did not go to plan.',
+    text: 'Sit in silence comes from a Codex verse that starts the day before any feed, inbox or message: cold water, still air and one honest look at yesterday. Keep the phone face down and go back over the day you had, including the part that did not go to plan.',
   },
   reveal: {
     headline: 'Start the day before opening it.',
@@ -102,7 +102,7 @@ const page: BenefitPage = {
       items: [
         { name: 'Before the first scroll', tag: 'Morning', body: 'Follow Sit in silence before the messages begin. Look at yesterday’s notes instead of starting with whatever arrived overnight.', href: '/codex/scr-030#verse-2' },
         { name: 'When the tabs pile up', tag: 'Midday', body: 'Use Reset your focus to clear one thing pulling at you. Close the spare tab or handle the small request you keep reopening.', href: '/codex/scr-030#verse-5' },
-        { name: 'When the day is done', tag: 'Evening', body: 'Close the day asks you to record the practice and stop. Leave the unfinished list for the next time you sit down.', href: '/codex/scr-030#verse-9' },
+        { name: 'When the day is done', tag: 'Evening', body: 'Close the day: tick off what you did and stop. The unfinished list keeps until the next time you sit down.', href: '/codex/scr-030#verse-9' },
       ],
     },
     compare: {

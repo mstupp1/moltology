@@ -27,6 +27,7 @@ quiz as the fallback. The costume is the parody; the reveal is the offer.
 | Shell, header, FAQ, reveal | `src/components/benefits/` |
 | Costumes | `src/components/benefits/kits/<kit>/` (`<Kit>Kit.tsx` + `<kit>.css`) |
 | Archetype plan for all 48 topics | [references/archetypes.md](references/archetypes.md) |
+| Codex brief for writing pages | [references/codex-copy-brief.md](references/codex-copy-brief.md) |
 | Content rules | `scripts/lib/benefit-pages-check.ts` (`npm run benefits:check`) |
 | Browser QA | `scripts/capture-benefit-pages.ts` (`npm run benefits:shots`) |
 
@@ -45,6 +46,10 @@ quiz as the fallback. The costume is the parody; the reveal is the offer.
    `benefits:check` fails on any 7+ word sentence that appears on two pages. Don't copy sentence
    *shapes* either: reviewers found every early page opening its FAQ with "Is Moltology a…?" and
    closing its reveal with "The X was a costume. The Y is real." Write each one fresh.
+   Handing a batch to Codex: a first pass on Sol 6.2 at medium effort passed every check but read
+   stiff, hedged and out of costume. Use high effort for copy and include a voice section with
+   good and bad headlines and the kit's best page as the benchmark:
+   [references/codex-copy-brief.md](references/codex-copy-brief.md) is that brief. Then hand the batch to a fresh reviewer agent before committing.
 4. **List it** in `summaries.ts` (same slug, topic, kit, `indexed: false`, `updated`).
 5. **Make images** (below), then run `npm run benefits:check` and `npm run benefits:shots`.
 6. Keep `indexed: false` until Myles has seen the page on a preview. Turning it on adds it to the
@@ -107,6 +112,21 @@ Design calls stay with Claude; filling pages inside a finished kit can go to Cod
 - A list that says eight shows all eight tasks; a stat that says 8 matches the list beside it.
 - The reveal: the component already says what Moltology is. `reveal.body` is one short line
   specific to this page, and `reveal.headline` must not reuse another page's shape.
+- Pick a query whose searcher wants what the page offers. If the page has to say "here it means
+  something else" (a "daily movement" page with no workouts), choose another query.
+- The claim rules are not a reason to hedge. Say each limit once, in the `disclaimer` or one FAQ,
+  and never write a line whose only job is to disclaim ("this makes no promise", "a task record
+  cannot diagnose"). Lines that pass the checker can still read like a compliance memo.
+- Name a task, then say the action: "Pick your one thing: write the task down before email." Not
+  "Pick your one thing asks you to…". At most a few "asks you to" a page and no "Moltology asks".
+- Plain verbs (do, pick, read, write, stop, ask). Avoid examine, consider, attend to, participation,
+  "in ordinary language", "specific enough to act on".
+- FAQ questions are full questions ("How can I…", "What is…"), never "How to X?". At most two FAQs
+  are about Moltology itself (the quiz, stats, Codex); the rest answer the search topic with real,
+  generally accepted guidance, then link it to the practice in one sentence at most.
+- FAQ answers lead with the answer (yes, no, a number, a definition, the first action) and never
+  say "linked", "above" or "this page". Vary their openings; no more than one "Start with…" a page.
+- US spelling (practice, favor, apologize).
 
 ### Product facts to check copy against
 
