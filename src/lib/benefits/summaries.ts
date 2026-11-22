@@ -115,9 +115,12 @@ export function findBenefitSummary(slug: string): BenefitSummary | undefined {
   return BENEFIT_PAGES.find((page) => page.slug === slug)
 }
 
-/** Every page keeps its hero at this bucket key; the gallery uses it as the thumbnail. */
+/**
+ * Every page keeps its hero at this bucket key; the gallery uses it as the thumbnail.
+ * `?v=` busts CDN entries cached before an image was uploaded (bump it when replacing images).
+ */
 export function benefitHeroSrc(slug: string) {
-  return `/images/benefits/${slug}/hero.jpg`
+  return `/images/benefits/${slug}/hero.jpg?v=2`
 }
 
 export const INDEXED_BENEFIT_PAGES = BENEFIT_PAGES.filter((page) => page.indexed)

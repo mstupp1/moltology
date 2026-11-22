@@ -12,7 +12,7 @@ const page: BenefitPage = {
   indexed: false,
   updated: '2026-11-22',
   shareImage: {
-    src: '/images/benefits/strength/share.jpg',
+    src: '/images/benefits/strength/share.jpg?v=2',
     alt: 'A big black crab mid-deadlift in a dark gym with chalk in the air',
     width: 1200,
     height: 630,
@@ -65,7 +65,7 @@ const page: BenefitPage = {
       sub: 'Nobody gets strong in one session. Moltology is eight small reps for your head, every day, free. Show up, log it, come back tomorrow.',
       cta: 'Start training free',
       image: {
-        src: '/images/benefits/strength/hero.jpg',
+        src: '/images/benefits/strength/hero.jpg?v=2',
         alt: 'A big black crab gripping a loaded barbell mid-lift in a dark concrete gym',
         width: 1600,
         height: 1000,
@@ -95,7 +95,7 @@ const page: BenefitPage = {
       intro: 'No membership card, no shaker, no kit bag.',
       items: ['A phone or a laptop', 'A few minutes, eight times a day', 'Willingness to come back after a bad day'],
       image: {
-        src: '/images/benefits/strength/tape.jpg',
+        src: '/images/benefits/strength/tape.jpg?v=2',
         alt: 'The black crab on a locker room bench, wrapping tape around one claw before training',
         width: 1024,
         height: 1280,

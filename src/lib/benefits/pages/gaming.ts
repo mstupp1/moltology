@@ -12,7 +12,7 @@ const page: BenefitPage = {
   indexed: false,
   updated: '2026-11-22',
   shareImage: {
-    src: '/images/benefits/gaming/share.jpg',
+    src: '/images/benefits/gaming/share.jpg?v=2',
     alt: 'An armored orange lobster hero on a reef ledge under a neon night sky',
     width: 1200,
     height: 630,
@@ -65,7 +65,7 @@ const page: BenefitPage = {
       sub: 'Eight daily quests. XP that tracks what you actually did. A character that levels with you and a weekly board to climb. Free to play, no loot boxes.',
       cta: 'Play free',
       image: {
-        src: '/images/benefits/gaming/hero.jpg',
+        src: '/images/benefits/gaming/hero.jpg?v=2',
         alt: 'An orange lobster in glowing teal and orange armor on a reef ledge above a glowing underwater city',
         width: 1600,
         height: 1000,
@@ -105,7 +105,7 @@ const page: BenefitPage = {
         { name: 'Ranked', body: 'The weekly XP leaderboard. Resets every Monday.' },
       ],
       image: {
-        src: '/images/benefits/gaming/setup.jpg',
+        src: '/images/benefits/gaming/setup.jpg?v=2',
         alt: 'The lobster in a gaming chair with a controller, lit by a big monitor and neon strip lights',
         width: 1280,
         height: 960,

@@ -32,7 +32,7 @@ async function findImages(pages: BenefitPage[]): Promise<Set<string>> {
   await Promise.all(
     keys.map(async (src) => {
       try {
-        const response = await fetch(`${S3_BASE_URL}/${src.replace(/^\/+/, '')}`, { method: 'HEAD' })
+        const response = await fetch(`${S3_BASE_URL}/${src.replace(/^\/+/, '').split('?')[0]}`, { method: 'HEAD' })
         if (response.ok) found.add(src)
       } catch {
         // Offline: reported as missing below.

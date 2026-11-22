@@ -12,7 +12,7 @@ const page: BenefitPage = {
   indexed: false,
   updated: '2026-11-22',
   shareImage: {
-    src: '/images/benefits/automation/share.jpg',
+    src: '/images/benefits/automation/share.jpg?v=2',
     alt: 'A teal lobster floating among glowing glass panels linked like a workflow',
     width: 1200,
     height: 630,
@@ -67,7 +67,7 @@ const page: BenefitPage = {
       cta: 'Start building free',
       prompt: 'Plan tomorrow around one thing: shipping the draft.',
       image: {
-        src: '/images/benefits/automation/hero.jpg',
+        src: '/images/benefits/automation/hero.jpg?v=2',
         alt: 'A teal lobster floating calmly among glowing translucent panels joined by thin lines of light',
         width: 1600,
         height: 1000,

@@ -13,7 +13,7 @@ const page: BenefitPage = {
   updated: '2026-11-22',
   disclaimer: 'Moltology is not financial advice and does not hold, manage or invest money.',
   shareImage: {
-    src: '/images/benefits/investing/share.jpg',
+    src: '/images/benefits/investing/share.jpg?v=2',
     alt: 'A purple lobster watering a small tree with coin-shaped leaves',
     width: 1200,
     height: 630,
@@ -66,7 +66,7 @@ const page: BenefitPage = {
       sub: 'No minimums, no fees, no market hours. Moltology turns eight small actions a day into a habit that compounds quietly for years.',
       cta: 'Open a free account',
       image: {
-        src: '/images/benefits/investing/hero.jpg',
+        src: '/images/benefits/investing/hero.jpg?v=2',
         alt: 'A purple lobster patiently watering a small potted tree whose leaves are tiny coins',
         width: 1280,
         height: 960,

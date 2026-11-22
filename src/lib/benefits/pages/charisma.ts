@@ -12,7 +12,7 @@ const page: BenefitPage = {
   indexed: false,
   updated: '2026-11-22',
   shareImage: {
-    src: '/images/benefits/charisma/share.jpg',
+    src: '/images/benefits/charisma/share.jpg?v=2',
     alt: 'A coral crab on a big stage with a headset microphone, one claw raised',
     width: 1200,
     height: 630,
@@ -64,7 +64,7 @@ const page: BenefitPage = {
       sub: 'Forget power poses and scripts. The people you remember are calm, present and actually interested in you. Moltology trains those three things in eight small daily steps.',
       cta: 'Claim your free seat',
       image: {
-        src: '/images/benefits/charisma/hero.jpg',
+        src: '/images/benefits/charisma/hero.jpg?v=2',
         alt: 'A coral crab in a navy blazer on a big stage, wearing a headset microphone with one claw raised',
         width: 1024,
         height: 1280,

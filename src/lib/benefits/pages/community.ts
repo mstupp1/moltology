@@ -12,7 +12,7 @@ const page: BenefitPage = {
   indexed: false,
   updated: '2026-11-22',
   shareImage: {
-    src: '/images/benefits/community/share.jpg',
+    src: '/images/benefits/community/share.jpg?v=2',
     alt: 'A group of cartoon crabs laughing together around a beach bonfire at golden hour',
     width: 1200,
     height: 630,
@@ -64,7 +64,7 @@ const page: BenefitPage = {
       cta: 'Join free',
       chips: ['Daily practice', 'Kind replies', 'No follower counts', 'Free'],
       image: {
-        src: '/images/benefits/community/hero.jpg',
+        src: '/images/benefits/community/hero.jpg?v=2',
         alt: 'Cartoon crabs laughing around a beach bonfire at golden hour, one showing the others a phone',
         width: 1280,
         height: 960,

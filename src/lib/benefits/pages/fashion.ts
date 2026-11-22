@@ -12,7 +12,7 @@ const page: BenefitPage = {
   indexed: false,
   updated: '2026-11-22',
   shareImage: {
-    src: '/images/benefits/fashion/share.jpg',
+    src: '/images/benefits/fashion/share.jpg?v=2',
     alt: 'A lobster in a tailored charcoal coat posing in a pale studio',
     width: 1200,
     height: 630,
@@ -65,7 +65,7 @@ const page: BenefitPage = {
       sub: 'The best dressed person in the room is rarely the one in the newest coat. It is the one who looks settled in their own skin. Moltology is a free daily practice for exactly that.',
       cta: 'Join the collection, free',
       image: {
-        src: '/images/benefits/fashion/hero.jpg',
+        src: '/images/benefits/fashion/hero.jpg?v=2',
         alt: 'A crimson lobster in an oversized charcoal coat and black turtleneck, posing in a pale grey studio',
         width: 1024,
         height: 1280,
@@ -94,7 +94,7 @@ const page: BenefitPage = {
       quote: 'You can buy the coat in an afternoon. The way you stand in it takes practice.',
       credit: 'Look 05, Deep work, worn daily',
       image: {
-        src: '/images/benefits/fashion/look.jpg',
+        src: '/images/benefits/fashion/look.jpg?v=2',
         alt: 'The lobster walking across a sunlit plaza in a cream trench coat and dark sunglasses',
         width: 1024,
         height: 1280,
