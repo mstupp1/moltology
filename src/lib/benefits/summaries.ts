@@ -327,6 +327,22 @@ export const BENEFIT_PAGES: BenefitSummary[] = [
     indexed: false,
     updated: '2026-11-22',
   },
+  {
+    slug: 'gamification',
+    topic: 'Gamification',
+    kit: 'arcade',
+    blurb: 'A habit app with XP, streaks, stages and a weekly board.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'technique',
+    topic: 'Technique',
+    kit: 'arcade',
+    blurb: 'Focus rounds, deep work and a set-up ritual, scored daily.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
 ]
 
 export const BENEFITS_HUB_PATH = '/benefits'
