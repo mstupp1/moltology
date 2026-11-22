@@ -12,6 +12,13 @@ const KITS = {
   clinic: lazy(() => import('./kits/clinic/ClinicKit')),
   can: lazy(() => import('./kits/can/CanKit')),
   retreat: lazy(() => import('./kits/retreat/RetreatKit')),
+  atelier: lazy(() => import('./kits/atelier/AtelierKit')),
+  ledger: lazy(() => import('./kits/ledger/LedgerKit')),
+  locker: lazy(() => import('./kits/locker/LockerKit')),
+  platform: lazy(() => import('./kits/platform/PlatformKit')),
+  arcade: lazy(() => import('./kits/arcade/ArcadeKit')),
+  seminar: lazy(() => import('./kits/seminar/SeminarKit')),
+  network: lazy(() => import('./kits/network/NetworkKit')),
 } satisfies Record<BenefitPage['kit'], React.LazyExoticComponent<React.ComponentType<BenefitKitProps>>>
 
 /**

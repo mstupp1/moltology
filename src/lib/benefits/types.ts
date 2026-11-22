@@ -6,7 +6,17 @@
 import type { FaqItem } from '@/lib/seo'
 
 /** The industry costumes. Each has its own components and CSS in src/components/benefits/kits/. */
-export type BenefitKit = 'clinic' | 'can' | 'retreat'
+export type BenefitKit =
+  | 'clinic'
+  | 'can'
+  | 'retreat'
+  | 'atelier'
+  | 'ledger'
+  | 'locker'
+  | 'platform'
+  | 'arcade'
+  | 'seminar'
+  | 'network'
 
 export interface BenefitImage {
   /** Site path under /images/benefits/<slug>/. */
@@ -113,10 +123,117 @@ export interface RetreatContent {
   carry: { title: string; items: string[]; image: BenefitImage }
 }
 
+// ---------------------------------------------------------------------------
+// Atelier: fashion houses and editorial lookbooks
+// ---------------------------------------------------------------------------
+
+export interface AtelierContent {
+  hero: { season: string; headline: string; sub: string; cta: string; image: BenefitImage }
+  manifesto: string[]
+  /** The eight daily tasks as numbered looks. */
+  lookbook: { title: string; intro: string; items: { name: string; note: string }[] }
+  campaign: { quote: string; credit: string; image: BenefitImage }
+  care: { title: string; rows: { label: string; value: string }[]; footnote: string }
+}
+
+// ---------------------------------------------------------------------------
+// Ledger: fintech and investing apps
+// ---------------------------------------------------------------------------
+
+export interface LedgerContent {
+  hero: {
+    eyebrow: string
+    headline: string
+    sub: string
+    cta: string
+    image: BenefitImage
+    /** The app card over the hero image: a practice "balance" and its chart. */
+    card: { label: string; value: string; change: string; points: number[] }
+  }
+  compound: { title: string; intro: string; rows: { label: string; value: string; note: string }[] }
+  features: { title: string; items: { title: string; body: string }[] }
+  statement: { title: string; intro: string; rows: { when: string; label: string; amount: string }[] }
+}
+
+// ---------------------------------------------------------------------------
+// Locker room: sportswear and training brands
+// ---------------------------------------------------------------------------
+
+export interface LockerContent {
+  hero: { tag: string; headline: string; sub: string; cta: string; image: BenefitImage }
+  stats: { value: string; label: string }[]
+  program: { title: string; intro: string; items: { set: string; title: string; body: string }[] }
+  gear: { title: string; intro: string; items: string[]; image: BenefitImage }
+  creed: string
+}
+
+// ---------------------------------------------------------------------------
+// Platform: AI software launches
+// ---------------------------------------------------------------------------
+
+export interface PlatformContent {
+  hero: { badge: string; headline: string; sub: string; cta: string; prompt: string; image: BenefitImage }
+  features: { title: string; intro: string; items: { title: string; body: string }[] }
+  workflow: { title: string; intro: string; steps: { when: string; then: string }[] }
+  config: { title: string; body: string; filename: string; lines: string[] }
+  plans: { title: string; items: { name: string; price: string; body: string; items: string[]; href?: string }[] }
+}
+
+// ---------------------------------------------------------------------------
+// Arcade: video game launches
+// ---------------------------------------------------------------------------
+
+export interface ArcadeContent {
+  hero: { tag: string; headline: string; sub: string; cta: string; image: BenefitImage }
+  stats: { title: string; intro: string; items: { code: string; label: string; body: string; value: number }[] }
+  quests: { title: string; intro: string; items: { title: string; body: string; reward: string }[] }
+  modes: { title: string; items: { name: string; body: string }[]; image: BenefitImage }
+  patch: { title: string; version: string; items: string[] }
+}
+
+// ---------------------------------------------------------------------------
+// Seminar: self-help books and live events
+// ---------------------------------------------------------------------------
+
+export interface SeminarContent {
+  hero: {
+    kicker: string
+    headline: string
+    sub: string
+    cta: string
+    image: BenefitImage
+    book: { title: string; subtitle: string; author: string }
+  }
+  promise: { title: string; items: string[] }
+  chapters: { title: string; items: { title: string; body: string }[] }
+  passage: { quote: string; source: BenefitLink }
+  agenda: { title: string; intro: string; items: { time: string; title: string }[] }
+}
+
+// ---------------------------------------------------------------------------
+// Network: social apps
+// ---------------------------------------------------------------------------
+
+export interface NetworkContent {
+  hero: { headline: string; sub: string; cta: string; chips: string[]; image: BenefitImage }
+  /** Sample posts in the hero phone, by the cast characters. */
+  feed: { name: string; handle: string; text: string; tag: string }[]
+  features: { title: string; items: { title: string; body: string }[] }
+  rooms: { title: string; intro: string; items: { name: string; body: string }[] }
+  norms: { title: string; items: string[] }
+}
+
 export type BenefitPage =
   | (BenefitPageBase & { kit: 'clinic'; content: ClinicContent })
   | (BenefitPageBase & { kit: 'can'; content: CanContent })
   | (BenefitPageBase & { kit: 'retreat'; content: RetreatContent })
+  | (BenefitPageBase & { kit: 'atelier'; content: AtelierContent })
+  | (BenefitPageBase & { kit: 'ledger'; content: LedgerContent })
+  | (BenefitPageBase & { kit: 'locker'; content: LockerContent })
+  | (BenefitPageBase & { kit: 'platform'; content: PlatformContent })
+  | (BenefitPageBase & { kit: 'arcade'; content: ArcadeContent })
+  | (BenefitPageBase & { kit: 'seminar'; content: SeminarContent })
+  | (BenefitPageBase & { kit: 'network'; content: NetworkContent })
 
 /** The light listing used by the hub, the sitemap and related links. */
 export interface BenefitSummary {
