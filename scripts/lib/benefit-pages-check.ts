@@ -138,6 +138,7 @@ export function checkBenefitPages(
 
   const sentenceOwners = new Map<string, string>()
   const hookOwners = new Map<string, string>()
+  const ctaOwners = new Map<string, string>()
   const faqShapes = new Map<string, Set<string>>()
   const revealShapes = new Map<number, string[]>()
 
@@ -200,6 +201,15 @@ export function checkBenefitPages(
       else if (!summarySlugs.has(related)) add(slug, 'related', `Related page "${related}" does not exist`)
     }
 
+    if (/^(this|the)\s+(codex\s+)?(verse|passage|scripture|reading)\b[^.]*\basks\b/i.test(page.hook.text)) {
+      add(slug, 'hook-voice', 'Hook text opens with "This verse asks you to…"; state the passage\'s rule in its own words')
+    }
+    const cta = 'hero' in page.content && 'cta' in page.content.hero ? String(page.content.hero.cta) : ''
+    if (cta) {
+      const ctaOwner = ctaOwners.get(cta)
+      if (ctaOwner) add(slug, 'cta-repeat', `Hero CTA "${cta}" is already used by ${ctaOwner}`, 'warning')
+      else ctaOwners.set(cta, slug)
+    }
     if (!page.hook.href.startsWith('/')) add(slug, 'hook', 'The Moltology hook must link to a page on the site')
     if (SENSITIVE_TOPICS.has(slug) && !page.disclaimer) add(slug, 'disclaimer', 'Health and money topics need a disclaimer line')
 

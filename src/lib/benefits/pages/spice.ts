@@ -65,7 +65,7 @@ const page: BenefitPage = {
       sticker: 'Now with extra curiosity',
       headline: 'Spice up your life. Retire the reruns.',
       sub: 'Same feed. Same saved videos. That sketchbook still in its wrapper. Pick something difficult and have a go. Open the book, ask the beginner question and put a little unfamiliar on the menu.',
-      cta: 'Join the daily practice',
+      cta: 'Add some heat, free',
       image: {
         src: '/images/benefits/spice/hero.jpg?v=2',
         alt: 'A glossy red crab showing an open sketchbook against vivid yellow in a bold snack advertisement',

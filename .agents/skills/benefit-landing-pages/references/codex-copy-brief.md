@@ -35,7 +35,7 @@ Copy rules that reviewers keep catching:
 - Grids: if a kit renders items in a grid, use counts that fill rows (match the existing page's counts unless the existing page shows otherwise).
 - Every page must differ from its siblings: different hero headline shape, different FAQ openings, different section titles where the type allows free text.
 
-Do NOT edit summaries.ts (rows are already there), kits, components, types, the checker, or any existing page. Only create your new page files.
+Do not commit or push; leave the changes in the working tree. Do NOT edit summaries.ts (rows are already there), kits, components, types, the checker, or any existing page. Only create your new page files.
 
 When done, run: npm run benefits:check -- --no-images
 Other kits' pages are being written at the same time, so ignore [missing-page] errors for slugs that are not yours and any errors on pages you did not write. Every rule on YOUR pages must pass (including duplicate-copy against existing pages). Then run: npx tsc --noEmit -p . 2>&1 | grep benefits  (it must print nothing for your files). Fix and re-run until clean. Finish with a short list of the files you created.

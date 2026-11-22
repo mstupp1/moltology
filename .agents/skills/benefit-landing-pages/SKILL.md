@@ -127,6 +127,12 @@ Design calls stay with Claude; filling pages inside a finished kit can go to Cod
 - FAQ answers lead with the answer (yes, no, a number, a definition, the first action) and never
   say "linked", "above" or "this page". Vary their openings; no more than one "Start with…" a page.
 - US spelling (practice, favor, apologize).
+- Hook text states the passage's rule in its own words ("Torque belongs on your work, never on
+  winning an argument"), never "This verse asks you to…".
+- In a batch, give every hero headline and CTA its own shape: "X. Start with Y." on three pages
+  reads as a template. Sample stats on sibling pages use different numbers.
+- Plan cards (platform kit) are short product nouns ("Higher Oracle limits", "Everything in Free"),
+  never reassurances ("Continued access to…", "stays included").
 
 ### Product facts to check copy against
 
