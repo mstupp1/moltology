@@ -57,7 +57,7 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
       <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-14 sm:pt-20 pb-16 sm:pb-24">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center">
           <div>
-            <p className="text-2xs font-medium uppercase tracking-[0.08em] text-ink-muted">Under the shell</p>
+            <p className="eyebrow">Under the shell</p>
             <h2 id="molt-reveal-title" className="mt-4 font-grotesk text-2xl sm:text-4xl font-semibold tracking-tight text-ink">
               {page.reveal.headline}
             </h2>
@@ -97,7 +97,7 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
 
         <div className="mt-14 grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <div className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-6">
-            <p className="text-2xs font-medium uppercase tracking-[0.08em] text-ink-muted">Where this comes from</p>
+            <p className="eyebrow">Where this comes from</p>
             <a
               href={page.hook.href}
               className="mt-3 inline-flex items-center gap-2 text-md font-medium text-ink hover:text-cyan-glow transition-colors"
@@ -108,7 +108,7 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
             <p className="mt-2 text-sm leading-relaxed text-ink-body">{page.hook.text}</p>
           </div>
           <nav aria-label="More benefits" className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-6">
-            <p className="text-2xs font-medium uppercase tracking-[0.08em] text-ink-muted">More benefits</p>
+            <p className="eyebrow">More benefits</p>
             <ul className="mt-3 divide-y divide-line-subtle">
               {related.map((item) => (
                 <li key={item.slug}>

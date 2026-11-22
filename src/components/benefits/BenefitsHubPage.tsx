@@ -24,7 +24,7 @@ export function BenefitsHubPage() {
           }}
         />
         <main className="flex-1 mx-auto w-full max-w-6xl px-4 sm:px-6 pt-28 sm:pt-36 pb-20">
-          <p className="text-2xs font-medium uppercase tracking-[0.08em] text-ink-muted">Benefits</p>
+          <p className="eyebrow">Benefits</p>
           <h1 className="mt-4 font-grotesk text-3xl sm:text-5xl font-semibold tracking-tight text-ink max-w-3xl">
             What a daily practice can do for you
           </h1>
