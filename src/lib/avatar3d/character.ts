@@ -12,7 +12,7 @@ import { bakeOcclusion, prepareBake, type BakeOptions } from './bake'
 import { BODY, bodySpheres, SWINGS, type BodySphere } from './collide'
 import { buildOccluders, buildSprings, type Spring } from './flex'
 import { bakeWorkPos, buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
-import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, legTap, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
+import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, jump, legTap, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
 import { blendMouth, LIP_TUBE, MOUTH_HOLE, MOUTH_PARAMS, mouthParams, type MouthParams, type MouthShape } from './mouth-shapes'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
@@ -70,6 +70,10 @@ const Yaxis = new Vector3(0, 1, 0)
 const LEG_UP = 1
 /** How long a middle leg's lift-and-tap fidget takes, in seconds. */
 const LEG_TAP_SECONDS = 0.9
+/** How far the ankle rises per radian the foot rolls onto its toes, as a share of the shin. */
+const TOE_REACH = 0.45
+/** How far the toes point down, in radians, at the push off of a jump. */
+const JUMP_TOE = 0.22
 
 export interface Character3D {
   root: Group
@@ -366,11 +370,16 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const twistQ = new Quaternion()
   const footQ = new Quaternion()
   /** `twist` turns where the foot stands (and the way it points) round the character's middle. */
-  const solveLeg = (leg: (typeof legs)[number], offset: Vector3, lift: number, twist = 0) => {
+  const toeQ = new Quaternion()
+  /**
+   * `toe` (radians) rolls the foot up onto its toes: the heel lifts, the ankle rises with it and the
+   * toes stay on the ground, as in a step or a push off.
+   */
+  const solveLeg = (leg: (typeof legs)[number], offset: Vector3, lift: number, twist = 0, toe = 0) => {
     hipAt.copy(leg.thigh.position).applyQuaternion(pelvisBone.quaternion).add(pelvisBone.position)
     twistQ.setFromAxisAngle(Yaxis, twist)
     reach.copy(leg.ankle).applyQuaternion(twistQ).add(offset)
-    reach.y += lift
+    reach.y += lift + Math.sin(Math.max(toe, 0)) * leg.lower * TOE_REACH
     reach.sub(hipAt)
     const far = reach.length()
     const d = Math.min(Math.max(far, Math.abs(leg.upper - leg.lower) + 1e-4), leg.upper + leg.lower - 1e-4)
@@ -387,7 +396,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     shinQ.copy(aimQuaternion(ankleAt.clone().sub(kneeAt)))
     leg.thigh.quaternion.copy(inv.copy(pelvisBone.quaternion).invert()).multiply(thighQ)
     leg.shin.quaternion.copy(inv.copy(thighQ).invert()).multiply(shinQ)
-    leg.foot.quaternion.copy(inv.copy(shinQ).invert()).multiply(footQ.copy(twistQ).multiply(leg.footQ))
+    toeQ.setFromAxisAngle(X, -toe)
+    leg.foot.quaternion.copy(inv.copy(shinQ).invert()).multiply(footQ.copy(twistQ).multiply(toeQ).multiply(leg.footQ))
   }
 
   // Loose parts lag behind the body and spring back: each antenna link by link, the tail fan,
@@ -744,6 +754,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     if (transition && transition.start === null) transition.start = time
     const progress = transition && idle ? (time - transition.start!) / POSE_SECONDS : 1
     const e = poseEase(progress)
+    // Extra lift of each foot, as a step during a pose change.
+    let stepL = 0
+    let stepR = 0
     for (const [name, target] of targets) {
       const c = current.get(name)!
       const from = transition?.from.get(name)
@@ -758,8 +771,25 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     const mix = progress < 1 ? e : 1
     extra.drop = was.drop + (extraTarget.drop - was.drop) * mix
     extra.shift = was.shift + (extraTarget.shift - was.shift) * mix
-    extra.footL.lerpVectors(was.footL, extraTarget.footL, mix)
-    extra.footR.lerpVectors(was.footR, extraTarget.footR, mix)
+    // A foot that moves to a new spot lifts and steps there, one foot after the other, instead of
+    // sliding across the floor.
+    if (progress < 1 && transition) {
+      const stepOf = (from: Vector3, to: Vector3, at: Vector3, start: number) => {
+        const d = from.distanceTo(to)
+        if (d < 1e-4) {
+          at.copy(to)
+          return 0
+        }
+        const s = Math.min(Math.max((progress - start) / 0.5, 0), 1)
+        at.lerpVectors(from, to, s * s * (3 - 2 * s))
+        return arc(s) * Math.min(0.5 * d + 0.03 * legLength, 0.16 * legLength)
+      }
+      stepL = stepOf(was.footL, extraTarget.footL, extra.footL, 0.05)
+      stepR = stepOf(was.footR, extraTarget.footR, extra.footR, 0.3)
+    } else {
+      extra.footL.copy(extraTarget.footL)
+      extra.footR.copy(extraTarget.footR)
+    }
     extra.eyes[0] = was.eyes[0] + (extraTarget.eyes[0] - was.eyes[0]) * mix
     extra.eyes[1] = was.eyes[1] + (extraTarget.eyes[1] - was.eyes[1]) * mix
     if (!idle || progress >= 1 + MAX_LAG / POSE_SECONDS) transition = null
@@ -770,6 +800,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     let dx = extra.shift
     let dy = -extra.drop * legLength
     let lift = 0
+    // Rolled up onto the toes (radians), as in a push off.
+    let toe = 0
     let eyeYaw = extra.eyes[0]
     let eyePitch = extra.eyes[1]
     // How open the mouth is (0 shut), how round, how far the brows rise and knit, how squashed the eyes are.
@@ -898,9 +930,12 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           reaction = null
         } else if (reaction.kind === 'poke') {
           // A flinch: duck, jump, eyes wide, claws out, antennae shaking.
-          const up = p < 0.2 ? -0.05 * arc(p / 0.2) : 0.1 * arc((p - 0.2) / 0.55)
-          dy += Math.min(up, 0) * legLength + Math.max(up, 0)
-          lift = Math.max(up, 0)
+          // A startled little jump: a quick crouch, up off the toes, feet snatched in, a soft landing.
+          const j = jump(p / 0.9, 0.09 / legLength, 0.12)
+          dy += j.body * legLength
+          lift = j.feet * legLength
+          toe = j.toe * JUMP_TOE
+          overlay('chest', X, 0.12 * j.lean)
           wide = arc(Math.min(p * 1.6, 1))
           closed = 0
           // A gasp: round open mouth, brows up.
@@ -943,10 +978,14 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           browUp += 0.012 * arc(p)
           for (const [tag, s] of [['L', 1], ['R', -1]] as const) overlay(`arm${tag}`, Zaxis, s * 0.12 * arc(p))
         } else {
-          // Celebrate: claws up and two hops.
-          const up = 0.1 * hops(p, 2)
-          dy += up
-          lift = up
+          // Celebrate: claws up and two jumps.
+          // Two real jumps: crouch, spring off the toes, tuck, land on bent knees.
+          const j = jump((p * 2) % 1, 0.11 / legLength)
+          dy += j.body * legLength
+          lift = j.feet * legLength
+          toe = j.toe * JUMP_TOE
+          overlay('chest', X, 0.14 * j.lean)
+          for (const [tag, s] of [['L', 1], ['R', -1]] as const) overlay(`arm${tag}`, Zaxis, s * 0.18 * j.lean)
           overlay('tail', X, Math.sin(p * 22) * 0.2)
           // A big open cheer, held for most of it, with happy eyes: lids up, cheeks pushing the
           // lower lids into a smile.
@@ -1091,7 +1130,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         } else {
           const s = p * p * (3 - 2 * p)
           f.yaw = f.step.from + wrap(f.step.to - f.step.from) * s
-          raise = arc(p) * 0.06 * legLength
+          raise = arc(p) * 0.1 * legLength
         }
       } else {
         const behind = wrap(turned - f.yaw)
@@ -1099,7 +1138,10 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         if (Math.abs(behind) > 1.1) f.yaw = wrap(turned - Math.sign(behind) * 1.1)
         if (Math.abs(behind) > STEP_AFTER && !other.step) f.step = { from: f.yaw, to: turned + Math.sign(behind) * 0.08, start: time }
       }
-      solveLeg(leg, leg.tag === 'L' ? extra.footL : extra.footR, lift + raise, wrap(f.yaw - turned))
+      const step = leg.tag === 'L' ? stepL : stepR
+      // A stepping foot peels off heel first and sets down flat.
+      const peel = (raise + step) / legLength
+      solveLeg(leg, leg.tag === 'L' ? extra.footL : extra.footR, lift + raise + step, wrap(f.yaw - turned), toe + Math.min(peel * 3, 0.35))
     }
     if (eyeYaw || eyePitch) {
       for (const tag of ['L', 'R'] as const) {

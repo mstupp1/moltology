@@ -104,3 +104,53 @@ export function legTap(p: number): number {
 export const arc = (p: number) => Math.sin(Math.min(Math.max(p, 0), 1) * Math.PI)
 /** A hop: up and down again `count` times over p in 0..1. */
 export const hops = (p: number, count: number) => Math.abs(Math.sin(Math.min(Math.max(p, 0), 1) * Math.PI * count))
+
+/** One jump's shape, all in leg lengths: how high the hips are, how high the feet are, how far the toes point down (0..1) and how far the chest leans in (0..1). */
+export interface Jump {
+  body: number
+  feet: number
+  toe: number
+  lean: number
+}
+
+const smooth = (x: number) => {
+  const c = Math.min(Math.max(x, 0), 1)
+  return c * c * (3 - 2 * c)
+}
+
+/**
+ * A jump over q in 0..1, the way a body really does one: it sinks into a crouch, drives up
+ * through the knees and rolls off the toes, tucks its feet in the air, lands toes first and
+ * soaks the landing up in the knees before standing tall again. `height` is the rise of the
+ * hips at the top and `squat` how deep the crouch goes, both in leg lengths.
+ */
+export function jump(q: number, height: number, squat = 0.16): Jump {
+  const out: Jump = { body: 0, feet: 0, toe: 0, lean: 0 }
+  if (q <= 0 || q >= 1) return out
+  // The hips rise this far over standing before the feet leave the ground (legs straight, on the toes).
+  const reach = 0.05
+  if (q < 0.22) {
+    const s = smooth(q / 0.22)
+    out.body = -squat * s
+    out.lean = s
+  } else if (q < 0.32) {
+    const s = (q - 0.22) / 0.1
+    out.body = -squat + (squat + reach) * s * s * (2 - s)
+    out.toe = smooth(s)
+    out.lean = 1 - s
+  } else if (q < 0.7) {
+    const t = (q - 0.32) / 0.38
+    out.body = reach + height * 4 * t * (1 - t)
+    // In the air the feet tuck up under the body, and come down again for the landing.
+    out.feet = out.body - reach + 0.6 * squat * Math.sin(t * Math.PI) ** 1.5
+    out.toe = 1 - 0.7 * smooth(t * 1.2)
+  } else {
+    const t = (q - 0.7) / 0.3
+    out.toe = 0.3 * (1 - smooth(t * 4))
+    // Toes first, then the knees give and spring back up with a little overshoot.
+    if (t < 0.28) out.body = reach - (reach + squat * 0.8) * smooth(t / 0.28)
+    else out.body = -squat * 0.8 * (1 - smooth((t - 0.28) / 0.72)) * (1 + 0.15 * Math.sin(((t - 0.28) / 0.72) * Math.PI))
+    out.lean = Math.max(0, -out.body / squat)
+  }
+  return out
+}
