@@ -103,6 +103,38 @@ export const BENEFIT_PAGES: BenefitSummary[] = [
     indexed: false,
     updated: '2026-11-22',
   },
+  {
+    slug: 'hardness',
+    topic: 'Hardness',
+    kit: 'clinic',
+    blurb: 'A short assessment and a daily plan for a thicker skin.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'focus',
+    topic: 'Focus',
+    kit: 'clinic',
+    blurb: 'One block of deep work a day, set up so the phone loses.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'clarity',
+    topic: 'Clarity',
+    kit: 'clinic',
+    blurb: 'Quiet mornings and fewer inputs for a head that feels foggy.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'intelligence',
+    topic: 'Intelligence',
+    kit: 'clinic',
+    blurb: 'Learn one hard thing a day and keep a record of it.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
 ]
 
 export const BENEFITS_HUB_PATH = '/benefits'
