@@ -49,6 +49,27 @@ describe('bendy parts and springs', () => {
     expect(settled.distanceTo(tip())).toBeLessThan(0.08)
     c.dispose()
   })
+
+  it('flicks the loose parts when a reaction starts, and they settle again', () => {
+    const c = buildCharacter(baselineLook('lobster'))
+    const tip = () => c.rig.bone('antennaL3').getWorldPosition(new Vector3())
+    for (let t = 0; t < 60; t++) c.update(1 / 60, t / 60, true)
+    const calm = tip()
+    c.react('poke')
+    let furthest = 0
+    for (let t = 60; t < 90; t++) {
+      c.update(1 / 60, t / 60, true)
+      furthest = Math.max(furthest, tip().distanceTo(calm))
+    }
+    // The poke throws the tip well off where it was.
+    expect(furthest).toBeGreaterThan(0.03)
+    for (let t = 90; t < 300; t++) c.update(1 / 60, t / 60, true)
+    c.root.updateMatrixWorld(true)
+    const settled = tip()
+    c.update(0, 300 / 60, false)
+    expect(settled.distanceTo(tip())).toBeLessThan(0.08)
+    c.dispose()
+  })
 })
 
 describe('detail pass', () => {

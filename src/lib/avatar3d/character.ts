@@ -33,13 +33,19 @@ const lagOf = (name: string) => LAGS.find(([test]) => test.test(name))?.[1] ?? 0
 const STEP_SECONDS = 0.26
 /** How far the body turns past its feet before one of them steps round. */
 const STEP_AFTER = 0.32
-/** Springs for each link of an antenna, base to tip: looser toward the tip. */
+/**
+ * Springs for each link of an antenna, base to tip: looser toward the tip, damped lightly enough
+ * that it wobbles a couple of times before it settles. `kick` is how hard a flick moves it.
+ */
 const ANTENNA_SPRINGS = [
-  { stiffness: 120, damping: 11, limit: 0.3 },
-  { stiffness: 95, damping: 9, limit: 0.4 },
-  { stiffness: 80, damping: 8, limit: 0.45 },
-  { stiffness: 65, damping: 7, limit: 0.5 },
+  { stiffness: 112, damping: 8.5, limit: 0.33, kick: 0.3 },
+  { stiffness: 88, damping: 6.8, limit: 0.45, kick: 0.45 },
+  { stiffness: 72, damping: 5.9, limit: 0.53, kick: 0.55 },
+  { stiffness: 58, damping: 5, limit: 0.6, kick: 0.6 },
 ]
+/** The flick loose parts get as a pose change lands, and how hard each reaction flicks them. */
+const POSE_KICK = 0.6
+const REACTION_KICK: Record<Reaction, number> = { poke: 1.3, equip: 0.7, snap: 0.35, celebrate: 0.5 }
 
 /**
  * Timing for a pose change: a slight pull back the other way, then a move that runs a little
@@ -400,16 +406,23 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       springs.push({ node: rig.bone(name), tip, ...ANTENNA_SPRINGS[Math.min(k, ANTENNA_SPRINGS.length - 1)] })
     })
   }
-  if (rig.bones.has('tail')) springs.push({ node: rig.bone('tail'), tip: new Vector3(0, -0.3, 0), stiffness: 120, damping: 12, limit: 0.3 })
+  if (rig.bones.has('tail')) springs.push({ node: rig.bone('tail'), tip: new Vector3(0, -0.3, 0), stiffness: 115, damping: 9, limit: 0.32, kick: 0.3 })
+  // Each tail-fan plate flicks on its own, the outer ones loosest.
+  TAIL_FAN.forEach((_, i) => {
+    const name = `tailFan${i}`
+    if (!rig.bones.has(name)) return
+    const outer = Math.abs(i - (TAIL_FAN.length - 1) / 2) / 2
+    springs.push({ node: rig.bone(name), tip: new Vector3(0, -0.2, 0), stiffness: 150 - 40 * outer, damping: 8 - 2 * outer, limit: 0.26, kick: 0.5 })
+  })
   for (const tag of ['L', 'R'] as const) {
     const grip = rig.sockets.get(`claw${tag}`)
-    if (grip) springs.push({ node: rig.bone(`claw${tag}`), tip: grip.node.position.clone(), stiffness: 210, damping: 19, limit: 0.16 })
+    if (grip) springs.push({ node: rig.bone(`claw${tag}`), tip: grip.node.position.clone(), stiffness: 200, damping: 15, limit: 0.18, kick: 0.15 })
   }
   for (const name of ['head', 'ears']) {
     const socket = rig.sockets.get(name)
     if (!socket?.node.children.length) continue
     sockets.push({ node: socket.node, rest: socket.node.quaternion.clone() })
-    springs.push({ node: socket.node, tip: new Vector3(0, Math.max(socket.radius, 0.12), 0), stiffness: 170, damping: 13, limit: 0.14 })
+    springs.push({ node: socket.node, tip: new Vector3(0, Math.max(socket.radius, 0.12), 0), stiffness: 160, damping: 9.5, limit: 0.17, kick: 0.3 })
   }
   const spring = buildSprings(springs)
   // Where each foot is planted, as a turn of the whole character, and the step it is taking.
@@ -511,6 +524,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   const eyesNow = { yaw: 0, pitch: 0 }
   let pointer: { x: number; y: number } | null = null
   let reaction: { kind: Reaction; start: number | null; side: 1 | -1 } | null = null
+  /** Seconds until loose parts get a flick (a pose change lands), or -1 for none. */
+  let kickLater = -1
+  const kickAt = new Vector3()
   /** The pose to go back to once a reaction that borrows another pose is over. */
   let held: AvatarPose | null = null
   /** Speech level from a scripted voice track (0 silent, 1 loudest), and the mouth shape for it. */
@@ -529,6 +545,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     targets = poseTargets(rig, POSES[next])
     extraTarget = poseExtras(POSES[next])
     if (!immediate) {
+      kickLater = 0.12
       const from = new Map<string, Quaternion>()
       for (const [name, c] of current) from.set(name, c.clone())
       transition = { from, extra: { drop: extra.drop, shift: extra.shift, footL: extra.footL.clone(), footR: extra.footR.clone(), eyes: [...extra.eyes] }, start: null }
@@ -868,7 +885,12 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       let bright = 0
 
       if (reaction) {
-        if (reaction.start === null) reaction.start = time
+        if (reaction.start === null) {
+          reaction.start = time
+          // Loose parts get flicked as it starts, toward the side it reacts to.
+          const k = REACTION_KICK[reaction.kind]
+          spring.kick(kickAt.set(reaction.side * 0.7 * k, -0.6 * k, 0.5 * k))
+        }
         const p = (time - reaction.start) / REACTION_SECONDS[reaction.kind]
         if (p >= 1) {
           if (held) aimPose(held)
@@ -1084,6 +1106,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         overlay(`eye${tag}`, Yaxis, (eyeYaw * Math.PI) / 180)
         overlay(`eye${tag}`, X, (eyePitch * Math.PI) / 180)
       }
+    }
+    if (kickLater >= 0) {
+      kickLater -= dt
+      // A little down and to one side, varying from one pose change to the next.
+      if (kickLater < 0) spring.kick(kickAt.set(Math.sin(time * 7.3) * 0.6, -1.1, 0.4).multiplyScalar(POSE_KICK))
     }
     spring.update(dt, idle)
     rig.root.updateMatrixWorld(true)

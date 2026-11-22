@@ -7,6 +7,10 @@
  *
  * Each lobe carries the same total light as the directional light it stands for, so diffuse
  * shading matches; highlights from it are softer, like a large softbox.
+ *
+ * On top of the lobes sit a few hard-edged studio panels (a key softbox, a rim strip and a low
+ * card). They add little light, but glossy coats, eyes and visors reflect them as crisp windows
+ * and lines instead of soft blobs, which is most of what reads as a studio product shot.
  */
 import { DataTexture, DataUtils, EquirectangularReflectionMapping, HalfFloatType, LinearFilter, LinearSRGBColorSpace, RGBAFormat, Color, Vector3 } from 'three'
 import { ROOM_ENV, ROOM_ENV_RGBE } from './room-env'
@@ -22,6 +26,35 @@ interface Lobe {
   /** Higher is a tighter lobe (12 is about 25 degrees across). */
   sharpness: number
 }
+
+/** A flat, hard-edged studio panel, seen from the character. */
+interface Panel {
+  /** Where the panel's centre is (towards it). */
+  from: [number, number, number]
+  /** Half its width and height, as the tangent of the angle from its centre. */
+  w: number
+  h: number
+  /** How soft its edges are, in the same units. */
+  edge: number
+  /** Its radiance, linear RGB. */
+  rgb: [number, number, number]
+}
+
+/** The studio panels every lighting shares. */
+const PANELS: Panel[] = [
+  // The key's softbox, up and to the front right: a tall window on every clear coat.
+  { from: [2.2, 3.4, 4.4], w: 0.32, h: 0.42, edge: 0.06, rgb: [9, 8.6, 8.1] },
+  // A thin strip behind on the left that draws a sharp line down the edges.
+  { from: [-3.4, 1.2, -2.2], w: 0.05, h: 0.75, edge: 0.03, rgb: [5, 6.8, 8] },
+  // A low warm card at the front for a small catch along the lower curves.
+  { from: [-0.8, -0.6, 4.6], w: 0.45, h: 0.06, edge: 0.04, rgb: [1.6, 1.2, 1.1] },
+]
+
+/**
+ * The live key light is dimmed by this much: the key softbox panel now carries part of its
+ * light, so the overall brightness stays about where it was.
+ */
+export const KEY_WITH_PANELS = 0.8
 
 interface LightRecipe {
   /** How much of the captured room shows (what scene.environmentIntensity was). */
@@ -57,8 +90,9 @@ export const LIGHT_RECIPES: Record<StageLighting, LightRecipe> = {
   },
 }
 
-const WIDTH = 256
-const HEIGHT = 128
+// 512 wide makes PMREM's sharpest level a 128 cube face (256 made it 64), so the panels stay crisp.
+const WIDTH = 512
+const HEIGHT = 256
 
 let room: Float32Array | null = null
 
@@ -100,7 +134,7 @@ function sampleRoom(u: number, v: number, out: number[]): void {
 const built = new Map<StageLighting, Uint16Array>()
 
 /**
- * The baked light as an equirectangular half-float picture (256x128, laid out the way three
+ * The baked light as an equirectangular half-float picture (512x256, laid out the way three
  * reads equirectangular maps). The pixels are made once per lighting and shared by every stage.
  */
 export function bakedLightTexture(lighting: StageLighting): DataTexture {
@@ -115,6 +149,15 @@ export function bakedLightTexture(lighting: StageLighting): DataTexture {
       rgb: new Color(l.color).multiplyScalar((l.intensity * l.sharpness) / (2 * Math.PI * (1 - Math.exp(-2 * l.sharpness)))),
       sharpness: l.sharpness,
     }))
+    const panels = PANELS.map((p) => {
+      const c = new Vector3(...p.from).normalize()
+      const right = new Vector3(0, 1, 0).cross(c).normalize()
+      return { ...p, c, right, up: c.clone().cross(right).normalize() }
+    })
+    const fill = (x: number) => {
+      const t = Math.min(1, Math.max(0, x))
+      return t * t * (3 - 2 * t)
+    }
     data = new Uint16Array(WIDTH * HEIGHT * 4)
     const px = [0, 0, 0]
     const d = new Vector3()
@@ -140,6 +183,18 @@ export function bakedLightTexture(lighting: StageLighting): DataTexture {
           r += l.rgb.r * k
           g += l.rgb.g * k
           b += l.rgb.b * k
+        }
+        for (const p of panels) {
+          const along = d.dot(p.c)
+          if (along <= 0) continue
+          // Where this direction meets the panel's plane, in its own width and height.
+          const across = Math.abs(d.dot(p.right) / along)
+          const high = Math.abs(d.dot(p.up) / along)
+          const k = fill((p.w - across) / p.edge + 0.5) * fill((p.h - high) / p.edge + 0.5)
+          if (!k) continue
+          r += p.rgb[0] * k
+          g += p.rgb[1] * k
+          b += p.rgb[2] * k
         }
         const i = (y * WIDTH + x) * 4
         data[i] = DataUtils.toHalfFloat(r)
