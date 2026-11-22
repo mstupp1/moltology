@@ -391,6 +391,22 @@ export const BENEFIT_PAGES: BenefitSummary[] = [
     indexed: false,
     updated: '2026-11-22',
   },
+  {
+    slug: 'social',
+    topic: 'Social',
+    kit: 'network',
+    blurb: 'Make friends as an adult by showing up somewhere every day.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'culture',
+    topic: 'Culture',
+    kit: 'network',
+    blurb: 'A small internet culture built around getting better.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
 ]
 
 export const BENEFITS_HUB_PATH = '/benefits'
