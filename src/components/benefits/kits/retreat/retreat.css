@@ -9,9 +9,9 @@
   --rt-sand: #ece3d4;
   --rt-ink: #2d3128;
   --rt-body: #4c5145;
-  --rt-muted: #757a6c;
-  --rt-sage: #7f8f76;
-  --rt-clay: #a85e43;
+  --rt-muted: #5f6457;
+  --rt-sage: #55624d;
+  --rt-clay: #8f4c34;
   --rt-line: #d9cfbf;
   --rt-script: 'Parisienne', 'Snell Roundhand', cursive;
   --rt-serif: 'EB Garamond', Garamond, Georgia, serif;
@@ -90,12 +90,12 @@
 [data-kit='retreat'] .rt-lockup-word {
   font-family: var(--rt-script);
   font-size: 1.9rem;
-  line-height: 1;
+  line-height: 1.1;
   padding-top: 2px;
 }
 
 [data-kit='retreat'] .rt-lockup-sub {
-  margin-top: 1px;
+  margin-top: 4px;
   font-size: 0.5625rem;
   font-weight: 500;
   letter-spacing: 0.32em;
@@ -229,7 +229,9 @@
 [data-kit='retreat'] .rt-hero-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(30, 33, 26, 0) 30%, rgba(30, 33, 26, 0.62) 100%);
+  background:
+    linear-gradient(90deg, rgba(30, 33, 26, 0.45) 0%, rgba(30, 33, 26, 0) 60%),
+    linear-gradient(180deg, rgba(30, 33, 26, 0) 20%, rgba(30, 33, 26, 0.7) 100%);
 }
 
 [data-kit='retreat'] .rt-hero-copy {

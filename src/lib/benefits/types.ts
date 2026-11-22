@@ -47,7 +47,7 @@ interface BenefitPageBase {
   query: string
   /** <title>, 60 characters or fewer. */
   title: string
-  /** Meta description, 120 to 160 characters. */
+  /** Meta description, 110 to 160 characters (LIMITS in scripts/lib/benefit-pages-check.ts). */
   description: string
   keywords: string
   /** false keeps the page out of search (noindex, not in the sitemap) until it is approved. */
@@ -217,7 +217,7 @@ export interface SeminarContent {
 export interface NetworkContent {
   hero: { headline: string; sub: string; cta: string; chips: string[]; image: BenefitImage }
   /** Sample posts in the hero phone, by the cast characters. */
-  feed: { name: string; handle: string; text: string; tag: string }[]
+  feed: { name: string; handle: string; text: string; tag: string; /** Key in content/characters/cast.json. */ cast: string }[]
   features: { title: string; items: { title: string; body: string }[] }
   rooms: { title: string; intro: string; items: { name: string; body: string }[] }
   norms: { title: string; items: string[] }

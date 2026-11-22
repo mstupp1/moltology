@@ -19,12 +19,12 @@ const page: BenefitPage = {
   },
   hook: {
     label: 'Shell and Depth, two of the five stats',
-    href: '/character',
+    href: '/character/progress',
     text: 'Your character tracks five stats. Shell is holding your boundaries and taking a hit without cracking; Depth is staying steady under pressure.',
   },
   reveal: {
-    headline: 'Training day is every day. The gym is an app.',
-    body: 'Moltology is a free practice with eight daily tasks, a streak, a character that grows with you, an AI coach and a forum. Sign up to log your first session, or step into the demo without an account.',
+    headline: 'Training day is every day.',
+    body: 'Your character\'s Shell and Depth stats track the work.',
     screenshot: 'dashboard',
   },
   related: ['investing', 'gaming', 'energy-drinks'],
@@ -32,7 +32,7 @@ const page: BenefitPage = {
     {
       question: 'Is this a workout program?',
       answer:
-        'No. Moltology trains the head, not the muscles. It works well beside any gym routine, and plenty of members use the deep work block for training sessions.',
+        'No. Moltology trains the head, not the muscles. It works well beside any gym routine, and you can run a training session inside the deep work block if you like.',
     },
     {
       question: 'How do you build mental toughness?',
@@ -50,13 +50,16 @@ const page: BenefitPage = {
         'Then you start again tomorrow. The streak resets but your history and character stay. Coming back after a miss is the toughness part.',
     },
     {
-      question: 'Is there a cost?',
-      answer: 'The program is free. Oracle MAX is an optional paid plan for people who lean on the AI coach a lot.',
+      question: 'What are examples of mental toughness?',
+      answer:
+        'Keeping a promise to yourself on a day you do not feel like it, staying calm when plans fall apart, and coming back after a setback without a long story about it.',
     },
     {
-      question: 'Can I try a session first?',
-      answer: 'Yes. Hit the demo and you can use the dashboard as a guest, no sign-up needed.',
+      question: 'Can mental toughness be trained?',
+      answer:
+        'Like most skills it improves with practice. Small commitments you keep, and an honest look at the ones you miss, are the usual training load.',
     },
+
   ],
   content: {
     hero: {
@@ -87,7 +90,8 @@ const page: BenefitPage = {
         { set: 'Rest', title: 'Reset your focus', body: 'Step away at midday. Recovery is part of the program.' },
         { set: 'Main lift', title: 'Deep work', body: 'One heavy, focused block. No phone, no tabs, no excuses.' },
         { set: 'Spot', title: 'Help a member', body: 'Answer someone on the forum. Strong people spot each other.' },
-        { set: 'Cool-down', title: 'Let one thing go and close the day', body: 'Drop what is not yours to carry, review, and sleep.' },
+        { set: 'Cool-down', title: 'Let one thing go', body: 'Drop what is not yours to carry.' },
+        { set: 'Stretch', title: 'Close the day', body: 'Review the session, log it and sleep.' },
       ],
     },
     gear: {
@@ -101,7 +105,7 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    creed: 'Strong is not loud. Strong is the one who shows up on the days it is hard.',
+    creed: 'Show up on the hard days. That is the whole program.',
   },
 }
 

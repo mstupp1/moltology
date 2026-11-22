@@ -60,7 +60,49 @@ async function inspect(page: Page) {
       .filter((el) => !el.closest('.cn-marquee'))
       .slice(0, 3)
       .map((el) => `${el.tagName.toLowerCase()}.${(el.className?.toString() ?? '').split(' ')[0]}`)
+    // Small text above the reveal must reach WCAG AA against its nearest solid background.
+    // Text over images or gradients is skipped: check those by eye in the screenshots.
+    const reveal = document.querySelector('.benefit-reveal')
+    const rgb = (value: string) => (value.match(/[\d.]+/g) ?? []).map(Number)
+    const lum = ([r, g, b]: number[]) => {
+      const c = [r, g, b].map((v) => {
+        const x = v / 255
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
+      })
+      return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+    }
+    const lowContrast: string[] = []
+    for (const el of Array.from(document.querySelectorAll('main p, main span, main a, main button, main li, main dt, main dd, main h1, main h2, main h3, main summary'))) {
+      if (reveal?.contains(el) || !visible(el)) continue
+      const own = Array.from(el.childNodes).some((node) => node.nodeType === 3 && node.textContent?.trim())
+      if (!own) continue
+      const style = getComputedStyle(el)
+      if (style.webkitTextFillColor === 'transparent' || el.closest('[aria-hidden="true"]')) continue
+      let bg: number[] | null = null
+      let node: Element | null = el
+      while (node) {
+        const cs = getComputedStyle(node)
+        if (cs.backgroundImage !== 'none') break
+        const c = rgb(cs.backgroundColor)
+        if (c.length >= 3 && (c[3] === undefined || c[3] === 1)) {
+          bg = c
+          break
+        }
+        node = node.parentElement
+      }
+      if (!bg) continue
+      const fg = rgb(style.color)
+      if (fg[3] !== undefined && fg[3] < 1) continue
+      const [a, b] = [lum(fg), lum(bg)].sort((x, y) => y - x)
+      const ratio = (a + 0.05) / (b + 0.05)
+      const size = parseFloat(style.fontSize)
+      const large = size >= 24 || (size >= 18.66 && Number(style.fontWeight) >= 700)
+      if (ratio < (large ? 3 : 4.5)) {
+        lowContrast.push(`${(el.textContent ?? '').trim().slice(0, 30)} (${ratio.toFixed(2)}:1)`)
+      }
+    }
     return {
+      lowContrast: Array.from(new Set(lowContrast)).slice(0, 6),
       sideScroll: doc.scrollWidth - doc.clientWidth,
       overflowing,
       h1Count: document.querySelectorAll('h1').length,
@@ -107,6 +149,11 @@ async function main() {
         page.on('pageerror', (error) => consoleErrors.push(error.message))
         const note = (message: string) => problems.push({ slug, viewport: viewport.name, message })
 
+        if (viewport === WIDTHS[0]) {
+          // Search engines read the server HTML, so the costume's H1 must be in it, not only after hydration.
+          const html = await (await fetch(`${base}/benefits/${slug}`)).text()
+          if (!/<h1[\s>]/.test(html)) note('No h1 in the server-rendered HTML')
+        }
         const response = await page.goto(`${base}/benefits/${slug}`, { waitUntil: 'networkidle' })
         if (!response || response.status() >= 400) note(`HTTP ${response?.status() ?? 'no response'}`)
         await page.evaluate(() => document.fonts.ready)
@@ -124,6 +171,7 @@ async function main() {
         if (!result.heroAction) note('No button or link in the first screen')
         if (result.brokenImages.length) note(`Broken images: ${result.brokenImages.join(', ')}`)
         if (!result.jsonLd) note('No JSON-LD on the page')
+        if (result.lowContrast.length) note(`Low contrast text: ${result.lowContrast.join('; ')}`)
         for (const error of consoleErrors) note(`Page error: ${error}`)
 
         await page.screenshot({ path: path.join(OUT_DIR, `${slug}-${viewport.name}-full.png`), fullPage: true })

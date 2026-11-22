@@ -9,7 +9,7 @@
   --at-greige: #e7e2da;
   --at-ink: #111111;
   --at-body: #3d3b38;
-  --at-muted: #8a857d;
+  --at-muted: #6c675f;
   --at-line: #d3cdc3;
   --at-serif: 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif;
   --at-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -324,9 +324,21 @@
 [data-kit='atelier'] .at-looks {
   margin-top: 48px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-top: 1px solid var(--at-line);
   border-left: 1px solid var(--at-line);
+}
+
+@media (max-width: 479px) {
+  [data-kit='atelier'] .at-looks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-kit='atelier'] .at-looks {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 [data-kit='atelier'] .at-look {

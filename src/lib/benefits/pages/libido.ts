@@ -25,8 +25,8 @@ const page: BenefitPage = {
     text: 'The plan follows the Daily Shedding Routine. Its first-hour step, The Grip, asks you to name the one thing that matters today and start on it before anything else gets a say.',
   },
   reveal: {
-    headline: 'The plan is a real app, and it costs nothing.',
-    body: 'Under the clinic look is Moltology: eight daily tasks, a streak, an AI guide called the Oracle and a community doing the same thing. Make an account to save your plan, or look around the demo first.',
+    headline: 'Your plan lives in a real app.',
+    body: 'The assessment is the Moltmax quiz, and the plan is the eight daily tasks.',
     screenshot: 'dashboard',
   },
   related: ['energy-drinks', 'spirituality'],
@@ -51,20 +51,22 @@ const page: BenefitPage = {
         'Eight short tasks from early morning to evening, such as sitting quietly before you open your phone, one block of deep work and letting one thing go at night. Most take a few minutes.',
     },
     {
-      question: 'How much does it cost?',
+      question: 'What causes low libido?',
       answer:
-        'Joining is free and so is the daily plan. Oracle MAX is an optional paid plan for people who chat with the AI guide a lot.',
+        'Many things, including stress, short sleep, relationship strain, hormones, medicines and other health conditions. If it changed suddenly or worries you, talk to a doctor first. Moltology only works on the everyday habits part.',
     },
     {
-      question: 'Can I try it before signing up?',
-      answer: 'Yes. The demo opens the full dashboard as a guest. Make an account when you want to keep your progress.',
+      question: 'Can sleep and stress affect sex drive?',
+      answer:
+        'Both are commonly linked to lower desire. Getting to bed on time and having fewer frantic days are reasonable places to start, alongside any medical advice.',
     },
+
   ],
   content: {
     hero: {
       eyebrow: 'Online assessment · free',
-      headline: 'Low drive is usually a schedule problem.',
-      sub: 'Most of what drains desire is ordinary: short nights, endless feeds, days with no point to them. Moltology gives you a short assessment and a daily plan that fixes the ordinary part.',
+      headline: 'Low libido? Start with the ordinary things.',
+      sub: 'Short nights, endless feeds and days with no point to them can flatten drive. Moltology gives you a three minute assessment and a daily plan for that part.',
       checks: ['Free, no card', 'About three minutes', 'Plan ready the same day'],
       cta: 'Get your free plan',
       image: {

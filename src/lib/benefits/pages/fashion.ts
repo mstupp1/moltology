@@ -18,13 +18,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The Daily Shedding Routine, in the Codex',
-    href: '/codex/scr-030',
-    text: 'Each look below is one step of the Daily Shedding Routine, the Codex passage the eight daily tasks come from.',
+    label: 'The character shop',
+    href: '/character/shop',
+    text: 'Every member has a 3D character with a wardrobe of shells, claws and gear. It is the one place on Moltology where you dress up.',
   },
   reveal: {
-    headline: 'The coat was borrowed. The confidence is yours to keep.',
-    body: 'Moltology is a free practice of eight small tasks a day, with readings, an AI guide called the Oracle and a forum of people doing the same. Join to start your first day, or open the demo as a guest.',
+    headline: 'The confidence comes from the practice.',
+    body: 'Your character has a wardrobe too, in the shop.',
     screenshot: 'dashboard',
   },
   related: ['charisma', 'spirituality', 'strength'],
@@ -32,7 +32,7 @@ const page: BenefitPage = {
     {
       question: 'Is Moltology a fashion brand?',
       answer:
-        'No. There are no clothes to buy here, apart from a small merch store. Moltology is a free app built around a daily practice. This page borrows the look of a fashion house to make a point about where style comes from.',
+        'No. There are no clothes to buy here, apart from a small merch store. Moltology is a free app built around a daily practice. The point here is where style comes from.',
     },
     {
       question: 'How does a daily practice help my style?',
@@ -49,14 +49,16 @@ const page: BenefitPage = {
       answer: 'Most of the eight tasks take a few minutes each. The deep work block is the longest, and you choose its length.',
     },
     {
-      question: 'What does it cost?',
+      question: 'How do I find my personal style?',
       answer:
-        'Nothing to start. Tasks, readings and the forum are free. Oracle MAX is an optional paid plan if you use the AI guide heavily.',
+        'Start with what you already reach for, notice what makes you stand differently, and keep a short list of pieces that work together. Style settles once you stop dressing for an imagined audience.',
     },
     {
-      question: 'Can I look around before signing up?',
-      answer: 'Yes. Try the demo to walk through the dashboard as a guest without making an account.',
+      question: 'Does confidence change how clothes look?',
+      answer:
+        'Posture, pace and eye contact change how any outfit reads. Those come from habits more than purchases, which is the part a daily practice works on.',
     },
+
   ],
   content: {
     hero: {

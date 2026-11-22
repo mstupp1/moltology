@@ -23,8 +23,8 @@ const page: BenefitPage = {
     text: 'The top of the forum shows a group photo of active members as their 3D characters, retaken at most once a day as people join.',
   },
   reveal: {
-    headline: 'No follower counts. Just people doing the same practice.',
-    body: 'Moltology is free: eight small daily tasks, a streak, readings, an AI guide and a forum where helping someone is part of the routine. Join to say hello, or read the demo as a guest first.',
+    headline: 'Come say hello on the forum.',
+    body: 'Introduce yourself in General Discussion. Helping newcomers is part of everyone\'s day.',
     screenshot: 'forum',
   },
   related: ['charisma', 'gaming', 'spirituality'],
@@ -49,18 +49,21 @@ const page: BenefitPage = {
       answer: 'Yes. You pick a display name and a 3D character as your avatar. You never have to show your face or real name.',
     },
     {
-      question: 'Does it cost anything to join?',
-      answer: 'No. Membership, the forum and the daily tasks are free. Oracle MAX, for heavy use of the AI guide, is the only paid option.',
+      question: 'How do I find an online community for self improvement?',
+      answer:
+        'Look for one built around something everyone does, not only talk. A shared practice gives people a reason to come back and a common language, which keeps a group friendly and useful.',
     },
     {
-      question: 'Can I read before I join?',
-      answer: 'Yes. The forum is open to read, and the demo opens the dashboard as a guest.',
+      question: 'How do I make friends online as an adult?',
+      answer:
+        'Turn up in the same place often, help with small things and reply to people by name. Helping another member is one of the daily tasks here, so those small exchanges happen without forcing them.',
     },
+
   ],
   content: {
     hero: {
       headline: 'An online community for self improvement that feels like friends.',
-      sub: 'No feed to scroll. No numbers to chase. Moltology is a free community where everyone does the same small daily practice, and helping each other is part of it.',
+      sub: 'No feed to scroll and no follower counts. Moltology is a free community where everyone does the same small daily practice, and helping each other is part of it.',
       cta: 'Join free',
       chips: ['Daily practice', 'Kind replies', 'No follower counts', 'Free'],
       image: {
@@ -71,9 +74,9 @@ const page: BenefitPage = {
       },
     },
     feed: [
-      { name: 'Juno', handle: '@juno', text: 'Day 12. Phone stayed in the drawer until after the silent start. Small, but it counts.', tag: 'Silent start' },
-      { name: 'Kit', handle: '@kit', text: 'First week here. What do you all pick as your one thing when everything feels urgent?', tag: 'Question' },
-      { name: 'Moss', handle: '@moss', text: 'Pick the thing you would be proudest of by tonight. The urgent things tend to shout for themselves.', tag: 'Help a member' },
+      { name: 'Juno', handle: '@juno', text: 'Day 12. Phone stayed in the drawer until after the silent start. Small, but it counts.', tag: 'Silent start', cast: 'crab_juno_marsh' },
+      { name: 'Kit', handle: '@kit', text: 'First week here. What do you all pick as your one thing when everything feels urgent?', tag: 'Question', cast: 'lobster_kit_shallows' },
+      { name: 'Moss', handle: '@moss', text: 'Pick the thing you would be proudest of by tonight. The urgent things tend to shout for themselves.', tag: 'Help a member', cast: 'crab_moss_tern' },
     ],
     features: {
       title: 'Built for showing up, not scrolling',

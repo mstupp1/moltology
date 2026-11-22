@@ -18,13 +18,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Help a member, a daily task',
-    href: '/forum',
-    text: 'One of the eight daily tasks is helping another member on the forum. It is the most direct practice of the attention that people read as charisma.',
+    label: 'Presence first, from the Codex',
+    href: '/codex/scr-013#verse-8',
+    text: 'The Codex asks members to keep each other calm company before giving advice. Helping a member, one of the daily tasks, is where that gets practiced.',
   },
   reveal: {
-    headline: 'No ticket, no stage. The seminar is a daily practice.',
-    body: 'Moltology is free: eight small tasks a day, readings from the Codex, an AI guide called the Oracle and a forum full of people practicing with you. Sign up to start chapter one today, or browse the demo first.',
+    headline: 'The seminar is a daily practice.',
+    body: 'Chapter one is a quiet morning tomorrow.',
     screenshot: 'forum',
   },
   related: ['fashion', 'community', 'spirituality'],
@@ -32,7 +32,7 @@ const page: BenefitPage = {
     {
       question: 'Is there a real seminar or book?',
       answer:
-        'No. This page borrows the look of a self-help event. The real thing is a free app with a daily practice, and the Codex, its book of readings, is free to read online.',
+        'No. The real thing is a free app with a daily practice, and the Codex, its book of readings, is free to read online.',
     },
     {
       question: 'Can charisma actually be learned?',
@@ -49,13 +49,16 @@ const page: BenefitPage = {
       answer: 'Only if you want to. Helping a member usually means a reply on the forum, and you choose what you share about yourself.',
     },
     {
-      question: 'How much does it cost?',
-      answer: 'The practice, the forum and the Codex cost nothing. An optional paid plan, Oracle MAX, raises the limits on the AI guide.',
+      question: 'What makes someone charismatic?',
+      answer:
+        'Most descriptions land on a mix of warmth and presence: people feel noticed, and they feel you are steady. Both are easier when you are rested and not half-looking at a phone.',
     },
     {
-      question: 'Can I preview it?',
-      answer: 'Yes. Open the demo to use the dashboard as a guest before you sign up.',
+      question: 'How long does it take to become more charismatic?',
+      answer:
+        'There is no fixed timeline. Treat it like any skill: a little practice every day, an honest look back, and patience.',
     },
+
   ],
   content: {
     hero: {
@@ -72,13 +75,13 @@ const page: BenefitPage = {
       book: { title: 'Presence', subtitle: 'The quiet habits of magnetic people', author: 'The Moltology method' },
     },
     promise: {
-      title: 'In your first 30 days you will',
+      title: 'What the first 30 days ask of you',
       items: [
-        'Start your mornings without reaching for your phone',
-        'Hold a conversation without planning your next line',
+        'Start each morning before your phone',
+        'Listen without planning your next line',
         'Help a stranger with something that matters to them',
-        'Drop at least one story you keep telling about yourself',
-        'Finish the day knowing what you did with it',
+        'Drop one story you keep telling about yourself',
+        'Close each day on purpose',
       ],
     },
     chapters: {
@@ -95,8 +98,8 @@ const page: BenefitPage = {
       ],
     },
     passage: {
-      quote: 'Keep them calm company without trying to fix anything. Presence first, counsel later.',
-      source: { label: 'the Codex, SCR-013', href: '/codex/scr-013#verse-8' },
+      quote: 'Presence first, counsel later.',
+      source: { label: 'the Codex, SCR-013, verse 8', href: '/codex/scr-013#verse-8' },
     },
     agenda: {
       title: 'Today’s agenda',

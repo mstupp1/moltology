@@ -142,6 +142,24 @@
   src: url('/fonts/nunito-latin-800.woff2') format('woff2');
 }
 
+.benefit-page .benefit-reveal {
+  font-feature-settings: normal;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Anchor jumps land below the sticky costume header. */
+.benefit-page [id] {
+  scroll-margin-top: 88px;
+}
+
+/* Dark costumes: a faint rim so the torn edge still reads against the abyss. */
+.benefit-page[data-kit='locker'] .benefit-shed-edge,
+.benefit-page[data-kit='platform'] .benefit-shed-edge,
+.benefit-page[data-kit='arcade'] .benefit-shed-edge {
+  filter: drop-shadow(0 -1.5px 0 rgba(255, 255, 255, 0.28));
+}
+
 .benefit-page .benefit-kit-fallback {
   min-height: 100vh;
 }

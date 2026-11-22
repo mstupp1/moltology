@@ -154,7 +154,7 @@
   font-family: var(--lk-display);
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(3.4rem, 10vw, 8.5rem);
+  font-size: clamp(3.4rem, 9vw, 7rem);
   line-height: 0.88;
   text-transform: uppercase;
   color: var(--lk-white);
@@ -285,6 +285,12 @@
 
 [data-kit='locker'] .lk-hero-copy {
   position: relative;
+}
+
+@media (min-width: 1024px) {
+  [data-kit='locker'] .lk-hero-copy > * {
+    max-width: 600px;
+  }
 }
 
 @media (max-width: 639px) {

@@ -76,7 +76,8 @@ export default function LedgerKit({ page, onJoin, children }: BenefitKitProps) {
                 fetchPriority="high"
                 className="lg-hero-img"
               />
-              <div className="lg-card" aria-label="Sample practice balance">
+              <figure className="lg-card">
+                <figcaption className="sr-only">A sample practice balance</figcaption>
                 <p className="lg-card-label">{hero.card.label}</p>
                 <p className="lg-card-value">{hero.card.value}</p>
                 <p className="lg-card-change">
@@ -87,14 +88,7 @@ export default function LedgerKit({ page, onJoin, children }: BenefitKitProps) {
                   <path d={`${line} L300 100 L0 100 Z`} className="lg-chart-fill" />
                   <path d={line} className="lg-chart-line" />
                 </svg>
-                <div className="lg-card-ranges" aria-hidden="true">
-                  <span>1W</span>
-                  <span className="is-on">1M</span>
-                  <span>3M</span>
-                  <span>1Y</span>
-                  <span>All</span>
-                </div>
-              </div>
+              </figure>
             </div>
           </div>
         </section>

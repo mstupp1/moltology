@@ -7,7 +7,7 @@ const page: BenefitPage = {
   query: 'investing in yourself',
   title: 'Investing in yourself, one small deposit a day | Moltology',
   description:
-    'The safest compounding asset is you. Moltology is a free daily practice: eight small deposits of focus, learning and rest that add up over months.',
+    'Small daily habits compound like regular deposits. Moltology is a free daily practice: eight small deposits of focus, learning and rest that add up over months.',
   keywords: 'investing in yourself, self investment, compound habits, personal growth, daily routine, self improvement',
   indexed: false,
   updated: '2026-11-22',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Your weekly XP and the leaderboard',
-    href: '/forum',
-    text: 'Every task you finish adds XP to your week, and the forum shows who has been showing up. It is the closest thing Moltology has to a portfolio.',
+    label: 'The weekly XP leaderboard',
+    href: '/forum/leaderboard',
+    text: 'Every task you finish adds XP to your week, and the leaderboard shows who has been showing up this week. It is the closest thing Moltology has to a portfolio.',
   },
   reveal: {
-    headline: 'No brokerage. Just a better return on your days.',
-    body: 'Moltology is a free practice app with eight daily tasks, a streak, readings, an AI guide and a community forum. Open an account to make your first deposit today, or look around the demo first.',
+    headline: 'Your first deposit takes five minutes.',
+    body: 'Start with a silent start tomorrow and watch the activity log fill.',
     screenshot: 'dashboard',
   },
   related: ['automation', 'strength', 'energy-drinks'],
@@ -33,7 +33,7 @@ const page: BenefitPage = {
     {
       question: 'Does Moltology give investment advice?',
       answer:
-        'No. It does not hold money, pick stocks or give financial advice. This page uses the look of an investing app because a daily practice compounds the same way small regular deposits do.',
+        'No. It does not hold money, pick stocks or give financial advice. A daily practice compounds the way small regular deposits do, but the only currency is your time.',
     },
     {
       question: 'What does investing in yourself actually mean here?',
@@ -43,21 +43,23 @@ const page: BenefitPage = {
     {
       question: 'How fast will I see a return?',
       answer:
-        'Most members notice calmer mornings within the first week. Bigger changes, like finishing projects you used to abandon, tend to show up after a month or two of steady days.',
+        'There is no promised return. Your streak and activity log show exactly what you put in, so you can judge it yourself after a few weeks.',
     },
     {
       question: 'What happens if I miss a day?',
       answer: 'Your streak resets, nothing else. Pick it back up the next morning. One missed day costs far less than quitting.',
     },
     {
-      question: 'Are there fees?',
+      question: 'What are good ways to invest in yourself?',
       answer:
-        'The practice is free with no card required. Oracle MAX, a paid plan for heavy use of the AI guide, is optional and you can ignore it entirely.',
+        'Sleep, learning a hard skill, protecting focused time and keeping good people around you. They cost little money and a lot of attention, which is why a daily structure helps.',
     },
     {
-      question: 'Can I see it before I open an account?',
-      answer: 'Yes. The demo shows the full dashboard as a guest, so you can see how the tasks and streak work first.',
+      question: 'How is time like compound interest?',
+      answer:
+        'Small, regular inputs build on the ones before them. Fifteen minutes of reading a day comes to about ninety hours a year, and each hour makes the next one easier to use.',
     },
+
   ],
   content: {
     hero: {
@@ -103,9 +105,11 @@ const page: BenefitPage = {
       rows: [
         { when: '7:02', label: 'Silent start', amount: '+1 task' },
         { when: '7:10', label: 'Picked one thing: finish the proposal', amount: '+1 task' },
+        { when: '8:30', label: 'Learned something hard: one Academy lesson', amount: '+1 task' },
         { when: '9:00', label: 'Deep work, 75 minutes', amount: '+1 task' },
         { when: '12:30', label: 'Reset your focus', amount: '+1 task' },
         { when: '18:15', label: 'Answered a question on the forum', amount: '+1 task' },
+        { when: '21:40', label: 'Let one thing go', amount: '+1 task' },
         { when: '22:00', label: 'Closed the day', amount: '+1 task' },
       ],
     },

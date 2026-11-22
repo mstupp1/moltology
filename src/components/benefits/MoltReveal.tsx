@@ -40,19 +40,23 @@ interface MoltRevealProps {
  * Where every costume ends: the page sheds its industry skin and lands in the normal
  * Moltology look with the real product and the real way in.
  */
+/** The same plain line on every page, so page files only add what is specific to them. */
+const REVEAL_INTRO =
+  'Moltology is a free daily practice: eight small tasks, readings from the Codex, an AI guide called the Oracle and a forum of people doing the same.'
+
 export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltRevealProps) {
   const shot = SCREENSHOTS[page.reveal.screenshot]
   const related = page.related.map(findBenefitSummary).filter((item) => item !== undefined)
 
   return (
-    <section aria-labelledby="molt-reveal-title" className="relative bg-abyss text-ink-body">
+    <section aria-labelledby="molt-reveal-title" className="benefit-reveal relative bg-abyss text-ink-body font-sans font-normal">
       <svg
         className="benefit-shed-edge"
         viewBox="0 0 1440 64"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <path d="M0 64V30l60 14 52-26 70 22 64-30 58 24 80-18 46 26 74-34 62 28 58-12 66 22 54-30 72 20 60-16 58 26 70-28 64 18 56-22 62 26 70-14 50 20V64Z" />
+        <path d="M0 64V30l60 14 52-26 70 22 64-30 58 24 80-18 46 26 74-34 62 28 58-12 66 22 54-30 72 20 60-16 58 26 70-28 64 18 56-22 62 26 70-14 184 20V64Z" />
       </svg>
       <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-14 sm:pt-20 pb-16 sm:pb-24">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-center">
@@ -61,7 +65,9 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
             <h2 id="molt-reveal-title" className="mt-4 font-grotesk text-2xl sm:text-4xl font-semibold tracking-tight text-ink">
               {page.reveal.headline}
             </h2>
-            <p className="mt-4 text-base sm:text-lg leading-relaxed text-ink-body max-w-xl">{page.reveal.body}</p>
+            <p className="mt-4 text-base sm:text-lg leading-relaxed text-ink-body max-w-xl">
+              {REVEAL_INTRO} {page.reveal.body}
+            </p>
             <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4">
               <Suspense fallback={<LandingAuthCtaSkeleton variant="bottom" />}>
                 {authReady ? (
@@ -102,7 +108,11 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
               href={page.hook.href}
               className="mt-3 inline-flex items-center gap-2 text-md font-medium text-ink hover:text-cyan-glow transition-colors"
             >
-              <BookOpen className="w-4 h-4 text-crimson-aggro" aria-hidden="true" />
+              {page.hook.href.startsWith('/codex') ? (
+                <BookOpen className="w-4 h-4 text-crimson-aggro" aria-hidden="true" />
+              ) : (
+                <ArrowRight className="w-4 h-4 text-crimson-aggro" aria-hidden="true" />
+              )}
               {page.hook.label}
             </a>
             <p className="mt-2 text-sm leading-relaxed text-ink-body">{page.hook.text}</p>

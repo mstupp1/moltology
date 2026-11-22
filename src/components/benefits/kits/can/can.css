@@ -181,7 +181,7 @@
   font-size: 1.125rem;
   line-height: 1.55;
   font-weight: 500;
-  color: var(--cn-cream);
+  color: var(--cn-black);
   text-wrap: pretty;
 }
 
@@ -302,7 +302,7 @@
   justify-content: center;
   min-height: 58px;
   padding: 0 22px;
-  color: var(--cn-cream);
+  color: var(--cn-black);
   font-weight: 700;
   font-size: 1rem;
   text-decoration: underline;
@@ -311,7 +311,7 @@
 }
 
 [data-kit='can'] .cn-btn-ghost:hover {
-  color: var(--cn-lime);
+  color: var(--cn-cream);
 }
 
 [data-kit='can'] .cn-hero-art {

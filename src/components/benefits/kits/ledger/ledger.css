@@ -9,8 +9,9 @@
   --lg-paper: #fbfdfb;
   --lg-ink: #0b3b24;
   --lg-body: #3e5448;
-  --lg-muted: #6f8478;
-  --lg-green: #00c26e;
+  --lg-muted: #52665a;
+  --lg-green: #00804a;
+  --lg-chart: #00b264;
   --lg-deep: #0b3b24;
   --lg-line: #d3e6d9;
   --lg-serif: 'Instrument Serif', Georgia, serif;
@@ -228,7 +229,7 @@
 }
 
 [data-kit='ledger'] .lg-btn:hover {
-  background: #00a95f;
+  background: #006b3d;
   transform: translateY(-1px);
 }
 
@@ -278,9 +279,9 @@
 
 [data-kit='ledger'] .lg-card {
   position: absolute;
-  right: 12px;
+  left: 12px;
   bottom: 0;
-  width: min(300px, 84%);
+  width: min(280px, 62%);
   padding: 20px 20px 16px;
   border-radius: 22px;
   background: #ffffff;
@@ -323,7 +324,7 @@
 
 [data-kit='ledger'] .lg-chart-line {
   fill: none;
-  stroke: var(--lg-green);
+  stroke: var(--lg-chart);
   stroke-width: 2.5;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;

@@ -23,8 +23,8 @@ const page: BenefitPage = {
     text: 'Every member has a 3D crab or lobster with five stats and gear from the shop. It sits on your profile and next to your forum posts.',
   },
   reveal: {
-    headline: 'Press start. This one saves your progress in real life.',
-    body: 'Moltology is a free practice app with eight daily quests, XP, a streak, a character you customize, an AI guide and a forum. Make an account to start day one, or play the demo as a guest.',
+    headline: 'Press start on day one.',
+    body: 'Quests reset every day and the board resets every Monday.',
     screenshot: 'dashboard',
   },
   related: ['strength', 'automation', 'community'],
@@ -51,12 +51,14 @@ const page: BenefitPage = {
     {
       question: 'Is it pay to win?',
       answer:
-        'No. XP comes from what you do in the practice, never from paying. Oracle MAX is an optional paid plan for heavier use of the AI guide and adds no XP.',
+        'No. XP, stage and leaderboard rank come only from doing the practice. Gear changes your character’s look and stats, never your XP or rank.',
     },
     {
-      question: 'Is there a free trial?',
-      answer: 'Everything core is free, and the demo lets you play as a guest before you make an account.',
+      question: 'What is a life RPG?',
+      answer:
+        'A way of treating real habits like a role-playing game: quests for daily actions, experience points for doing them and a character that reflects your progress. Moltology takes its quests from a daily practice.',
     },
+
   ],
   content: {
     hero: {

@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { Hash, Heart, MessageCircle, Sparkles } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
+import { CAST, castStillFilename } from '@/lib/cast'
+import { MASCOT_S3_PREFIX } from '@/lib/mascots'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
@@ -18,6 +20,12 @@ function NetworkLockup() {
       <span className="nw-lockup-word">moltology</span>
     </span>
   )
+}
+
+/** The cast member's 3D still, or nothing when the key is unknown. */
+function castStill(key: string) {
+  const member = CAST.find((item) => item.key === key)
+  return member ? getAssetUrl(`${MASCOT_S3_PREFIX}/${castStillFilename(member)}`) : null
 }
 
 /** Network: social apps. White and violet, a sunset gradient, rounded type, a phone with a feed. */
@@ -61,7 +69,7 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
               </div>
             </div>
 
-            <div className="nw-phone" aria-label="Sample feed">
+            <figure className="nw-phone">
               <div className="nw-phone-screen">
                 <div className="nw-phone-top" aria-hidden="true">
                   <span className="nw-lockup-word">moltology</span>
@@ -77,12 +85,11 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
                     className="nw-photo-img"
                   />
                 </figure>
+                <p className="nw-sample">Sample posts from the cast</p>
                 <ul className="nw-feed">
                   {feed.map((post) => (
                     <li key={post.handle} className="nw-post">
-                      <span className="nw-avatar" aria-hidden="true">
-                        {post.name.slice(0, 1)}
-                      </span>
+                      <img src={castStill(post.cast) ?? ''} alt="" width={34} height={34} loading="lazy" className="nw-avatar" />
                       <div className="nw-post-body">
                         <p className="nw-post-meta">
                           <span className="nw-post-name">{post.name}</span>
@@ -98,7 +105,8 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
                   ))}
                 </ul>
               </div>
-            </div>
+              <figcaption className="sr-only">Sample posts by Moltology’s cast characters</figcaption>
+            </figure>
           </div>
         </section>
 
@@ -138,10 +146,10 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
                   <span className="nw-room-icon" aria-hidden="true">
                     <Hash />
                   </span>
-                  <span>
+                  <div>
                     <h3 className="nw-h3">{room.name}</h3>
-                    <span className="nw-room-body">{room.body}</span>
-                  </span>
+                    <p className="nw-room-body">{room.body}</p>
+                  </div>
                 </li>
               ))}
             </ul>

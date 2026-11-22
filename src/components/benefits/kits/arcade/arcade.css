@@ -11,7 +11,7 @@
   --ar-line: #3a2a6e;
   --ar-white: #f3f0ff;
   --ar-body: #bdb4de;
-  --ar-muted: #8478b0;
+  --ar-muted: #a297cf;
   --ar-cyan: #3cf2e0;
   --ar-magenta: #ff3ca6;
   --ar-gold: #ffd23c;
@@ -118,7 +118,7 @@
   margin-left: auto;
   padding: 10px 18px;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  background: var(--ar-magenta);
+  background: #c9136a;
   color: #ffffff;
   font-family: var(--ar-display);
   font-weight: 600;
@@ -223,7 +223,7 @@
 
 [data-kit='arcade'] .ar-btn {
   margin-top: 28px;
-  background: linear-gradient(90deg, var(--ar-magenta), #ff7a3c);
+  background: linear-gradient(90deg, #c9136a, #b8430c);
   color: #ffffff;
 }
 
@@ -294,6 +294,12 @@
 
 [data-kit='arcade'] .ar-hero-copy {
   position: relative;
+}
+
+@media (min-width: 1024px) {
+  [data-kit='arcade'] .ar-hero-copy > * {
+    max-width: 540px;
+  }
 }
 
 @media (max-width: 639px) {

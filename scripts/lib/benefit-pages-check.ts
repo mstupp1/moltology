@@ -29,6 +29,27 @@ export const BANNED_PHRASES = [
   'delve',
 ]
 
+/**
+ * FAQs answer the page's search topic. Cost, sign-up and demo questions are answered once by
+ * the reveal, so they never repeat across 48 FAQPage blocks.
+ */
+export const FAQ_INTENT_BANNED =
+  /\b(cost|costs|free|fees?|price|pricing|trial|demo|preview|sandbox|try it|try a|look around|before (i|signing|joining)|read before|see it before)\b/i
+
+/** Claims the skill bans: invented member outcomes, promises and overreach. */
+export const CLAIM_BANS: { pattern: RegExp; why: string }[] = [
+  { pattern: /\b(most|many|plenty of) (members|people|users)\b/i, why: 'invents what members do or feel' },
+  { pattern: /\bwithin (the )?first (week|month|days?)\b/i, why: 'promises a timeline' },
+  { pattern: /\byou(’ll|'ll| will) (feel|see|notice|become|get|have|be|gain|wake|sleep|look|find|finally|never again)\b/i, why: 'promises an outcome (describe what the practice asks instead)' },
+  { pattern: /\b(safest|guaranteed?|proven|clinically|scientifically)\b/i, why: 'overclaims' },
+  { pattern: /\bonly paid\b/i, why: 'wrong: Molt Credits and the store are paid too' },
+  { pattern: /\bthis page (borrows|uses|wears)\b/i, why: 'explains the costume (BAN 6)' },
+  { pattern: /\b(the look of|dressed (up )?as) an? \w+ (site|brand|app|house|event)\b/i, why: 'explains the costume (BAN 6)' },
+]
+
+/** Reveal headlines that every page reached for first. One page may use a shape, never two. */
+export const REVEAL_SHAPES = [/was a (costume|metaphor)/i, /was borrowed/i, /\bis (real|an app)\b/i]
+
 export const LIMITS = {
   titleMax: 60,
   descriptionMin: 110,
@@ -99,6 +120,9 @@ export function checkBenefitPages(
   }
 
   const sentenceOwners = new Map<string, string>()
+  const hookOwners = new Map<string, string>()
+  const faqShapes = new Map<string, Set<string>>()
+  const revealShapes = new Map<number, string[]>()
 
   for (const page of pages) {
     const { slug } = page
@@ -118,6 +142,32 @@ export function checkBenefitPages(
       add(slug, 'query', `None of the target query words (${page.query}) are in the title, description or headline`)
     }
 
+    const headlineWords = words(headline)
+    const coveredInHeadline = queryWords.filter((word) => headlineWords.some((h) => h.startsWith(word.slice(0, 5))))
+    if (queryWords.length && coveredInHeadline.length * 2 < queryWords.length) {
+      add(slug, 'query-headline', `The H1 should carry at least half of the query words (${page.query})`)
+    }
+
+    for (const faq of page.faqs) {
+      if (FAQ_INTENT_BANNED.test(faq.question)) {
+        add(slug, 'faq-intent', `"${faq.question}" belongs to the reveal (cost, sign-up, demo); ask about the topic instead`)
+      }
+      const shape = words(faq.question).slice(0, 4).join(' ')
+      if (!faqShapes.has(shape)) faqShapes.set(shape, new Set())
+      faqShapes.get(shape)!.add(slug)
+    }
+    const topicFaqs = page.faqs.filter((faq) => queryWords.some((word) => faq.question.toLowerCase().includes(word.slice(0, 5))))
+    if (topicFaqs.length < 2) add(slug, 'faq-topic', 'At least two FAQ questions should use the search topic\'s words')
+
+    REVEAL_SHAPES.forEach((pattern, index) => {
+      if (pattern.test(page.reveal.headline)) revealShapes.set(index, [...(revealShapes.get(index) ?? []), slug])
+    })
+
+    const hookKey = page.hook.href
+    const hookOwner = hookOwners.get(hookKey)
+    if (hookOwner) add(slug, 'hook-reused', `Hook ${hookKey} is already used by ${hookOwner}; pick another real feature`)
+    else hookOwners.set(hookKey, slug)
+
     if (page.faqs.length < LIMITS.faqMin || page.faqs.length > LIMITS.faqMax) {
       add(slug, 'faq-count', `${page.faqs.length} FAQs (want ${LIMITS.faqMin} to ${LIMITS.faqMax})`)
     }
@@ -136,6 +186,12 @@ export function checkBenefitPages(
     for (const phrase of BANNED_PHRASES) {
       if (lower.includes(phrase)) add(slug, 'banned-phrase', `Copy uses "${phrase}"`)
     }
+    for (const { pattern, why } of CLAIM_BANS) {
+      const match = copy.match(pattern)
+      if (match) add(slug, 'claim', `"${match[0]}": ${why}`)
+    }
+    const noOpeners = sentences(copy).filter((sentence) => /^(no|not)\b/.test(sentence)).length
+    if (noOpeners > 3) add(slug, 'no-contrast', `${noOpeners} sentences open with "No"/"Not"; vary the shape`, 'warning')
     const wordCount = words(copy).length
     if (wordCount < LIMITS.wordsMin) add(slug, 'thin', `Only ${wordCount} words of page copy (want ${LIMITS.wordsMin}+)`)
 
@@ -153,6 +209,15 @@ export function checkBenefitPages(
         }
       }
     }
+  }
+
+  for (const [shape, owners] of faqShapes) {
+    if (owners.size >= 3) {
+      for (const owner of owners) add(owner, 'faq-repeat', `FAQ opening "${shape}…" appears on ${owners.size} pages`)
+    }
+  }
+  for (const owners of revealShapes.values()) {
+    if (owners.length > 1) for (const owner of owners.slice(1)) add(owner, 'reveal-shape', `Reveal headline repeats a shape used by ${owners[0]}`)
   }
 
   return issues

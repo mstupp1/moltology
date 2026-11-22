@@ -23,8 +23,8 @@ const page: BenefitPage = {
     text: 'The Oracle, our AI guide, has skills you can switch on, and it can read the forum, the news and the page you are on to give answers that fit.',
   },
   reveal: {
-    headline: 'The pipeline was a metaphor. The Oracle is real.',
-    body: 'Moltology is a free practice app: eight daily tasks, a streak, readings, a forum and the Oracle, an AI guide you can ask anything. Create an account to run your first day, or open the demo as a guest.',
+    headline: 'The Oracle is ready when the plan breaks.',
+    body: 'Ask it to plan tomorrow around one thing.',
     screenshot: 'oracle',
   },
   related: ['investing', 'energy-drinks', 'gaming'],
@@ -50,14 +50,16 @@ const page: BenefitPage = {
         'The eight are fixed so everyone practices the same thing. What you do inside them is yours: your one thing, your deep work, the member you help.',
     },
     {
-      question: 'What does the free plan include?',
+      question: 'What is decision fatigue?',
       answer:
-        'The daily tasks, streak, readings, forum and everyday Oracle use. Oracle MAX is a paid plan with higher limits and a stronger model, and it is optional.',
+        'The idea that each small choice draws on the same limited attention, so a day full of tiny decisions leaves less for the ones that matter. Fixing the order of your day removes a lot of them.',
     },
     {
-      question: 'Is there a sandbox?',
-      answer: 'Yes. The demo runs the full dashboard as a guest, so you can try the routine before you create an account.',
+      question: 'What should I automate first in my daily routine?',
+      answer:
+        'The first hour. Decide the night before what you will do before opening any app, then do it the same way each morning. A silent start and picking your one thing cover exactly that.',
     },
+
   ],
   content: {
     hero: {
@@ -78,9 +80,9 @@ const page: BenefitPage = {
       intro: 'You bring the goals. The structure, reminders of what comes next and the help are built in.',
       items: [
         { title: 'Fixed schedule', body: 'Eight tasks in a set order, from a quiet start to closing the day. Nothing to configure.' },
-        { title: 'AI on call', body: 'The Oracle plans, explains and unblocks. Skills add planning, breathing drills, weekly reviews and more.' },
+        { title: 'AI on call', body: 'The Oracle plans, explains and unblocks. Four skills are free, and more can be added from the shop.' },
         { title: 'Run history', body: 'A streak, weekly XP and an activity log show what ran and what did not.' },
-        { title: 'Human review', body: 'A forum of members doing the same practice, for the problems AI cannot fix.' },
+        { title: 'Members who help', body: 'A forum of people doing the same practice, for the problems AI cannot fix.' },
         { title: 'Source docs', body: 'Every task links to its passage in the Codex, so you know why it is there.' },
         { title: 'Works anywhere', body: 'Phone or desktop, in the browser. No install.' },
       ],
@@ -99,7 +101,7 @@ const page: BenefitPage = {
     },
     config: {
       title: 'Zero config, but here is the config',
-      body: 'If your day were a file, it would look like this. You will never have to write it.',
+      body: 'If your day were a file, it would look like this. You never have to write it.',
       filename: 'practice.yml',
       lines: [
         'schedule: daily',
@@ -123,7 +125,7 @@ const page: BenefitPage = {
           name: 'Free',
           price: '$0',
           body: 'The whole practice, for everyone.',
-          items: ['All eight daily tasks', 'Streak, XP and activity log', 'Codex readings and forum', 'Everyday Oracle use'],
+          items: ['All eight daily tasks', 'Streak, XP and activity log', 'Codex readings and forum', 'Everyday Oracle use', 'Four free Oracle skills'],
         },
         {
           name: 'Oracle MAX',

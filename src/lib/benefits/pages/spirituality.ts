@@ -23,8 +23,8 @@ const page: BenefitPage = {
     text: 'The practice comes from one reading in the Codex. It argues that two moments carry the day: the first hour, which decides what the day is for, and the last minutes, which decide what you carry into tomorrow.',
   },
   reveal: {
-    headline: 'The retreat is an app. It is free, and it fits in a day.',
-    body: 'Under the linen is Moltology: a daily practice, readings in the Codex, an AI guide and a forum of people keeping the same rhythm. Make an account to begin, or look around the demo first.',
+    headline: 'The retreat fits inside an ordinary day.',
+    body: 'Begin with a few quiet minutes tomorrow morning and build from there.',
     screenshot: 'forum',
   },
   related: ['libido', 'energy-drinks'],
@@ -50,18 +50,21 @@ const page: BenefitPage = {
         'The morning and evening practices take a few minutes each. The full day has eight small tasks, and you can begin with just the first and the last.',
     },
     {
-      question: 'Does it cost anything?',
-      answer: 'No. The practice, the readings and the forum are free. An optional paid plan adds more time with the AI guide.',
+      question: 'How do I start a spiritual practice at home?',
+      answer:
+        'Pick a small fixed time, keep it quiet and keep it short enough that you will do it again tomorrow. Something worth reading and a deliberate end to the day give it a shape.',
     },
     {
-      question: 'Can I look around before joining?',
-      answer: 'Yes. The demo shows the whole dashboard without an account, so you can see the practice before you commit to it.',
+      question: 'Do I have to believe anything?',
+      answer:
+        'No. The Codex is a set of readings with its own story and language, and you can take it as metaphor. The practice is the same whatever you believe.',
     },
+
   ],
   content: {
     hero: {
       kicker: 'A retreat you never travel to',
-      headline: 'Stillness, every day, at home.',
+      headline: 'A daily spiritual practice, at home.',
       sub: 'Moltology is a free daily practice: a quiet start, one honest look back and a clear end to each day. No flights, no fees, no week away.',
       cta: 'Begin your practice',
       image: {
@@ -81,7 +84,9 @@ const page: BenefitPage = {
       items: [
         { time: 'Early morning', title: 'Sit in silence', body: 'Before any feed or inbox, sit quietly and look honestly at yesterday.' },
         { time: 'Morning', title: 'Pick your one thing', body: 'Name what matters most today and begin it.' },
+        { time: 'Late morning', title: 'Learn something hard', body: 'Read a passage or a lesson that asks something of you.' },
         { time: 'Noon', title: 'Reset your focus', body: 'Clear one distraction and choose the next useful act.' },
+        { time: 'Afternoon', title: 'Do deep work', body: 'One unhurried block of real attention on the thing you chose.' },
         { time: 'Late afternoon', title: 'Help someone', body: 'Answer one member or welcome a newcomer.' },
         { time: 'Early evening', title: 'Let one thing go', body: 'Name one thing from today and set it down.' },
         { time: 'Evening', title: 'Close the day', body: 'Check off the day and stop. It is done either way.' },

@@ -104,7 +104,6 @@ export default function ArcadeKit({ page, onJoin, children }: BenefitKitProps) {
             <ol className="ar-quests">
               {quests.items.map((quest, index) => (
                 <li key={quest.title} className="ar-quest">
-                  <span className="ar-check" aria-hidden="true" />
                   <span className="ar-quest-copy">
                     <span className="ar-pixel ar-quest-n">Q{index + 1}</span>
                     <h3 className="ar-h3">{quest.title}</h3>

@@ -28,4 +28,18 @@ describe('benefit pages', () => {
     expect(rules).toContain('libido:disclaimer')
     expect(rules).toContain('twin:duplicate-copy')
   })
+
+  it('flags reveal questions in FAQs, invented outcomes and reused hooks', () => {
+    const [first, second, ...rest] = pages
+    const noisy = {
+      ...first,
+      faqs: [...first.faqs, { question: 'How much does it cost?', answer: 'Nothing.' }],
+      hook: { ...first.hook, text: 'Most members feel calmer within the first week.' },
+    } as BenefitPage
+    const copycat = { ...second, hook: { ...second.hook, href: first.hook.href } } as BenefitPage
+    const rules = checkBenefitPages(BENEFIT_PAGES, [noisy, copycat, ...rest]).map((issue) => `${issue.slug}:${issue.rule}`)
+    expect(rules).toContain(`${first.slug}:faq-intent`)
+    expect(rules).toContain(`${first.slug}:claim`)
+    expect(rules).toContain(`${second.slug}:hook-reused`)
+  })
 })

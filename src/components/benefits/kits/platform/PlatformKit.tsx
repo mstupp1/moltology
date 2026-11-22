@@ -58,12 +58,13 @@ export default function PlatformKit({ page, onJoin, children }: BenefitKitProps)
                 Open the demo
               </Link>
             </div>
-            <div className="pf-prompt" aria-label="Example request to the Oracle">
+            <Link to="/oracle" className="pf-prompt">
+              <span className="sr-only">Ask the Oracle, for example: </span>
               <span className="pf-prompt-text">{hero.prompt}</span>
               <span className="pf-prompt-send" aria-hidden="true">
                 <ArrowUp />
               </span>
-            </div>
+            </Link>
           </div>
           <div className="pf-wrap">
             <div className="pf-frame">

@@ -11,6 +11,7 @@
   --sm-paper: #fffdf7;
   --sm-gold: #ffcf2e;
   --sm-orange: #ff8a1f;
+  --sm-label: #b35600;
   --sm-body: #3a4361;
   --sm-muted: #6b7391;
   --sm-line: #e8dfc7;
@@ -416,7 +417,7 @@
   font-size: 0.8125rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--sm-orange);
+  color: var(--sm-label);
 }
 
 @media (min-width: 720px) {
@@ -505,7 +506,7 @@
   font-size: 0.875rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--sm-orange);
+  color: var(--sm-label);
 }
 
 [data-kit='seminar'] .sm-ticket-title {

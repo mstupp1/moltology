@@ -9,7 +9,7 @@
   --nw-lav: #f4f0ff;
   --nw-ink: #1b1530;
   --nw-body: #4b4566;
-  --nw-muted: #8a84a3;
+  --nw-muted: #6f6990;
   --nw-violet: #6b3cff;
   --nw-pink: #ff4f9a;
   --nw-orange: #ff9a3c;
@@ -215,7 +215,7 @@
 }
 
 [data-kit='network'] .nw-btn {
-  background: var(--nw-grad);
+  background: linear-gradient(135deg, #5a2ee6 0%, #c8246c 100%);
   color: #ffffff;
   box-shadow: 0 12px 30px -12px rgba(255, 79, 154, 0.7);
 }
@@ -315,15 +315,20 @@
 }
 
 [data-kit='network'] .nw-avatar {
-  display: grid;
-  place-items: center;
   width: 34px;
   height: 34px;
   flex-shrink: 0;
   border-radius: 999px;
-  background: var(--nw-grad);
-  color: #ffffff;
-  font-weight: 800;
+  background: var(--nw-lav);
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+[data-kit='network'] .nw-sample {
+  padding: 0 20px 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--nw-muted);
 }
 
 [data-kit='network'] .nw-post-body {
@@ -346,7 +351,7 @@
   padding: 1px 8px;
   border-radius: 999px;
   background: #ffe9f3;
-  color: #d02a73;
+  color: #a81d5a;
   font-size: 0.6875rem;
 }
 

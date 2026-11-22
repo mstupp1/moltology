@@ -7,7 +7,7 @@ const page: BenefitPage = {
   query: 'energy drink alternative',
   title: 'The energy drink alternative with zero caffeine | Moltology',
   description:
-    'Tired of the 3pm crash? Moltology is an energy drink alternative with zero sugar and zero caffeine: eight small daily tasks that keep your energy steady. Free.',
+    'Tired of the 3pm crash? Moltology is an energy drink alternative with zero sugar and zero caffeine: eight small daily tasks aimed at the afternoon slump. Free.',
   keywords: 'energy drink alternative, no caffeine energy, afternoon slump, 3pm crash, natural energy, daily routine',
   indexed: false,
   updated: '2026-11-22',
@@ -23,8 +23,8 @@ const page: BenefitPage = {
     text: 'The noon reset comes from the Daily Shedding Routine, which calls it Low Tide: clear one distraction, then choose the next useful thing to do.',
   },
   reveal: {
-    headline: 'The can was a costume. The app is real.',
-    body: 'Moltology is a free daily practice with eight tasks, a streak, an AI guide and a community. Make an account to start your first day, or try the demo with nothing to sign.',
+    headline: 'The afternoon fix is an app.',
+    body: 'Start with the noon reset tomorrow and see how the afternoon goes.',
     screenshot: 'dashboard',
   },
   related: ['libido', 'spirituality'],
@@ -49,20 +49,22 @@ const page: BenefitPage = {
       answer: 'Most tasks take a few minutes. Deep work is the longest, and you decide how long it runs.',
     },
     {
-      question: 'Is it really free?',
+      question: 'Why do I crash at 3pm?',
       answer:
-        'Yes. The daily tasks, the forum and the Codex are free. Oracle MAX is an optional paid plan for heavy use of the AI guide.',
+        'Part of the afternoon dip is ordinary body rhythm. It tends to feel worse after short sleep, a heavy lunch or hours of screen time without a break, and caffeine late in the day can push the problem into the night.',
     },
     {
-      question: 'Can I try it first?',
-      answer: 'Yes. The demo opens the full dashboard as a guest, no account needed.',
+      question: 'What can I do instead of an energy drink?',
+      answer:
+        'Common swaps are a short walk outside, water, a real break from screens and a clear next task. The noon reset task is built around that kind of break.',
     },
+
   ],
   content: {
     hero: {
-      sticker: 'Zero sugar · zero caffeine',
-      headline: 'Crack open a better afternoon.',
-      sub: 'Moltology is the energy drink alternative you do not drink. Eight small tasks spread across the day keep your focus up and stop the 3pm cliff. Free, with nothing to recycle.',
+      sticker: 'Crack open a better afternoon',
+      headline: 'The energy drink alternative with zero caffeine.',
+      sub: 'Moltology is the energy drink alternative you do not drink. Eight small tasks spread across the day aim squarely at the 3pm cliff. Free, with nothing to recycle.',
       cta: 'Grab a free account',
       image: {
         src: '/images/benefits/energy-drinks/hero.jpg',
@@ -71,7 +73,7 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    marquee: ['Zero sugar', 'Zero caffeine', 'Zero crash', 'Eight tasks a day', 'Free to join'],
+    marquee: ['Zero sugar', 'Zero caffeine', 'Zero caffeine at 3pm', 'Eight tasks a day', 'Free to join'],
     flavors: {
       title: 'Pick your flavor',
       items: [
@@ -95,7 +97,7 @@ const page: BenefitPage = {
       footnote: 'Not a beverage. Do not pour over ice. Results depend on sleep, food and whether you did the tasks.',
     },
     crash: {
-      title: 'The buzz, minus the crash',
+      title: 'A different shape of afternoon',
       without: ['A spike at 10am', 'A slump at 3pm', 'A second can at 4pm', 'Wide awake at midnight'],
       with: ['A clear first hour', 'A reset at noon', 'Deep work after lunch', 'A real end to the day'],
     },
