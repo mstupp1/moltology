@@ -20,7 +20,7 @@ const page: BenefitPage = {
   hook: {
     label: 'Two pincers beat ten hands, a Codex reading',
     href: '/codex/scr-012#verse-4',
-    text: 'Two pincers beat ten hands asks you to hold one objective until the job is done. Choose the work for this session before opening your tools. Put the other projects aside and keep the file you need in front of you.',
+    text: 'Two pincers beat ten hands: a crab trades dexterity for the ability to hold one thing until the job is done. Choose the work for this session before opening your tools. Put the other projects aside and keep the file you need in front of you.',
   },
   reveal: {
     headline: 'Give the project a place in your day.',
@@ -37,12 +37,12 @@ const page: BenefitPage = {
     {
       question: 'What counts as career growth besides a new title?',
       answer:
-        'Career growth can mean deeper skills, different responsibilities or a change in the work you want to do. Write down which one you mean before choosing a course. In Moltology, Learn something hard asks for deliberate study of a difficult thing.',
+        'Career growth can mean deeper skills, different responsibilities or a change in the work you want to do. Write down which one you mean before choosing a course, because each needs a different plan.',
     },
     {
       question: 'Which skill should I learn for my current role?',
       answer:
-        'Start with a real task you find difficult. Ask a colleague or manager which part needs attention, then choose a lesson or exercise about that part. Keep the question narrow enough to practice on an actual piece of work.',
+        'One tied to a real task you find difficult. Ask a colleague or manager which part needs attention, then choose a lesson or exercise about that part. Keep the question narrow enough to practice on an actual piece of work.',
     },
     {
       question: 'Where does deep work fit in a meeting-heavy day?',
@@ -64,7 +64,7 @@ const page: BenefitPage = {
     hero: {
       eyebrow: 'Professional development · Free account',
       headline: 'Put career growth on your calendar.',
-      sub: 'The proposal needs a draft. The manual has a chapter you keep skipping. Choose one piece of work and study the difficult part. Moltology puts focused work and learning on the daily checklist, ready for you to do.',
+      sub: 'Your proposal needs a draft, and the manual has a chapter you keep skipping. Book time for both. Moltology puts focused work and hard learning on the daily checklist, so growth stops waiting for a quiet quarter.',
       cta: 'Create your free account',
       image: {
         src: '/images/benefits/career/hero.jpg?v=2',
@@ -92,9 +92,9 @@ const page: BenefitPage = {
     features: {
       title: 'Your working account',
       items: [
-        { title: 'A priority before the inbox', body: 'Pick your one thing asks you to name what matters today and start. Choose the proposal section you need to write before collecting another list of ideas.' },
+        { title: 'A priority before the inbox', body: 'Name what matters today and start on it. Choose the proposal section you need to write before collecting another list of ideas.' },
         { title: 'Study on the checklist', body: 'Learn something hard makes room for a subject that pushes back. Read the documentation, work through the example and write down the question that remains.' },
-        { title: 'One file in focus', body: 'Do deep work asks you to work on one thing with interruptions shut out. Agree on availability where needed, then put the phone aside for the session.' },
+        { title: 'One file in focus', body: 'One thing, interruptions shut out. Agree on availability where needed, then put the phone aside for the session.' },
         { title: 'A useful second opinion', body: 'Ask the Oracle, our AI guide, to break a broad project into tasks. Standard chat includes a free daily limit; bring a concrete question about where to begin.' },
       ],
     },

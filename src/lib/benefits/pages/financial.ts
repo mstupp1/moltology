@@ -33,7 +33,7 @@ const page: BenefitPage = {
     {
       question: 'What does financial discipline mean?',
       answer:
-        'Financial discipline means following your money decisions with consistent actions. For the habits side, write down the reason for an optional purchase before opening the checkout. Moltology asks for that same plain approach to choosing a daily priority.',
+        'Financial discipline means spending and saving by a plan you made in advance, not by the mood you are in at checkout. A simple first habit: write down why you want an optional purchase before you pay for it.',
     },
     {
       question: 'Where can I start with financial discipline?',
@@ -51,21 +51,21 @@ const page: BenefitPage = {
         'Shopping can be another thing to do when the original task feels difficult or dull. Look at what was open just before the shop tab. Reset your focus asks you to clear one distraction and choose the next useful action.',
     },
     {
-      question: 'Are Chitin Gems and Molt Credits interchangeable?',
+      question: 'What is the 24-hour rule for spending?',
       answer:
-        'No. Chitin Gems are earned through work, while Molt Credits are paid currency. Purchases cannot award XP, stage, rank or forum authority; character gear changes looks and stats.',
+        'It is a pause: wait a day before buying anything you did not plan to buy. If you still want it tomorrow and it fits your budget, buy it then. Some people use a week, or 30 days, for bigger items.',
     },
     {
-      question: 'Should I log every purchase in the daily checklist?',
+      question: 'What helps with impulse buying online?',
       answer:
-        'No. Keep purchase records with your money records. Use the daily checklist for its named actions, such as learning, focused work and helping someone; a shopping receipt belongs in a different account.',
+        'Make buying slower. Unsubscribe from sale emails, remove saved card details from shops you browse when bored and close the basket instead of leaving it open in a tab.',
     },
   ],
   content: {
     hero: {
       eyebrow: 'Clear terms · Free to join',
       headline: 'Financial discipline. Check the terms before checkout.',
-      sub: 'Another tab. Another tempting upgrade. Before you click buy, name what you came to do. Moltology asks you to put attention into a daily practice, with clear rules for what you earn and what you purchase.',
+      sub: 'Another tab. Another tempting upgrade. Before you click buy, name what you came to do, then go and do it. Moltology gives that urge eight better places to go.',
       cta: 'Start a free account',
       image: {
         src: '/images/benefits/financial/hero.jpg?v=2',
@@ -96,7 +96,7 @@ const page: BenefitPage = {
         { title: 'Work on the record', body: 'Tick off an action after doing it. The daily tasks ask for quiet, a priority, learning, focus, useful work, help, letting go and a finish.' },
         { title: 'Optional extras, clearly named', body: 'Oracle MAX, Molt Credits and the merch store are paid options. Read what each offers and choose the one you actually want, if any.' },
         { title: 'A question before the basket', body: 'Ask the Oracle, our AI guide, to help break down the task you are avoiding. Standard chat has a free daily limit.' },
-        { title: 'Learning before equipment', body: 'Open the material you already bookmarked. Learn something hard asks you to study a difficult thing, even when the stationery drawer is fully stocked.' },
+        { title: 'Learning before equipment', body: 'Open the material you already bookmarked. Learn something hard means studying a difficult thing, even when the stationery drawer is fully stocked.' },
       ],
     },
     statement: {

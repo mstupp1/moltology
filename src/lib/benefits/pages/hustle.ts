@@ -37,12 +37,12 @@ const page: BenefitPage = {
     {
       question: 'Can I reject hustle culture and still be ambitious?',
       answer:
-        'Yes. Keep the goal and decide how much work belongs in this session. Choose the next piece of it, agree on realistic responsibilities and set a stopping point. Moltology asks for focused work alongside a daily close.',
+        'Yes. Keep the goal and decide how much work belongs in this session. Choose the next piece of it, agree on realistic responsibilities and set a stopping point. Ambition and a closing time get along fine.',
     },
     {
       question: 'How do I stop checking work email at night?',
       answer:
-        'Start by checking the availability your role actually requires. Agree on an urgent contact route where needed, then choose when to read routine mail. At the end of work, close the inbox and put the device away.',
+        'Check what availability your role really requires. Agree on an urgent contact route where needed, then choose when to read routine mail. At the end of work, close the inbox and put the device away.',
     },
     {
       question: 'What should I do when a focus timer ends?',
@@ -64,7 +64,7 @@ const page: BenefitPage = {
     hero: {
       eyebrow: 'Focused effort · Clear closing time',
       headline: 'Hustle culture has enough overtime.',
-      sub: 'The late-night email can stay a draft. Pick the work, give it your attention and set a time to stop. Moltology asks for a full daily practice, including the part where you put the laptop away.',
+      sub: 'The late-night email can stay a draft. Pick the work, give it your attention and set a time to stop. Moltology’s daily practice includes the part where you put the laptop away.',
       cta: 'Join the daily practice free',
       image: {
         src: '/images/benefits/hustle/hero.jpg?v=2',
@@ -92,9 +92,9 @@ const page: BenefitPage = {
     features: {
       title: 'A daily practice with closing hours',
       items: [
-        { title: 'Choose before adding more', body: 'Pick your one thing asks for a priority. Write the task you intend to start, even if the rest of the list keeps making suggestions.' },
-        { title: 'Work the chosen session', body: 'Do deep work asks you to shut out interruptions and stay with one thing. Keep the agreed urgent contact route open while routine messages wait.' },
-        { title: 'Make room for other people', body: 'Help a member asks you to answer someone or welcome a newcomer. Give that reply your attention, then return to the rest of your day.' },
+        { title: 'Choose before adding more', body: 'Write the task you intend to start, even if the rest of the list keeps making suggestions.' },
+        { title: 'Work the chosen session', body: 'Shut out interruptions and stay with one thing. Keep the agreed urgent contact route open while routine messages wait.' },
+        { title: 'Make room for other people', body: 'Answer someone on the forum or welcome a newcomer. Give that reply your attention, then return to the rest of your day.' },
         { title: 'Close with work left over', body: 'Review what you did and where you stopped. Close the day includes ending an unfinished day. Leave the next step beside the task and shut the file.' },
       ],
     },
