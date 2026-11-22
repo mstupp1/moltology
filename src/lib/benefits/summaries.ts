@@ -255,6 +255,46 @@ export const BENEFIT_PAGES: BenefitSummary[] = [
     indexed: false,
     updated: '2026-11-22',
   },
+  {
+    slug: 'physicality',
+    topic: 'Physicality',
+    kit: 'locker',
+    blurb: 'Train the link between a calm mind and a body you notice.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'grip',
+    topic: 'Grip',
+    kit: 'locker',
+    blurb: 'Get a grip on your day: one thing first, every morning.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'fitness',
+    topic: 'Fitness',
+    kit: 'locker',
+    blurb: 'Mental fitness with stats, reps and a weekly board.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'movement',
+    topic: 'Movement',
+    kit: 'locker',
+    blurb: 'Small daily movement against the habit of stalling.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
+  {
+    slug: 'resilience',
+    topic: 'Resilience',
+    kit: 'locker',
+    blurb: 'Practice bouncing back while the stakes are small.',
+    indexed: false,
+    updated: '2026-11-22',
+  },
 ]
 
 export const BENEFITS_HUB_PATH = '/benefits'
