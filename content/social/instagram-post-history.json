@@ -1073,7 +1073,8 @@
         "#DeepWork"
       ],
       "firstComment": "https://moltology.org",
-      "status": "scheduled",
+      "status": "cancelled",
+      "supersededByZernioPostId": "6b03693d28129002fb135a23",
       "scheduledFor": "2026-11-23T18:00:00.000Z",
       "queueId": "6a84b76d2421e968ac81f5bc",
       "zernioPostId": "6b03664f514e8621aef1209e",
@@ -1087,6 +1088,42 @@
       "stopper": "Oversized cursor on a blank page",
       "loudness": 3,
       "createdAt": "2026-11-22T22:01:53.034Z"
+    },
+    {
+      "id": "post-1795385660513",
+      "topic": "Getting started on a writing task with one rough first sentence",
+      "hookHeadline": "Your blank document needs one ugly sentence.",
+      "theme": "editorial",
+      "mascot": "crab_juno_marsh",
+      "archivePath": "Social Archive/2026/11/post-43914cdabac146c7f6377f69",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/media/1795385660855_5ed3d7889f8329b8_01.png"
+      ],
+      "aspectRatio": "4:5",
+      "caption": "Your blank document needs one ugly sentence.\n\nWhen the report is still a blinking cursor, write the one thing you need the reader to know. You can give the sentence a shell on the second pass.\n\nSave this for the next blank page.",
+      "hashtags": [
+        "#Moltology",
+        "#Writing",
+        "#DeepWork"
+      ],
+      "firstComment": "https://moltology.org",
+      "status": "published",
+      "publishedAt": "2026-11-22T22:14:47.499Z",
+      "platformPostUrl": "https://www.instagram.com/p/DgD2ovxiA-o/",
+      "replacesZernioPostId": "6b03664f514e8621aef1209e",
+      "scheduledFor": "2026-11-22T22:14:22.005Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6b03693d28129002fb135a23",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "series": "One-off",
+      "episode": 1,
+      "cast": [
+        "crab_juno_marsh"
+      ],
+      "stopper": "Oversized cursor on a blank page",
+      "loudness": 3,
+      "createdAt": "2026-11-22T22:14:36.157Z"
     }
   ]
 }
