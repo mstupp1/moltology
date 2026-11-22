@@ -8,9 +8,10 @@
  * Each lobe carries the same total light as the directional light it stands for, so diffuse
  * shading matches; highlights from it are softer, like a large softbox.
  *
- * On top of the lobes sit a few hard-edged studio panels (a key softbox, a rim strip and a low
- * card). They add little light, but glossy coats, eyes and visors reflect them as crisp windows
- * and lines instead of soft blobs, which is most of what reads as a studio product shot.
+ * On top of the lobes sit a few soft studio panels (a key softbox, a rim strip and a low card).
+ * They add a gentle sheen to glossy coats, eyes and visors. Their edges are kept very soft and
+ * their light low on purpose: sharp, bright panels read as a visible square on the skin and
+ * in the eyes.
  */
 import { DataTexture, DataUtils, EquirectangularReflectionMapping, HalfFloatType, LinearFilter, LinearSRGBColorSpace, RGBAFormat, Color, Vector3 } from 'three'
 import { ROOM_ENV, ROOM_ENV_RGBE } from './room-env'
@@ -43,18 +44,18 @@ interface Panel {
 /** The studio panels every lighting shares. */
 const PANELS: Panel[] = [
   // The key's softbox, up and to the front right: a tall window on every clear coat.
-  { from: [2.2, 3.4, 4.4], w: 0.32, h: 0.42, edge: 0.06, rgb: [9, 8.6, 8.1] },
+  { from: [2.2, 3.4, 4.4], w: 0.32, h: 0.42, edge: 0.48, rgb: [2.7, 2.58, 2.43] },
   // A thin strip behind on the left that draws a sharp line down the edges.
-  { from: [-3.4, 1.2, -2.2], w: 0.05, h: 0.75, edge: 0.03, rgb: [5, 6.8, 8] },
+  { from: [-3.4, 1.2, -2.2], w: 0.05, h: 0.75, edge: 0.24, rgb: [1.5, 2.04, 2.4] },
   // A low warm card at the front for a small catch along the lower curves.
-  { from: [-0.8, -0.6, 4.6], w: 0.45, h: 0.06, edge: 0.04, rgb: [1.6, 1.2, 1.1] },
+  { from: [-0.8, -0.6, 4.6], w: 0.45, h: 0.06, edge: 0.32, rgb: [0.48, 0.36, 0.33] },
 ]
 
 /**
  * The live key light is dimmed by this much: the key softbox panel now carries part of its
  * light, so the overall brightness stays about where it was.
  */
-export const KEY_WITH_PANELS = 0.8
+export const KEY_WITH_PANELS = 0.94
 
 interface LightRecipe {
   /** How much of the captured room shows (what scene.environmentIntensity was). */
