@@ -193,7 +193,13 @@ export async function openCompositeSession(options: CompositeSessionOptions = {}
       env: { ...process.env, PORT: String(port), NODE_ENV: 'production' },
       stdio: 'ignore',
     })
-    await waitForServer(probeUrl, 30000)
+    try {
+      await waitForServer(probeUrl, 60000)
+    } catch (err) {
+      // A server that never came up would otherwise outlive the run and keep the process open.
+      server.kill('SIGTERM')
+      throw err
+    }
   }
 
   const { chromium } = await import('playwright-core')

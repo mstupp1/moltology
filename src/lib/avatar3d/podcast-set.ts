@@ -9,6 +9,7 @@
  */
 import {
   BoxGeometry,
+  CanvasTexture,
   Color,
   CylinderGeometry,
   Group,
@@ -16,6 +17,7 @@ import {
   MeshPhysicalMaterial,
   MeshStandardMaterial,
   SphereGeometry,
+  SRGBColorSpace,
   TorusGeometry,
   Vector3,
   type Material,
@@ -39,6 +41,35 @@ function shadowed<T extends Mesh>(mesh: T): T {
   mesh.castShadow = true
   mesh.receiveShadow = true
   return mesh
+}
+
+/** Walnut grain drawn once on a canvas; null where there is no 2D canvas (tests). */
+function woodGrain(): CanvasTexture | null {
+  if (typeof document === 'undefined') return null
+  const canvas = document.createElement('canvas')
+  canvas.width = 1024
+  canvas.height = 256
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  ctx.fillStyle = '#6a4529'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  // Seeded so every render of the set shows the same board.
+  let seed = 7
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+  for (let i = 0; i < 140; i++) {
+    const y = rand() * canvas.height
+    const dark = rand() > 0.5
+    ctx.strokeStyle = dark ? `rgba(40,24,14,${0.08 + rand() * 0.18})` : `rgba(150,105,70,${0.05 + rand() * 0.12})`
+    ctx.lineWidth = 0.6 + rand() * 2.4
+    ctx.beginPath()
+    ctx.moveTo(0, y)
+    for (let x = 0; x <= canvas.width; x += 64) ctx.lineTo(x, y + Math.sin(x / 180 + i) * (2 + rand() * 4))
+    ctx.stroke()
+  }
+  const texture = new CanvasTexture(canvas)
+  texture.colorSpace = SRGBColorSpace
+  texture.anisotropy = 8
+  return texture
 }
 
 /** A cylinder from a to b. */
@@ -137,27 +168,44 @@ export function dressPodcast(members: DressMember[]): Group {
   props.name = 'podcast:props'
   if (!members.length) return props
   const spots = members.map((m) => ({ member: m, ...anchors(m) }))
-  // The desk top sits a little under the lowest mouth, so every speaker clears it.
+  // The desk top sits well under the lowest mouth, low enough that a medium shot is mostly host
+  // and an open front lets the floor and the hosts' lower bodies show.
   const lowestMouth = Math.min(...spots.map((s) => s.mouth.y))
-  const deskY = Math.min(1.05, Math.max(0.5, lowestMouth - 0.42))
+  const deskY = Math.min(0.95, Math.max(0.45, lowestMouth - 0.55))
   const xs = members.map((m) => m.x)
   const front = Math.max(...spots.map((s) => s.member.z + 0.62))
-  const depth = 0.7
+  const depth = 0.62
   const width = Math.max(1.8, Math.max(...xs) - Math.min(...xs) + 1.9)
   const centreX = (Math.max(...xs) + Math.min(...xs)) / 2
   const centreZ = front + depth / 2
+  const frontZ = centreZ + depth / 2
 
-  const wood = mat('#5b3b26', 0.6)
+  const grain = woodGrain()
+  const wood = new MeshPhysicalMaterial({ color: grain ? '#ffffff' : '#6a4529', map: grain ?? null, roughness: 0.42, clearcoat: 0.35, clearcoatRoughness: 0.4 })
   const top = new Mesh(new BoxGeometry(width, 0.07, depth), wood)
   top.position.set(centreX, deskY, centreZ)
   props.add(shadowed(top))
-  // A front panel to the floor, in a darker stain with a thin amber strip: the desk reads as solid.
-  const panel = new Mesh(new BoxGeometry(width - 0.08, deskY - 0.035, 0.05), mat('#2f2119', 0.7))
-  panel.position.set(centreX, (deskY - 0.035) / 2, centreZ + depth / 2 - 0.04)
-  props.add(shadowed(panel))
-  const strip = new Mesh(new BoxGeometry(width - 0.2, 0.025, 0.01), new MeshStandardMaterial({ color: '#f5b93a', emissive: new Color('#b8720c'), emissiveIntensity: 0.8 }))
-  strip.position.set(centreX, deskY - 0.12, centreZ + depth / 2 - 0.01)
+  // A rounded front edge catches a line of light, so the top reads as a real slab of wood.
+  const lip = new Mesh(new CylinderGeometry(0.036, 0.036, width, 16), wood)
+  lip.rotation.z = Math.PI / 2
+  lip.position.set(centreX, deskY, frontZ)
+  props.add(shadowed(lip))
+  // A short dark apron under the top with a warm strip of light along its bottom edge.
+  const apronH = 0.15
+  const apron = new Mesh(new BoxGeometry(width - 0.24, apronH, 0.04), mat('#2a1d15', 0.65))
+  apron.position.set(centreX, deskY - 0.035 - apronH / 2, frontZ - 0.07)
+  props.add(shadowed(apron))
+  const strip = new Mesh(new BoxGeometry(width - 0.3, 0.018, 0.012), new MeshStandardMaterial({ color: '#f5b93a', emissive: new Color('#b8720c'), emissiveIntensity: 0.9 }))
+  strip.position.set(centreX, deskY - 0.035 - apronH + 0.012, frontZ - 0.045)
   props.add(strip)
+  // Two blackened steel end frames; no rail, so nothing runs along the hosts' feet.
+  const steel = mat('#16171a', 0.4, 0.6)
+  for (const end of [-1, 1]) {
+    const x = centreX + end * (width / 2 - 0.1)
+    const frame = new Mesh(new BoxGeometry(0.05, deskY - 0.035, depth - 0.12), steel)
+    frame.position.set(x, (deskY - 0.035) / 2, centreZ)
+    props.add(shadowed(frame))
+  }
 
   for (const spot of spots) {
     const { member, mouth, ears } = spot
