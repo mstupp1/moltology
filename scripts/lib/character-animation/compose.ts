@@ -207,21 +207,22 @@ export function renderHeadlineCards(headline: string, outDir: string): string[] 
 export function renderTagCard(tag: string, outPath: string): string {
   const canvas = createCanvas(OUT_W, OUT_H)
   const ctx = canvas.getContext('2d')
-  ctx.font = `700 40px ${FONT}`
-  const width = ctx.measureText(tag).width + 56
-  const x = 120
+  // Small and tucked to the left edge, so it clears the studio's wall emblem (top centre).
+  ctx.font = `700 34px ${FONT}`
+  const width = ctx.measureText(tag).width + 50
+  const x = 72
   const y = 250
   ctx.fillStyle = 'rgba(8,12,18,0.78)'
   ctx.beginPath()
-  ctx.roundRect(x, y, width, 68, 34)
+  ctx.roundRect(x, y, width, 58, 29)
   ctx.fill()
   ctx.fillStyle = '#f59e0b'
   ctx.beginPath()
-  ctx.arc(x + 30, y + 34, 9, 0, Math.PI * 2)
+  ctx.arc(x + 27, y + 29, 8, 0, Math.PI * 2)
   ctx.fill()
   ctx.fillStyle = '#ffffff'
   ctx.textBaseline = 'middle'
-  ctx.fillText(tag, x + 48, y + 35)
+  ctx.fillText(tag, x + 43, y + 30)
   fs.mkdirSync(path.dirname(outPath), { recursive: true })
   fs.writeFileSync(outPath, canvas.toBuffer('image/png'))
   return outPath
