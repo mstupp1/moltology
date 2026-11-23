@@ -117,14 +117,15 @@ export function garment(kit: Kit, wear: Wearable): void {
 }
 
 /**
- * The coat below the torso: a ring round the hem, carried down and out into a gentle flare. It
- * rides the torso bone, open a little at the front so the legs show when the character walks.
+ * The coat below the torso: a ring round the hem, carried down and out so it hangs round the
+ * outside of the walking legs, wherever the species and build put them, with a little room to
+ * spare. It rides the torso bone, open a little at the front so the legs show as it walks.
  */
 function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
   const { loft: host, bone } = wear.torso
   const length = drop
-  const cols = 48
-  const rows = 8
+  const cols = 64
+  const rows = 12
   const split = 0.16
   const top = hem + 0.01
   const k = host.key(host.sAt(top))
@@ -132,17 +133,50 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
   const cz = k.z ?? 0
   const verts: number[] = []
   const index: number[] = []
+  const ring = Array.from({ length: cols + 1 }, (_, c) => {
+    const phi = split + (c / cols) * (Math.PI * 2 - split * 2)
+    return onBody(host, top, phi > Math.PI ? phi - Math.PI * 2 : phi, LIFT + 0.004).at
+  })
+  const legs = legLines(kit)
+  const room = wear.leg.radius * 1.25 + 0.035
+  let prev: number[] = []
   for (let r = 0; r <= rows; r++) {
     const t = r / rows
-    for (let c = 0; c <= cols; c++) {
-      const phi = split + (c / cols) * (Math.PI * 2 - split * 2)
-      const angle = phi > Math.PI ? phi - Math.PI * 2 : phi
-      const p = onBody(host, top, angle, LIFT + 0.004).at
-      const flare = 1 + 0.32 * t * t + 0.05 * t
-      const x = cx + (p.x - cx) * flare
-      const z = cz + (p.z - cz) * flare
-      verts.push(x, p.y - length * t, z)
+    const y = top - length * t
+    // How far out each column hangs: a gentle flare, pushed further wherever a leg is in the way.
+    const reach = ring.map((p) => {
+      const dx = p.x - cx
+      const dz = p.z - cz
+      const base = Math.hypot(dx, dz)
+      const ux = dx / base
+      const uz = dz / base
+      let need = base * (1 + 0.32 * t * t + 0.05 * t)
+      for (const at of legs) {
+        const leg = at(y)
+        if (!leg) continue
+        const lx = leg.x - cx
+        const lz = leg.z - cz
+        const along = lx * ux + lz * uz
+        const off = Math.abs(lx * uz - lz * ux)
+        // Wide of the leg, the cloth still has to curve round it, so the clearance fades out.
+        const wide = room * 2.2
+        if (along > 0 && off < wide) need = Math.max(need, along + Math.sqrt(Math.max(0, wide * wide - off * off)) * (room / wide) + room * 0.25)
+      }
+      return need
+    })
+    // Smooth round the ring (never pulling in past a leg), and never narrower than the row above.
+    for (let pass = 0; pass < 4; pass++) {
+      const copy = reach.slice()
+      for (let c = 0; c <= cols; c++) reach[c] = Math.max(copy[c], (copy[Math.max(0, c - 1)] + copy[c] * 2 + copy[Math.min(cols, c + 1)]) / 4)
     }
+    if (prev.length) for (let c = 0; c <= cols; c++) reach[c] = Math.max(reach[c], prev[c])
+    prev = reach
+    ring.forEach((p, c) => {
+      const dx = p.x - cx
+      const dz = p.z - cz
+      const base = Math.hypot(dx, dz)
+      verts.push(cx + (dx / base) * reach[c], y, cz + (dz / base) * reach[c])
+    })
   }
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -177,6 +211,33 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
     edge.push(v(verts[i], verts[i + 1], verts[i + 2]))
   }
   kit.addWorld(bone, 'trim', tube(edge, 0.008, 96))
+}
+
+/**
+ * Each walking leg as a line from hip to knee to ankle at rest (character space), so a coat can hang
+ * clear of it. Returns where the leg's centre is at a given height, or nothing above the hip.
+ */
+function legLines(kit: Kit): ((y: number) => Vector3 | null)[] {
+  const { root } = kit.rig
+  root.updateMatrixWorld(true)
+  const bone = (name: string) => kit.rig.bones.get(name)
+  const at = (name: string) => {
+    const node = bone(name)
+    return node && root.worldToLocal(node.getWorldPosition(new Vector3()))
+  }
+  return SIDES.flatMap(({ tag }) => {
+    const pts = [at(`thigh${tag}`), at(`shin${tag}`), at(`foot${tag}`)]
+    if (pts.some((p) => !p)) return []
+    const [hip, knee, ankle] = pts as Vector3[]
+    return [
+      (y: number) => {
+        if (y > hip.y) return null
+        const [a, b] = y > knee.y ? [hip, knee] : [knee, ankle]
+        const k = Math.min(1, Math.max(0, (a.y - y) / (a.y - b.y)))
+        return a.clone().lerp(b, k)
+      },
+    ]
+  })
 }
 
 /** Shoes: `clog` (a rounded slip-on with a thick sole) or `hi-top` (up over the ankle, laced). */
