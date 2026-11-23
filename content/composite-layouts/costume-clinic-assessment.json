@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "name": "costume-clinic-assessment",
+  "aspect": "4:5",
+  "costume": "clinic",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 52,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 60
+      }
+    },
+    {
+      "id": "eyebrow",
+      "type": "pill",
+      "text": "Free online assessment",
+      "size": 30,
+      "background": "sage",
+      "color": "sageInk",
+      "border": "sage",
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 70
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Low drive is often a bad-days problem.",
+      "size": 96,
+      "minSize": 67,
+      "box": {
+        "x": 7,
+        "y": 22,
+        "w": 86,
+        "h": 25
+      },
+      "highlight": "bad-days"
+    },
+    {
+      "id": "card",
+      "type": "panel",
+      "box": {
+        "x": 7,
+        "y": 50,
+        "w": 86,
+        "h": 23
+      }
+    },
+    {
+      "id": "checks",
+      "type": "list",
+      "items": [
+        "15 questions, about 3 minutes",
+        "No account needed",
+        "A daily plan from your answers"
+      ],
+      "size": 38,
+      "marker": "check",
+      "gap": 22,
+      "box": {
+        "x": 12,
+        "y": 54,
+        "w": 76,
+        "h": 17
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Start the assessment",
+      "size": 40,
+      "arrow": true,
+      "box": {
+        "x": 7,
+        "y": 80,
+        "w": 86,
+        "h": 8
+      }
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "text": "Not a medical service. Free to join.",
+      "size": 36,
+      "minSize": 36,
+      "box": {
+        "x": 7,
+        "y": 90,
+        "w": 86,
+        "h": 5
+      },
+      "font": "body",
+      "color": "muted",
+      "align": "center"
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "name": "costume-can-label",
+  "aspect": "4:5",
+  "costume": "can",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 52,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 60
+      }
+    },
+    {
+      "id": "sticker",
+      "type": "pill",
+      "text": "New flavor",
+      "size": 34,
+      "box": {
+        "x": 62,
+        "y": 5,
+        "w": 31,
+        "h": 7
+      },
+      "align": "right"
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Energy that skips the crash",
+      "size": 118,
+      "minSize": 82,
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 86,
+        "h": 27
+      }
+    },
+    {
+      "id": "label",
+      "type": "panel",
+      "color": "cream",
+      "border": "black",
+      "borderWidth": 5,
+      "radius": 8,
+      "box": {
+        "x": 7,
+        "y": 45,
+        "w": 86,
+        "h": 36
+      }
+    },
+    {
+      "id": "label-title",
+      "type": "text",
+      "text": "Daily facts",
+      "size": 64,
+      "minSize": 44,
+      "box": {
+        "x": 12,
+        "y": 48,
+        "w": 76,
+        "h": 7
+      },
+      "color": "black",
+      "font": "display"
+    },
+    {
+      "id": "label-rule",
+      "type": "shape",
+      "shape": "line",
+      "color": "black",
+      "thickness": 6,
+      "box": {
+        "x": 12,
+        "y": 56,
+        "w": 76
+      }
+    },
+    {
+      "id": "facts",
+      "type": "list",
+      "items": [
+        "Serving: one ordinary day",
+        "Daily tasks: 8",
+        "Sugar: 0 g, it is an app",
+        "Crash: not included"
+      ],
+      "size": 40,
+      "marker": "none",
+      "color": "black",
+      "weight": 700,
+      "gap": 16,
+      "box": {
+        "x": 12,
+        "y": 58,
+        "w": 76,
+        "h": 21
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Crack one open",
+      "size": 42,
+      "box": {
+        "x": 7,
+        "y": 85,
+        "w": 86,
+        "h": 8
+      }
+    }
+  ]
+}

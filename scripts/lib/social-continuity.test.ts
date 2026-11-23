@@ -44,3 +44,18 @@ describe('summarizeContinuity', () => {
     expect(formatContinuityReport(report)).toContain('Shell Check: 3 (carousel')
   })
 })
+
+describe('costumes', () => {
+  it('records the costume and warns when over one in three recent pieces wear one', () => {
+    expect(continuityFields({ series: 'Molt Pod', costume: 'can', benefit: 'energy-drinks' })).toMatchObject({ costume: 'can', benefit: 'energy-drinks' })
+    const posts = [
+      { hookHeadline: 'a', costume: 'can', createdAt: '2026-11-20' },
+      { hookHeadline: 'b', costume: 'can', createdAt: '2026-11-21' },
+      { hookHeadline: 'c', createdAt: '2026-11-22' },
+    ]
+    const report = summarizeContinuity(posts, [], 12)
+    expect(report.costumed).toBe(2)
+    expect(report.costumeCounts).toEqual([{ costume: 'can', count: 2 }])
+    expect(formatContinuityReport(report)).toContain('over 1 in 3')
+  })
+})

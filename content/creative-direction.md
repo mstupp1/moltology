@@ -28,6 +28,7 @@ blank page. Keep one-offs to at most one in four pieces.
 | **The Molt Log** | A running workplace story with the same characters, one small win per episode | POV, fake group chat, expectation vs reality, story, before and after | The Log crew (section 2): the same three characters every episode | Illustrated deep-sea office, warm practicals, recurring set (the same desk, the same window, the same plant) | Lavender |
 | **Codex Lessons** | One Codex passage turned into one thing to do today, taught by the same 3D host | Animated lesson shorts ([animated-lessons](../.agents/skills/animated-lessons/SKILL.md)): claim, the passage in plain words, the action, the website invitation | `crab_juno_marsh` (Juno) hosting, `lobster_kit_shallows` (Kit) asking, rendered by the site's 3D character code | Deep-water set or a lamp-lit study at depth, cinematic rim light, the host centre frame | Amber |
 | **Crab Logic** | Pure deadpan crab and lobster micro-comedy with zero productivity tips and a hard cut on the punchline | 12–18s 3D ensemble sketches ([benthic-comedy-shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md)): Surface Confusion, Literal Crab Logic, Reef Breakroom Drama | Rotating 2–3 cast ensembles (`bo`, `vera`, `otto`, `sol`, `nell`, `moss`) rendered by the site's 3D character code | Existing 3D sets or custom 9:16 painted sets per gag; fast cuts into reaction close-ups, no promo outro | Cyan |
+| **Molt Pod** | Highlight clips from a podcast that sounds like two friends who actually do the practice: one honest question, one real answer, a laugh | Podcast highlight clips ([animated-lessons](../.agents/skills/animated-lessons/SKILL.md#molt-pod)): 20–45s cut from "the episode", cold open on the best line, sometimes a guest in a [costume](costumes.md) | `crab_juno_marsh` and `lobster_vera_drift` host at the desk; guests rotate from the cast | The `podcast-studio` set: desk, broadcast mics on boom arms, studio headphones, warm practicals and a lit sign behind; close singles cut with a wide two-shot | Amber |
 
 Rules:
 
@@ -42,9 +43,19 @@ Rules:
 - **Rotate series.** Don't run the same series twice in a row on one channel unless it's a
   two-part story. Check the ledger (section 7).
 - **New series.** Propose a new series only with three episode ideas ready. Add it to this
-  table in the same change. Codex Lessons started with: the Daily Shedding Routine (SCR-030),
+  table in the same change. Molt Pod started with: "Is a morning routine just a phone with
+  extra steps?", "The energy drink rep" (a can-costume guest pitches, the hosts talk them down to
+  a noon reset) and "Vera rates Juno's to-do list". Codex Lessons started with: the Daily Shedding Routine (SCR-030),
   the Nightly Molt Audit and the Isolation Protocols. Crab Logic started with: Walking Forward,
   Six Alarms, and The Cold Box.
+
+### Costumes
+
+Any series can wear one of the benefit-page [costumes](costumes.md) for an episode: a Shell Check
+tier list in the can look, a Molt Pod guest from the seminar, a Field Notes cover set like a
+lookbook. The series tag, cast and callback stay; the type, colours and props change. At most one
+piece in three wears a costume, never the same costume twice in a row, and every costumed piece
+ends in the house look on the real feature. Record `costume` and `benefit` in the draft.
 
 ## 2. Cast
 
@@ -200,7 +211,7 @@ same series unless a one-off is justified.
 ## 7. Continuity ledger
 
 `content/social/instagram-post-history.json` and `instagram-reel-history.json` record
-`series`, `episode`, `format`, `cast`, `stopper`, `callback` and `loudness` from the
+`series`, `episode`, `format`, `cast`, `stopper`, `callback`, `loudness`, `costume` and `benefit` from the
 reviewed draft when a piece is queued. Before the brief, run:
 
 ```bash
@@ -212,7 +223,8 @@ characters have been overused, and repeated hooks. Use it to:
 
 - continue the series that is due, with the next episode number;
 - pick a callback from the last episode of that series;
-- avoid repeating a hook, format or lead character from the last three pieces on that channel.
+- avoid repeating a hook, format or lead character from the last three pieces on that channel;
+- keep costumes to one piece in three and rotate them (the report warns).
 
 ## 8. Phone proof
 
@@ -241,4 +253,5 @@ character), then make the sheet again. Save it beside the draft as `phone-proof.
 | [Benthic Swipe Lab](../.agents/skills/benthic-swipe-lab/SKILL.md) | Shell Check, The Molt Log | Meme formats live here; the cover system matters most |
 | [Carousels](../.agents/skills/instagram-carousel-creator/SKILL.md) | Ask the Oracle, Field Notes | Useful decks; the payoff slide follows the type scale strictly |
 | [Single posts](../.agents/skills/instagram-post-creator/SKILL.md) | Any; lead magnets use Ask the Oracle | One frame: stopper, focal point and headline do all the work |
+| [Animated lessons](../.agents/skills/animated-lessons/SKILL.md) | Codex Lessons, Molt Pod | Molt Pod clips use the podcast-studio set; a costumed guest follows costumes.md |
 | [Benthic comedy shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md) | Crab Logic | 12–18s pure 3D comedy; hard cut on the punchline, custom sets allowed, dedicated comedy queue |

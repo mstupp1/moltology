@@ -13,7 +13,8 @@ A lesson is one JSON file. `npm run anim:create` checks it before rendering and 
 | `host` | Cast key, first name or alias from `content/characters/cast.json` (`juno`); speaks any line without a `speaker` |
 | `cast` | Optional `[{ "id", "at" }]` for two or more characters; `at` is a mark: `left`, `center` or `right`. Must include the host |
 | `acting` | Optional `auto` (default), `calm` or `none`: how much the cast acts on their own while talking and listening (see [Acting](#acting)) |
-| `set` | Optional 3D set: `codex-study`, `reef-office` or `open-water` (pieces stay behind and beside the marks). Its art kit from `content/animation/sets/` is used automatically |
+| `set` | Optional 3D set: `codex-study`, `reef-office`, `open-water` or `podcast-studio` (pieces stay behind and beside the marks, except the podcast desk, which stands in front of the cast on purpose). Its art kit from `content/animation/sets/` is used automatically |
+| `tag` | Optional small label on every scene, top left, at most 32 characters: `"Molt Pod · Ep. 3"` for show-style series |
 | `codex` | `{ id, title, url }` when teaching a passage |
 | `hookHeadline` | Scene 1's whole line, under 14 words |
 | `backdrop` | Optional 9:16 image, relative to the lesson file; overrides the set's painted plate |

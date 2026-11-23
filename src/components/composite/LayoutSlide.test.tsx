@@ -31,4 +31,28 @@ describe('LayoutSlide', () => {
     expect(screen.getByText('Moltology')).toBeInTheDocument()
     expect(screen.getByText('moltology.org')).toBeInTheDocument()
   })
+
+  it('wears a costume: its ground, fonts, tokens and lockup', () => {
+    const { container } = render(
+      <LayoutSlide
+        spec={{
+          aspect: '4:5',
+          costume: 'locker',
+          layers: [
+            { type: 'text', text: 'Heavy days', size: 120, box: { x: 6, y: 10, w: 80, h: 20 } },
+            { type: 'pill', text: 'Program 01', color: 'volt', background: 'black', box: { x: 6, y: 40, w: 40 } },
+            { type: 'brand', box: { x: 6, y: 90, w: 40 } },
+          ],
+        }}
+      />
+    )
+    const root = container.querySelector('[data-composite-root]') as HTMLElement
+    expect(root.dataset.costume).toBe('locker')
+    expect(root.style.backgroundColor).toBe('rgb(12, 12, 12)')
+    const headline = screen.getByText('Heavy days').parentElement as HTMLElement
+    expect(headline.style.fontFamily).toContain('Anton')
+    expect(headline.style.textTransform).toBe('uppercase')
+    expect(screen.getByText('Program 01').style.color).toBe('rgb(216, 255, 60)')
+    expect(screen.getByText('Moltology').style.fontStyle).toBe('italic')
+  })
 })

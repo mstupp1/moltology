@@ -47,6 +47,10 @@ Choose the goal before writing. Editorial carousels end with one specific share/
 
 Follow the creative-direction type scale (cover headline 96px or more, slide headline 64px, body 40px, labels 30px on the 1080-wide canvas; at most 12 words on the cover and 40 per slide). Keep natural breathing room, at most one meaningful category pill per slide, rounded panels, and the brand colours plus the series accent. Use the series cover system on slide 1. Vary shots across slides (the playbook's shot list) while keeping one light direction and grade, so the deck looks like one place. Inspect source-backed numbers and clearly distinguish fictional HUD readings. No fake reviews, certification seals, decorative glyphs or unsupported product claims.
 
+### Costume decks
+
+A carousel can wear one of the benefit-page [costumes](../../../content/costumes.md) when its topic matches a benefit page: costumed cover, two to four slides built on the industry's devices (the clinic plan picker, the ledger statement, the locker spec table), then a slide in the house look on the real feature. Run `npm run costumes:brief -- --topic <slug>` for the angle, real hook, FAQs (good slide questions) and safety line, and start from the costume's starter layout with `"costume"` set. A costumed cover against the house cover on the same topic is a good one-variable experiment. Record `costume` and `benefit` in the draft; the continuity report keeps costumes to one piece in three.
+
 ### Quote decks: a save-focused option
 
 Offer a quote deck when the idea works as five to eight concise lines worth returning to. The user's supplied rationale is that quote decks are the most-saved Instagram format; treat that as a hypothesis to test with our audience, not an independently established ranking.

@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "name": "costume-locker-spec",
+  "aspect": "4:5",
+  "costume": "locker",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 52,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 60
+      }
+    },
+    {
+      "id": "tag",
+      "type": "pill",
+      "text": "Program 01",
+      "size": 32,
+      "uppercase": true,
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 50
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Built for the heavy days",
+      "size": 150,
+      "minSize": 105,
+      "box": {
+        "x": 7,
+        "y": 22,
+        "w": 86,
+        "h": 30
+      }
+    },
+    {
+      "id": "spec",
+      "type": "panel",
+      "box": {
+        "x": 7,
+        "y": 55,
+        "w": 86,
+        "h": 24
+      }
+    },
+    {
+      "id": "specs",
+      "type": "list",
+      "items": [
+        "Grip: one thing before 9",
+        "Sets: 8 daily tasks",
+        "Rest: a real reset"
+      ],
+      "size": 44,
+      "marker": "dash",
+      "weight": 700,
+      "gap": 20,
+      "color": "text",
+      "box": {
+        "x": 12,
+        "y": 59,
+        "w": 76,
+        "h": 17
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Start training",
+      "size": 42,
+      "uppercase": true,
+      "box": {
+        "x": 7,
+        "y": 84,
+        "w": 86,
+        "h": 8
+      }
+    }
+  ]
+}

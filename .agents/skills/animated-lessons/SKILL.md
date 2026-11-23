@@ -42,10 +42,11 @@ Pitch three hooks and shapes for the same idea (for example: claim then steps, m
 | **Ask the host** | `kit` + `juno` | The junior asks or admits the mistake, the host answers, the junior lands the payoff |
 | **Nature doc** | One or two characters who never speak | `narrator` only: an off-screen voice describes what the characters do, and their poses and reactions carry the scene |
 | **Myth vs fact** | Two characters | One states the myth, the other corrects it; or the narrator calls each one |
+| **Molt Pod clip** | Two hosts at the desk, sometimes a guest | The hosts, to each other more than to camera; see [Molt Pod](#molt-pod) |
 
 Characters, their looks and their fixed Fish voices live in the shared content cast, `content/characters/cast.json` ([overview](../../../content/characters/README.md)); a lesson can name them by key, first name or alias (`juno`, `crab_juno_marsh`, the old `host-crab`). A character always uses its own voice so viewers learn who is who; the narrator (`speaker: "narrator"`) uses the reel narrator. Add a new cast member with the character-creator skill rather than restyling an existing one. Any of the eight can appear; pick by job (see creative direction's cast table). Keep a dialogue to two or three characters.
 
-Pick a set: `codex-study` (bookshelves, lamp, rug: Codex lessons), `reef-office` (round window, desk: work and routines), `open-water` (sea floor, kelp: what Moltology is, moltmaxxing). The set is built in 3D so the characters stand on it and cast shadows, and its painted art kit (see [Set art kits](#set-art-kits)) gives it a painted background and textured floor.
+Pick a set: `codex-study` (bookshelves, lamp, rug: Codex lessons), `reef-office` (round window, desk: work and routines), `open-water` (sea floor, kelp: what Moltology is, moltmaxxing), `podcast-studio` (desk, broadcast mics, headphones: Molt Pod). The set is built in 3D so the characters stand on it and cast shadows, and its painted art kit (see [Set art kits](#set-art-kits)) gives it a painted background and textured floor.
 
 ## 4. Write the scenes
 
@@ -110,6 +111,19 @@ The same steps work for any agent:
 
 To change a set's look, edit its prompts in `art.json`, then repeat the steps. A new set needs prompts there and an entry in `src/lib/avatar3d/sets.ts`.
 
+## Molt Pod
+
+Molt Pod clips are highlights from a podcast that doesn't exist yet: the cast at a desk in the `podcast-studio` set, wearing studio headphones and talking into broadcast mics on boom arms. The set fits a mic to each speaker's mouth and headphones to every head on its own, whatever their size; nothing else to set up. Series rules live in [creative direction](../../../content/creative-direction.md) (Molt Pod row).
+
+- **Cast.** `juno` and `vera` host (marks `left` and `right`); a guest from the cast takes `center` in a three-person episode. Keep the hosts the same every episode so the show feels real.
+- **Shape.** 20 to 45 seconds, cut as if from a longer episode: open mid-conversation on the best line (that line is `hookHeadline`), one honest question, one real answer, a laugh or a turn, and the doable action said plainly. 50 to 90 words. No "welcome to the show" or intro; the cold open is the format.
+- **Tag.** Set `"tag": "Molt Pod · Ep. <n>"` so every scene carries the small show label, and `series: "Molt Pod"` with the next `episode` from `npm run social:continuity`.
+- **Shots.** Open on `two` (the desk, both hosts), cut to `close` or `medium` on whoever speaks, back to `two` for the laugh. Hosts mostly `look: "other"`; the line meant for the viewer turns to camera. Keep gestures small (`acting: "calm"` suits the listener), so claws stay above the desk.
+- **Costumed guests.** A guest can pitch in one of the benefit-page [costumes](../../../content/costumes.md) (the energy drink rep, the ledger advisor, the seminar author): take the pitch from `npm run costumes:brief -- --topic <slug>`, play it straight for two lines, then the hosts talk it back to the real practice. Paint an episode backdrop for the guest only if the joke needs it. Record `costume` and `benefit` in the draft. Costume outfits for the cast come later from the shop collections.
+- **Ending.** One website invitation, as for any lesson. The outro stays the normal one.
+
+The studio's painted art kit has prompts in `content/animation/sets/art.json` but no images yet: before the first episode, make it with the [Set art kits](#set-art-kits) steps (`--set podcast-studio`) and commit the manifest. Until then it renders with a drawn stand-in wall.
+
 ## 7. Inspect and queue
 
 Before queueing, watch the final file once with sound on at phone size and run the playbook's phone proof on the stills in `checks/` (frame zero, mid-hook, last hook word, first body phrase, a later moment and the outro). Check that the right mouth moves with each voice and its shapes match the sounds (lips shut on M, B and P, a pucker on OO; if a line looks off, run `--mouth-check`, see [Mouth check](references/lesson-format.md#mouth-check)), no claw passes through anyone, the headline never overlaps the face, the subtitles never cover the eyes, and every reaction lands on its word.
@@ -129,4 +143,4 @@ A lesson that does well can also go on the Academy as a short video lesson: hand
 
 ## Not built yet
 
-Long-form episodes (16:9 chapters that cut into shorts), characters walking between marks, hand props and a branded intro sting. Long form needs a 16:9 compositor; ask before building it.
+Long-form episodes (16:9 chapters that cut into shorts, which would make Molt Pod a real show), characters walking between marks, hand props and a branded intro sting. Long form needs a 16:9 compositor; ask before building it.

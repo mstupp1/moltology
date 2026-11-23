@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "name": "costume-arcade-patch",
+  "aspect": "4:5",
+  "costume": "arcade",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 52,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 60
+      }
+    },
+    {
+      "id": "version",
+      "type": "pill",
+      "text": "Patch notes 1.8",
+      "size": 30,
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 60
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Season of the molt",
+      "size": 130,
+      "minSize": 91,
+      "box": {
+        "x": 7,
+        "y": 22,
+        "w": 86,
+        "h": 22
+      },
+      "highlight": "molt"
+    },
+    {
+      "id": "notes-panel",
+      "type": "panel",
+      "border": "line",
+      "borderWidth": 3,
+      "box": {
+        "x": 7,
+        "y": 49,
+        "w": 86,
+        "h": 26
+      }
+    },
+    {
+      "id": "notes",
+      "type": "list",
+      "items": [
+        "New: 8 daily quests, every day",
+        "New: XP ring around your avatar",
+        "Fixed: doomscrolling now ends the run"
+      ],
+      "size": 40,
+      "marker": "dash",
+      "markerColor": "magenta",
+      "gap": 26,
+      "box": {
+        "x": 12,
+        "y": 53,
+        "w": 76,
+        "h": 20
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Press start",
+      "size": 44,
+      "box": {
+        "x": 7,
+        "y": 84,
+        "w": 86,
+        "h": 8
+      }
+    }
+  ]
+}

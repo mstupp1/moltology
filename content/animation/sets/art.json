@@ -31,6 +31,10 @@
     "open-water": {
       "plate": "The open sea floor at dusk depth: a wide sandy plain with distant rock formations and kelp forest silhouettes fading into deep blue-teal water, long sun shafts from the surface far above, drifting particles. The lower third is empty rippled sand.",
       "floor": "Rippled pale golden sea-floor sand with tiny shell fragments."
+    },
+    "podcast-studio": {
+      "plate": "Interior of a cozy underwater podcast studio at depth: the back wall covered in warm brown acoustic foam panels, a round porthole on one side showing deep blue water with drifting light, a blank glowing amber pill-shaped sign high on the wall with nothing written on it, two warm practical lamps, a shelf with a few plants and vinyl records, soft teal caustic light from above mixing with amber lamp pools. No desk, no microphones, no furniture in the foreground. The lower third is an empty dark wooden floor.",
+      "floor": "Dark warm walnut floorboards, satin finish, planks running left to right, faint soft reflections."
     }
   }
 }

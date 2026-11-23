@@ -34,6 +34,10 @@ Start from one recognisable everyday moment, as specific as possible: a time, an
 
 Choose the seasonal treatment now, before writing (rules in references/production.md). For a seasonal reel, the situation, one spoken line and the payoff all carry the season, so the audio alone explains it. If nothing fits, mark it evergreen.
 
+### Costume ads
+
+One pitch in three may be a **costume ad** (format in [reel formats](references/reel-formats.md#costume-ad)): the reel plays a straight-faced ad from one of the benefit-page industries (a telehealth spot, an energy drink drop, a retreat film), then drops it for the real app. Pick the page first with `npm run costumes:brief -- --list`, run `--topic <slug>` for its search phrase, real hook and safety line, and follow [costumes](../../../content/costumes.md): only real features, no claims, an industry and never one brand, at most one costumed piece in three. Put the costume's art direction line from that file in every scene prompt before the shed, and record `costume` and `benefit` in the draft. The shed scene shows the real screen the brief names, and the outro stays the normal one.
+
 ## 2. Pitch three, build one
 
 Follow the playbook's pitch step with three **different** formats from the reel format library, each with its spoken hook, a one-line summary of the beats, and the payoff. Save them to `tmp/reel-next/pitches.md` with Stop, Laugh, Pull, Keep and Fresh scores, and build the winner. A pitch under 3 on Stop or Laugh is rewritten before it can win. When nothing in the library fits, a new format is fine; describe its skeleton in the pitch.

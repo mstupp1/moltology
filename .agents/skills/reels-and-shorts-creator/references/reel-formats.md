@@ -68,6 +68,23 @@ opening line, a new situation each time). That replaces the retired episodic ser
 > see my screen." Results may include an empty Tuesday afternoon. Side effects: finishing
 > things. The sentence is free. Learn the rest at moltology.org.
 
+## Costume ad
+
+- **Skeleton:** an ad from one industry played completely straight (the clinic's calm voice and
+  "online assessment", the can's loud drop and flavor list, the retreat's slow morning), each
+  feature a real Moltology thing in that industry's words, then a hard cut: the costume falls
+  away and the real screen does the last line in the house look.
+- **Why it works:** people know the ad rhythm from the first frame, and the swap ("the flavors
+  are eight small tasks") is the joke. The benefit page already holds tested lines and the
+  search phrase people use.
+- **Trap:** winking every line, inventing results, or copying one real brand's ad. The ad has to
+  be good enough to pass for real for five seconds. Health and money topics carry the page's
+  safety line in the caption.
+
+> Feeling flat by three? Meet the afternoon in a new flavor. Eight small tasks, zero sugar,
+> zero caffeine. Crack one open at noon: clear one distraction, pick the next useful thing.
+> [Cut to the dashboard.] It's not a drink. It's a free app. Start at moltology.org.
+
 ## Expectation vs reality
 
 - **Skeleton:** the plan stated proudly, then reality minute by minute, then the absurd

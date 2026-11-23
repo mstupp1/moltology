@@ -111,8 +111,10 @@ export interface Lesson {
    * built around the host's size.
    */
   cast?: { id: string; at: Mark }[]
-  /** Set dressing in front of the backdrop: codex-study, reef-office or open-water. */
+  /** Set dressing in front of the backdrop: codex-study, reef-office, open-water or podcast-studio. */
   set?: SetName
+  /** A small tag on every scene, e.g. "Molt Pod · Ep. 3" (show-style series). */
+  tag?: string
   /** How much the cast acts on their own while talking and listening. Default auto. */
   acting?: Acting
   /** The Codex passage taught, when there is one. */
@@ -220,6 +222,7 @@ export function lessonProblems(lesson: Lesson): string[] {
   if (new Set(cast.map((c) => c.at)).size !== cast.length) problems.push('each cast member needs their own mark')
   if (cast.some((c) => !MARKS.includes(c.at))) problems.push(`cast marks are ${MARKS.join(', ')}`)
   if (lesson.acting && !ACTING.includes(lesson.acting)) problems.push(`acting "${lesson.acting}" is not one of ${ACTING.join(', ')}`)
+  if (lesson.tag !== undefined && (typeof lesson.tag !== 'string' || lesson.tag.length > 32)) problems.push('tag is a short label of at most 32 characters')
   if (lesson.set && !SET_NAMES.includes(lesson.set)) problems.push(`set "${lesson.set}" is not one of ${SET_NAMES.join(', ')}`)
   if (!Array.isArray(lesson.hashtags) || lesson.hashtags.length > 3) problems.push('at most three hashtags')
   const scenes = Array.isArray(lesson.scenes) ? lesson.scenes : []

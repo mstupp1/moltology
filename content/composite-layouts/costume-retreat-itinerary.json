@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "name": "costume-retreat-itinerary",
+  "aspect": "4:5",
+  "costume": "retreat",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 60,
+      "align": "center",
+      "box": {
+        "x": 10,
+        "y": 6,
+        "w": 80
+      }
+    },
+    {
+      "id": "kicker",
+      "type": "text",
+      "text": "a quiet daily practice",
+      "size": 64,
+      "minSize": 44,
+      "box": {
+        "x": 10,
+        "y": 19,
+        "w": 80,
+        "h": 7
+      },
+      "font": "script",
+      "color": "clay",
+      "align": "center"
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Begin the day before your phone does.",
+      "size": 90,
+      "minSize": 62,
+      "box": {
+        "x": 8,
+        "y": 27,
+        "w": 84,
+        "h": 22
+      },
+      "align": "center"
+    },
+    {
+      "id": "rule",
+      "type": "shape",
+      "shape": "line",
+      "color": "line",
+      "thickness": 2,
+      "box": {
+        "x": 30,
+        "y": 52,
+        "w": 40
+      }
+    },
+    {
+      "id": "itinerary",
+      "type": "list",
+      "items": [
+        "6:30   Sit in silence",
+        "9:00   Pick your one thing",
+        "21:00   Let one thing go"
+      ],
+      "size": 42,
+      "marker": "none",
+      "font": "serif",
+      "gap": 26,
+      "color": "text",
+      "box": {
+        "x": 22,
+        "y": 56,
+        "w": 62,
+        "h": 20
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Read the practice",
+      "size": 38,
+      "style": "outline",
+      "box": {
+        "x": 25,
+        "y": 82,
+        "w": 50,
+        "h": 8
+      }
+    }
+  ]
+}

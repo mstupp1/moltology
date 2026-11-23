@@ -73,6 +73,10 @@ Two supported paths:
 3. Save the 1080×1920 PNG under your working directory (or alongside an example sketch) and set `"backdrop": "./custom-plate.png"` on the lesson JSON (or override per scene with `scene.backdrop`).
 4. Still pass `"set": "open-water"` (or `"reef-office"` / `"codex-study"`) so the 3D floor disc and lighting match the plate's tone (`open-water` cool sand, `reef-office` bright stone, `codex-study` warm wood + lamp flicker).
 
+### Path A+: A costume backdrop
+
+Now and then (at most one episode in five) the joke is the cast stuck inside an ad: a retreat lobby, an energy drink commercial, a game lobby, a fashion shoot. Paint the plate as in Path A using the costume's art direction line from [costumes](../../../content/costumes.md) instead of the ocean style, still with no text and no logos, and play it completely deadpan. The anti-ad rules above still hold: the costume is the setting, never a pitch, and there is no reveal or promo. Record `costume` in the draft.
+
 ### Path B: New reusable permanent 3D set (when a comedy venue should recur)
 
 1. Add the set's `plate` (1080×1920) and seamless `floor` (1024×1024) prompts to `content/animation/sets/art.json`.

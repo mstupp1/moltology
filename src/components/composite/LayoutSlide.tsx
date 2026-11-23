@@ -5,15 +5,15 @@ import { COMPOSITE_DIMENSIONS, type CompositeAspectRatio } from './CompositeCont
 import { getMascotUrl, type MascotKey } from './MascotOverlay'
 import {
   BRAND_COLORS,
-  FONT_STACKS,
   boxToStyle,
   defaultFitMin,
-  resolveColor,
   splitHighlights,
   type LayoutLayer,
   type LayoutSpec,
   type LayoutTextLayer,
 } from './layout-spec'
+import { themeColor, themeFor, type LayoutTheme } from './layout-theme'
+import '@/components/benefits/benefits.css'
 
 export interface LayoutSlideProps {
   spec: LayoutSpec
@@ -26,6 +26,9 @@ export interface LayoutSlideProps {
 /** Works for hex, rgb() and named colors alike. */
 const withAlpha = (color: string, alpha: number) => `color-mix(in srgb, ${color} ${Math.round(alpha * 100)}%, transparent)`
 
+/** Named shadows, or a costume's own text-shadow string passed straight through. */
+const textShadow = (name: string) => (name in TEXT_SHADOWS ? TEXT_SHADOWS[name] : name)
+
 const TEXT_SHADOWS: Record<string, string | undefined> = {
   none: undefined,
   soft: '0 2px 12px rgba(0,0,0,0.65)',
@@ -37,7 +40,7 @@ const TEXT_SHADOWS: Record<string, string | undefined> = {
  * Shrinks a text box's font until it fits, after web fonts load. Marks itself with
  * data-fit so the headless capture waits for the final size instead of shooting mid-fit.
  */
-function FitText({ layer }: { layer: LayoutTextLayer }) {
+function FitText({ layer, theme }: { layer: LayoutTextLayer; theme: LayoutTheme }) {
   const ref = useRef<HTMLDivElement | null>(null)
   const shouldFit = layer.box.h !== undefined && layer.fit !== false
 
@@ -80,6 +83,9 @@ function FitText({ layer }: { layer: LayoutTextLayer }) {
 
   const valign = layer.valign ?? 'top'
   const runs = splitHighlights(layer.text, layer.highlight)
+  const font = layer.font ?? 'display'
+  // Headlines take the costume's type treatment; body copy stays plain.
+  const headline = font === 'display'
 
   return (
     <div
@@ -89,16 +95,16 @@ function FitText({ layer }: { layer: LayoutTextLayer }) {
       style={{
         ...boxToStyle(layer.box),
         justifyContent: valign === 'center' ? 'center' : valign === 'bottom' ? 'flex-end' : 'flex-start',
-        fontFamily: FONT_STACKS[layer.font ?? 'display'],
+        fontFamily: theme.fonts[font],
         fontSize: `${layer.size}px`,
-        fontWeight: layer.weight ?? 700,
-        fontStyle: layer.italic ? 'italic' : undefined,
-        color: resolveColor(layer.color, BRAND_COLORS.white),
+        fontWeight: layer.weight ?? (headline ? theme.headline.weight : theme.costume ? 500 : 700),
+        fontStyle: (layer.italic ?? (headline && theme.headline.italic)) ? 'italic' : undefined,
+        color: themeColor(theme, layer.color, headline ? theme.text : theme.body),
         textAlign: layer.align ?? 'left',
-        lineHeight: layer.lineHeight ?? 1.08,
-        letterSpacing: layer.tracking !== undefined ? `${layer.tracking}em` : undefined,
-        textTransform: layer.uppercase ? 'uppercase' : undefined,
-        textShadow: TEXT_SHADOWS[layer.shadow ?? 'soft'],
+        lineHeight: layer.lineHeight ?? (headline ? theme.headline.lineHeight : 1.08),
+        letterSpacing: (layer.tracking ?? (headline ? theme.headline.tracking : undefined)) !== undefined ? `${layer.tracking ?? theme.headline.tracking}em` : undefined,
+        textTransform: (layer.uppercase ?? (headline && theme.headline.uppercase)) ? 'uppercase' : undefined,
+        textShadow: textShadow(layer.shadow ?? theme.textShadow),
         opacity: layer.opacity,
         zIndex: layer.z,
         whiteSpace: 'pre-line',
@@ -109,7 +115,7 @@ function FitText({ layer }: { layer: LayoutTextLayer }) {
       <span>
         {runs.map((run, i) =>
           run.hit ? (
-            <span key={i} style={{ color: resolveColor(layer.highlightColor, BRAND_COLORS.cyan) }}>
+            <span key={i} style={{ color: themeColor(theme, layer.highlightColor, theme.highlight) }}>
               {run.text}
             </span>
           ) : (
@@ -121,7 +127,124 @@ function FitText({ layer }: { layer: LayoutTextLayer }) {
   )
 }
 
-function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKey | undefined) {
+/**
+ * A costume's take on the lockup, after the landing page headers: the emblem bare or in a disc,
+ * tile or seal, the name in the costume's face, and its small extras ("+", "/ai", "the ... Method").
+ */
+function CostumeLockupLayer({
+  layer,
+  theme,
+  style,
+}: {
+  layer: Extract<LayoutLayer, { type: 'brand' }>
+  theme: LayoutTheme
+  style: React.CSSProperties
+}) {
+  const lockup = theme.lockup!
+  const size = layer.size ?? 56
+  const variant = layer.variant ?? 'lockup'
+  const align = layer.align ?? 'left'
+  const justify = align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'
+  const ink = themeColor(theme, layer.color, theme.text)
+  const iconInk = themeColor(theme, lockup.iconColor, lockup.icon === 'bare' ? ink : theme.accentText)
+  const framed = lockup.icon === 'disc' || lockup.icon === 'tile' || lockup.icon === 'seal'
+  const showIcon = variant !== 'wordmark' && (lockup.icon !== 'none' || variant === 'emblem')
+  const iconBox = size * (framed ? 1.05 : 0.9)
+  const wordFont = theme.fonts[lockup.font]
+  const scriptScale = lockup.font === 'script' ? 1.25 : 1
+
+  return (
+    <div className="flex items-center" style={{ ...style, justifyContent: justify, gap: size * 0.26, color: ink }}>
+      {showIcon && (
+        <span
+          className="grid place-items-center shrink-0"
+          style={{
+            width: iconBox,
+            height: iconBox,
+            borderRadius: lockup.icon === 'tile' ? iconBox * 0.28 : 999,
+            background: framed ? themeColor(theme, lockup.iconBackground, theme.accent) : undefined,
+            color: iconInk,
+          }}
+        >
+          <BrandIcon aria-hidden="true" tone="inherit" style={{ width: framed ? iconBox * 0.6 : iconBox, height: framed ? iconBox * 0.6 : iconBox }} />
+        </span>
+      )}
+      {variant !== 'emblem' && (
+        <span className="flex flex-col" style={{ textAlign: align }}>
+          <span className="flex items-baseline" style={{ gap: size * 0.16, justifyContent: justify }}>
+            {lockup.prefix && (
+              <span style={{ fontFamily: theme.fonts.serif, fontStyle: 'italic', fontSize: size * 0.42, lineHeight: 1, textTransform: 'none' }}>
+                {lockup.prefix}
+              </span>
+            )}
+            <span
+              style={{
+                fontFamily: wordFont,
+                fontWeight: lockup.weight,
+                fontStyle: lockup.italic ? 'italic' : undefined,
+                fontSize: size * 0.72 * scriptScale,
+                lineHeight: 1,
+                letterSpacing: lockup.uppercase ? '0.01em' : '-0.01em',
+                textTransform: lockup.uppercase ? 'uppercase' : undefined,
+                textShadow: lockup.uppercase && theme.textShadow !== 'none' ? textShadow(theme.textShadow) : undefined,
+              }}
+            >
+              {lockup.word}
+            </span>
+            {lockup.suffix && lockup.suffixStyle === 'pill' && (
+              <span
+                style={{
+                  alignSelf: 'center',
+                  fontFamily: theme.fonts.body,
+                  fontWeight: 600,
+                  fontSize: size * 0.3,
+                  lineHeight: 1,
+                  padding: '0.3em 0.7em',
+                  borderRadius: 999,
+                  background: theme.accent,
+                  color: theme.accentText,
+                }}
+              >
+                {lockup.suffix}
+              </span>
+            )}
+            {lockup.suffix && lockup.suffixStyle === 'mark' && (
+              <span style={{ fontFamily: theme.fonts.mono, fontWeight: 600, fontSize: size * 0.4, lineHeight: 1, color: themeColor(theme, 'highlight', ink) }}>
+                {lockup.suffix}
+              </span>
+            )}
+            {lockup.suffix && lockup.suffixStyle === 'word' && (
+              <span style={{ fontFamily: wordFont, fontWeight: lockup.weight, fontSize: size * 0.72, lineHeight: 1, textTransform: lockup.uppercase ? 'uppercase' : undefined, color: theme.highlight }}>
+                {lockup.suffix}
+              </span>
+            )}
+          </span>
+          {(layer.caption || lockup.sub) && (
+            <span
+              style={{
+                fontFamily: theme.fonts.body,
+                fontWeight: 600,
+                fontSize: Math.max(16, size * 0.28),
+                marginTop: size * 0.14,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: themeColor(theme, 'muted', ink),
+              }}
+            >
+              {layer.caption ?? lockup.sub}
+            </span>
+          )}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKey | undefined, theme: LayoutTheme) {
+  const color = (value: string | undefined, fallback: string) => themeColor(theme, value, fallback)
+  // Labels on pills and buttons: loud costumes letter them in their display face.
+  const labelFont = theme.costume && theme.headline.uppercase ? theme.fonts.display : theme.costume ? theme.fonts.body : theme.fonts.display
+  const labelWeight = theme.costume && theme.headline.uppercase ? theme.headline.weight : 700
   const key = layer.id || `${layer.type}-${index}`
   const base: React.CSSProperties = {
     ...boxToStyle(layer.box),
@@ -132,30 +255,30 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
 
   switch (layer.type) {
     case 'text':
-      return <FitText key={key} layer={layer} />
+      return <FitText key={key} layer={layer} theme={theme} />
 
     case 'panel': {
-      const color = resolveColor(layer.color, BRAND_COLORS.navy)
-      const style = layer.style ?? 'glass'
+      const fill = color(layer.color, theme.panel)
+      const style = layer.style ?? (theme.costume ? 'solid' : 'glass')
       const background =
         style === 'gradient'
-          ? `linear-gradient(160deg, ${color}, ${resolveColor(layer.colorTo, BRAND_COLORS.abyss)})`
+          ? `linear-gradient(160deg, ${fill}, ${color(layer.colorTo, theme.panelTo)})`
           : style === 'outline'
             ? 'transparent'
             : style === 'glass'
-              ? `linear-gradient(160deg, ${withAlpha(color, 0.9)}, ${withAlpha(color, 0.7)})`
-              : color
+              ? `linear-gradient(160deg, ${withAlpha(fill, 0.9)}, ${withAlpha(fill, 0.7)})`
+              : fill
       return (
         <div
           key={key}
           style={{
             ...base,
             background,
-            borderRadius: layer.radius ?? 28,
-            border: `${layer.borderWidth ?? (style === 'solid' ? 0 : 1.5)}px solid ${resolveColor(layer.border, 'rgba(0,195,255,0.35)')}`,
+            borderRadius: layer.radius ?? theme.radius.panel,
+            border: `${layer.borderWidth ?? (style === 'solid' ? 0 : 1.5)}px solid ${color(layer.border, theme.line)}`,
             boxShadow: [
-              layer.shadow !== false ? '0 24px 60px rgba(0,0,0,0.55)' : '',
-              layer.glow ? `0 0 40px ${withAlpha(resolveColor(layer.glow), 0.35)}` : '',
+              layer.shadow !== false ? (theme.panelShadow ?? '') : '',
+              layer.glow ? `0 0 40px ${withAlpha(color(layer.glow, BRAND_COLORS.white), 0.35)}` : '',
               style === 'glass' ? 'inset 0 1px 0 rgba(255,255,255,0.12)' : '',
             ]
               .filter(Boolean)
@@ -175,17 +298,20 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
           style={{ ...base, justifyContent: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start' }}
         >
           <span
-            className="inline-flex items-center rounded-full font-bold"
+            className="inline-flex items-center"
             style={{
-              fontFamily: FONT_STACKS.display,
+              fontFamily: labelFont,
+              fontWeight: labelWeight,
               fontSize: `${layer.size ?? 26}px`,
               lineHeight: 1,
               padding: '0.55em 1.1em',
+              borderRadius: theme.radius.pill,
               letterSpacing: layer.uppercase ? '0.12em' : '0.01em',
               textTransform: layer.uppercase ? 'uppercase' : undefined,
-              color: resolveColor(layer.color, BRAND_COLORS.white),
-              background: resolveColor(layer.background, 'rgba(0,195,255,0.16)'),
-              border: `1.5px solid ${resolveColor(layer.border, 'rgba(0,195,255,0.5)')}`,
+              color: color(layer.color, theme.pillText),
+              background: color(layer.background, theme.pillBackground),
+              border: `1.5px solid ${color(layer.border, theme.pillBorder)}`,
+              boxShadow: theme.costume ? theme.buttonShadow?.(theme.accent) : undefined,
             }}
           >
             {layer.text}
@@ -195,23 +321,24 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
     }
 
     case 'button': {
-      const color = resolveColor(layer.color, BRAND_COLORS.cyan)
+      const fill = color(layer.color, theme.accent)
       const style = layer.style ?? 'solid'
       return (
         <div
           key={key}
-          className="flex items-center justify-center font-bold"
+          className="flex items-center justify-center"
           style={{
             ...base,
-            fontFamily: FONT_STACKS.display,
+            fontFamily: labelFont,
+            fontWeight: labelWeight,
             fontSize: `${layer.size ?? 40}px`,
             minHeight: layer.box.h === undefined ? '2.4em' : undefined,
-            borderRadius: layer.radius ?? 999,
-            color: resolveColor(layer.textColor, style === 'outline' ? color : BRAND_COLORS.abyss),
+            borderRadius: layer.radius ?? theme.radius.button,
+            color: color(layer.textColor, style === 'outline' ? fill : theme.accentText),
             background:
-              style === 'outline' ? 'transparent' : style === 'gradient' ? `linear-gradient(90deg, ${color}, ${BRAND_COLORS.sky})` : color,
-            border: `2px solid ${color}`,
-            boxShadow: style === 'outline' ? undefined : `0 12px 40px ${withAlpha(color, 0.35)}`,
+              style === 'outline' ? 'transparent' : style === 'gradient' ? `linear-gradient(90deg, ${fill}, ${color('highlight', BRAND_COLORS.sky)})` : fill,
+            border: `2px solid ${fill}`,
+            boxShadow: style === 'outline' ? undefined : theme.buttonShadow?.(fill),
             gap: '0.4em',
           }}
         >
@@ -234,7 +361,7 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
             objectFit: layer.fit ?? 'cover',
             objectPosition: layer.position ?? 'center',
             borderRadius: layer.radius,
-            border: layer.border ? `2px solid ${resolveColor(layer.border)}` : undefined,
+            border: layer.border ? `2px solid ${color(layer.border, BRAND_COLORS.white)}` : undefined,
             filter: layer.shadow ? 'drop-shadow(0 24px 40px rgba(0,0,0,0.75))' : undefined,
             transform: [base.transform, layer.flip ? 'scaleX(-1)' : ''].filter(Boolean).join(' ') || undefined,
           }}
@@ -242,6 +369,7 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
       )
 
     case 'brand': {
+      if (theme.lockup) return <CostumeLockupLayer key={key} layer={layer} theme={theme} style={base} />
       const size = layer.size ?? 56
       const variant = layer.variant ?? 'lockup'
       const align = layer.align ?? 'left'
@@ -258,12 +386,12 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
             <div className="flex flex-col" style={{ textAlign: align }}>
               <span
                 style={{
-                  fontFamily: FONT_STACKS.display,
+                  fontFamily: theme.fonts.display,
                   fontWeight: 700,
                   fontSize: size * 0.72,
                   lineHeight: 1,
                   letterSpacing: '-0.01em',
-                  color: resolveColor(layer.color, BRAND_COLORS.white),
+                  color: color(layer.color, BRAND_COLORS.white),
                 }}
               >
                 Moltology
@@ -271,7 +399,7 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
               {layer.caption && (
                 <span
                   style={{
-                    fontFamily: FONT_STACKS.display,
+                    fontFamily: theme.fonts.display,
                     fontWeight: 600,
                     fontSize: Math.max(16, size * 0.3),
                     marginTop: size * 0.12,
@@ -312,9 +440,9 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
     }
 
     case 'shape': {
-      const color = resolveColor(layer.color, BRAND_COLORS.cyan)
+      const fill = color(layer.color, theme.accent)
       if (layer.shape === 'line') {
-        return <div key={key} style={{ ...base, height: layer.thickness ?? 2, background: color, borderRadius: 999 }} />
+        return <div key={key} style={{ ...base, height: layer.thickness ?? 2, background: fill, borderRadius: 999 }} />
       }
       if (layer.shape === 'glow') {
         return (
@@ -323,7 +451,7 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
             style={{
               ...base,
               borderRadius: '50%',
-              background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+              background: `radial-gradient(circle, ${fill} 0%, transparent 70%)`,
               filter: `blur(${layer.blur ?? 40}px)`,
               opacity: layer.opacity ?? 0.35,
             }}
@@ -335,7 +463,7 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
           key={key}
           style={{
             ...base,
-            background: color,
+            background: fill,
             borderRadius: layer.shape === 'circle' ? '50%' : layer.radius,
             filter: layer.blur ? `blur(${layer.blur}px)` : undefined,
           }}
@@ -344,7 +472,7 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
     }
 
     case 'list': {
-      const markerColor = resolveColor(layer.markerColor, BRAND_COLORS.cyan)
+      const markerColor = color(layer.markerColor, theme.accent === theme.text ? theme.highlight : theme.accent)
       return (
         <ul
           key={key}
@@ -352,11 +480,11 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
           style={{
             ...base,
             gap: layer.gap ?? 18,
-            fontFamily: FONT_STACKS[layer.font ?? 'body'],
+            fontFamily: theme.fonts[layer.font ?? 'body'],
             fontSize: `${layer.size}px`,
             fontWeight: layer.weight ?? 500,
             lineHeight: 1.25,
-            color: resolveColor(layer.color, BRAND_COLORS.bone),
+            color: color(layer.color, theme.body),
           }}
         >
           {layer.items.map((item, i) => (
@@ -379,13 +507,14 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
         <div key={key} className="flex flex-col" style={{ ...base, textAlign: align }}>
           <span
             style={{
-              fontFamily: FONT_STACKS.display,
-              fontWeight: 700,
+              fontFamily: theme.fonts.display,
+              fontWeight: theme.headline.weight,
+              fontStyle: theme.headline.italic ? 'italic' : undefined,
               fontSize: `${layer.size ?? 120}px`,
               lineHeight: 0.95,
               letterSpacing: '-0.03em',
-              color: resolveColor(layer.color, BRAND_COLORS.cyan),
-              textShadow: TEXT_SHADOWS.soft,
+              color: color(layer.color, theme.costume ? theme.highlight : theme.accent),
+              textShadow: textShadow(theme.textShadow),
             }}
           >
             {layer.value}
@@ -393,12 +522,12 @@ function renderLayer(layer: LayoutLayer, index: number, fallbackMascot: MascotKe
           {layer.label && (
             <span
               style={{
-                fontFamily: FONT_STACKS.body,
+                fontFamily: theme.fonts.body,
                 fontWeight: 500,
                 fontSize: `${Math.max(20, Math.round((layer.size ?? 120) * 0.24))}px`,
                 marginTop: '0.5em',
                 lineHeight: 1.25,
-                color: resolveColor(layer.labelColor, BRAND_COLORS.bone),
+                color: color(layer.labelColor, theme.body),
               }}
             >
               {layer.label}
@@ -419,21 +548,23 @@ export const LayoutSlide: React.FC<LayoutSlideProps> = ({ spec, aspectRatio, mas
   const { width, height } = COMPOSITE_DIMENSIONS[aspect] ?? COMPOSITE_DIMENSIONS['4:5']
   const bg = spec.background ?? {}
   const safe = spec.safeArea ?? 4
+  const theme = themeFor(spec.costume)
 
   return (
     <div
       data-composite-root=""
       data-layout-name={spec.name}
+      data-costume={spec.costume}
       className="relative overflow-hidden select-none box-border"
       style={{
         width,
         height,
         minWidth: width,
         minHeight: height,
-        backgroundColor: resolveColor(bg.color, BRAND_COLORS.abyss),
+        backgroundColor: themeColor(theme, bg.color, theme.ground),
         backgroundImage: bg.gradient,
-        color: BRAND_COLORS.bone,
-        fontFamily: FONT_STACKS.display,
+        color: theme.body,
+        fontFamily: theme.fonts.display,
       }}
     >
       {bg.image && (
@@ -446,7 +577,7 @@ export const LayoutSlide: React.FC<LayoutSlideProps> = ({ spec, aspectRatio, mas
           style={{ opacity: bg.imageOpacity ?? 1, objectPosition: bg.imagePosition ?? 'center' }}
         />
       )}
-      {bg.vignette !== false && (
+      {(bg.vignette ?? theme.vignette) && (
         <div
           className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(1,6,14,0.85) 100%)' }}
@@ -476,7 +607,7 @@ export const LayoutSlide: React.FC<LayoutSlideProps> = ({ spec, aspectRatio, mas
         </svg>
       )}
 
-      {spec.layers.map((layer, i) => renderLayer(layer, i, mascot))}
+      {spec.layers.map((layer, i) => renderLayer(layer, i, mascot, theme))}
 
       {showGuides && (
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 9999 }}>

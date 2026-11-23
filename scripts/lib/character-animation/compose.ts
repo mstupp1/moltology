@@ -32,6 +32,31 @@ const BACKDROP_TONES: Record<string, { sky: [string, string, string]; shaft: str
   'open-water': { sky: ['#0b3a4f', '#08263a', '#040d18'], shaft: '160,235,255', pool: '90,170,190' },
   'codex-study': { sky: ['#3b2618', '#22150d', '#0c0705'], shaft: '255,205,140', pool: '210,150,90' },
   'reef-office': { sky: ['#0f4c55', '#0a3038', '#041419'], shaft: '170,245,240', pool: '110,200,190' },
+  'podcast-studio': { sky: ['#2a1d16', '#1a120d', '#0a0706'], shaft: '255,190,120', pool: '220,150,90' },
+}
+
+/** Acoustic foam panels and a glowing sign shape on the back wall, for the podcast studio. */
+function studioWall(ctx: SKRSContext2D) {
+  for (let col = 0; col < 3; col++) {
+    for (let row = 0; row < 3; row++) {
+      const x = 120 + col * 300
+      const y = 300 + row * 190
+      ctx.fillStyle = (col + row) % 2 ? 'rgba(60,40,32,0.9)' : 'rgba(48,32,26,0.9)'
+      ctx.fillRect(x, y, 240, 160)
+      ctx.fillStyle = 'rgba(0,0,0,0.18)'
+      for (let k = 1; k < 6; k++) ctx.fillRect(x + k * 40, y, 3, 160)
+    }
+  }
+  // A lit pill sign high on the wall, blank: painted art supplies the real one.
+  const glow = ctx.createRadialGradient(540, 200, 10, 540, 200, 220)
+  glow.addColorStop(0, 'rgba(245,185,58,0.35)')
+  glow.addColorStop(1, 'rgba(245,185,58,0)')
+  ctx.fillStyle = glow
+  ctx.fillRect(300, 60, 480, 300)
+  ctx.fillStyle = 'rgba(245,185,58,0.85)'
+  ctx.beginPath()
+  ctx.roundRect(430, 175, 220, 50, 25)
+  ctx.fill()
 }
 
 /** Shelves of books along the back wall, for the Codex study. */
@@ -82,6 +107,7 @@ export async function defaultBackdrop(outPath: string, set?: string): Promise<st
   ctx.fillRect(0, 0, OUT_W, OUT_H)
   if (set === 'codex-study') shelves(ctx)
   if (set === 'reef-office') window_(ctx)
+  if (set === 'podcast-studio') studioWall(ctx)
   // Light falling from above, in three soft shafts.
   for (const [x, w, a] of [[300, 260, 0.07], [620, 180, 0.05], [820, 220, 0.04]] as const) {
     const g = ctx.createLinearGradient(0, 0, 0, OUT_H * 0.85)
@@ -172,6 +198,33 @@ export function renderHeadlineCards(headline: string, outDir: string): string[] 
     cards.push(file)
   }
   return cards
+}
+
+/**
+ * A small series tag ("Molt Pod · Ep. 3") as a pill near the top left, on every scene, so a clip
+ * reads as cut from a longer show. Sits below the platform's top overlay.
+ */
+export function renderTagCard(tag: string, outPath: string): string {
+  const canvas = createCanvas(OUT_W, OUT_H)
+  const ctx = canvas.getContext('2d')
+  ctx.font = `700 40px ${FONT}`
+  const width = ctx.measureText(tag).width + 56
+  const x = 120
+  const y = 250
+  ctx.fillStyle = 'rgba(8,12,18,0.78)'
+  ctx.beginPath()
+  ctx.roundRect(x, y, width, 68, 34)
+  ctx.fill()
+  ctx.fillStyle = '#f59e0b'
+  ctx.beginPath()
+  ctx.arc(x + 30, y + 34, 9, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = '#ffffff'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(tag, x + 48, y + 35)
+  fs.mkdirSync(path.dirname(outPath), { recursive: true })
+  fs.writeFileSync(outPath, canvas.toBuffer('image/png'))
+  return outPath
 }
 
 /** A centred line of text near the top of the frame, for the outro. */

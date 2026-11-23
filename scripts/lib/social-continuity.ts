@@ -12,6 +12,9 @@ export interface ContinuityFields {
   stopper?: string
   callback?: string
   loudness?: number
+  /** Benefit-page costume the piece wore (content/costumes.md), and the benefit page it points to. */
+  costume?: string
+  benefit?: string
 }
 
 type Draft = Record<string, unknown> | null | undefined
@@ -48,6 +51,8 @@ export function continuityFields(draft: Draft): ContinuityFields {
     stopper: str(pick('stopper')),
     callback: str(pick('callback')),
     loudness: num(pick('loudness')),
+    costume: str(pick('costume')),
+    benefit: str(pick('benefit')),
   }
   return Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)) as ContinuityFields
 }
@@ -74,6 +79,10 @@ export interface ContinuityReport {
   seriesLatest: { series: string; episode: number | null; channel: string; when: string; hook?: string }[]
   castCounts: { character: string; count: number }[]
   repeatedHooks: { hook: string; count: number }[]
+  /** Costumes worn in the recent pieces, most used first. */
+  costumeCounts: { costume: string; count: number }[]
+  /** Recent pieces that wore a costume. */
+  costumed: number
   untracked: number
 }
 
@@ -118,11 +127,16 @@ export function summarizeContinuity(posts: LedgerEntry[], reels: LedgerEntry[], 
     else hooks.set(key, { hook: e.hookHeadline, count: 1 })
   }
 
+  const costumes = new Map<string, number>()
+  for (const e of recent) if (e.costume) costumes.set(e.costume, (costumes.get(e.costume) ?? 0) + 1)
+
   return {
     recent,
     seriesLatest: [...seriesLatest.values()],
     castCounts: [...cast.entries()].map(([character, count]) => ({ character, count })).sort((a, b) => b.count - a.count),
     repeatedHooks: [...hooks.values()].filter((h) => h.count > 1).sort((a, b) => b.count - a.count),
+    costumeCounts: [...costumes.entries()].map(([costume, count]) => ({ costume, count })).sort((a, b) => b.count - a.count),
+    costumed: recent.filter((e) => e.costume).length,
     untracked: recent.filter((e) => !e.series).length,
   }
 }
@@ -135,7 +149,8 @@ export function formatContinuityReport(report: ContinuityReport): string {
   for (const e of report.recent) {
     const series = e.series ? `${e.series}${e.episode ? ` #${e.episode}` : ''}` : 'no series'
     const who = e.cast?.join(', ') || e.mascot || 'no cast'
-    lines.push(`  ${day(e.when)}  ${e.channel.padEnd(8)} ${series} | ${e.format || 'format?'} | ${who} | ${e.hookHeadline || e.topic || ''}`)
+    const costume = e.costume ? ` | costume ${e.costume}` : ''
+    lines.push(`  ${day(e.when)}  ${e.channel.padEnd(8)} ${series} | ${e.format || 'format?'} | ${who}${costume} | ${e.hookHeadline || e.topic || ''}`)
   }
 
   lines.push('', 'Latest episode per series:')
@@ -149,6 +164,9 @@ export function formatContinuityReport(report: ContinuityReport): string {
   for (const c of report.castCounts) {
     lines.push(`  ${c.character}: ${c.count}${c.count >= crowd ? '  <- overused, pick someone else unless the series needs them' : ''}`)
   }
+
+  lines.push('', `Costumes in the last ${report.recent.length} pieces: ${report.costumed}${report.recent.length && report.costumed * 3 > report.recent.length ? '  <- over 1 in 3, make the next piece in the house look' : ''}`)
+  for (const c of report.costumeCounts) lines.push(`  ${c.costume}: ${c.count}${c.count > 1 ? '  <- worn more than once, pick another costume next' : ''}`)
 
   if (report.repeatedHooks.length) {
     lines.push('', 'Hooks used more than once (do not reuse):')
