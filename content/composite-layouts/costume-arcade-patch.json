@@ -47,9 +47,9 @@
       "borderWidth": 3,
       "box": {
         "x": 7,
-        "y": 47,
+        "y": 49,
         "w": 86,
-        "h": 32
+        "h": 26
       }
     },
     {
@@ -60,15 +60,15 @@
         "New: XP ring around your avatar",
         "Fixed: doomscrolling now ends the run"
       ],
-      "size": 38,
+      "size": 40,
       "marker": "dash",
       "markerColor": "magenta",
-      "gap": 22,
+      "gap": 26,
       "box": {
         "x": 12,
-        "y": 51,
+        "y": 53,
         "w": 76,
-        "h": 25
+        "h": 20
       }
     },
     {
