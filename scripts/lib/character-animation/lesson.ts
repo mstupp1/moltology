@@ -13,6 +13,9 @@ import { SHOTS, type AnimationTimeline, type CameraMove, type ShotName, type Tim
 import { parseLobsterAvatarConfig } from '../../../src/lib/lobster-avatar'
 import { tokenizeScriptText, type WordBoundaryEvent } from '../tts-engine'
 
+/** How far a podcast-desk speaker shot aims below the default, in world units (see buildTimeline). */
+const DESK_SHOT_DROP = 0.16
+
 export const REACTIONS: readonly Reaction[] = ['poke', 'snap', 'equip', 'celebrate']
 export const LOOKS = ['camera', 'wander', 'left', 'right', 'down', 'up'] as const
 export type LessonLook = (typeof LOOKS)[number]
@@ -399,7 +402,11 @@ export function buildTimeline(
     const move = i === 0 || (i === 1 && options.hookLift && (scene.move ?? 'glide') === 'glide') ? 'cut' : (scene.move ?? 'glide')
     // A two-shot is framed wider, so it needs less lift to clear the headline; more would strand the
     // pair high above an empty floor.
-    const lift = i === 0 && options.hookLift ? options.hookLift * (scene.shot === 'two' ? 0.8 : 1) : 0
+    const hook = i === 0 && options.hookLift ? options.hookLift * (scene.shot === 'two' ? 0.8 : 1) : 0
+    // At the podcast desk a single-speaker shot aims lower, so the mouth sits above the subtitle band
+    // (centred at 61% of the height) instead of under it; the desk fills the bottom of the frame.
+    const deskDrop = (options.set ?? lesson.set) === 'podcast-studio' && i > 0 && scene.shot !== 'two' && focus !== 'all' ? DESK_SHOT_DROP : 0
+    const lift = hook - deskDrop
     // The hook's two-shot comes in a step closer so the pair reads big under the headline. It holds
     // a resting pose there; later two-shots keep the wider frame so pointing and cheering claws stay in.
     const zoom = i === 0 && options.hookLift && scene.shot === 'two' ? 0.56 : shot.zoom
