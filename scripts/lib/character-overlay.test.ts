@@ -8,7 +8,7 @@ import {
 
 describe('Character Overlay & Registry', () => {
   it('contains core registered cartoon characters with valid S3 URLs', () => {
-    const keys = ['crab_juno_marsh', 'lobster_kit_shallows', 'crab_otto_basalt', 'lobster_sol_ember', 'lobster_nell_quill', 'crab_bo_pebble', 'lobster_vera_drift', 'crab_moss_tern']
+    const keys = ['crab_juno_marsh', 'lobster_kit_shallows', 'crab_otto_basalt', 'lobster_sol_ember', 'lobster_nell_quill', 'crab_bo_pebble', 'lobster_vera_drift', 'crab_moss_tern', 'crab_maris_slate', 'lobster_cora_pearl']
 
     for (const key of keys) {
       const char = CHARACTER_REGISTRY[key]
@@ -31,7 +31,7 @@ describe('Character Overlay & Registry', () => {
 
   it('provides random character selection across the entire registry', () => {
     const allKeys = getAllCharacterKeys()
-    expect(allKeys.length).toBe(8)
+    expect(allKeys.length).toBe(10)
 
     const randomKey = getRandomCharacterKey()
     expect(allKeys).toContain(randomKey)

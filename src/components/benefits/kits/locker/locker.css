@@ -1,0 +1,1521 @@
+/*
+ * Locker room costume: sportswear and training brands. Black and concrete, one volt accent,
+ * condensed italic capitals, hard edges, big numbers and a gritty hero.
+ * Scoped to [data-kit="locker"]; colours and fonts here stay in this file.
+ */
+
+[data-kit='locker'] {
+  --lk-black: #0c0c0c;
+  --lk-concrete: #1a1a1a;
+  --lk-steel: #2a2a2a;
+  --lk-white: #f5f5f0;
+  --lk-body: #c9c9c2;
+  --lk-muted: #8d8d86;
+  --lk-volt: #d8ff3c;
+  --lk-display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+  --lk-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--lk-black);
+}
+
+[data-kit='locker'] .lk {
+  background: var(--lk-black);
+  color: var(--lk-body);
+  font-family: var(--lk-sans);
+  overflow-x: clip;
+}
+
+[data-kit='locker'] .lk ::selection {
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'] .lk-wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header ---------------------------------------------------------------- */
+
+[data-kit='locker'] .bh {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--lk-black);
+  border-bottom: 1px solid var(--lk-steel);
+}
+
+[data-kit='locker'] .bh-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+[data-kit='locker'] .bh-lockup {
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-lockup {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+}
+
+[data-kit='locker'] .lk-lockup-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--lk-volt);
+  transform: skewX(-12deg);
+}
+
+[data-kit='locker'] .lk-lockup-word {
+  font-family: var(--lk-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  font-style: italic;
+  transform: skewX(-8deg);
+}
+
+[data-kit='locker'] .lk-lockup-bar {
+  position: absolute;
+  left: 32px;
+  right: -6px;
+  bottom: 0;
+  height: 3px;
+  background: var(--lk-volt);
+  transform: skewX(-30deg);
+}
+
+[data-kit='locker'] .bh-nav {
+  display: none;
+  gap: 4px;
+  margin-left: auto;
+}
+
+[data-kit='locker'] .bh-link {
+  padding: 8px 12px;
+  font-family: var(--lk-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .bh-link:hover {
+  color: var(--lk-volt);
+}
+
+[data-kit='locker'] .bh-cta {
+  margin-left: auto;
+  padding: 10px 18px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+  font-family: var(--lk-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .bh-nav {
+    display: flex;
+  }
+
+  [data-kit='locker'] .bh-cta {
+    margin-left: 12px;
+  }
+}
+
+/* Type and buttons ------------------------------------------------------ */
+
+[data-kit='locker'] .lk-tag {
+  display: inline-block;
+  padding: 6px 10px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+  font-family: var(--lk-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[data-kit='locker'] .lk-h1 {
+  margin-top: 18px;
+  max-width: 11ch;
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(3.4rem, 9vw, 7rem);
+  line-height: 0.88;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-h2 {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-h3 {
+  font-family: var(--lk-display);
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-lede {
+  margin-top: 20px;
+  max-width: 30rem;
+  font-size: 1.125rem;
+  line-height: 1.55;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+[data-kit='locker'] .lk-intro {
+  margin-top: 16px;
+  max-width: 34rem;
+}
+
+[data-kit='locker'] .lk-actions {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+[data-kit='locker'] .lk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  margin-top: 28px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+  font-family: var(--lk-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: transform 0.15s;
+}
+
+[data-kit='locker'] .lk-actions .lk-btn {
+  margin-top: 0;
+}
+
+[data-kit='locker'] .lk-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-kit='locker'] .lk-btn:hover {
+  transform: translateX(3px);
+}
+
+[data-kit='locker'] .lk-btn-line {
+  display: inline-flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 22px;
+  box-shadow: inset 0 0 0 2px var(--lk-white);
+  color: var(--lk-white);
+  font-family: var(--lk-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+[data-kit='locker'] .lk-btn:focus-visible,
+[data-kit='locker'] .lk-btn-line:focus-visible {
+  outline: 2px solid var(--lk-volt);
+  outline-offset: 3px;
+}
+
+/* Hero ------------------------------------------------------------------ */
+
+[data-kit='locker'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: min(92vh, 860px);
+  padding: 120px 0 64px;
+  overflow: hidden;
+}
+
+[data-kit='locker'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% center;
+}
+
+[data-kit='locker'] .lk-hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(12, 12, 12, 0.92) 0%, rgba(12, 12, 12, 0.6) 45%, rgba(12, 12, 12, 0.05) 75%),
+    linear-gradient(0deg, rgba(12, 12, 12, 0.9) 0%, rgba(12, 12, 12, 0) 45%);
+}
+
+[data-kit='locker'] .lk-hero-copy {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  [data-kit='locker'] .lk-hero-copy > * {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 639px) {
+  [data-kit='locker'] .lk-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 48px;
+  }
+
+  [data-kit='locker'] .lk-hero-img {
+    position: static;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  [data-kit='locker'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'] .lk-hero-copy {
+    margin-top: -36px;
+  }
+}
+
+/* Stats ----------------------------------------------------------------- */
+
+[data-kit='locker'] .lk-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'] .lk-stat {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+  border-right: 2px solid var(--lk-black);
+  border-bottom: 2px solid var(--lk-black);
+}
+
+[data-kit='locker'] .lk-stat-value {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-size: clamp(3rem, 7vw, 5rem);
+  line-height: 0.9;
+}
+
+[data-kit='locker'] .lk-stat-label {
+  margin-top: 6px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .lk-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  [data-kit='locker'] .lk-stat {
+    padding: 32px 40px;
+    border-bottom: 0;
+  }
+
+  [data-kit='locker'] .lk-stat:last-child {
+    border-right: 0;
+  }
+}
+
+/* Program --------------------------------------------------------------- */
+
+[data-kit='locker'] .lk-section {
+  padding: 88px 0;
+}
+
+[data-kit='locker'] .lk-program {
+  margin-top: 48px;
+  border-top: 2px solid var(--lk-white);
+}
+
+[data-kit='locker'] .lk-set {
+  display: grid;
+  gap: 6px 32px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--lk-steel);
+  transition: background-color 0.2s;
+}
+
+[data-kit='locker'] .lk-set:hover {
+  background: var(--lk-concrete);
+}
+
+[data-kit='locker'] .lk-set-label {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lk-volt);
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .lk-section {
+    padding: 128px 0;
+  }
+
+  [data-kit='locker'] .lk-set {
+    grid-template-columns: 160px minmax(0, 1fr) minmax(0, 1.2fr);
+    align-items: baseline;
+    padding: 28px 16px;
+  }
+}
+
+/* Gear ------------------------------------------------------------------ */
+
+[data-kit='locker'] .lk-gear-section {
+  background: var(--lk-concrete);
+}
+
+[data-kit='locker'] .lk-gear {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+
+[data-kit='locker'] .lk-gear-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  filter: contrast(1.05);
+}
+
+[data-kit='locker'] .lk-gear-list {
+  margin-top: 28px;
+  display: grid;
+  gap: 4px;
+}
+
+[data-kit='locker'] .lk-gear-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--lk-steel);
+  font-size: 1.0625rem;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-gear-list svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--lk-volt);
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .lk-gear {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 88px;
+  }
+}
+
+/* Creed ----------------------------------------------------------------- */
+
+[data-kit='locker'] .lk-creed {
+  padding: 96px 0;
+  background: var(--lk-volt);
+}
+
+[data-kit='locker'] .lk-creed-text {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-size: clamp(2.2rem, 5.4vw, 4.6rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+  color: var(--lk-black);
+}
+
+/* FAQ ------------------------------------------------------------------- */
+
+[data-kit='locker'] .bf {
+  padding: 88px 0 136px;
+}
+
+[data-kit='locker'] .bf-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+[data-kit='locker'] .bf-title {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .bf-list {
+  margin-top: 32px;
+  border-top: 2px solid var(--lk-white);
+}
+
+[data-kit='locker'] .bf-item {
+  border-bottom: 1px solid var(--lk-steel);
+}
+
+[data-kit='locker'] .bf-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  font-family: var(--lk-display);
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .bf-icon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+[data-kit='locker'] .bf-icon::before,
+[data-kit='locker'] .bf-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 18px;
+  height: 3px;
+  background: var(--lk-volt);
+  transition: transform 0.2s;
+}
+
+[data-kit='locker'] .bf-icon::after {
+  transform: rotate(90deg);
+}
+
+[data-kit='locker'] .bf-item[open] .bf-icon::after {
+  transform: rotate(0deg);
+}
+
+[data-kit='locker'] .bf-a {
+  padding: 0 0 24px;
+  max-width: 680px;
+  line-height: 1.65;
+}
+
+/* Variant: track-club (physicality) ------------------------------------- */
+
+[data-kit='locker'][data-variant='track-club'] {
+  --lk-chalk: #f3f0ea;
+  --lk-asphalt: #141312;
+  --lk-crimson: #b32217;
+  --lk-ember: #ff6b5a;
+  --lk-ink: #141312;
+  --lk-ink-body: #33302c;
+  --lk-ink-muted: #57524b;
+  --lk-rule: #dbd5ca;
+  --lk-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk {
+  background: var(--lk-chalk);
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk ::selection {
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh {
+  background: var(--lk-chalk);
+  border-bottom: 1px solid var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-lockup {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-track {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-track .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-track .lk-lockup-word {
+  font-style: normal;
+  transform: none;
+  color: var(--lk-ink);
+  letter-spacing: 0.02em;
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-link {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-link:hover {
+  color: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-cta {
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(84svh, 760px);
+  max-width: none;
+  padding: 64px 0;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero-shade {
+  display: block;
+  background: linear-gradient(104deg, #f3f0ea 0%, #f3f0ea 49.5%, #b32217 49.5%, #b32217 50.1%, rgba(20, 19, 18, 0.08) 50.2%, transparent 66%);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero-copy {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-copy > * {
+    max-width: 550px;
+  }
+}
+
+@media (max-width: 899px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-copy {
+    order: 1;
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 82% center;
+  }
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-tag {
+  background: transparent;
+  color: var(--lk-crimson);
+  padding: 0 0 0 12px;
+  border-left: 3px solid var(--lk-crimson);
+  font-family: var(--lk-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-h1 {
+  font-style: normal;
+  font-size: clamp(3rem, 6vw, 5.2rem);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lede {
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-btn {
+  background: var(--lk-ink);
+  color: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-btn-line {
+  box-shadow: inset 0 0 0 2px var(--lk-ink);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stats {
+  background: var(--lk-asphalt);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stat {
+  border-color: #2c2a27;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stat-value {
+  font-style: normal;
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stat-label {
+  font-family: var(--lk-mono);
+  color: var(--lk-ember);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-section .lk-h2 {
+  font-style: normal;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 0;
+  background: transparent;
+  border: 0;
+  border-top: 2px solid var(--lk-ink);
+  border-bottom: 0;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set:hover {
+  background: transparent;
+  border-top-color: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set-label {
+  font-family: var(--lk-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set .lk-h3 {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section {
+  background: var(--lk-asphalt);
+  color: #d6d3cb;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-h2 {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-gear-list li {
+  color: #f5f5f0;
+  border-bottom-color: #2e2c29;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-gear-list svg {
+  color: var(--lk-ember);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-btn {
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-gear {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-gear-img {
+    order: 2;
+  }
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-creed {
+  background: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-creed-text {
+  font-style: normal;
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf {
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-title {
+  font-style: normal;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-list {
+  border-top-color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-item {
+  border-bottom-color: var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-q {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-icon::before,
+[data-kit='locker'][data-variant='track-club'] .bf-icon::after {
+  background: var(--lk-crimson);
+}
+
+/* Variant: cobalt-iron (grip) ------------------------------------------- */
+
+[data-kit='locker'][data-variant='cobalt-iron'] {
+  --lk-black: #0a101d;
+  --lk-concrete: #121b2e;
+  --lk-steel: #253454;
+  --lk-white: #f0f5ff;
+  --lk-body: #c7d3eb;
+  --lk-muted: #8e9fc4;
+  --lk-volt: #68abff;
+  --lk-cobalt-ink: #071226;
+  --lk-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-block {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-volt);
+  color: var(--lk-cobalt-ink);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-block .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--lk-cobalt-ink);
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-block .lk-lockup-word {
+  font-style: normal;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-h1,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-h2,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-stat-value,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-creed-text {
+  font-style: normal;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(84svh, 760px);
+  max-width: none;
+  padding: 64px 0;
+  background: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% center;
+  border: 0;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-shade {
+  display: block;
+  background: linear-gradient(92deg, #070d19 0%, rgba(7, 13, 25, 0.88) 44%, rgba(7, 13, 25, 0.06) 72%);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy > * {
+    max-width: 550px;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy {
+    padding-left: 44px;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: var(--lk-volt);
+  }
+}
+
+@media (max-width: 899px) {
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy {
+    order: 1;
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 78% center;
+  }
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  background: var(--lk-concrete);
+  border: 1px solid var(--lk-steel);
+  border-left: 4px solid var(--lk-volt);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-set-label,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-stat-label {
+  font-family: var(--lk-mono);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-creed-text {
+  color: var(--lk-cobalt-ink);
+}
+
+/* Variant: chalk-gym (fitness) ------------------------------------------ */
+
+[data-kit='locker'][data-variant='chalk-gym'] {
+  --lk-chalk: #f3f3ee;
+  --lk-pine: #13211a;
+  --lk-emerald: #135c42;
+  --lk-mint: #89dfc0;
+  --lk-ink: #13211a;
+  --lk-ink-body: #324038;
+  --lk-ink-muted: #505e56;
+  --lk-rule: #d1d6cc;
+  --lk-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk {
+  background: var(--lk-chalk);
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk ::selection {
+  background: var(--lk-emerald);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh {
+  background: var(--lk-chalk);
+  border-bottom: 1px solid var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh-lockup,
+[data-kit='locker'][data-variant='chalk-gym'] .bh-link {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh-link:hover {
+  color: var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh-cta {
+  background: var(--lk-emerald);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-track {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-emerald);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-track .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-track .lk-lockup-word {
+  font-style: normal;
+  transform: none;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 28px 20px 44px;
+  align-items: center;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero-shade {
+  display: none;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero-copy {
+  order: 1;
+  padding: 0;
+  margin: 0;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero-img {
+  position: static;
+  order: 2;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: 84% center;
+  border: 0;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    min-height: min(82svh, 740px);
+    padding: 0;
+    align-items: stretch;
+  }
+
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero-copy {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 56px 56px 56px max(24px, calc((100vw - 1280px) / 2 + 20px));
+  }
+
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero-copy > * {
+    max-width: 540px;
+  }
+
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero-img {
+    order: 2;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-tag {
+  background: var(--lk-emerald);
+  color: #ffffff;
+  font-family: var(--lk-mono);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-h1,
+[data-kit='locker'][data-variant='chalk-gym'] .lk-h2,
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat-value,
+[data-kit='locker'][data-variant='chalk-gym'] .lk-creed-text {
+  font-style: normal;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-h1 {
+  font-size: clamp(3rem, 6vw, 5.1rem);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lede {
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-btn {
+  background: var(--lk-ink);
+  color: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-btn-line {
+  box-shadow: inset 0 0 0 2px var(--lk-ink);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stats {
+  background: var(--lk-pine);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat {
+  border-color: #25382e;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat-value {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat-label {
+  font-family: var(--lk-mono);
+  color: var(--lk-mint);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-section .lk-h2 {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-program {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid var(--lk-rule);
+  border-top: 3px solid var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-set-label {
+  font-family: var(--lk-mono);
+  font-size: 0.75rem;
+  color: var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-set .lk-h3 {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section {
+  background: var(--lk-pine);
+  color: #dbe3de;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-h2 {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-gear-list li {
+  color: #f4f6f4;
+  border-bottom-color: #263b30;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-gear-list svg {
+  color: var(--lk-mint);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-btn {
+  background: var(--lk-mint);
+  color: var(--lk-pine);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-creed {
+  background: var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-creed-text {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf {
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-title {
+  font-style: normal;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-list {
+  border-top-color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-item {
+  border-bottom-color: var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-q {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-icon::before,
+[data-kit='locker'][data-variant='chalk-gym'] .bf-icon::after {
+  background: var(--lk-emerald);
+}
+
+/* Variant: gold-sprint (movement) --------------------------------------- */
+
+[data-kit='locker'][data-variant='gold-sprint'] {
+  --lk-black: #0f0e0c;
+  --lk-concrete: #191713;
+  --lk-steel: #302b22;
+  --lk-white: #faf7ef;
+  --lk-body: #d3cdc0;
+  --lk-muted: #9e9686;
+  --lk-volt: #f0b91a;
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-lockup-block {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-lockup-block .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-hero {
+  background: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-hero-img {
+  object-position: 78% center;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='gold-sprint'] .lk-hero {
+    align-items: flex-end;
+    min-height: min(86svh, 780px);
+    padding: 96px 0 68px;
+  }
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-hero-shade {
+  background:
+    linear-gradient(90deg, rgba(15, 14, 12, 0.94) 0%, rgba(15, 14, 12, 0.72) 44%, rgba(15, 14, 12, 0.08) 76%),
+    linear-gradient(0deg, var(--lk-black) 0%, rgba(15, 14, 12, 0) 42%);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-creed-text {
+  color: var(--lk-black);
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='gold-sprint'] .lk-gear-img {
+    order: 2;
+  }
+}
+
+/* Variant: forged-amber (resilience) ------------------------------------ */
+
+[data-kit='locker'][data-variant='forged-amber'] {
+  --lk-black: #110d0b;
+  --lk-concrete: #1c1613;
+  --lk-steel: #352922;
+  --lk-white: #f8f2ec;
+  --lk-body: #d8cac0;
+  --lk-muted: #a89487;
+  --lk-volt: #ff942e;
+  --lk-display: 'Chakra Petch', 'Anton', sans-serif;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-block {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-block .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--lk-black);
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-block .lk-lockup-word {
+  font-style: normal;
+  font-weight: 700;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-h1,
+[data-kit='locker'][data-variant='forged-amber'] .lk-h2,
+[data-kit='locker'][data-variant='forged-amber'] .lk-h3,
+[data-kit='locker'][data-variant='forged-amber'] .lk-stat-value,
+[data-kit='locker'][data-variant='forged-amber'] .lk-creed-text {
+  font-style: normal;
+  font-weight: 700;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-h1 {
+  font-size: clamp(2.4rem, 4.6vw, 4.1rem);
+  line-height: 0.96;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-h2 {
+  font-size: clamp(2rem, 3.8vw, 3.3rem);
+  line-height: 0.98;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-creed-text {
+  font-size: clamp(2rem, 4.4vw, 3.6rem);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy {
+  min-width: 0;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(84svh, 760px);
+  max-width: none;
+  padding: 64px 0;
+  background: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+  border: 0;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-shade {
+  display: block;
+  background: linear-gradient(96deg, rgba(17, 13, 11, 0.96) 0%, rgba(17, 13, 11, 0.75) 45%, rgba(17, 13, 11, 0.06) 74%);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy > * {
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 899px) {
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy {
+    order: 1;
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 80% center;
+  }
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='forged-amber'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  background: var(--lk-concrete);
+  border: 1px solid var(--lk-steel);
+  border-top: 3px solid var(--lk-volt);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-creed-text {
+  color: var(--lk-black);
+}

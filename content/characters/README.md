@@ -12,6 +12,8 @@ Moltology's content uses eight 3D characters built in the site's character creat
 | Bo Pebble | `crab_bo_pebble` (`bo`) | Comic relief. Means well, trips over the obvious lesson first. | Just Many |
 | Vera Drift | `lobster_vera_drift` (`vera`) | The skeptic. Pushes back so the lesson has to earn it. | Friendly Young Woman |
 | Moss Tern | `crab_moss_tern` (`moss`) | The calm elder. Slow, kind, has molted many times. | Mommy |
+| Maris Slate | `crab_maris_slate` (`maris`) | The strategist. Maps out the hard problem and tests the rule before acting. | Hannah |
+| Cora Pearl | `lobster_cora_pearl` (`cora`) | The curator. Notices taste, pacing, and small details everyone else rushes past. | Twilight Sparkle |
 
 Voices are first picks from the Fish catalog in `scripts/lib/tts-providers/fish-audio.ts`; change one in `cast.json` after hearing it. Keep each character's voice fixed once it has been used in published content.
 

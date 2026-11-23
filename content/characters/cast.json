@@ -268,6 +268,76 @@
           }
         }
       }
+    },
+    "crab_maris_slate": {
+      "name": "Maris Slate",
+      "role": "The strategist. Maps out the hard problem and tests the rule before acting.",
+      "storyRole": "A calm, methodical planner who lays out the exact step before moving",
+      "description": "Tall cobalt-blue satin crab with darker tide-ring markings, square boxy shell, wide amber eyes under focused lids, a steady grin, feathery plume antennae and an abyssal ward carapace plate",
+      "voice": "Hannah",
+      "pose": "ready",
+      "aliases": [
+        "maris"
+      ],
+      "config": {
+        "seed": "cast-maris-slate",
+        "race": "crab",
+        "shellColor": "cobalt",
+        "shellFinish": "satin",
+        "marking": "tide",
+        "mouth": "grin",
+        "antennae": "plume",
+        "headShape": "square",
+        "build": "classic",
+        "height": "tall",
+        "eyeColor": "amber",
+        "eyeVariant": "wide",
+        "pupilVariant": "keen",
+        "eyelidStyle": "focused",
+        "gaze": "ahead",
+        "temperament": "calm",
+        "equipment": {
+          "carapace": {
+            "visualKey": "abyssal-ward-shell",
+            "rarity": "rare"
+          }
+        }
+      }
+    },
+    "lobster_cora_pearl": {
+      "name": "Cora Pearl",
+      "role": "The curator. Notices taste, pacing, and small details everyone else rushes past.",
+      "storyRole": "A composed editorial eye who treats ordinary habits with quiet care",
+      "description": "Slim pearlescent porcelain-white lobster with soft lavender-grey coral-lace markings, tall head, sparkling amethyst eyes under relaxed lids, gentle smile, curled antennae and a small gold crown",
+      "voice": "Twilight Sparkle",
+      "pose": "strut",
+      "aliases": [
+        "cora"
+      ],
+      "config": {
+        "seed": "cast-cora-pearl",
+        "race": "lobster",
+        "shellColor": "ghost",
+        "shellFinish": "pearl",
+        "marking": "lace",
+        "mouth": "smile",
+        "antennae": "curl",
+        "headShape": "tall",
+        "build": "slim",
+        "height": "regular",
+        "eyeColor": "amethyst",
+        "eyeVariant": "tall",
+        "pupilVariant": "sparkle",
+        "eyelidStyle": "relaxed",
+        "gaze": "ahead",
+        "temperament": "proud",
+        "equipment": {
+          "head": {
+            "visualKey": "creator-crown",
+            "rarity": "uncommon"
+          }
+        }
+      }
     }
   }
 }
