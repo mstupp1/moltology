@@ -9,6 +9,7 @@ Read the shared prerequisites and matching skill before any content pipeline, in
 - Read the [annual content calendar](annual-content-calendar.md) before choosing topics, copy, or artwork. Use the intended publication date and channel timezone; follow seasonal lead-in and expiry. News and release claims still require actual sources and shipped work. Supporting asset skills inherit the campaign brief without changing canonical identities or factual screenshots.
 - For artwork featuring characters, follow [character casting](character-casting.md) before choosing characters or writing image prompts. Match characters to the written story first; use recent usage and randomization to choose among equally strong matches across the full cast. Characters are the 3D content cast in [characters/](characters/README.md), rendered with `npm run cast:render`.
 - Follow [asset workflows](../docs/assets-and-media.md) and the [social archive procedure](../docs/social-archive.md). Archive finished social files in Google Drive before queueing; website/blog media, character sources, and reusable templates stay on Neon S3. Preserve final files after failures.
+- When a piece wears a benefit-page costume (a telehealth, energy drink, retreat... look), follow [costumes](costumes.md) and start from `npm run costumes:brief`.
 - Queue and publish through repo CLI scripts only, never Zernio MCP tools. [Publishing storage](../docs/social-publishing-storage.md) explains Zernio uploads and retries.
 
 ## Choose the matching skill
@@ -22,6 +23,7 @@ Read the shared prerequisites and matching skill before any content pipeline, in
 | Loud, format-led carousels | [benthic-swipe-lab](../.agents/skills/benthic-swipe-lab/SKILL.md) |
 | Reels and Shorts | [reels-and-shorts-creator](../.agents/skills/reels-and-shorts-creator/SKILL.md) |
 | Cast stills, poses and reference sheets | [character-creator](../.agents/skills/character-creator/SKILL.md), `npm run cast:render`; cast in [characters/cast.json](characters/cast.json) |
+| Molt Pod podcast highlight clips | [animated-lessons](../.agents/skills/animated-lessons/SKILL.md) (Molt Pod format, `podcast-studio` set) |
 | Animated lessons with the 3D characters | [animated-lessons](../.agents/skills/animated-lessons/SKILL.md), `npm run anim:create`; cast in [characters/cast.json](characters/cast.json) |
 | Benthic comedy shorts (Crab Logic) | [benthic-comedy-shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md), `npm run anim:create`; cast in [characters/cast.json](characters/cast.json) |
 | Blog dispatches | [blog-creator](../.agents/skills/blog-creator/SKILL.md) |

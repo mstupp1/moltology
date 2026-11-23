@@ -34,7 +34,7 @@ The schema and lint rules live in [`src/components/composite/layout-spec.ts`](..
 
 | Layer | Use it for | Key fields |
 | --- | --- | --- |
-| `text` | Headlines, body, captions | `text` (newlines allowed), `size`, `font` (display, body, serif, mono), `weight`, `color`, `highlight` + `highlightColor`, `align`, `valign`, `lineHeight`, `tracking`, `uppercase`, `shadow` (none, soft, strong, glow). With a box height the text shrinks to fit (down to `minSize`). |
+| `text` | Headlines, body, captions | `text` (newlines allowed), `size`, `font` (display, body, serif, mono, script), `weight`, `color`, `highlight` + `highlightColor`, `align`, `valign`, `lineHeight`, `tracking`, `uppercase`, `shadow` (none, soft, strong, glow). With a box height the text shrinks to fit (down to `minSize`). |
 | `panel` | Cards, glass HUD plates, color blocks | `style` (glass, solid, outline, gradient), `color`, `colorTo`, `border`, `radius`, `glow`, `shadow` |
 | `pill` | Eyebrows, category tags | `text`, `size`, `color`, `background`, `border`, `align` |
 | `button` | The call to action | `text`, `size`, `style` (solid, outline, gradient), `color`, `textColor`, `arrow` |
@@ -44,6 +44,12 @@ The schema and lint rules live in [`src/components/composite/layout-spec.ts`](..
 | `shape` | Glows, dividers, blocks, circles | `shape` (rect, circle, line, glow), `color`, `blur`, `radius`, `thickness` |
 | `list` | Bullets, steps, checklists | `items`, `size`, `marker` (dot, check, number, dash, none), `gap` |
 | `stat` | A big number with a label | `value`, `label`, `size`, `color`, `labelColor`, `align` |
+
+## Costumes
+
+Set `"costume": "<costume>"` at the top of a spec to dress it in a benefit-page costume (`clinic`, `can`, `retreat`, `atelier`, `ledger`, `locker`, `platform`, `arcade`, `seminar`, `network`). The costume's ground, fonts, headline treatment (caps, italics), corners, shadows and lockup become the defaults, the vignette turns off, and its color names work as tokens beside the brand ones: every costume has `ground`, `surface`, `text`, `body`, `muted`, `line`, `accent`, `accentText` and `highlight`, plus its own (`volt`, `lime`, `blush`, `gold`...). `npm run costumes:brief -- --kit <costume>` lists them. A `brand` layer draws the costume's lockup, and the `script` font role is the retreat's hand-lettered face (other costumes fall back to their display face).
+
+Each costume has a starter, `costume-<costume>-*.json`, built on one device from its industry (the clinic assessment card, the can's nutrition label, the arcade patch notes). Rules for using them in social content: [costumes.md](../costumes.md).
 
 ## Lint
 
