@@ -1,0 +1,572 @@
+/*
+ * Arcade costume: video game launches. Night purple, neon cyan and magenta, pixel labels,
+ * angular headings, HUD frames with clipped corners and stat bars.
+ * Scoped to [data-kit="arcade"]; colours and fonts here stay in this file.
+ */
+
+[data-kit='arcade'] {
+  --ar-night: #12082a;
+  --ar-deep: #0b0420;
+  --ar-panel: #1d1040;
+  --ar-line: #3a2a6e;
+  --ar-white: #f3f0ff;
+  --ar-body: #bdb4de;
+  --ar-muted: #a297cf;
+  --ar-cyan: #3cf2e0;
+  --ar-magenta: #ff3ca6;
+  --ar-gold: #ffd23c;
+  --ar-pixel: 'Press Start 2P', ui-monospace, monospace;
+  --ar-display: 'Chakra Petch', 'Inter', sans-serif;
+  --ar-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ar-cut: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  background: var(--ar-night);
+}
+
+[data-kit='arcade'] .ar {
+  background: var(--ar-night);
+  color: var(--ar-body);
+  font-family: var(--ar-sans);
+  overflow-x: clip;
+}
+
+[data-kit='arcade'] .ar ::selection {
+  background: var(--ar-magenta);
+  color: #ffffff;
+}
+
+[data-kit='arcade'] .ar-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+[data-kit='arcade'] .ar-pixel {
+  font-family: var(--ar-pixel);
+  font-size: 0.625rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Header ---------------------------------------------------------------- */
+
+[data-kit='arcade'] .bh {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(11, 4, 32, 0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--ar-line);
+}
+
+[data-kit='arcade'] .bh-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+[data-kit='arcade'] .bh-lockup {
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .ar-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-kit='arcade'] .ar-lockup-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--ar-cyan);
+  filter: drop-shadow(2px 0 0 var(--ar-magenta));
+}
+
+[data-kit='arcade'] .ar-lockup-word {
+  font-family: var(--ar-pixel);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  text-shadow: 2px 0 0 var(--ar-magenta), -2px 0 0 var(--ar-cyan);
+}
+
+[data-kit='arcade'] .bh-nav {
+  display: none;
+  gap: 4px;
+  margin-left: auto;
+}
+
+[data-kit='arcade'] .bh-link {
+  padding: 8px 12px;
+  font-family: var(--ar-display);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ar-body);
+}
+
+[data-kit='arcade'] .bh-link:hover {
+  color: var(--ar-cyan);
+}
+
+[data-kit='arcade'] .bh-cta {
+  margin-left: auto;
+  padding: 10px 18px;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  background: #c9136a;
+  color: #ffffff;
+  font-family: var(--ar-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  [data-kit='arcade'] .bh-nav {
+    display: flex;
+  }
+
+  [data-kit='arcade'] .bh-cta {
+    margin-left: 12px;
+  }
+}
+
+/* Type and buttons ------------------------------------------------------ */
+
+[data-kit='arcade'] .ar-h1 {
+  margin-top: 18px;
+  max-width: 11ch;
+  font-family: var(--ar-display);
+  font-weight: 600;
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--ar-white);
+  text-shadow: 0 0 40px rgba(60, 242, 224, 0.35);
+}
+
+[data-kit='arcade'] .ar-h2 {
+  margin-top: 12px;
+  font-family: var(--ar-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 4.6vw, 3.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .ar-h3 {
+  font-family: var(--ar-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .ar-lede {
+  margin-top: 20px;
+  max-width: 32rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .ar-body {
+  margin-top: 12px;
+  max-width: 34rem;
+  line-height: 1.6;
+}
+
+[data-kit='arcade'] .ar-label {
+  color: var(--ar-cyan);
+}
+
+[data-kit='arcade'] .ar-tag {
+  display: inline-block;
+  padding: 8px 12px;
+  background: rgba(255, 60, 166, 0.16);
+  box-shadow: inset 0 0 0 2px var(--ar-magenta);
+  color: #ffd1ea;
+}
+
+[data-kit='arcade'] .ar-actions {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+[data-kit='arcade'] .ar-btn,
+[data-kit='arcade'] .ar-btn-alt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  font-family: var(--ar-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition: filter 0.15s, transform 0.15s;
+}
+
+[data-kit='arcade'] .ar-btn {
+  margin-top: 28px;
+  background: linear-gradient(90deg, #c9136a, #b8430c);
+  color: #ffffff;
+}
+
+[data-kit='arcade'] .ar-actions .ar-btn {
+  margin-top: 0;
+}
+
+[data-kit='arcade'] .ar-btn-alt {
+  background: var(--ar-cyan);
+  color: var(--ar-deep);
+}
+
+[data-kit='arcade'] .ar-btn svg,
+[data-kit='arcade'] .ar-btn-alt svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-kit='arcade'] .ar-btn:hover,
+[data-kit='arcade'] .ar-btn-alt:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+[data-kit='arcade'] .ar-btn:focus-visible,
+[data-kit='arcade'] .ar-btn-alt:focus-visible,
+[data-kit='arcade'] .ar-quiz:focus-visible {
+  outline: 2px solid var(--ar-gold);
+  outline-offset: 3px;
+}
+
+[data-kit='arcade'] .ar-quiz {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 0.9375rem;
+  color: var(--ar-cyan);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Hero ------------------------------------------------------------------ */
+
+[data-kit='arcade'] .ar-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(90vh, 820px);
+  padding: 96px 0;
+  overflow: hidden;
+}
+
+[data-kit='arcade'] .ar-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 72% center;
+}
+
+[data-kit='arcade'] .ar-hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(18, 8, 42, 0.95) 0%, rgba(18, 8, 42, 0.7) 40%, rgba(18, 8, 42, 0) 70%),
+    linear-gradient(0deg, var(--ar-night) 0%, rgba(18, 8, 42, 0) 30%);
+}
+
+[data-kit='arcade'] .ar-hero-copy {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  [data-kit='arcade'] .ar-hero-copy > * {
+    max-width: 540px;
+  }
+}
+
+@media (max-width: 639px) {
+  [data-kit='arcade'] .ar-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 56px;
+  }
+
+  [data-kit='arcade'] .ar-hero-img {
+    position: static;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  [data-kit='arcade'] .ar-hero-shade {
+    top: auto;
+    height: 30%;
+    bottom: auto;
+    display: none;
+  }
+
+  [data-kit='arcade'] .ar-hero-copy {
+    padding-top: 28px;
+  }
+}
+
+/* Sections -------------------------------------------------------------- */
+
+[data-kit='arcade'] .ar-section {
+  padding: 88px 0;
+}
+
+[data-kit='arcade'] .ar-dark {
+  background:
+    linear-gradient(rgba(60, 242, 224, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(60, 242, 224, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--ar-deep);
+}
+
+[data-kit='arcade'] .ar-split {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+
+[data-kit='arcade'] .ar-panel {
+  padding: 24px;
+  clip-path: var(--ar-cut);
+  background: var(--ar-panel);
+  box-shadow: inset 0 0 0 2px var(--ar-line);
+}
+
+@media (min-width: 900px) {
+  [data-kit='arcade'] .ar-section {
+    padding: 120px 0;
+  }
+
+  [data-kit='arcade'] .ar-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 72px;
+  }
+}
+
+/* Stats ----------------------------------------------------------------- */
+
+[data-kit='arcade'] .ar-stats {
+  display: grid;
+  gap: 20px;
+}
+
+[data-kit='arcade'] .ar-stat-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+[data-kit='arcade'] .ar-stat-code {
+  color: var(--ar-cyan);
+}
+
+[data-kit='arcade'] .ar-stat-name {
+  flex: 1;
+  font-family: var(--ar-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .ar-stat-value {
+  color: var(--ar-gold);
+}
+
+[data-kit='arcade'] .ar-bar {
+  display: block;
+  height: 10px;
+  margin-top: 8px;
+  background: var(--ar-deep);
+  box-shadow: inset 0 0 0 1px var(--ar-line);
+}
+
+[data-kit='arcade'] .ar-bar span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--ar-cyan) 0 8px, transparent 8px 10px);
+}
+
+[data-kit='arcade'] .ar-stat-body {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Quests ---------------------------------------------------------------- */
+
+[data-kit='arcade'] .ar-quests {
+  margin-top: 40px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+[data-kit='arcade'] .ar-quest {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  background: var(--ar-panel);
+  box-shadow: inset 0 0 0 1px var(--ar-line);
+  transition: box-shadow 0.15s;
+}
+
+[data-kit='arcade'] .ar-quest:hover {
+  box-shadow: inset 0 0 0 2px var(--ar-cyan);
+}
+
+[data-kit='arcade'] .ar-check {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 2px var(--ar-cyan);
+}
+
+[data-kit='arcade'] .ar-quest-copy {
+  flex: 1;
+  display: grid;
+  gap: 4px;
+}
+
+[data-kit='arcade'] .ar-quest-n {
+  color: var(--ar-muted);
+}
+
+[data-kit='arcade'] .ar-quest-body {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+[data-kit='arcade'] .ar-reward {
+  color: var(--ar-gold);
+  white-space: nowrap;
+}
+
+/* Modes ----------------------------------------------------------------- */
+
+[data-kit='arcade'] .ar-modes-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  clip-path: var(--ar-cut);
+}
+
+[data-kit='arcade'] .ar-mode-list {
+  margin-top: 28px;
+  display: grid;
+  gap: 18px;
+}
+
+[data-kit='arcade'] .ar-mode {
+  padding-left: 16px;
+  border-left: 3px solid var(--ar-magenta);
+}
+
+[data-kit='arcade'] .ar-mode .ar-body {
+  margin-top: 4px;
+}
+
+/* Patch notes ----------------------------------------------------------- */
+
+[data-kit='arcade'] .ar-version {
+  margin-top: 16px;
+}
+
+[data-kit='arcade'] .ar-patch {
+  display: grid;
+  gap: 12px;
+  font-family: var(--ar-display);
+  font-weight: 600;
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .ar-patch li::before {
+  content: '+ ';
+  color: var(--ar-cyan);
+}
+
+/* FAQ ------------------------------------------------------------------- */
+
+[data-kit='arcade'] .bf {
+  padding: 88px 0 136px;
+}
+
+[data-kit='arcade'] .bf-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+[data-kit='arcade'] .bf-title {
+  font-family: var(--ar-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  text-transform: uppercase;
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .bf-list {
+  margin-top: 32px;
+  display: grid;
+  gap: 8px;
+}
+
+[data-kit='arcade'] .bf-item {
+  background: var(--ar-panel);
+  box-shadow: inset 0 0 0 1px var(--ar-line);
+}
+
+[data-kit='arcade'] .bf-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  font-family: var(--ar-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'] .bf-icon {
+  width: 0;
+  height: 0;
+  flex-shrink: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 9px solid var(--ar-cyan);
+  transition: transform 0.15s;
+}
+
+[data-kit='arcade'] .bf-item[open] .bf-icon {
+  transform: rotate(90deg);
+}
+
+[data-kit='arcade'] .bf-a {
+  padding: 0 20px 20px;
+  line-height: 1.6;
+}

@@ -1,0 +1,617 @@
+/*
+ * Retreat costume: mindfulness apps and wellness retreats. Linen, sand and sage,
+ * a script lockup, Garamond headlines, thin rules and lots of air.
+ * Scoped to [data-kit="retreat"]; colours and fonts here stay in this file.
+ */
+
+[data-kit='retreat'] {
+  --rt-linen: #f7f2ea;
+  --rt-sand: #ece3d4;
+  --rt-ink: #2d3128;
+  --rt-body: #4c5145;
+  --rt-muted: #5f6457;
+  --rt-sage: #55624d;
+  --rt-clay: #8f4c34;
+  --rt-line: #d9cfbf;
+  --rt-script: 'Parisienne', 'Snell Roundhand', cursive;
+  --rt-serif: 'EB Garamond', Garamond, Georgia, serif;
+  --rt-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--rt-linen);
+}
+
+[data-kit='retreat'] .rt {
+  background: var(--rt-linen);
+  color: var(--rt-body);
+  font-family: var(--rt-sans);
+}
+
+[data-kit='retreat'] .rt ::selection {
+  background: var(--rt-sand);
+  color: var(--rt-ink);
+}
+
+[data-kit='retreat'] .rt-wrap {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+[data-kit='retreat'] .rt-wrap-narrow {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header ---------------------------------------------------------------- */
+
+[data-kit='retreat'] .bh {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(247, 242, 234, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rt-line);
+}
+
+[data-kit='retreat'] .bh-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+[data-kit='retreat'] .bh-lockup {
+  color: var(--rt-ink);
+  border-radius: 8px;
+}
+
+[data-kit='retreat'] .rt-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-kit='retreat'] .rt-lockup-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--rt-clay);
+}
+
+[data-kit='retreat'] .rt-lockup-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+[data-kit='retreat'] .rt-lockup-word {
+  font-family: var(--rt-script);
+  font-size: 1.9rem;
+  line-height: 1.1;
+  padding-top: 2px;
+}
+
+[data-kit='retreat'] .rt-lockup-sub {
+  margin-top: 4px;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rt-muted);
+}
+
+[data-kit='retreat'] .bh-nav {
+  display: none;
+  gap: 6px;
+  margin-left: auto;
+}
+
+[data-kit='retreat'] .bh-link {
+  font-family: var(--rt-serif);
+  font-size: 1.0625rem;
+  color: var(--rt-body);
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: color 0.3s;
+}
+
+[data-kit='retreat'] .bh-link:hover {
+  color: var(--rt-clay);
+}
+
+[data-kit='retreat'] .bh-cta {
+  margin-left: auto;
+  padding: 9px 22px;
+  border: 1px solid var(--rt-ink);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rt-ink);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+[data-kit='retreat'] .bh-cta:hover {
+  background: var(--rt-ink);
+  color: var(--rt-linen);
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'] .bh-nav {
+    display: flex;
+  }
+
+  [data-kit='retreat'] .bh-cta {
+    margin-left: 12px;
+  }
+}
+
+/* Type ------------------------------------------------------------------ */
+
+[data-kit='retreat'] .rt-h1,
+[data-kit='retreat'] .rt-h2,
+[data-kit='retreat'] .rt-h3,
+[data-kit='retreat'] .bf-title {
+  font-family: var(--rt-serif);
+  font-weight: 400;
+  color: var(--rt-ink);
+  text-wrap: balance;
+}
+
+[data-kit='retreat'] .rt-h1 {
+  margin-top: 16px;
+  font-size: clamp(2.8rem, 7vw, 5.4rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #fffaf2;
+}
+
+[data-kit='retreat'] .rt-h2,
+[data-kit='retreat'] .bf-title {
+  font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+  line-height: 1.05;
+}
+
+[data-kit='retreat'] .rt-h3 {
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+[data-kit='retreat'] .rt-kicker {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 250, 242, 0.88);
+}
+
+[data-kit='retreat'] .rt-kicker-dark {
+  color: var(--rt-sage);
+  margin-bottom: 14px;
+}
+
+[data-kit='retreat'] .rt-body {
+  margin-top: 8px;
+  font-size: 1rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+[data-kit='retreat'] .rt-center {
+  text-align: center;
+}
+
+/* Hero ------------------------------------------------------------------ */
+
+[data-kit='retreat'] .rt-hero {
+  position: relative;
+  min-height: min(88vh, 820px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: var(--rt-sage);
+}
+
+[data-kit='retreat'] .rt-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The crab sits in the lower right; keep it in frame on narrow screens. */
+  object-position: 78% center;
+}
+
+[data-kit='retreat'] .rt-hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(30, 33, 26, 0.45) 0%, rgba(30, 33, 26, 0) 60%),
+    linear-gradient(180deg, rgba(30, 33, 26, 0) 20%, rgba(30, 33, 26, 0.7) 100%);
+}
+
+[data-kit='retreat'] .rt-hero-copy {
+  position: relative;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 120px 20px 56px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'] .rt-hero-copy {
+    padding-bottom: 88px;
+  }
+}
+
+[data-kit='retreat'] .rt-lede {
+  margin-top: 18px;
+  max-width: 32rem;
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: rgba(255, 250, 242, 0.92);
+  text-wrap: pretty;
+}
+
+[data-kit='retreat'] .rt-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+@media (min-width: 560px) {
+  [data-kit='retreat'] .rt-actions {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+  }
+}
+
+[data-kit='retreat'] .rt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 34px;
+  border-radius: 999px;
+  background: #fffaf2;
+  color: var(--rt-ink);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+[data-kit='retreat'] .rt-btn:hover {
+  background: var(--rt-sand);
+}
+
+[data-kit='retreat'] .rt-btn-dark {
+  margin-top: 32px;
+  background: var(--rt-ink);
+  color: var(--rt-linen);
+}
+
+[data-kit='retreat'] .rt-btn-dark:hover {
+  background: var(--rt-clay);
+  color: #fffaf2;
+}
+
+[data-kit='retreat'] .rt-btn-quiet {
+  font-family: var(--rt-serif);
+  font-style: italic;
+  font-size: 1.125rem;
+  color: #fffaf2;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 250, 242, 0.45);
+  text-underline-offset: 5px;
+}
+
+[data-kit='retreat'] .rt-btn-quiet:hover {
+  text-decoration-color: #fffaf2;
+}
+
+/* Intention ------------------------------------------------------------- */
+
+[data-kit='retreat'] .rt-intention {
+  padding: 88px 0;
+  text-align: center;
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'] .rt-intention {
+    padding: 128px 0;
+  }
+}
+
+[data-kit='retreat'] .rt-ornament {
+  display: block;
+  width: 1px;
+  height: 56px;
+  margin: 0 auto 32px;
+  background: var(--rt-clay);
+}
+
+[data-kit='retreat'] .rt-quote {
+  font-family: var(--rt-serif);
+  font-style: italic;
+  font-size: clamp(1.6rem, 3.6vw, 2.5rem);
+  line-height: 1.3;
+  color: var(--rt-ink);
+  text-wrap: balance;
+}
+
+[data-kit='retreat'] .rt-source {
+  margin-top: 24px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--rt-muted);
+}
+
+[data-kit='retreat'] .rt-source a {
+  color: var(--rt-clay);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Sections -------------------------------------------------------------- */
+
+[data-kit='retreat'] .rt-section {
+  padding: 80px 0;
+  border-top: 1px solid var(--rt-line);
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'] .rt-section {
+    padding: 120px 0;
+  }
+}
+
+[data-kit='retreat'] .rt-sand {
+  background: var(--rt-sand);
+  border-top: 0;
+}
+
+[data-kit='retreat'] .rt-practice {
+  display: grid;
+  gap: 40px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'] .rt-practice {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 80px;
+  }
+
+  [data-kit='retreat'] .rt-practice-head {
+    position: sticky;
+    top: 120px;
+    align-self: start;
+  }
+}
+
+[data-kit='retreat'] .rt-rhythm li {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--rt-line);
+}
+
+[data-kit='retreat'] .rt-rhythm li:first-child {
+  border-top: 1px solid var(--rt-line);
+}
+
+@media (min-width: 640px) {
+  [data-kit='retreat'] .rt-rhythm li {
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+[data-kit='retreat'] .rt-time {
+  padding-top: 8px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rt-sage);
+}
+
+[data-kit='retreat'] .rt-days {
+  margin-top: 48px;
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='retreat'] .rt-days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  [data-kit='retreat'] .rt-days {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+[data-kit='retreat'] .rt-day {
+  padding: 28px 22px;
+  border-radius: 200px 200px 6px 6px;
+  background: var(--rt-linen);
+  text-align: center;
+}
+
+[data-kit='retreat'] .rt-day-n {
+  display: block;
+  margin: 12px 0 14px;
+  font-family: var(--rt-script);
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--rt-clay);
+}
+
+[data-kit='retreat'] .rt-day .rt-body {
+  font-size: 0.9375rem;
+}
+
+[data-kit='retreat'] .rt-carry {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'] .rt-carry {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 80px;
+  }
+}
+
+[data-kit='retreat'] .rt-carry-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--rt-sand);
+}
+
+[data-kit='retreat'] .rt-carry-list {
+  margin-top: 24px;
+}
+
+[data-kit='retreat'] .rt-carry-list li {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rt-line);
+  font-family: var(--rt-serif);
+  font-size: 1.3rem;
+  line-height: 1.35;
+  color: var(--rt-ink);
+}
+
+/* FAQ ------------------------------------------------------------------- */
+
+[data-kit='retreat'] .bf {
+  padding: 80px 0 136px;
+  background: var(--rt-sand);
+}
+
+[data-kit='retreat'] .bf-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+[data-kit='retreat'] .bf-title {
+  text-align: center;
+}
+
+[data-kit='retreat'] .bf-list {
+  margin-top: 40px;
+  border-top: 1px solid var(--rt-line);
+}
+
+[data-kit='retreat'] .bf-item {
+  border-bottom: 1px solid var(--rt-line);
+}
+
+[data-kit='retreat'] .bf-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 2px;
+  border-radius: 4px;
+  font-family: var(--rt-serif);
+  font-size: 1.35rem;
+  color: var(--rt-ink);
+}
+
+[data-kit='retreat'] .bf-icon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+[data-kit='retreat'] .bf-icon::before,
+[data-kit='retreat'] .bf-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 18px;
+  height: 1px;
+  background: var(--rt-ink);
+  transition: transform 0.3s;
+}
+
+[data-kit='retreat'] .bf-icon::after {
+  transform: rotate(90deg);
+}
+
+[data-kit='retreat'] .bf-item[open] .bf-icon::after {
+  transform: rotate(0deg);
+}
+
+[data-kit='retreat'] .bf-a {
+  padding: 0 2px 24px;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Phones: the photo sits above the words instead of under them, so the crab stays clear. */
+@media (max-width: 639px) {
+  [data-kit='retreat'] .rt-hero {
+    display: block;
+    min-height: 0;
+    background: var(--rt-linen);
+  }
+
+  [data-kit='retreat'] .rt-hero-img {
+    position: static;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  [data-kit='retreat'] .rt-hero-shade {
+    display: none;
+  }
+
+  [data-kit='retreat'] .rt-hero-copy {
+    padding: 32px 20px 48px;
+  }
+
+  [data-kit='retreat'] .rt-hero .rt-kicker {
+    color: var(--rt-sage);
+  }
+
+  [data-kit='retreat'] .rt-h1 {
+    color: var(--rt-ink);
+  }
+
+  [data-kit='retreat'] .rt-lede {
+    color: var(--rt-body);
+  }
+
+  [data-kit='retreat'] .rt-hero .rt-btn {
+    background: var(--rt-ink);
+    color: var(--rt-linen);
+  }
+
+  [data-kit='retreat'] .rt-btn-quiet {
+    color: var(--rt-ink);
+    text-decoration-color: var(--rt-line);
+  }
+}

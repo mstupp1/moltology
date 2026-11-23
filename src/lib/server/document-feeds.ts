@@ -2,6 +2,7 @@ import { generateRssFeedXml, generateSitemapXml, SITE_ORIGIN, type SitemapUrlEnt
 import { getBlogPostsFn, getForumCategoriesFn, getForumTopicsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS, type BlogPostData } from '@/lib/blog-data'
 import { getAcademyCourseFn, getAcademyHomeFn } from '@/lib/server/academy-api'
+import { benefitSitemapEntries } from '@/lib/benefits/summaries'
 
 export async function loadPublishedBlogPosts(): Promise<BlogPostData[]> {
   try {
@@ -134,7 +135,7 @@ export async function sitemapXmlResponse(): Promise<Response> {
     loadAcademySitemapEntries(),
   ])
   return xmlDocumentResponse(
-    generateSitemapXml(posts, SITE_ORIGIN, [...forum, ...academy]),
+    generateSitemapXml(posts, SITE_ORIGIN, [...benefitSitemapEntries(), ...forum, ...academy]),
     'application/xml; charset=utf-8',
     'public, max-age=3600, s-maxage=86400',
   )

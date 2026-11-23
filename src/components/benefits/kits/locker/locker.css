@@ -1,0 +1,549 @@
+/*
+ * Locker room costume: sportswear and training brands. Black and concrete, one volt accent,
+ * condensed italic capitals, hard edges, big numbers and a gritty hero.
+ * Scoped to [data-kit="locker"]; colours and fonts here stay in this file.
+ */
+
+[data-kit='locker'] {
+  --lk-black: #0c0c0c;
+  --lk-concrete: #1a1a1a;
+  --lk-steel: #2a2a2a;
+  --lk-white: #f5f5f0;
+  --lk-body: #c9c9c2;
+  --lk-muted: #8d8d86;
+  --lk-volt: #d8ff3c;
+  --lk-display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+  --lk-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--lk-black);
+}
+
+[data-kit='locker'] .lk {
+  background: var(--lk-black);
+  color: var(--lk-body);
+  font-family: var(--lk-sans);
+  overflow-x: clip;
+}
+
+[data-kit='locker'] .lk ::selection {
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'] .lk-wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header ---------------------------------------------------------------- */
+
+[data-kit='locker'] .bh {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--lk-black);
+  border-bottom: 1px solid var(--lk-steel);
+}
+
+[data-kit='locker'] .bh-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+[data-kit='locker'] .bh-lockup {
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-lockup {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+}
+
+[data-kit='locker'] .lk-lockup-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--lk-volt);
+  transform: skewX(-12deg);
+}
+
+[data-kit='locker'] .lk-lockup-word {
+  font-family: var(--lk-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  font-style: italic;
+  transform: skewX(-8deg);
+}
+
+[data-kit='locker'] .lk-lockup-bar {
+  position: absolute;
+  left: 32px;
+  right: -6px;
+  bottom: 0;
+  height: 3px;
+  background: var(--lk-volt);
+  transform: skewX(-30deg);
+}
+
+[data-kit='locker'] .bh-nav {
+  display: none;
+  gap: 4px;
+  margin-left: auto;
+}
+
+[data-kit='locker'] .bh-link {
+  padding: 8px 12px;
+  font-family: var(--lk-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .bh-link:hover {
+  color: var(--lk-volt);
+}
+
+[data-kit='locker'] .bh-cta {
+  margin-left: auto;
+  padding: 10px 18px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+  font-family: var(--lk-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .bh-nav {
+    display: flex;
+  }
+
+  [data-kit='locker'] .bh-cta {
+    margin-left: 12px;
+  }
+}
+
+/* Type and buttons ------------------------------------------------------ */
+
+[data-kit='locker'] .lk-tag {
+  display: inline-block;
+  padding: 6px 10px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+  font-family: var(--lk-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[data-kit='locker'] .lk-h1 {
+  margin-top: 18px;
+  max-width: 11ch;
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(3.4rem, 9vw, 7rem);
+  line-height: 0.88;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-h2 {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-h3 {
+  font-family: var(--lk-display);
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-lede {
+  margin-top: 20px;
+  max-width: 30rem;
+  font-size: 1.125rem;
+  line-height: 1.55;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+[data-kit='locker'] .lk-intro {
+  margin-top: 16px;
+  max-width: 34rem;
+}
+
+[data-kit='locker'] .lk-actions {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+[data-kit='locker'] .lk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 28px;
+  margin-top: 28px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+  font-family: var(--lk-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: transform 0.15s;
+}
+
+[data-kit='locker'] .lk-actions .lk-btn {
+  margin-top: 0;
+}
+
+[data-kit='locker'] .lk-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-kit='locker'] .lk-btn:hover {
+  transform: translateX(3px);
+}
+
+[data-kit='locker'] .lk-btn-line {
+  display: inline-flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 22px;
+  box-shadow: inset 0 0 0 2px var(--lk-white);
+  color: var(--lk-white);
+  font-family: var(--lk-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+[data-kit='locker'] .lk-btn:focus-visible,
+[data-kit='locker'] .lk-btn-line:focus-visible {
+  outline: 2px solid var(--lk-volt);
+  outline-offset: 3px;
+}
+
+/* Hero ------------------------------------------------------------------ */
+
+[data-kit='locker'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: min(92vh, 860px);
+  padding: 120px 0 64px;
+  overflow: hidden;
+}
+
+[data-kit='locker'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% center;
+}
+
+[data-kit='locker'] .lk-hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(12, 12, 12, 0.92) 0%, rgba(12, 12, 12, 0.6) 45%, rgba(12, 12, 12, 0.05) 75%),
+    linear-gradient(0deg, rgba(12, 12, 12, 0.9) 0%, rgba(12, 12, 12, 0) 45%);
+}
+
+[data-kit='locker'] .lk-hero-copy {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  [data-kit='locker'] .lk-hero-copy > * {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 639px) {
+  [data-kit='locker'] .lk-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 48px;
+  }
+
+  [data-kit='locker'] .lk-hero-img {
+    position: static;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  [data-kit='locker'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'] .lk-hero-copy {
+    margin-top: -36px;
+  }
+}
+
+/* Stats ----------------------------------------------------------------- */
+
+[data-kit='locker'] .lk-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'] .lk-stat {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+  border-right: 2px solid var(--lk-black);
+  border-bottom: 2px solid var(--lk-black);
+}
+
+[data-kit='locker'] .lk-stat-value {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-size: clamp(3rem, 7vw, 5rem);
+  line-height: 0.9;
+}
+
+[data-kit='locker'] .lk-stat-label {
+  margin-top: 6px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .lk-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  [data-kit='locker'] .lk-stat {
+    padding: 32px 40px;
+    border-bottom: 0;
+  }
+
+  [data-kit='locker'] .lk-stat:last-child {
+    border-right: 0;
+  }
+}
+
+/* Program --------------------------------------------------------------- */
+
+[data-kit='locker'] .lk-section {
+  padding: 88px 0;
+}
+
+[data-kit='locker'] .lk-program {
+  margin-top: 48px;
+  border-top: 2px solid var(--lk-white);
+}
+
+[data-kit='locker'] .lk-set {
+  display: grid;
+  gap: 6px 32px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--lk-steel);
+  transition: background-color 0.2s;
+}
+
+[data-kit='locker'] .lk-set:hover {
+  background: var(--lk-concrete);
+}
+
+[data-kit='locker'] .lk-set-label {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lk-volt);
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .lk-section {
+    padding: 128px 0;
+  }
+
+  [data-kit='locker'] .lk-set {
+    grid-template-columns: 160px minmax(0, 1fr) minmax(0, 1.2fr);
+    align-items: baseline;
+    padding: 28px 16px;
+  }
+}
+
+/* Gear ------------------------------------------------------------------ */
+
+[data-kit='locker'] .lk-gear-section {
+  background: var(--lk-concrete);
+}
+
+[data-kit='locker'] .lk-gear {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+
+[data-kit='locker'] .lk-gear-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  filter: contrast(1.05);
+}
+
+[data-kit='locker'] .lk-gear-list {
+  margin-top: 28px;
+  display: grid;
+  gap: 4px;
+}
+
+[data-kit='locker'] .lk-gear-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--lk-steel);
+  font-size: 1.0625rem;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .lk-gear-list svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--lk-volt);
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'] .lk-gear {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 88px;
+  }
+}
+
+/* Creed ----------------------------------------------------------------- */
+
+[data-kit='locker'] .lk-creed {
+  padding: 96px 0;
+  background: var(--lk-volt);
+}
+
+[data-kit='locker'] .lk-creed-text {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-size: clamp(2.2rem, 5.4vw, 4.6rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+  color: var(--lk-black);
+}
+
+/* FAQ ------------------------------------------------------------------- */
+
+[data-kit='locker'] .bf {
+  padding: 88px 0 136px;
+}
+
+[data-kit='locker'] .bf-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+[data-kit='locker'] .bf-title {
+  font-family: var(--lk-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .bf-list {
+  margin-top: 32px;
+  border-top: 2px solid var(--lk-white);
+}
+
+[data-kit='locker'] .bf-item {
+  border-bottom: 1px solid var(--lk-steel);
+}
+
+[data-kit='locker'] .bf-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  font-family: var(--lk-display);
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--lk-white);
+}
+
+[data-kit='locker'] .bf-icon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+[data-kit='locker'] .bf-icon::before,
+[data-kit='locker'] .bf-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 18px;
+  height: 3px;
+  background: var(--lk-volt);
+  transition: transform 0.2s;
+}
+
+[data-kit='locker'] .bf-icon::after {
+  transform: rotate(90deg);
+}
+
+[data-kit='locker'] .bf-item[open] .bf-icon::after {
+  transform: rotate(0deg);
+}
+
+[data-kit='locker'] .bf-a {
+  padding: 0 0 24px;
+  max-width: 680px;
+  line-height: 1.65;
+}

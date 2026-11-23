@@ -207,6 +207,13 @@ export const MainFooter: React.FC<MainFooterProps> = ({
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <Link
+              to="/benefits"
+              className="transition-colors text-2xs hover:text-cyan-glow text-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+            >
+              Benefits
+            </Link>
+            <span className={'text-line'}>·</span>
+            <Link
               to="/privacy"
               className="transition-colors text-2xs hover:text-cyan-glow text-ink-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >

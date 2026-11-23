@@ -56,6 +56,8 @@
     "emblem:bake": "node scripts/brand/bake-emblem-light.mjs",
     "vercel:clean": "node scripts/clean-vercel-deployments.mjs",
     "ui:check": "tsx scripts/check-ui-tokens.ts",
+    "benefits:check": "tsx scripts/check-benefit-pages.ts",
+    "benefits:shots": "tsx scripts/capture-benefit-pages.ts",
     "brand:build": "node scripts/build-brand-assets.mjs",
     "brand:check": "node scripts/check-brand-assets.mjs",
     "image:generate": "tsx scripts/generate-image.ts",
