@@ -209,7 +209,7 @@ export function renderTagCard(tag: string, outPath: string): string {
   const ctx = canvas.getContext('2d')
   ctx.font = `700 40px ${FONT}`
   const width = ctx.measureText(tag).width + 56
-  const x = 120
+  const x = 64
   const y = 250
   ctx.fillStyle = 'rgba(8,12,18,0.78)'
   ctx.beginPath()
