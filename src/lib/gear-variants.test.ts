@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest'
 import { getEquipmentVisual } from './avatar/equipment'
 import { BASE_EQUIPMENT_CATALOG, VARIANT_EQUIPMENT_CATALOG } from './equipment-seed-data'
 import { GEAR_PRICES, RARITY_ORDER, parseVariantKey, variantKey } from './gear-variants'
+import { GEAR_PIECES } from './gear/pieces'
 
 describe('gear variants', () => {
-  it('gives every base piece each rarity above its own', () => {
-    for (const base of BASE_EQUIPMENT_CATALOG) {
+  it('gives every laddered base piece each rarity above its own', () => {
+    const laddered = new Set(GEAR_PIECES.filter((p) => p.ladder !== false).map((p) => p.key))
+    for (const base of BASE_EQUIPMENT_CATALOG.filter((b) => laddered.has(b.slug))) {
       const tiers = VARIANT_EQUIPMENT_CATALOG.filter(
         (v) => parseVariantKey(v.appearanceKey!).baseKey === (base.appearanceKey ?? base.slug),
       ).map((v) => v.rarity)

@@ -8,6 +8,7 @@ import { ALL_EQUIPMENT_CATALOG } from '../equipment-seed-data'
 import { buildCharacter } from './character'
 import { supportsEquipment } from './equipment'
 import { SUPPORTED_ACCESSORIES } from './gear'
+import { HATS } from '../gear/types'
 import { resolveAvatarTraits, type LobsterAvatarConfig } from '../lobster-avatar'
 import { baselineLook, lookChange, lookFromConfig } from './look'
 import { REACTION_SECONDS } from './motion'
@@ -125,8 +126,9 @@ describe('avatar3d', () => {
     }
   })
 
-  it('has a 3D build for every hat in the catalog', () => {
-    expect([...SUPPORTED_ACCESSORIES].sort()).toEqual(AVATAR_ACCESSORIES.filter((a) => a !== 'none').sort())
+  it('has a 3D build for every hat, old accessory hats included', () => {
+    expect([...SUPPORTED_ACCESSORIES].sort()).toEqual([...HATS].sort())
+    for (const a of AVATAR_ACCESSORIES) if (a !== 'none') expect(SUPPORTED_ACCESSORIES).toContain(a)
   })
 
   it('mounts a hat on the head socket, scaled to the head', () => {

@@ -7,6 +7,9 @@ import type {
   EquipmentUniquePower,
 } from '../db/schema'
 import { higherTiers, tierAbility, variantId, variantKey, variantStats } from './gear-variants'
+import { imageUrlOf, visualTypeOf } from './gear/catalog'
+import { GEAR_PIECES } from './gear/pieces'
+import type { GearPiece } from './gear/types'
 
 export interface EquipmentCatalogSeed {
   id: string
@@ -26,388 +29,51 @@ export interface EquipmentCatalogSeed {
   appearanceKey?: string
 }
 
-const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
-  helm: 'head',
-  carapace: 'carapace',
-  pincer: 'claws',
-  hammer: 'claws',
-  antennae: 'antennae',
-  greaves: 'legs',
-  belt: 'belt',
-}
-
-function typeImage(visualType: ChassisVisualType): string {
-  return `/images/chassis/${visualType}.webp`
-}
-
-function piece(
-  partial: Omit<EquipmentCatalogSeed, 'imageUrl' | 'category'> & {
-    category?: EquipmentCategory
-  },
-): EquipmentCatalogSeed {
-  const category = partial.category ?? VISUAL_TYPE_SLOT[partial.visualType]
+/** A piece definition (src/lib/gear/pieces.ts) as a catalog row. */
+function catalogRow(p: GearPiece): EquipmentCatalogSeed {
   return {
-    ...partial,
-    category,
-    imageUrl: typeImage(partial.visualType),
+    id: p.id,
+    slug: p.key,
+    name: p.name,
+    flavorText: p.flavorText,
+    category: p.slot,
+    rarity: p.rarity,
+    visualType: visualTypeOf(p),
+    primaryStat: p.primaryStat,
+    affixes: p.affixes,
+    uniquePower: p.uniquePower ?? tierAbility(p.slot, p.rarity),
+    imageUrl: imageUrlOf(p),
+    sortOrder: p.sortOrder,
+    kind: 'gear',
+    appearanceKey: p.key,
   }
 }
 
-/**
- * Original benthic catalog. Art is type-level: every helm shares helm.webp,
- * every pincer shares pincer.webp, and so on. Do not point imageUrl at a per-row file.
- */
-export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000001',
-    slug: 'larval-plate-vest',
-    name: 'Larval Plate Vest',
-    flavorText: 'Thin chitin, still soft from the last shed. It holds because you do.',
-    visualType: 'carapace',
-    rarity: 'common',
-    primaryStat: 2,
-    affixes: [],
-    uniquePower: null,
-    sortOrder: 1,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000002',
-    slug: 'tide-braced-carapace',
-    name: 'Tide-Braced Carapace',
-    flavorText: 'Ribbed against surface weather. Drama slides off like silt.',
-    visualType: 'carapace',
-    rarity: 'uncommon',
-    primaryStat: 5,
-    affixes: [{ stat: 'depthTolerance', value: 2 }],
-    uniquePower: null,
-    sortOrder: 2,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000003',
-    slug: 'abyssal-ward-shell',
-    name: 'Abyssal Ward Shell',
-    flavorText: 'Pressure-forged in the benthic core. Nothing shallow dents this.',
-    visualType: 'carapace',
-    rarity: 'epic',
-    primaryStat: 13,
-    affixes: [{ stat: 'neuralLatency', value: 3 }],
-    uniquePower: null,
-    sortOrder: 3,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000011',
-    slug: 'hydrostatic-seal-plate',
-    name: 'Hydrostatic Seal Plate',
-    flavorText: 'Depth is not an enemy. Depth is the kiln.',
-    visualType: 'carapace',
-    rarity: 'legendary',
-    primaryStat: 17,
-    affixes: [{ stat: 'neuralLatency', value: 4 }],
-    uniquePower: {
-      name: 'Pressure Calcifies',
-      description:
-        'The harder the current, the tighter this plate sets. Surface weather cannot pry it open.',
-    },
-    sortOrder: 4,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000004',
-    slug: 'training-pincers',
-    name: 'Training Pincers',
-    flavorText: 'Practice clamps for initiates who are still learning to finish.',
-    visualType: 'pincer',
-    rarity: 'common',
-    primaryStat: 3,
-    affixes: [],
-    uniquePower: null,
-    sortOrder: 5,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000005',
-    slug: 'hydraulic-crush-claws',
-    name: 'Hydraulic Crush Claws',
-    flavorText: 'They close once. The goal does not escape.',
-    visualType: 'pincer',
-    rarity: 'rare',
-    primaryStat: 9,
-    affixes: [{ stat: 'ecdysisDiscipline', value: 2 }],
-    uniquePower: null,
-    sortOrder: 6,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000006',
-    slug: 'synapse-shear-claws',
-    name: 'Synapse-Shear Claws',
-    flavorText: 'Legendary torque. Soft deadlines do not survive contact.',
-    visualType: 'pincer',
-    rarity: 'legendary',
-    primaryStat: 17,
-    affixes: [{ stat: 'ecdysisDiscipline', value: 3 }],
-    uniquePower: {
-      name: 'Zero-Latency Clamp',
-      description:
-        'The first grip of a session closes without hesitation. There is no gap between seeing the work and taking it.',
-    },
-    sortOrder: 7,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000012',
-    slug: 'silt-maul',
-    name: 'Silt Maul',
-    flavorText: 'A blunt instrument for mornings that will not start themselves.',
-    visualType: 'hammer',
-    rarity: 'uncommon',
-    primaryStat: 6,
-    affixes: [{ stat: 'shellHardness', value: 2 }],
-    uniquePower: null,
-    sortOrder: 8,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000013',
-    slug: 'tideforge-hammer',
-    name: 'Tideforge Hammer',
-    flavorText: 'Forged where current meets iron. One strike, one finished task.',
-    visualType: 'hammer',
-    rarity: 'rare',
-    primaryStat: 10,
-    affixes: [{ stat: 'shellHardness', value: 2 }],
-    uniquePower: null,
-    sortOrder: 9,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000007',
-    slug: 'soft-shell-visor',
-    name: 'Soft-Shell Visor',
-    flavorText: 'Filters the loudest currents so a young mind can think.',
-    visualType: 'helm',
-    rarity: 'common',
-    primaryStat: 2,
-    affixes: [],
-    uniquePower: null,
-    sortOrder: 10,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000008',
-    slug: 'architect-crown-plate',
-    name: 'Architect Crown Plate',
-    flavorText: 'A calm brow for builders who stack systems instead of tabs.',
-    visualType: 'helm',
-    rarity: 'rare',
-    primaryStat: 8,
-    affixes: [{ stat: 'depthTolerance', value: 2 }],
-    uniquePower: null,
-    sortOrder: 11,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000009',
-    slug: 'oracle-dome-lattice',
-    name: 'Oracle Dome Lattice',
-    flavorText: 'Thought arrives quiet and leaves finished.',
-    visualType: 'helm',
-    rarity: 'legendary',
-    primaryStat: 16,
-    affixes: [{ stat: 'depthTolerance', value: 4 }],
-    uniquePower: {
-      name: 'Quiet Arrival',
-      description:
-        'Thought reaches the dome already complete. Surface chatter never crosses the lattice.',
-    },
-    sortOrder: 12,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-00000000000a',
-    slug: 'silt-walker-greaves',
-    name: 'Silt-Walker Greaves',
-    flavorText: 'Steady steps through muddy mornings.',
-    visualType: 'greaves',
-    rarity: 'common',
-    primaryStat: 2,
-    affixes: [],
-    uniquePower: null,
-    sortOrder: 13,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-00000000000b',
-    slug: 'current-cutter-legs',
-    name: 'Current-Cutter Legs',
-    flavorText: 'They find the short path through the noise.',
-    visualType: 'greaves',
-    rarity: 'uncommon',
-    primaryStat: 6,
-    affixes: [{ stat: 'pincerTorque', value: 2 }],
-    uniquePower: null,
-    sortOrder: 14,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-00000000000c',
-    slug: 'void-stride-articulation',
-    name: 'Void-Stride Articulation',
-    flavorText: 'Epic locomotion for initiates who refuse to linger on the surface.',
-    visualType: 'greaves',
-    rarity: 'epic',
-    primaryStat: 12,
-    affixes: [{ stat: 'depthTolerance', value: 3 }],
-    uniquePower: null,
-    sortOrder: 15,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-00000000000d',
-    slug: 'larval-feelers',
-    name: 'Larval Feelers',
-    flavorText: 'They twitch at the first hint of distraction.',
-    visualType: 'antennae',
-    rarity: 'common',
-    primaryStat: 2,
-    affixes: [],
-    uniquePower: null,
-    sortOrder: 16,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-00000000000e',
-    slug: 'depth-sense-antennae',
-    name: 'Depth-Sense Antennae',
-    flavorText: 'You notice the quiet work before the loud demand.',
-    visualType: 'antennae',
-    rarity: 'uncommon',
-    primaryStat: 5,
-    affixes: [{ stat: 'neuralLatency', value: 2 }],
-    uniquePower: null,
-    sortOrder: 17,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-00000000000f',
-    slug: 'benthic-radar-array',
-    name: 'Benthic Radar Array',
-    flavorText: 'Rare perception. Surface chatter never reaches the core.',
-    visualType: 'antennae',
-    rarity: 'rare',
-    primaryStat: 9,
-    affixes: [{ stat: 'ecdysisDiscipline', value: 2 }],
-    uniquePower: null,
-    sortOrder: 18,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000010',
-    slug: 'ascendant-signal-crown',
-    name: 'Ascendant Signal Crown',
-    flavorText: 'Antennae that hear what matters and ignore the melt.',
-    visualType: 'antennae',
-    rarity: 'epic',
-    primaryStat: 13,
-    affixes: [{ stat: 'neuralLatency', value: 3 }],
-    uniquePower: null,
-    sortOrder: 19,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000014',
-    slug: 'larval-chitin-cincture',
-    name: 'Larval Chitin Cincture',
-    flavorText: 'A snug ventral sash keeping the abdominal plates locked under depth.',
-    visualType: 'belt',
-    rarity: 'common',
-    primaryStat: 2,
-    affixes: [],
-    uniquePower: null,
-    sortOrder: 20,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000016',
-    slug: 'silt-tension-vent-sash',
-    name: 'Silt-Tension Vent Sash',
-    flavorText:
-      'Woven from flexible hydrothermal cords. Keeps the abdominal plates stable during rapid descent.',
-    visualType: 'belt',
-    rarity: 'uncommon',
-    primaryStat: 5,
-    affixes: [{ stat: 'shellHardness', value: 2 }],
-    uniquePower: null,
-    sortOrder: 21,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000015',
-    slug: 'abyssal-clasp-girdle',
-    name: 'Abyssal Clasp Girdle',
-    flavorText: 'Forged from tempered chitin ribs. Secures the core when pressure mounts.',
-    visualType: 'belt',
-    rarity: 'rare',
-    primaryStat: 8,
-    affixes: [{ stat: 'ecdysisDiscipline', value: 2 }],
-    uniquePower: null,
-    sortOrder: 22,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000017',
-    slug: 'hydrostatic-girdle-lattice',
-    name: 'Hydrostatic Girdle Lattice',
-    flavorText:
-      'Pressure-sealed titanium ribs distribute benthic torque evenly across the chassis core.',
-    visualType: 'belt',
-    rarity: 'epic',
-    primaryStat: 13,
-    affixes: [{ stat: 'neuralLatency', value: 3 }],
-    uniquePower: null,
-    sortOrder: 23,
-  }),
-  piece({
-    id: 'a1000000-0000-4000-8000-000000000018',
-    slug: 'core-lock-vent-harness',
-    name: 'Core-Lock Vent Harness',
-    flavorText: 'Legendary ventral plating. The deep core does not buckle.',
-    visualType: 'belt',
-    rarity: 'legendary',
-    primaryStat: 17,
-    affixes: [{ stat: 'shellHardness', value: 4 }],
-    uniquePower: {
-      name: 'Zero-Strain Bulkhead',
-      description:
-        'When abdominal torque peaks, internal pressure vents automatically. Your core never fractures under sudden load.',
-    },
-    sortOrder: 24,
-  }),
-].map((item) => ({ ...item, uniquePower: item.uniquePower ?? tierAbility(item.category, item.rarity) }))
+/** Original benthic catalog. Rows come from the piece definitions in src/lib/gear/pieces.ts. */
+export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = GEAR_PIECES.filter((p) => p.n <= 24).map(catalogRow)
 
-export const CREATOR_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
-  ['hard-hat', 'Hard hat', 'head', 'helm'],
-  ['crown', 'Crown', 'head', 'helm'],
-  ['headset', 'Headset', 'head', 'helm'],
-  ['halo', 'Halo', 'head', 'helm'],
-  ['bow', 'Bow', 'head', 'helm'],
-  ['beanie', 'Beanie', 'head', 'helm'],
-  ['crusher', 'Crusher gauntlet', 'claws', 'pincer'],
-  ['slim', 'Slender gauntlet', 'claws', 'pincer'],
-  ['mitten', 'Mitten gauntlet', 'claws', 'pincer'],
-].map(([slug, name, category, visualType], i) => ({
-  id: `a2000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`,
-  slug: `creator-${slug}`,
-  name,
-  flavorText: 'A familiar fit, made for your shell.',
-  category: category as EquipmentCategory,
-  visualType: visualType as ChassisVisualType,
-  rarity: 'common',
-  primaryStat: 2,
-  affixes: [],
-  uniquePower: null,
-  imageUrl: '',
-  appearanceKey: `creator-${slug}`,
-  sortOrder: 25 + i,
-  kind: 'gear',
-}))
+/** The character creator's hats and gauntlets. */
+export const CREATOR_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = GEAR_PIECES.filter((p) => p.n >= 25 && p.n <= 33).map(catalogRow)
+
+/** Pieces added since, collections included. */
+export const LATER_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = GEAR_PIECES.filter((p) => p.n > 33).map(catalogRow)
+
 /** Every base piece, in catalog order. Variants are built from this list. */
-export const BASE_EQUIPMENT_CATALOG = [...INITIAL_EQUIPMENT_CATALOG, ...CREATOR_EQUIPMENT_CATALOG]
+export const BASE_EQUIPMENT_CATALOG = [...INITIAL_EQUIPMENT_CATALOG, ...CREATOR_EQUIPMENT_CATALOG, ...LATER_EQUIPMENT_CATALOG]
 
 /** Rarer versions of every base piece (see src/lib/gear-variants.ts). */
-export const VARIANT_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = BASE_EQUIPMENT_CATALOG.flatMap(
-  (base, baseIndex) =>
-    higherTiers(base.rarity).map((rarity, tierIndex) => ({
-      ...base,
-      ...variantStats(base, rarity),
-      id: variantId(baseIndex, rarity),
-      slug: variantKey(base.slug, rarity),
-      appearanceKey: variantKey(base.appearanceKey ?? base.slug, rarity),
-      rarity,
-      sortOrder: 1000 + base.sortOrder * 10 + tierIndex,
-    })),
-)
+export const VARIANT_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = GEAR_PIECES.filter((p) => p.ladder !== false).flatMap((piece) => {
+  const base = catalogRow(piece)
+  return higherTiers(base.rarity).map((rarity, tierIndex) => ({
+    ...base,
+    ...variantStats(base, rarity),
+    id: variantId(piece.n, rarity),
+    slug: variantKey(base.slug, rarity),
+    appearanceKey: variantKey(base.appearanceKey ?? base.slug, rarity),
+    rarity,
+    sortOrder: 1000 + base.sortOrder * 10 + tierIndex,
+  }))
+})
 
 export const ALL_EQUIPMENT_CATALOG = [...BASE_EQUIPMENT_CATALOG, ...VARIANT_EQUIPMENT_CATALOG]
 

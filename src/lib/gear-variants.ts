@@ -166,9 +166,9 @@ export function variantStats(base: VariantBase, rarity: EquipmentRarity): Varian
   return { primaryStat, affixes, uniquePower }
 }
 
-/** Deterministic id: a3 prefix, base position, tier position. */
-export function variantId(baseIndex: number, rarity: EquipmentRarity): string {
-  const n = (baseIndex + 1) * 10 + RARITY_ORDER.indexOf(rarity)
+/** Permanent id of a rarer version: a3 prefix, the base piece's permanent `n`, tier position. */
+export function variantId(pieceN: number, rarity: EquipmentRarity): string {
+  const n = pieceN * 10 + RARITY_ORDER.indexOf(rarity)
   return `a3000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 }
 
