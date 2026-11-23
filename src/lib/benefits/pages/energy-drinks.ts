@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Tired of the 3pm crash? Moltology is an energy drink alternative with zero sugar and zero caffeine: eight small daily tasks aimed at the afternoon slump. Free.',
   keywords: 'energy drink alternative, no caffeine energy, afternoon slump, 3pm crash, natural energy, daily routine',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/energy-drinks/share.jpg',

@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'truth',
   topic: 'Truth',
   kit: 'seminar',
+  variant: 'plum-journal',
   query: 'how to be honest with yourself',
   title: 'How to be honest with yourself: name one thing | Moltology',
   description:
     'Practice how to be honest with yourself through the Nightly Molt Audit. Name what happened, choose one thing to release, and close the day with Moltology.',
   keywords: 'how to be honest with yourself, nightly review, Nightly Molt Audit, self honesty',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/truth/share.jpg?v=2',

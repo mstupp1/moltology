@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'gamification',
   topic: 'Gamification',
   kit: 'arcade',
+  variant: 'gold-cabinet',
   query: 'gamified habit app',
   title: 'A gamified habit app for unfinished tasks | Moltology',
   description:
     'Meet the gamified habit app with eight daily tasks and XP for checking them off. Open the Moltology task board, do the work, then claim the completion.',
   keywords: 'gamified habit app, daily task board, habit quests, task XP, daily practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/gamification/share.jpg?v=2',

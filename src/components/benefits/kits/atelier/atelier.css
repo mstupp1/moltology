@@ -17,6 +17,7 @@
 }
 
 [data-kit='atelier'] .at {
+  overflow-x: clip;
   background: var(--at-paper);
   color: var(--at-body);
   font-family: var(--at-sans);
@@ -534,4 +535,550 @@
   max-width: 640px;
   font-size: 0.9375rem;
   line-height: 1.75;
+}
+
+/* Variant: noir (famous) ------------------------------------------------ */
+
+[data-kit='atelier'][data-variant='noir'] {
+  --at-paper: #0f0e0d;
+  --at-greige: #191715;
+  --at-ink: #f4efe6;
+  --at-body: #cfc7ba;
+  --at-muted: #a89f91;
+  --at-line: rgba(244, 239, 230, 0.16);
+  --at-bronze: #d6a774;
+}
+
+[data-kit='atelier'][data-variant='noir'] .bh {
+  background: rgba(15, 14, 13, 0.94);
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-lockup-noir {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-lockup-noir .at-lockup-word {
+  font-size: 1.15rem;
+  letter-spacing: 0.28em;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-lockup-rule {
+  width: 1px;
+  height: 18px;
+  background: var(--at-line);
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-btn:hover {
+  background: transparent;
+  color: var(--at-ink);
+  box-shadow: inset 0 0 0 1px var(--at-ink);
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-hero {
+  padding: 36px 0 60px;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-hero-figure {
+  padding: 0;
+  border: 0;
+  background: #0d0c0b;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-figcaption {
+  color: var(--at-bronze);
+}
+
+@media (min-width: 900px) {
+  [data-kit='atelier'][data-variant='noir'] .at-hero {
+    padding: 0;
+  }
+
+  [data-kit='atelier'][data-variant='noir'] .at-hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    align-items: stretch;
+  }
+
+  [data-kit='atelier'][data-variant='noir'] .at-hero-figure {
+    order: -1;
+    display: flex;
+    flex-direction: column;
+    margin-left: calc(-1 * max(20px, (100vw - 1240px) / 2));
+  }
+
+  [data-kit='atelier'][data-variant='noir'] .at-hero-img {
+    flex: 1;
+    min-height: 600px;
+    aspect-ratio: auto;
+    object-position: center 20%;
+    background: #0d0c0b;
+  }
+
+  [data-kit='atelier'][data-variant='noir'] .at-figcaption {
+    margin-top: 0;
+    padding: 12px 24px;
+    border-top: 1px solid var(--at-line);
+    background: var(--at-paper);
+  }
+
+  [data-kit='atelier'][data-variant='noir'] .at-hero-copy {
+    align-self: center;
+    padding: 64px 0 64px 56px;
+    border-left: 1px solid var(--at-line);
+  }
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-manifesto {
+  background: #f2ece1;
+  color: #141210;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-looks {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 56px;
+  border-left: 0;
+  border-top: 1px solid var(--at-line);
+}
+
+@media (min-width: 720px) {
+  [data-kit='atelier'][data-variant='noir'] .at-looks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-kit='atelier'][data-variant='noir'] .at-looks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-look {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding: 28px 0;
+  border-right: 0;
+  border-bottom: 1px solid var(--at-line);
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-look:hover {
+  background: transparent;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-look-num {
+  font-family: var(--at-serif);
+  font-style: italic;
+  font-size: 2.2rem;
+  line-height: 0.9;
+  color: var(--at-bronze);
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-look-copy .at-h3 {
+  margin-top: 0;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-campaign {
+  background: #ede5d8;
+  padding: 56px 20px;
+  gap: 36px;
+  align-items: center;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-campaign-img {
+  padding: 12px;
+  border: 1px solid rgba(20, 18, 16, 0.16);
+  background: #f7f3eb;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-campaign-copy {
+  padding: 0;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-quote {
+  color: #141210;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-campaign .at-caption {
+  color: #4d453b;
+}
+
+@media (min-width: 900px) {
+  [data-kit='atelier'][data-variant='noir'] .at-campaign {
+    padding: 80px max(20px, calc((100% - 1240px) / 2));
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 64px;
+  }
+
+  [data-kit='atelier'][data-variant='noir'] .at-campaign-img {
+    order: 2;
+    max-height: 620px;
+  }
+
+  [data-kit='atelier'][data-variant='noir'] .at-campaign-copy {
+    order: 1;
+  }
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-label {
+  background: var(--at-greige);
+  border: 1px solid var(--at-line);
+  box-shadow: none;
+}
+
+[data-kit='atelier'][data-variant='noir'] .at-label-row dt {
+  color: var(--at-bronze);
+}
+
+[data-kit='atelier'][data-variant='noir'] .bf {
+  background: var(--at-greige);
+}
+
+/* Variant: porcelain-lacquer (beauty) ----------------------------------- */
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] {
+  --at-paper: #fbf7f6;
+  --at-greige: #f0e6e4;
+  --at-ink: #1e1316;
+  --at-body: #423236;
+  --at-muted: #6c565c;
+  --at-line: #decac7;
+  --at-lacquer: #6e1624;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .bh {
+  background: rgba(251, 247, 246, 0.95);
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-lockup-noir {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-lockup-noir .at-lockup-word {
+  font-size: 1.15rem;
+  letter-spacing: 0.28em;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-lockup-rule {
+  width: 1px;
+  height: 18px;
+  background: var(--at-line);
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-btn,
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .bh-cta {
+  background: var(--at-lacquer);
+  color: #ffffff;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-btn:hover {
+  background: transparent;
+  color: var(--at-lacquer);
+  box-shadow: inset 0 0 0 1px var(--at-lacquer);
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-hero-img {
+  border-radius: 260px 260px 0 0;
+  border: 1px solid var(--at-line);
+  outline: 1px solid rgba(158, 43, 37, 0.35);
+  outline-offset: 8px;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-figcaption {
+  color: var(--at-lacquer);
+  justify-content: center;
+  gap: 20px;
+  margin-top: 18px;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-manifesto {
+  background: var(--at-lacquer);
+  color: #fbf7f6;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-looks {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 52px;
+  border-left: 0;
+  border-top: 1px solid var(--at-line);
+}
+
+@media (min-width: 720px) {
+  [data-kit='atelier'][data-variant='porcelain-lacquer'] .at-looks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-look {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 18px;
+  padding: 28px 0;
+  border-right: 0;
+  border-bottom: 1px solid var(--at-line);
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-look-num {
+  font-family: var(--at-serif);
+  font-style: italic;
+  font-size: 2.2rem;
+  line-height: 0.9;
+  color: var(--at-lacquer);
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-look-copy .at-h3 {
+  margin-top: 0;
+}
+
+[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-label-row dt {
+  color: var(--at-lacquer);
+}
+
+/* Variant: milan-terracotta (sexy) -------------------------------------- */
+
+[data-kit='atelier'][data-variant='milan-terracotta'] {
+  --at-paper: #f6ece3;
+  --at-greige: #ead9ca;
+  --at-ink: #24140f;
+  --at-body: #47322a;
+  --at-muted: #6c5045;
+  --at-line: #d6beaa;
+  --at-sienna: #94361d;
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .bh {
+  background: rgba(246, 236, 227, 0.95);
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-lockup-noir {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-lockup-noir .at-lockup-word {
+  font-size: 1.15rem;
+  letter-spacing: 0.28em;
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-lockup-rule {
+  width: 1px;
+  height: 18px;
+  background: var(--at-line);
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-hero-figure {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+@media (min-width: 900px) {
+  [data-kit='atelier'][data-variant='milan-terracotta'] .at-hero {
+    padding: 0;
+  }
+
+  [data-kit='atelier'][data-variant='milan-terracotta'] .at-hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    align-items: stretch;
+  }
+
+  [data-kit='atelier'][data-variant='milan-terracotta'] .at-hero-figure {
+    order: -1;
+    display: flex;
+    flex-direction: column;
+    margin-left: calc(-1 * max(20px, (100vw - 1240px) / 2));
+  }
+
+  [data-kit='atelier'][data-variant='milan-terracotta'] .at-hero-img {
+    flex: 1;
+    min-height: 580px;
+    aspect-ratio: auto;
+  }
+
+  [data-kit='atelier'][data-variant='milan-terracotta'] .at-figcaption {
+    margin-top: 0;
+    padding: 10px 24px 12px;
+    border-top: 1px solid var(--at-line);
+    background: var(--at-greige);
+  }
+
+  [data-kit='atelier'][data-variant='milan-terracotta'] .at-hero-copy {
+    align-self: center;
+    padding: 64px 0 64px 56px;
+  }
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-looks {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 44px;
+  border-left: 0;
+  border-top: 1px solid var(--at-line);
+}
+
+@media (min-width: 900px) {
+  [data-kit='atelier'][data-variant='milan-terracotta'] .at-looks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-look {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 14px;
+  padding: 26px 0;
+  border-right: 0;
+  border-bottom: 1px solid var(--at-line);
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-look-num {
+  font-family: var(--at-serif);
+  font-style: italic;
+  font-size: 2rem;
+  line-height: 0.9;
+  color: var(--at-sienna);
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-look-copy .at-h3 {
+  margin-top: 0;
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-campaign {
+  background: var(--at-ink);
+  color: #f6ece3;
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-quote {
+  color: #ffffff;
+}
+
+[data-kit='atelier'][data-variant='milan-terracotta'] .at-campaign .at-caption {
+  color: #e4c4ae;
+}
+
+/* Variant: architectural-stone (stature) -------------------------------- */
+
+[data-kit='atelier'][data-variant='architectural-stone'] {
+  --at-paper: #efefe9;
+  --at-greige: #e1e2da;
+  --at-ink: #161b1e;
+  --at-body: #373d3d;
+  --at-muted: #58605f;
+  --at-line: #c7cabf;
+  --at-olive: #4b5746;
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .bh {
+  background: rgba(239, 239, 233, 0.95);
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-lockup-noir {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-lockup-noir .at-lockup-word {
+  font-size: 1.12rem;
+  letter-spacing: 0.3em;
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-lockup-rule {
+  width: 1px;
+  height: 18px;
+  background: var(--at-line);
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-h1,
+[data-kit='atelier'][data-variant='architectural-stone'] .at-h2,
+[data-kit='atelier'][data-variant='architectural-stone'] .at-look-num {
+  font-style: normal;
+}
+
+@media (min-width: 900px) {
+  [data-kit='atelier'][data-variant='architectural-stone'] .at-hero {
+    padding: 0;
+  }
+
+  [data-kit='atelier'][data-variant='architectural-stone'] .at-hero-grid {
+    align-items: stretch;
+  }
+
+  [data-kit='atelier'][data-variant='architectural-stone'] .at-hero-copy {
+    align-self: center;
+    padding: 64px 0 64px 32px;
+    border-left: 3px solid var(--at-ink);
+  }
+
+  [data-kit='atelier'][data-variant='architectural-stone'] .at-hero-figure {
+    display: flex;
+    flex-direction: column;
+    margin-right: calc(-1 * max(20px, (100vw - 1240px) / 2));
+  }
+
+  [data-kit='atelier'][data-variant='architectural-stone'] .at-hero-img {
+    flex: 1;
+    min-height: 580px;
+    aspect-ratio: auto;
+    border-left: 1px solid var(--at-line);
+  }
+
+  [data-kit='atelier'][data-variant='architectural-stone'] .at-figcaption {
+    margin-top: 0;
+    padding: 10px 24px 12px;
+    border-top: 1px solid var(--at-line);
+    border-left: 1px solid var(--at-line);
+  }
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-manifesto {
+  background: var(--at-ink);
+  color: var(--at-paper);
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-looks {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-left: 0;
+  border-top: 1px solid var(--at-ink);
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-look {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 16px;
+  padding: 24px 0;
+  border-right: 0;
+  border-bottom: 1px solid var(--at-line);
+}
+
+@media (min-width: 760px) {
+  [data-kit='atelier'][data-variant='architectural-stone'] .at-look {
+    grid-template-columns: 72px minmax(200px, 0.65fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: baseline;
+  }
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-look-num {
+  font-family: var(--at-serif);
+  font-size: 1.7rem;
+  color: var(--at-olive);
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-look-copy {
+  display: contents;
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-look-copy .at-h3 {
+  margin-top: 0;
+}
+
+[data-kit='atelier'][data-variant='architectural-stone'] .at-look-copy .at-body {
+  margin-top: 0;
 }

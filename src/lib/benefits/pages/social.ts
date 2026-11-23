@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'social',
   topic: 'Social',
   kit: 'network',
+  variant: 'coastal-club',
   query: 'how to make friends as an adult',
   title: 'How to make friends as an adult | Moltology',
   description:
     'Wondering how to make friends as an adult? Start a conversation, ask a follow-up, and add someone on Moltology. A shared practice gives you a place to begin.',
   keywords: 'how to make friends as an adult, adult friendships, meet people online, conversation starters, friend requests',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/social/share.jpg?v=2',

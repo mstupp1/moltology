@@ -21,6 +21,7 @@
 }
 
 [data-kit='clinic'] .ck {
+  overflow-x: clip;
   background: var(--ck-ground);
   color: var(--ck-body);
   font-family: var(--ck-sans);
@@ -731,4 +732,964 @@
   padding: 0 22px 22px;
   font-size: 1rem;
   line-height: 1.6;
+}
+
+/* Variant: botanical-lab (clarity) -------------------------------------- */
+
+[data-kit='clinic'][data-variant='botanical-lab'] {
+  --ck-ground: #f5f8f6;
+  --ck-paper: #ffffff;
+  --ck-ink: #0e342c;
+  --ck-body: #2b4740;
+  --ck-muted: #47635b;
+  --ck-line: #d2e0d9;
+  --ck-blush: #e6f0eb;
+  --ck-sage: #dff0e8;
+  --ck-sage-ink: #145c4b;
+  --ck-crimson: #8f4719;
+  --ck-serif: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ck-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .bh {
+  background: rgba(245, 248, 246, 0.94);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-lockup-lab .ck-lockup-disc {
+  border-radius: 10px;
+  background: var(--ck-ink);
+  color: var(--ck-sage);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-lockup-lab .ck-lockup-word {
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.025em;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-lockup-lab-tag {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--ck-sage);
+  color: var(--ck-sage-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .bh-cta,
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-btn,
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-btn-ghost {
+  border-radius: 10px;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-actions {
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-btn,
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-btn-ghost {
+  min-height: 48px;
+  padding: 0 20px;
+  font-size: 0.9375rem;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-btn-ghost {
+  border-color: #b4c8be;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-h1,
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-h2,
+[data-kit='clinic'][data-variant='botanical-lab'] .bf-title {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-h1 {
+  font-size: clamp(2.4rem, 5.2vw, 4rem);
+  line-height: 1.05;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-pill {
+  border-radius: 8px;
+  font-family: var(--ck-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-hero-art {
+  position: relative;
+  margin: 0 auto;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-hero-img {
+  border-radius: 16px;
+  border: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-lab-readout {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--ck-paper);
+  border: 1px solid var(--ck-line);
+  font-family: var(--ck-mono);
+  font-size: 0.75rem;
+  color: var(--ck-ink);
+}
+
+@media (min-width: 900px) {
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-hero {
+    padding: 0;
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-hero-grid {
+    align-items: stretch;
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-hero-copy {
+    padding: 64px 0 80px;
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-hero-art {
+    max-width: none;
+    height: 100%;
+    margin-right: calc(-1 * max(20px, (100vw - 1120px) / 2));
+    display: flex;
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-hero-img {
+    height: 100%;
+    min-height: 540px;
+    aspect-ratio: auto;
+    border-radius: 0;
+    border: 0;
+    border-left: 1px solid var(--ck-line);
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-lab-readout {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+    margin-top: 0;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+  }
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-trust {
+  background: var(--ck-blush);
+  color: var(--ck-ink);
+  border-top: 1px solid var(--ck-line);
+  border-bottom: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-trust-row svg {
+  color: var(--ck-sage-ink);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-signs-list {
+  padding: 6px 22px;
+  border-radius: 14px;
+  border: 1px solid var(--ck-line);
+  background: var(--ck-paper);
+  gap: 0;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-signs-list li {
+  padding: 16px 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-signs-list li + li {
+  border-top: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--ck-sage);
+  color: var(--ck-sage-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-steps {
+  gap: 24px;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-step {
+  padding: 24px 0 0;
+  border-radius: 0;
+  background: transparent;
+  border-top: 2px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-step-n {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--ck-sage);
+  color: var(--ck-sage-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-plans {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-plan {
+  border-radius: 14px;
+  padding: 24px 26px;
+  gap: 14px;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-tag {
+  margin-bottom: 10px;
+  border-radius: 6px;
+  font-family: var(--ck-mono);
+  font-size: 0.72rem;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-plan-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-price {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-price strong {
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-link {
+  margin-top: 0;
+}
+
+@media (min-width: 900px) {
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-plans {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-plan {
+    display: grid;
+    grid-template-columns: minmax(210px, 1.05fr) minmax(0, 1.65fr) auto;
+    align-items: center;
+    gap: 28px;
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-plan .ck-body {
+    margin-top: 0;
+  }
+
+  [data-kit='clinic'][data-variant='botanical-lab'] .ck-plan-meta {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    text-align: right;
+  }
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-table-wrap {
+  border: 1px solid var(--ck-line);
+  border-radius: 14px;
+  background: var(--ck-paper);
+  overflow-x: auto;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-table {
+  border-collapse: collapse;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-table thead th {
+  background: var(--ck-blush);
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-table .is-us {
+  background: #edf5f1;
+  border-left: 3px solid var(--ck-sage-ink);
+  border-radius: 0;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .ck-table thead .is-us {
+  background: var(--ck-sage);
+  border-radius: 0;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .bf-item {
+  border-radius: 12px;
+}
+
+[data-kit='clinic'][data-variant='botanical-lab'] .bf-q {
+  border-radius: 12px;
+}
+
+/* Variant: graphite-protocol (hardness) --------------------------------- */
+
+[data-kit='clinic'][data-variant='graphite-protocol'] {
+  --ck-ground: #eef1f5;
+  --ck-paper: #ffffff;
+  --ck-ink: #17212b;
+  --ck-body: #344150;
+  --ck-muted: #556373;
+  --ck-line: #cfd7e0;
+  --ck-blush: #e2e8ef;
+  --ck-sage: #dce8ea;
+  --ck-sage-ink: #0f5f59;
+  --ck-crimson: #223548;
+  --ck-serif: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ck-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .bh {
+  background: rgba(238, 241, 245, 0.94);
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-lockup-proto .ck-lockup-disc {
+  border-radius: 6px;
+  background: var(--ck-ink);
+  color: #8ee5dd;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-lockup-proto .ck-lockup-word {
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-lockup-proto-tag {
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--ck-line);
+  background: var(--ck-paper);
+  color: var(--ck-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .bh-cta,
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-btn,
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-btn-ghost {
+  border-radius: 6px;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-actions {
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-btn,
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-btn-ghost {
+  min-height: 48px;
+  padding: 0 20px;
+  font-size: 0.9375rem;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-btn-ghost {
+  border-color: #b4c0ce;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-h1,
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-h2,
+[data-kit='clinic'][data-variant='graphite-protocol'] .bf-title {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-h1 {
+  font-size: clamp(2.35rem, 5vw, 3.9rem);
+  line-height: 1.05;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-pill {
+  border-radius: 4px;
+  font-family: var(--ck-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero-art {
+  position: relative;
+  margin: 0 auto;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero-img {
+  border-radius: 6px;
+  border: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-lab-readout {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: var(--ck-ink);
+  color: #edf3f8;
+  font-family: var(--ck-mono);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 900px) {
+  [data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero {
+    padding: 0;
+  }
+
+  [data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero-grid {
+    align-items: stretch;
+  }
+
+  [data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero-copy {
+    padding: 64px 0 80px;
+  }
+
+  [data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero-art {
+    order: -1;
+    max-width: none;
+    height: 100%;
+    margin: 0 0 0 calc(-1 * max(20px, (100vw - 1120px) / 2));
+    display: flex;
+  }
+
+  [data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero-img {
+    height: 100%;
+    min-height: 540px;
+    aspect-ratio: auto;
+    border-radius: 0;
+    border: 0;
+    border-right: 1px solid var(--ck-line);
+  }
+
+  [data-kit='clinic'][data-variant='graphite-protocol'] .ck-lab-readout {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+    margin-top: 0;
+    background: var(--ck-ink);
+  }
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-trust {
+  background: var(--ck-ink);
+  color: #e6eef5;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-trust-row svg {
+  color: #7ee3d9;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-signs-list li {
+  border-radius: 8px;
+  background: var(--ck-paper);
+  border: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-box {
+  border-radius: 4px;
+  background: var(--ck-ink);
+  color: #ffffff;
+  font-family: var(--ck-mono);
+  font-size: 0.75rem;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-tint {
+  background: var(--ck-blush);
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-step {
+  border-radius: 8px;
+  background: var(--ck-ink);
+  color: #cfd8e3;
+  border-top: 3px solid #2ab7a9;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-step .ck-h3 {
+  color: #ffffff;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-step .ck-body {
+  color: #d6dfe9;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-step-n {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(42, 183, 169, 0.16);
+  color: #8ee5dd;
+  font-family: var(--ck-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-plan {
+  border-radius: 8px;
+  border: 1px solid var(--ck-line);
+  border-left: 4px solid var(--ck-ink);
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-tag {
+  border-radius: 4px;
+  font-family: var(--ck-mono);
+  font-size: 0.72rem;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-plan-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 18px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-price {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-link {
+  margin-top: 0;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-table-wrap {
+  border: 1px solid var(--ck-line);
+  border-radius: 8px;
+  background: var(--ck-paper);
+  overflow-x: auto;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .ck-table .is-us {
+  background: #e2eff0;
+  border-radius: 0;
+}
+
+[data-kit='clinic'][data-variant='graphite-protocol'] .bf-item,
+[data-kit='clinic'][data-variant='graphite-protocol'] .bf-q {
+  border-radius: 8px;
+}
+
+/* Variant: cognitive-studio (focus) ------------------------------------- */
+
+[data-kit='clinic'][data-variant='cognitive-studio'] {
+  --ck-ground: #f5f6fc;
+  --ck-paper: #ffffff;
+  --ck-ink: #1a2456;
+  --ck-body: #394370;
+  --ck-muted: #58618e;
+  --ck-line: #d4daf0;
+  --ck-blush: #eaedfb;
+  --ck-sage: #dfe4fb;
+  --ck-sage-ink: #273eb0;
+  --ck-crimson: #9f3e24;
+  --ck-serif: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ck-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .bh {
+  background: rgba(245, 246, 252, 0.94);
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-lockup-studio .ck-lockup-disc {
+  border-radius: 12px;
+  background: var(--ck-sage-ink);
+  color: #ffffff;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-lockup-studio .ck-lockup-word {
+  font-weight: 600;
+  font-size: 1.22rem;
+  letter-spacing: -0.025em;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-lockup-studio-tag {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--ck-sage);
+  color: var(--ck-sage-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-actions {
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-btn {
+  background: var(--ck-sage-ink);
+  color: #ffffff;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-btn:hover {
+  background: var(--ck-ink);
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-btn,
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-btn-ghost {
+  min-height: 48px;
+  padding: 0 20px;
+  font-size: 0.9375rem;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-h1,
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-h2,
+[data-kit='clinic'][data-variant='cognitive-studio'] .bf-title {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-h1 {
+  font-size: clamp(2.4rem, 5.2vw, 3.95rem);
+  line-height: 1.05;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-hero-art {
+  margin: 0 auto;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-hero-img {
+  border-radius: 999px;
+  border: 1px solid var(--ck-line);
+  outline: 1px solid var(--ck-line);
+  outline-offset: 10px;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-lab-readout {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+  padding: 12px 4px 0;
+  border-radius: 0;
+  border-top: 1px solid var(--ck-line);
+  background: transparent;
+  color: var(--ck-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.74rem;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-trust {
+  background: var(--ck-blush);
+  color: var(--ck-ink);
+  border-top: 1px dashed var(--ck-line);
+  border-bottom: 1px dashed var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-trust-row svg {
+  color: var(--ck-sage-ink);
+}
+
+@media (min-width: 900px) {
+  [data-kit='clinic'][data-variant='cognitive-studio'] .ck-signs {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    align-items: start;
+  }
+
+  [data-kit='clinic'][data-variant='cognitive-studio'] .ck-signs-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-signs-list li {
+  border-radius: 14px;
+  background: var(--ck-paper);
+  border: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-box {
+  border-radius: 999px;
+  background: var(--ck-sage);
+  color: var(--ck-sage-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-step {
+  border-radius: 16px;
+  border: 1px solid var(--ck-line);
+  border-top: 4px solid var(--ck-sage-ink);
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-step-n {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--ck-sage);
+  color: var(--ck-sage-ink);
+  font-family: var(--ck-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-plan {
+  border-radius: 16px;
+  border: 1px solid var(--ck-line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-plan-meta {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--ck-line);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-price,
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-link {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+[data-kit='clinic'][data-variant='cognitive-studio'] .ck-table .is-us {
+  background: var(--ck-blush);
+}
+
+/* Variant: clinical-editorial (intelligence) ---------------------------- */
+
+[data-kit='clinic'][data-variant='clinical-editorial'] {
+  --ck-ground: #faf6ee;
+  --ck-paper: #ffffff;
+  --ck-ink: #2a1118;
+  --ck-body: #4b343b;
+  --ck-muted: #6c535b;
+  --ck-line: #dfd3c2;
+  --ck-blush: #f2e8da;
+  --ck-sage: #f3e0e4;
+  --ck-sage-ink: #761930;
+  --ck-crimson: #761930;
+  --ck-serif: 'Instrument Serif', Georgia, serif;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .bh {
+  background: rgba(250, 246, 238, 0.94);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-lockup-editorial .ck-lockup-disc {
+  background: var(--ck-sage);
+  color: var(--ck-crimson);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-lockup-ed-tag {
+  font-family: var(--ck-serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ck-crimson);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-actions {
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-btn,
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-btn-ghost {
+  min-height: 48px;
+  padding: 0 20px;
+  font-size: 0.9375rem;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-btn {
+  background: var(--ck-crimson);
+  color: #ffffff;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-btn:hover {
+  background: var(--ck-ink);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-h1 {
+  font-size: clamp(2.8rem, 6vw, 4.65rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero-art {
+  position: relative;
+  margin: 0 auto;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero-img {
+  border-radius: 6px;
+  border: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-lab-readout {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  background: var(--ck-blush);
+  border: 1px solid var(--ck-line);
+  font-family: var(--ck-serif);
+  font-size: 1.05rem;
+  color: var(--ck-ink);
+}
+
+@media (min-width: 900px) {
+  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero {
+    padding: 0;
+  }
+
+  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero-grid {
+    align-items: stretch;
+  }
+
+  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero-copy {
+    padding: 64px 0 80px;
+  }
+
+  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero-art {
+    max-width: none;
+    height: 100%;
+    margin-right: calc(-1 * max(20px, (100vw - 1120px) / 2));
+    display: flex;
+    flex-direction: column;
+  }
+
+  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero-img {
+    flex: 1;
+    min-height: 540px;
+    aspect-ratio: auto;
+    border-radius: 0;
+    border: 0;
+    object-position: center 35%;
+  }
+
+  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-lab-readout {
+    margin-top: 0;
+    border-radius: 0;
+    border: 0;
+    border-top: 1px solid var(--ck-line);
+    padding: 14px 24px;
+  }
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-signs-list {
+  gap: 0;
+  border-top: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-signs-list li {
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ck-line);
+  padding: 16px 0;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-box {
+  border-radius: 999px;
+  background: var(--ck-crimson);
+  color: #ffffff;
+  font-family: var(--ck-serif);
+  font-size: 0.95rem;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-steps {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--ck-line);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-step {
+  border-radius: 0;
+  background: transparent;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--ck-line);
+}
+
+@media (min-width: 760px) {
+  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-step {
+    display: grid;
+    grid-template-columns: 120px minmax(180px, 0.55fr) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 24px;
+  }
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-step-n {
+  font-family: var(--ck-serif);
+  font-style: italic;
+  font-size: 1.35rem;
+  color: var(--ck-crimson);
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-plan {
+  border-radius: 12px;
+  border: 1px solid var(--ck-line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-plan-meta {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--ck-line);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-price,
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-link {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+[data-kit='clinic'][data-variant='clinical-editorial'] .ck-table .is-us {
+  background: #f5e6e8;
 }

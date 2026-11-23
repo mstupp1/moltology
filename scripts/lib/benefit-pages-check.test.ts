@@ -21,7 +21,7 @@ describe('benefit pages', () => {
     } as BenefitPage
     const twin = { ...libido, slug: 'twin', topic: 'Twin', related: ['libido', 'spirituality'] } as BenefitPage
     const rules = checkBenefitPages(
-      [...BENEFIT_PAGES, { slug: 'twin', topic: 'Twin', kit: 'clinic', blurb: '', indexed: false, updated: libido.updated }],
+      [...BENEFIT_PAGES, { slug: 'twin', topic: 'Twin', kit: 'clinic', blurb: '', indexed: libido.indexed, updated: libido.updated }],
       [broken, twin, ...pages.filter((page) => page.slug !== 'libido')],
     ).map((issue) => `${issue.slug}:${issue.rule}`)
     expect(rules).toContain('libido:title-length')

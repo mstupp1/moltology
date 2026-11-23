@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'synergy',
   topic: 'Synergy',
   kit: 'platform',
+  variant: 'split-prism',
   query: 'habit stacking',
   title: 'Habit stacking, built around your day | Moltology',
   description:
     'Put habit stacking on your daily agenda. Pair small actions with things you already do, follow the daily tasks, and ask the Oracle for a second opinion.',
   keywords: 'habit stacking, daily habits, routine cues, habit stack, daily practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/synergy/share.jpg?v=2',

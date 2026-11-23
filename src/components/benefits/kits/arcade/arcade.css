@@ -570,3 +570,326 @@
   padding: 0 20px 20px;
   line-height: 1.6;
 }
+
+/* Variant: gold-cabinet (gamification) --------------------------------- */
+
+[data-kit='arcade'][data-variant='gold-cabinet'] {
+  --ar-night: #0e0b16;
+  --ar-deep: #08060e;
+  --ar-panel: #181426;
+  --ar-line: #3b3259;
+  --ar-white: #faf5e8;
+  --ar-body: #cec7de;
+  --ar-muted: #a196be;
+  --ar-cyan: #2ee6a6;
+  --ar-magenta: #f5b82e;
+  --ar-gold: #f5b82e;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .bh {
+  background: rgba(14, 11, 22, 0.92);
+  border-bottom-color: var(--ar-line);
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--ar-gold);
+  color: var(--ar-night);
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-lockup-variant .ar-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--ar-night);
+  filter: none;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-lockup-variant .ar-lockup-word {
+  color: var(--ar-gold);
+  text-shadow: none;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .bh-cta {
+  background: var(--ar-gold);
+  color: var(--ar-night);
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-h1 {
+  text-shadow: none;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-tag {
+  background: rgba(245, 184, 46, 0.14);
+  box-shadow: inset 0 0 0 2px var(--ar-gold);
+  color: #fde49b;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(86svh, 780px);
+  max-width: none;
+  padding: 72px 0;
+  background: var(--ar-night);
+  border-bottom: 3px solid var(--ar-gold);
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 74% center;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero-shade {
+  display: block;
+  background: linear-gradient(92deg, rgba(10, 7, 18, 0.96) 0%, rgba(10, 7, 18, 0.76) 44%, rgba(10, 7, 18, 0.08) 72%);
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero-copy {
+  position: relative;
+}
+
+@media (max-width: 639px) {
+  [data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero-shade {
+    display: none;
+  }
+
+  [data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero-copy {
+    order: 1;
+    padding: 0;
+  }
+
+  [data-kit='arcade'][data-variant='gold-cabinet'] .ar-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 74% center;
+  }
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-btn,
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-btn-alt {
+  clip-path: none;
+  border-radius: 8px;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-btn {
+  background: var(--ar-gold);
+  color: var(--ar-deep);
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-dark {
+  background:
+    linear-gradient(rgba(245, 184, 46, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(245, 184, 46, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--ar-deep);
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-panel,
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-quest,
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-modes-img {
+  clip-path: none;
+  border-radius: 10px;
+}
+
+[data-kit='arcade'][data-variant='gold-cabinet'] .ar-quest {
+  border-left: 3px solid var(--ar-gold);
+}
+
+/* Variant: esports-light (technique) ------------------------------------ */
+
+[data-kit='arcade'][data-variant='esports-light'] {
+  --ar-night: #f3f4f9;
+  --ar-deep: #e6e8f2;
+  --ar-panel: #ffffff;
+  --ar-line: #cdd2e4;
+  --ar-white: #141129;
+  --ar-body: #393654;
+  --ar-muted: #585578;
+  --ar-cyan: #0d7a72;
+  --ar-magenta: #5b21b6;
+  --ar-gold: #8c4a03;
+  background: var(--ar-night);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .bh {
+  background: rgba(243, 244, 249, 0.94);
+  border-bottom: 1px solid var(--ar-line);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .bh-lockup,
+[data-kit='arcade'][data-variant='esports-light'] .bh-link {
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .bh-link:hover {
+  color: var(--ar-magenta);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .bh-cta {
+  background: var(--ar-magenta);
+  color: #ffffff;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--ar-magenta);
+  color: #ffffff;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-lockup-variant .ar-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+  filter: none;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-lockup-variant .ar-lockup-word {
+  color: var(--ar-white);
+  text-shadow: none;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-h1 {
+  text-shadow: none;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-tag {
+  background: #ebe6fa;
+  box-shadow: inset 0 0 0 1px rgba(91, 33, 182, 0.35);
+  color: var(--ar-magenta);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(84svh, 760px);
+  max-width: none;
+  padding: 72px 0;
+  background: var(--ar-night);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% center;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-hero-shade {
+  display: block;
+  background: linear-gradient(106deg, #f3f4f9 0%, #f3f4f9 49%, #5b21b6 49%, #5b21b6 49.6%, rgba(20, 17, 41, 0.08) 49.7%, transparent 66%);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-hero-copy {
+  position: relative;
+}
+
+@media (min-width: 900px) {
+  [data-kit='arcade'][data-variant='esports-light'] .ar-hero-copy > * {
+    max-width: 530px;
+  }
+}
+
+@media (max-width: 899px) {
+  [data-kit='arcade'][data-variant='esports-light'] .ar-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='arcade'][data-variant='esports-light'] .ar-hero-shade {
+    display: none;
+  }
+
+  [data-kit='arcade'][data-variant='esports-light'] .ar-hero-copy {
+    order: 1;
+    padding: 0;
+  }
+
+  [data-kit='arcade'][data-variant='esports-light'] .ar-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 76% center;
+  }
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-btn,
+[data-kit='arcade'][data-variant='esports-light'] .ar-btn-alt {
+  clip-path: none;
+  border-radius: 8px;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-btn {
+  background: var(--ar-magenta);
+  color: #ffffff;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-btn-alt {
+  background: var(--ar-cyan);
+  color: #ffffff;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-quiz {
+  color: var(--ar-magenta);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-dark {
+  background:
+    linear-gradient(rgba(91, 33, 182, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(91, 33, 182, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--ar-deep);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-panel,
+[data-kit='arcade'][data-variant='esports-light'] .ar-quest,
+[data-kit='arcade'][data-variant='esports-light'] .ar-modes-img {
+  clip-path: none;
+  border-radius: 10px;
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .ar-bar {
+  background: var(--ar-deep);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .bf-q {
+  color: var(--ar-white);
+}
+
+[data-kit='arcade'][data-variant='esports-light'] .bf-icon::before,
+[data-kit='arcade'][data-variant='esports-light'] .bf-icon::after {
+  background: var(--ar-magenta);
+}

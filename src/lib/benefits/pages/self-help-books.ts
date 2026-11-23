@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'self-help-books',
   topic: 'Self help Books',
   kit: 'seminar',
+  variant: 'publisher',
   query: 'best self help books',
   title: 'Best self help books: put a chapter to work | Moltology',
   description:
     'Looking for the best self help books? Open the Codex, pick one passage, and put down the highlighter. Then do what it says, with a daily practice to hold it.',
   keywords: 'best self help books, self improvement reading, Codex, daily reading practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/self-help-books/share.jpg?v=2',

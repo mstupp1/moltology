@@ -9,7 +9,27 @@ import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './locker.css'
 
 /** The sportswear lockup: slanted condensed capitals with the emblem riding a speed bar. */
-function LockerLockup() {
+function LockerLockup({ variant }: { variant?: string }) {
+  if (variant === 'track-club' || variant === 'chalk-gym') {
+    return (
+      <span className="lk-lockup lk-lockup-track">
+        <span className="lk-lockup-badge">
+          <BrandIcon aria-hidden="true" tone="inherit" className="lk-lockup-icon" />
+        </span>
+        <span className="lk-lockup-word">Moltology</span>
+      </span>
+    )
+  }
+  if (variant) {
+    return (
+      <span className="lk-lockup lk-lockup-block">
+        <span className="lk-lockup-badge">
+          <BrandIcon aria-hidden="true" tone="inherit" className="lk-lockup-icon" />
+        </span>
+        <span className="lk-lockup-word">Moltology</span>
+      </span>
+    )
+  }
   return (
     <span className="lk-lockup">
       <BrandIcon aria-hidden="true" tone="inherit" className="lk-lockup-icon" />
@@ -23,11 +43,12 @@ function LockerLockup() {
 export default function LockerKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'locker') return null
   const { hero, stats, program, gear, creed } = page.content
+  const isVariant = Boolean(page.variant)
 
   return (
     <div className="lk">
       <BenefitHeader
-        lockup={<LockerLockup />}
+        lockup={<LockerLockup variant={page.variant} />}
         links={[
           { label: 'Program', href: '#program' },
           { label: 'Gear', href: '#gear' },
@@ -80,9 +101,11 @@ export default function LockerKit({ page, onJoin, children }: BenefitKitProps) {
             </h2>
             <p className="lk-body lk-intro">{program.intro}</p>
             <ol className="lk-program">
-              {program.items.map((item) => (
+              {program.items.map((item, index) => (
                 <li key={item.title} className="lk-set">
-                  <span className="lk-set-label">{item.set}</span>
+                  <span className="lk-set-label">
+                    {isVariant ? `${String(index + 1).padStart(2, '0')} · ${item.set}` : item.set}
+                  </span>
                   <h3 className="lk-h3">{item.title}</h3>
                   <p className="lk-body">{item.body}</p>
                 </li>

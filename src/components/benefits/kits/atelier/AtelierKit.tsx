@@ -7,8 +7,34 @@ import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './atelier.css'
 
+const ATELIER_PLATES: Record<string, [string, string]> = {
+  noir: ['Plate 01', 'Signed edition'],
+  'porcelain-lacquer': ['Plate 01', 'Porcelain cabinet'],
+  'milan-terracotta': ['No. 01', 'Milano edition'],
+  'architectural-stone': ['Study 01', 'Stone dossier'],
+}
+
+const ATELIER_LOCKUP_SUB: Record<string, string> = {
+  noir: 'Édition',
+  'porcelain-lacquer': 'Cabinet',
+  'milan-terracotta': 'Milano',
+  'architectural-stone': 'Atelier',
+}
+
 /** The fashion house lockup: the name in spaced Didone capitals over a small maison line. */
-function AtelierLockup() {
+function AtelierLockup({ variant }: { variant?: string }) {
+  if (variant) {
+    return (
+      <span className="at-lockup at-lockup-noir">
+        <span className="at-lockup-word">Moltology</span>
+        <span className="at-lockup-rule" aria-hidden="true" />
+        <span className="at-lockup-sub">
+          <BrandIcon aria-hidden="true" tone="inherit" className="at-lockup-icon" />
+          {ATELIER_LOCKUP_SUB[variant] ?? 'Édition'}
+        </span>
+      </span>
+    )
+  }
   return (
     <span className="at-lockup">
       <span className="at-lockup-word">Moltology</span>
@@ -24,11 +50,13 @@ function AtelierLockup() {
 export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'atelier') return null
   const { hero, manifesto, lookbook, campaign, care } = page.content
+  const isVariant = Boolean(page.variant)
+  const plate = page.variant ? ATELIER_PLATES[page.variant] : undefined
 
   return (
     <div className="at">
       <BenefitHeader
-        lockup={<AtelierLockup />}
+        lockup={<AtelierLockup variant={page.variant} />}
         links={[
           { label: 'The looks', href: '#looks' },
           { label: 'Care', href: '#care' },
@@ -64,8 +92,17 @@ export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) 
                 className="at-hero-img"
               />
               <figcaption className="at-caption at-figcaption">
-                <span>Look 01</span>
-                <span>Silence, tailored</span>
+                {plate ? (
+                  <>
+                    <span>{plate[0]}</span>
+                    <span>{plate[1]}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Look 01</span>
+                    <span>Silence, tailored</span>
+                  </>
+                )}
               </figcaption>
             </figure>
           </div>
@@ -92,9 +129,21 @@ export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) 
             <ol className="at-looks">
               {lookbook.items.map((look, index) => (
                 <li key={look.name} className="at-look">
-                  <span className="at-caption">Look {String(index + 1).padStart(2, '0')}</span>
-                  <h3 className="at-h3">{look.name}</h3>
-                  <p className="at-body">{look.note}</p>
+                  {isVariant ? (
+                    <>
+                      <span className="at-look-num">{String(index + 1).padStart(2, '0')}</span>
+                      <div className="at-look-copy">
+                        <h3 className="at-h3">{look.name}</h3>
+                        <p className="at-body">{look.note}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="at-caption">Look {String(index + 1).padStart(2, '0')}</span>
+                      <h3 className="at-h3">{look.name}</h3>
+                      <p className="at-body">{look.note}</p>
+                    </>
+                  )}
                 </li>
               ))}
             </ol>

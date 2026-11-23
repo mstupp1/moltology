@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'answers',
   topic: 'Answers',
   kit: 'seminar',
+  variant: 'midnight-folio',
   query: 'meaning of life',
   title: 'Meaning of life: bring the question with you | Moltology',
   description:
     'The meaning of life is a large question for an ordinary Tuesday. Read the Prime Directive and choose what deserves your attention in Moltology’s daily practice.',
   keywords: 'meaning of life, purpose, Prime Directive, choosing what matters',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/answers/share.jpg?v=2',

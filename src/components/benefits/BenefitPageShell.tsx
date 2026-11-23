@@ -39,7 +39,7 @@ export function BenefitPageShell({ page }: { page: BenefitPage }) {
   const Kit = KITS[page.kit]
 
   return (
-    <div className="benefit-page min-h-screen flex flex-col bg-abyss" data-kit={page.kit}>
+    <div className="benefit-page min-h-screen flex flex-col bg-abyss" data-kit={page.kit} data-variant={page.variant}>
       <Suspense fallback={<div className="benefit-kit-fallback" />}>
         <Kit page={page} onJoin={() => openAuth('signup')}>
           <MoltReveal

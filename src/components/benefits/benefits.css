@@ -154,9 +154,10 @@
 }
 
 /* Dark costumes: a faint rim so the torn edge still reads against the abyss. */
-.benefit-page[data-kit='locker'] .benefit-shed-edge,
-.benefit-page[data-kit='platform'] .benefit-shed-edge,
-.benefit-page[data-kit='arcade'] .benefit-shed-edge {
+.benefit-page[data-kit='locker']:not([data-variant='track-club']):not([data-variant='chalk-gym']) .benefit-shed-edge,
+.benefit-page[data-kit='atelier'][data-variant='noir'] .benefit-shed-edge,
+.benefit-page[data-kit='platform']:not([data-variant='light-shield']) .benefit-shed-edge,
+.benefit-page[data-kit='arcade']:not([data-variant='esports-light']) .benefit-shed-edge {
   filter: drop-shadow(0 -1.5px 0 rgba(255, 255, 255, 0.28));
 }
 
@@ -307,4 +308,200 @@
   color: #6b3cff;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
+}
+
+.benefit-swatch[data-kit='clinic'][data-variant='botanical-lab'] {
+  background: #e6f0eb;
+  color: #0e342c;
+  font-family: 'Geist', 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.benefit-swatch[data-kit='can'][data-variant='cobalt-shift'] {
+  background: #1032b5;
+  color: #ffb71b;
+  text-shadow: 3px 3px 0 #0a122e;
+}
+
+.benefit-swatch[data-kit='atelier'][data-variant='noir'] {
+  background: #0f0e0d;
+  color: #f4efe6;
+}
+
+.benefit-swatch[data-kit='locker'][data-variant='track-club'] {
+  background: #f3f0ea;
+  color: #c4281c;
+  font-style: normal;
+}
+
+.benefit-swatch[data-kit='seminar'][data-variant='publisher'] {
+  background: #f7f3ea;
+  color: #183c2b;
+  font-family: 'Instrument Serif', Georgia, serif;
+  text-transform: none;
+}
+
+.benefit-swatch[data-kit='platform'][data-variant='split-prism'] {
+  background: #15132b;
+  color: #ff7a52;
+}
+
+.benefit-swatch[data-kit='clinic'][data-variant='graphite-protocol'] {
+  background: #eff2f6;
+  color: #1e2d3d;
+}
+
+.benefit-swatch[data-kit='clinic'][data-variant='cognitive-studio'] {
+  background: #eef0fb;
+  color: #2d46b9;
+}
+
+.benefit-swatch[data-kit='clinic'][data-variant='clinical-editorial'] {
+  background: #f6efe4;
+  color: #6b2135;
+}
+
+.benefit-swatch[data-kit='can'][data-variant='solar-chili'] {
+  background: #9e1118;
+  color: #f8c808;
+}
+
+.benefit-swatch[data-kit='can'][data-variant='citrus-burst'] {
+  background: #0d4a2b;
+  color: #b7ef22;
+}
+
+.benefit-swatch[data-kit='retreat'][data-variant='moss-monastery'] {
+  background: #27382e;
+  color: #dde5dc;
+}
+
+.benefit-swatch[data-kit='retreat'][data-variant='coastal-air'] {
+  background: #eaf1f4;
+  color: #1f4863;
+}
+
+.benefit-swatch[data-kit='retreat'][data-variant='terracotta-courtyard'] {
+  background: #f7eae0;
+  color: #9c4029;
+}
+
+.benefit-swatch[data-kit='retreat'][data-variant='amber-hearth'] {
+  background: #f4ead6;
+  color: #8c530f;
+}
+
+.benefit-swatch[data-kit='atelier'][data-variant='porcelain-lacquer'] {
+  background: #faf5f4;
+  color: #7a1c28;
+}
+
+.benefit-swatch[data-kit='atelier'][data-variant='milan-terracotta'] {
+  background: #f3e6dd;
+  color: #9e3c22;
+}
+
+.benefit-swatch[data-kit='atelier'][data-variant='architectural-stone'] {
+  background: #e6e8e3;
+  color: #22282a;
+}
+
+.benefit-swatch[data-kit='ledger'][data-variant='swiss-private'] {
+  background: #f4f6f8;
+  color: #a61b29;
+}
+
+.benefit-swatch[data-kit='ledger'][data-variant='heritage-treasury'] {
+  background: #163628;
+  color: #dfd0a8;
+}
+
+.benefit-swatch[data-kit='ledger'][data-variant='executive-navy'] {
+  background: #11223a;
+  color: #dbe6f2;
+}
+
+.benefit-swatch[data-kit='ledger'][data-variant='amber-desk'] {
+  background: #f5ebd6;
+  color: #a14807;
+}
+
+.benefit-swatch[data-kit='locker'][data-variant='cobalt-iron'] {
+  background: #0d1322;
+  color: #5a9cff;
+}
+
+.benefit-swatch[data-kit='locker'][data-variant='chalk-gym'] {
+  background: #f3f2ed;
+  color: #1b1f23;
+}
+
+.benefit-swatch[data-kit='locker'][data-variant='gold-sprint'] {
+  background: #111114;
+  color: #eab308;
+}
+
+.benefit-swatch[data-kit='locker'][data-variant='forged-amber'] {
+  background: #141210;
+  color: #f59e0b;
+}
+
+.benefit-swatch[data-kit='platform'][data-variant='cyan-console'] {
+  background: #07111a;
+  color: #22d3ee;
+}
+
+.benefit-swatch[data-kit='platform'][data-variant='light-shield'] {
+  background: #f5f6fb;
+  color: #4c1d95;
+}
+
+.benefit-swatch[data-kit='platform'][data-variant='crimson-grid'] {
+  background: #120d12;
+  color: #fb7185;
+}
+
+.benefit-swatch[data-kit='arcade'][data-variant='gold-cabinet'] {
+  background: #100d18;
+  color: #fbbf24;
+}
+
+.benefit-swatch[data-kit='arcade'][data-variant='esports-light'] {
+  background: #f2f3f8;
+  color: #5b21b6;
+}
+
+.benefit-swatch[data-kit='seminar'][data-variant='keynote-stage'] {
+  background: #1c1917;
+  color: #f59e0b;
+}
+
+.benefit-swatch[data-kit='seminar'][data-variant='cobalt-summit'] {
+  background: #1e3a8a;
+  color: #dbeafe;
+}
+
+.benefit-swatch[data-kit='seminar'][data-variant='olive-monograph'] {
+  background: #f2efe4;
+  color: #3f4f28;
+}
+
+.benefit-swatch[data-kit='seminar'][data-variant='midnight-folio'] {
+  background: #121624;
+  color: #e2c074;
+}
+
+.benefit-swatch[data-kit='seminar'][data-variant='plum-journal'] {
+  background: #faf5f7;
+  color: #5b1f41;
+}
+
+.benefit-swatch[data-kit='network'][data-variant='coastal-club'] {
+  background: #eef6f8;
+  color: #155e75;
+}
+
+.benefit-swatch[data-kit='network'][data-variant='editorial-salon'] {
+  background: #f3f1fa;
+  color: #3b2f63;
 }

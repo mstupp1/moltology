@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'spice',
   topic: 'Spice',
   kit: 'can',
+  variant: 'solar-chili',
   query: 'how to spice up your life',
   title: 'How to spice up your life: break the repeat | Moltology',
   description:
     'How to spice up your life when every day is a rerun: pick a hard question, open the sketchbook and do something beyond your usual scroll with Moltology.',
   keywords: 'how to spice up your life, bored with routine, stuck in a rut, new interests, daily learning',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/spice/share.jpg?v=2',

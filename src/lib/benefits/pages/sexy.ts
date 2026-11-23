@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'sexy',
   topic: 'Sexy',
   kit: 'atelier',
+  variant: 'milan-terracotta',
   query: 'how to be more attractive',
   title: 'How to be more attractive: the daily edit | Moltology',
   description:
     'Wondering how to be more attractive? Start with the Moltmax quiz, then practice giving your attention, speaking plainly and keeping your own plans.',
   keywords: 'how to be more attractive, quiet confidence, conversation habits, bearing, Moltmax quiz',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology offers a daily practice, not health advice or a promise that anyone will find you attractive.',
   shareImage: {

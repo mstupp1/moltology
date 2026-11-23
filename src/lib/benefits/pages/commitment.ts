@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'commitment',
   topic: 'Commitment',
   kit: 'seminar',
+  variant: 'cobalt-summit',
   query: 'how to stick to goals',
   title: 'How to stick to goals: choose the next action | Moltology',
   description:
     'Working out how to stick to goals? Choose one objective, name the next action, and protect a place for it in your day with Moltology’s daily practice.',
   keywords: 'how to stick to goals, commitment, one objective, daily goal practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/commitment/share.jpg?v=2',
@@ -67,8 +68,8 @@ const page: BenefitPage = {
       sub: 'The notebook is lovely. Put one task in it. Choose what matters today, shut out the avoidable interruptions, and do the work you named before adding another objective.',
       cta: 'Start your daily practice',
       image: {
-        src: '/images/benefits/commitment/hero.jpg?v=2',
-        alt: 'A dark blue crab on a navy stage holding one folder beside a gold reading lamp, focused seminar portrait',
+        src: '/images/benefits/commitment/hero-alt.jpg',
+        alt: 'Cora Pearl, a pearl-white lobster wearing a gold crown, standing beside a cobalt-paneled architectural podium in a daylight seminar studio',
         width: 1024,
         height: 1280,
       },

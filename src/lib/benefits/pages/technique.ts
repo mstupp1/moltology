@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'technique',
   topic: 'Technique',
   kit: 'arcade',
+  variant: 'esports-light',
   query: 'pomodoro technique',
   title: 'Pomodoro technique: ready up for one round | Moltology',
   description:
     'Run the pomodoro technique with one target and a timer. Moltology pairs a pre-round setup with Focus rounds, an Oracle skill for 25-minute work sessions.',
   keywords: 'pomodoro technique, focus rounds, work intervals, pomodoro breaks, single task work',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/technique/share.jpg?v=2',

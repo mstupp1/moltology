@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'intelligence',
   topic: 'Intelligence',
   kit: 'clinic',
+  variant: 'clinical-editorial',
   query: 'how to get smarter',
   title: 'How to get smarter: go beyond the bookmark | Moltology',
   description:
     'Asking how to get smarter? Choose something you cannot explain yet. Moltology gives you a daily task for it: learn one hard thing, then check your answer.',
   keywords: 'how to get smarter, learning habits, active recall, study routine, learn something hard',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/intelligence/share.jpg?v=2',
@@ -68,8 +69,8 @@ const page: BenefitPage = {
       checks: ['Bring your own subject', 'Start at your level', 'Check off the work'],
       cta: 'Start your learning routine',
       image: {
-        src: '/images/benefits/intelligence/hero.jpg?v=2',
-        alt: 'A lobster studying a technical drawing at a pale desk, with soft directional light and restrained clinic portrait styling',
+        src: '/images/benefits/intelligence/hero-alt.jpg',
+        alt: 'Maris Slate, a cobalt-blue crab with tide markings, leaning over an open notebook at a warm timber desk beside a sunlit window and library shelves',
         width: 1024,
         height: 1280,
       },

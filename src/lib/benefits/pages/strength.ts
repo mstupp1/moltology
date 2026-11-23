@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Mental toughness is trained like a lift: small reps, every day, with rest built in. Moltology is a free daily program of eight reps for your head.',
   keywords: 'mental toughness, mental strength, discipline, how to build mental toughness, resilience, daily training',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/strength/share.jpg?v=2',

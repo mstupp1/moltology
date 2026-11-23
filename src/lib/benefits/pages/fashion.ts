@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Personal style starts before the closet. Moltology is a free daily practice that builds the posture, focus and calm that make any outfit look like yours.',
   keywords: 'personal style, how to find your personal style, confidence, self presentation, style tips, daily routine',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/fashion/share.jpg?v=2',

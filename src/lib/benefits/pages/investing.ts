@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Small daily habits compound like regular deposits. Moltology is a free daily practice: eight small deposits of focus, learning and rest that add up over months.',
   keywords: 'investing in yourself, self investment, compound habits, personal growth, daily routine, self improvement',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology is not financial advice and does not hold, manage or invest money.',
   shareImage: {

@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Stop deciding how to run every day. Moltology automates your daily routine into eight small tasks, with an AI guide on call when the plan breaks. Free.',
   keywords: 'automate your daily routine, routine automation, decision fatigue, AI productivity, daily planner, habit system',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/automation/share.jpg?v=2',

@@ -54,6 +54,10 @@ interface BenefitPageBase {
   indexed: boolean
   /** Date the copy was last reviewed (YYYY-MM-DD). */
   updated: string
+  /** Optional visual sub-style key within a kit (omitted on the 10 original pages). */
+  variant?: string
+  /** Optional alternate hero path (for variants using dedicated artwork). */
+  heroSrc?: string
   /** The real Moltology feature or Codex passage this page is about. */
   hook: BenefitLink & { text: string }
   reveal: BenefitReveal
@@ -240,6 +244,10 @@ export interface BenefitSummary {
   slug: string
   topic: string
   kit: BenefitKit
+  /** Optional visual sub-style key within a kit (omitted on the 10 original pages). */
+  variant?: string
+  /** Optional alternate hero path (for variants using dedicated artwork). */
+  heroSrc?: string
   /** One line for cards and links. */
   blurb: string
   indexed: boolean

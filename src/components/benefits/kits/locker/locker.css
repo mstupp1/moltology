@@ -547,3 +547,975 @@
   max-width: 680px;
   line-height: 1.65;
 }
+
+/* Variant: track-club (physicality) ------------------------------------- */
+
+[data-kit='locker'][data-variant='track-club'] {
+  --lk-chalk: #f3f0ea;
+  --lk-asphalt: #141312;
+  --lk-crimson: #b32217;
+  --lk-ember: #ff6b5a;
+  --lk-ink: #141312;
+  --lk-ink-body: #33302c;
+  --lk-ink-muted: #57524b;
+  --lk-rule: #dbd5ca;
+  --lk-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk {
+  background: var(--lk-chalk);
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk ::selection {
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh {
+  background: var(--lk-chalk);
+  border-bottom: 1px solid var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-lockup {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-track {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-track .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lockup-track .lk-lockup-word {
+  font-style: normal;
+  transform: none;
+  color: var(--lk-ink);
+  letter-spacing: 0.02em;
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-link {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-link:hover {
+  color: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bh-cta {
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(84svh, 760px);
+  max-width: none;
+  padding: 64px 0;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero-shade {
+  display: block;
+  background: linear-gradient(104deg, #f3f0ea 0%, #f3f0ea 49.5%, #b32217 49.5%, #b32217 50.1%, rgba(20, 19, 18, 0.08) 50.2%, transparent 66%);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-hero-copy {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-copy > * {
+    max-width: 550px;
+  }
+}
+
+@media (max-width: 899px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-copy {
+    order: 1;
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 82% center;
+  }
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-tag {
+  background: transparent;
+  color: var(--lk-crimson);
+  padding: 0 0 0 12px;
+  border-left: 3px solid var(--lk-crimson);
+  font-family: var(--lk-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-h1 {
+  font-style: normal;
+  font-size: clamp(3rem, 6vw, 5.2rem);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-lede {
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-btn {
+  background: var(--lk-ink);
+  color: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-btn-line {
+  box-shadow: inset 0 0 0 2px var(--lk-ink);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stats {
+  background: var(--lk-asphalt);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stat {
+  border-color: #2c2a27;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stat-value {
+  font-style: normal;
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-stat-label {
+  font-family: var(--lk-mono);
+  color: var(--lk-ember);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-section .lk-h2 {
+  font-style: normal;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 0;
+  background: transparent;
+  border: 0;
+  border-top: 2px solid var(--lk-ink);
+  border-bottom: 0;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set:hover {
+  background: transparent;
+  border-top-color: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set-label {
+  font-family: var(--lk-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-set .lk-h3 {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section {
+  background: var(--lk-asphalt);
+  color: #d6d3cb;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-h2 {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-gear-list li {
+  color: #f5f5f0;
+  border-bottom-color: #2e2c29;
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-gear-list svg {
+  color: var(--lk-ember);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-gear-section .lk-btn {
+  background: var(--lk-crimson);
+  color: #ffffff;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='track-club'] .lk-gear {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+
+  [data-kit='locker'][data-variant='track-club'] .lk-gear-img {
+    order: 2;
+  }
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-creed {
+  background: var(--lk-crimson);
+}
+
+[data-kit='locker'][data-variant='track-club'] .lk-creed-text {
+  font-style: normal;
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf {
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-title {
+  font-style: normal;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-list {
+  border-top-color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-item {
+  border-bottom-color: var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-q {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='track-club'] .bf-icon::before,
+[data-kit='locker'][data-variant='track-club'] .bf-icon::after {
+  background: var(--lk-crimson);
+}
+
+/* Variant: cobalt-iron (grip) ------------------------------------------- */
+
+[data-kit='locker'][data-variant='cobalt-iron'] {
+  --lk-black: #0a101d;
+  --lk-concrete: #121b2e;
+  --lk-steel: #253454;
+  --lk-white: #f0f5ff;
+  --lk-body: #c7d3eb;
+  --lk-muted: #8e9fc4;
+  --lk-volt: #68abff;
+  --lk-cobalt-ink: #071226;
+  --lk-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-block {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-volt);
+  color: var(--lk-cobalt-ink);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-block .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--lk-cobalt-ink);
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-lockup-block .lk-lockup-word {
+  font-style: normal;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-h1,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-h2,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-stat-value,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-creed-text {
+  font-style: normal;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(84svh, 760px);
+  max-width: none;
+  padding: 64px 0;
+  background: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% center;
+  border: 0;
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-shade {
+  display: block;
+  background: linear-gradient(92deg, #070d19 0%, rgba(7, 13, 25, 0.88) 44%, rgba(7, 13, 25, 0.06) 72%);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy > * {
+    max-width: 550px;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy {
+    padding-left: 44px;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: var(--lk-volt);
+  }
+}
+
+@media (max-width: 899px) {
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-copy {
+    order: 1;
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 78% center;
+  }
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='cobalt-iron'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  background: var(--lk-concrete);
+  border: 1px solid var(--lk-steel);
+  border-left: 4px solid var(--lk-volt);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-set-label,
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-stat-label {
+  font-family: var(--lk-mono);
+}
+
+[data-kit='locker'][data-variant='cobalt-iron'] .lk-creed-text {
+  color: var(--lk-cobalt-ink);
+}
+
+/* Variant: chalk-gym (fitness) ------------------------------------------ */
+
+[data-kit='locker'][data-variant='chalk-gym'] {
+  --lk-chalk: #f3f3ee;
+  --lk-pine: #13211a;
+  --lk-emerald: #135c42;
+  --lk-mint: #89dfc0;
+  --lk-ink: #13211a;
+  --lk-ink-body: #324038;
+  --lk-ink-muted: #505e56;
+  --lk-rule: #d1d6cc;
+  --lk-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk {
+  background: var(--lk-chalk);
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk ::selection {
+  background: var(--lk-emerald);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh {
+  background: var(--lk-chalk);
+  border-bottom: 1px solid var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh-lockup,
+[data-kit='locker'][data-variant='chalk-gym'] .bh-link {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh-link:hover {
+  color: var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bh-cta {
+  background: var(--lk-emerald);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-track {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-emerald);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-track .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lockup-track .lk-lockup-word {
+  font-style: normal;
+  transform: none;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 28px 20px 44px;
+  align-items: center;
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero-shade {
+  display: none;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero-copy {
+  order: 1;
+  padding: 0;
+  margin: 0;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-hero-img {
+  position: static;
+  order: 2;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: 84% center;
+  border: 0;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    min-height: min(82svh, 740px);
+    padding: 0;
+    align-items: stretch;
+  }
+
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero-copy {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 56px 56px 56px max(24px, calc((100vw - 1280px) / 2 + 20px));
+  }
+
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero-copy > * {
+    max-width: 540px;
+  }
+
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-hero-img {
+    order: 2;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-tag {
+  background: var(--lk-emerald);
+  color: #ffffff;
+  font-family: var(--lk-mono);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-h1,
+[data-kit='locker'][data-variant='chalk-gym'] .lk-h2,
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat-value,
+[data-kit='locker'][data-variant='chalk-gym'] .lk-creed-text {
+  font-style: normal;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-h1 {
+  font-size: clamp(3rem, 6vw, 5.1rem);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-lede {
+  color: var(--lk-ink-body);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-btn {
+  background: var(--lk-ink);
+  color: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-btn-line {
+  box-shadow: inset 0 0 0 2px var(--lk-ink);
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stats {
+  background: var(--lk-pine);
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat {
+  border-color: #25382e;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat-value {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-stat-label {
+  font-family: var(--lk-mono);
+  color: var(--lk-mint);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-section .lk-h2 {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  [data-kit='locker'][data-variant='chalk-gym'] .lk-program {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid var(--lk-rule);
+  border-top: 3px solid var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-set-label {
+  font-family: var(--lk-mono);
+  font-size: 0.75rem;
+  color: var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-set .lk-h3 {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section {
+  background: var(--lk-pine);
+  color: #dbe3de;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-h2 {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-gear-list li {
+  color: #f4f6f4;
+  border-bottom-color: #263b30;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-gear-list svg {
+  color: var(--lk-mint);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-gear-section .lk-btn {
+  background: var(--lk-mint);
+  color: var(--lk-pine);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-creed {
+  background: var(--lk-emerald);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .lk-creed-text {
+  color: #ffffff;
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf {
+  background: var(--lk-chalk);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-title {
+  font-style: normal;
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-list {
+  border-top-color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-item {
+  border-bottom-color: var(--lk-rule);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-q {
+  color: var(--lk-ink);
+}
+
+[data-kit='locker'][data-variant='chalk-gym'] .bf-icon::before,
+[data-kit='locker'][data-variant='chalk-gym'] .bf-icon::after {
+  background: var(--lk-emerald);
+}
+
+/* Variant: gold-sprint (movement) --------------------------------------- */
+
+[data-kit='locker'][data-variant='gold-sprint'] {
+  --lk-black: #0f0e0c;
+  --lk-concrete: #191713;
+  --lk-steel: #302b22;
+  --lk-white: #faf7ef;
+  --lk-body: #d3cdc0;
+  --lk-muted: #9e9686;
+  --lk-volt: #f0b91a;
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-lockup-block {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-lockup-block .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-hero {
+  background: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-hero-img {
+  object-position: 78% center;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='gold-sprint'] .lk-hero {
+    align-items: flex-end;
+    min-height: min(86svh, 780px);
+    padding: 96px 0 68px;
+  }
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-hero-shade {
+  background:
+    linear-gradient(90deg, rgba(15, 14, 12, 0.94) 0%, rgba(15, 14, 12, 0.72) 44%, rgba(15, 14, 12, 0.08) 76%),
+    linear-gradient(0deg, var(--lk-black) 0%, rgba(15, 14, 12, 0) 42%);
+}
+
+[data-kit='locker'][data-variant='gold-sprint'] .lk-creed-text {
+  color: var(--lk-black);
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='gold-sprint'] .lk-gear-img {
+    order: 2;
+  }
+}
+
+/* Variant: forged-amber (resilience) ------------------------------------ */
+
+[data-kit='locker'][data-variant='forged-amber'] {
+  --lk-black: #110d0b;
+  --lk-concrete: #1c1613;
+  --lk-steel: #352922;
+  --lk-white: #f8f2ec;
+  --lk-body: #d8cac0;
+  --lk-muted: #a89487;
+  --lk-volt: #ff942e;
+  --lk-display: 'Chakra Petch', 'Anton', sans-serif;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-block {
+  padding-bottom: 0;
+  gap: 10px;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--lk-volt);
+  color: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-block .lk-lockup-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--lk-black);
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-lockup-block .lk-lockup-word {
+  font-style: normal;
+  font-weight: 700;
+  transform: none;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-h1,
+[data-kit='locker'][data-variant='forged-amber'] .lk-h2,
+[data-kit='locker'][data-variant='forged-amber'] .lk-h3,
+[data-kit='locker'][data-variant='forged-amber'] .lk-stat-value,
+[data-kit='locker'][data-variant='forged-amber'] .lk-creed-text {
+  font-style: normal;
+  font-weight: 700;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-h1 {
+  font-size: clamp(2.4rem, 4.6vw, 4.1rem);
+  line-height: 0.96;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-h2 {
+  font-size: clamp(2rem, 3.8vw, 3.3rem);
+  line-height: 0.98;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-creed-text {
+  font-size: clamp(2rem, 4.4vw, 3.6rem);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy {
+  min-width: 0;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(84svh, 760px);
+  max-width: none;
+  padding: 64px 0;
+  background: var(--lk-black);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+  border: 0;
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-shade {
+  display: block;
+  background: linear-gradient(96deg, rgba(17, 13, 11, 0.96) 0%, rgba(17, 13, 11, 0.75) 45%, rgba(17, 13, 11, 0.06) 74%);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy > * {
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 899px) {
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+    padding: 28px 20px 44px;
+  }
+
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-shade {
+    display: none;
+  }
+
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-copy {
+    order: 1;
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-kit='locker'][data-variant='forged-amber'] .lk-hero-img {
+    position: static;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 80% center;
+  }
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-program {
+  border-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  [data-kit='locker'][data-variant='forged-amber'] .lk-program {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  background: var(--lk-concrete);
+  border: 1px solid var(--lk-steel);
+  border-top: 3px solid var(--lk-volt);
+}
+
+[data-kit='locker'][data-variant='forged-amber'] .lk-creed-text {
+  color: var(--lk-black);
+}

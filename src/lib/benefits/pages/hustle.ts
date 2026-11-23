@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'hustle',
   topic: 'Hustle',
   kit: 'ledger',
+  variant: 'amber-desk',
   query: 'hustle culture',
   title: 'Hustle culture. Set a closing time. | Moltology',
   description:
     'Rethink hustle culture with a work session that ends. Pick an objective, set the timer and close the day with Moltology’s free daily practice.',
   keywords: 'hustle culture, stopping work, focused sessions, work boundaries, daily routine',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/hustle/share.jpg?v=2',
@@ -67,8 +68,8 @@ const page: BenefitPage = {
       sub: 'The late-night email can stay a draft. Pick the work, give it your attention and set a time to stop. Moltology’s daily practice includes the part where you put the laptop away.',
       cta: 'Join the daily practice free',
       image: {
-        src: '/images/benefits/hustle/hero.jpg?v=2',
-        alt: 'A copper lobster with a closed laptop and desk clock in a restrained executive magazine portrait',
+        src: '/images/benefits/hustle/hero-alt.jpg',
+        alt: 'Bo Pebble, a sunny yellow crab in a muted teal beanie, resting both claws on a closed cognac leather notebook beside a brushed brass clock on a warm timber desk',
         width: 1280,
         height: 960,
       },

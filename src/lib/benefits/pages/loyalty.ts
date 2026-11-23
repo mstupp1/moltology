@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'loyalty',
   topic: 'Loyalty',
   kit: 'seminar',
+  variant: 'olive-monograph',
   query: 'how to be loyal',
   title: 'How to be loyal: show up and ask first | Moltology',
   description:
     'Learn how to be loyal through kept promises, quiet company, and help that starts with a question. Stand beside the people you care about; skip managing them.',
   keywords: 'how to be loyal, loyalty in friendship, keeping promises, supporting a friend',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/loyalty/share.jpg?v=2',

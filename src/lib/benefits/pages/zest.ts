@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'zest',
   topic: 'Zest',
   kit: 'can',
+  variant: 'citrus-burst',
   query: 'zest for life',
   title: 'Zest for life. Go with your own taste. | Moltology',
   description:
     'Make space for zest for life: read for fun, join a conversation and wear what you like. Explore the daily practice and optional Moltology merch.',
   keywords: 'zest for life, everyday enthusiasm, personal interests, Moltology merchandise, making time for fun',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/zest/share.jpg?v=2',

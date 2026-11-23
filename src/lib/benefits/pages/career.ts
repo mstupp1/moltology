@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'career',
   topic: 'Career',
   kit: 'ledger',
+  variant: 'executive-navy',
   query: 'career growth',
   title: 'Career growth deserves time on the calendar | Moltology',
   description:
     'Make time for career growth: choose a project, study one difficult question and do focused work. A free daily practice with a clear place to start.',
   keywords: 'career growth, professional learning, focused work, skill practice, work priorities',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/career/share.jpg?v=2',

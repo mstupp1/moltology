@@ -3,7 +3,7 @@ import { DEFAULT_MASCOT_KEY, MASCOT_CAST, RETIRED_MASCOT_SUCCESSORS, getMascotKe
 
 describe('mascot cast', () => {
   it('offers only named film renders with unique keys and files', () => {
-    expect(getMascotKeys()).toEqual(['crab_juno_marsh', 'lobster_kit_shallows', 'crab_otto_basalt', 'lobster_sol_ember', 'lobster_nell_quill', 'crab_bo_pebble', 'lobster_vera_drift', 'crab_moss_tern'])
+    expect(getMascotKeys()).toEqual(['crab_juno_marsh', 'lobster_kit_shallows', 'crab_otto_basalt', 'lobster_sol_ember', 'lobster_nell_quill', 'crab_bo_pebble', 'lobster_vera_drift', 'crab_moss_tern', 'crab_maris_slate', 'lobster_cora_pearl'])
     expect(DEFAULT_MASCOT_KEY).toBe('crab_juno_marsh')
     expect(getMascotKeys()).not.toContain('lobster_clove_cinder')
     expect(new Set(getMascotKeys()).size).toBe(MASCOT_CAST.length)

@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'freedom',
   topic: 'Freedom',
   kit: 'retreat',
+  variant: 'coastal-air',
   query: 'how to feel free',
   title: 'How to feel free: leave one thing behind | Moltology',
   description:
     'Wondering how to feel free? Start with one small thing to let go: a stale plan, a noisy feed or an automatic yes. Make space for a daily practice.',
   keywords: 'how to feel free, letting go, personal boundaries, fewer commitments, daily practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/freedom/share.jpg?v=2',

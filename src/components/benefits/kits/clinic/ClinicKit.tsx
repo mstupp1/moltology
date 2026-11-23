@@ -10,8 +10,59 @@ import './clinic.css'
 
 const TRUST_ICONS = [Sparkles, Pill, CircleCheck, Clock]
 
-/** The telehealth lockup: lowercase serif word, emblem in a soft disc, a small plus. */
-function ClinicLockup() {
+const CLINIC_READOUTS: Record<string, [string, string, string]> = {
+  'botanical-lab': ['01 Quiet start', '02 Daily check-in', '03 Free forever'],
+  'graphite-protocol': ['01 Clear rule', '02 Hard boundary', '03 Daily log'],
+  'cognitive-studio': ['01 Single task', '02 Timer set', '03 Phone away'],
+  'clinical-editorial': ['I. Question', 'II. Recall', 'III. Record'],
+}
+
+/** The telehealth lockup: lowercase wordmark, emblem, and variant editorial tag. */
+function ClinicLockup({ variant }: { variant?: string }) {
+  if (variant === 'botanical-lab') {
+    return (
+      <span className="ck-lockup ck-lockup-lab">
+        <span className="ck-lockup-disc">
+          <BrandIcon aria-hidden="true" tone="inherit" className="ck-lockup-icon" />
+        </span>
+        <span className="ck-lockup-word">moltology</span>
+        <span className="ck-lockup-lab-tag">lab</span>
+      </span>
+    )
+  }
+  if (variant === 'graphite-protocol') {
+    return (
+      <span className="ck-lockup ck-lockup-proto">
+        <span className="ck-lockup-disc">
+          <BrandIcon aria-hidden="true" tone="inherit" className="ck-lockup-icon" />
+        </span>
+        <span className="ck-lockup-word">moltology</span>
+        <span className="ck-lockup-proto-tag">protocol</span>
+      </span>
+    )
+  }
+  if (variant === 'cognitive-studio') {
+    return (
+      <span className="ck-lockup ck-lockup-studio">
+        <span className="ck-lockup-disc">
+          <BrandIcon aria-hidden="true" tone="inherit" className="ck-lockup-icon" />
+        </span>
+        <span className="ck-lockup-word">moltology</span>
+        <span className="ck-lockup-studio-tag">studio</span>
+      </span>
+    )
+  }
+  if (variant === 'clinical-editorial') {
+    return (
+      <span className="ck-lockup ck-lockup-editorial">
+        <span className="ck-lockup-disc">
+          <BrandIcon aria-hidden="true" tone="inherit" className="ck-lockup-icon" />
+        </span>
+        <span className="ck-lockup-word">moltology</span>
+        <span className="ck-lockup-ed-tag">ed.</span>
+      </span>
+    )
+  }
   return (
     <span className="ck-lockup">
       <span className="ck-lockup-disc">
@@ -27,11 +78,13 @@ function ClinicLockup() {
 export default function ClinicKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'clinic') return null
   const { hero, trust, signs, steps, plans, compare } = page.content
+  const isVariant = Boolean(page.variant)
+  const readout = page.variant ? CLINIC_READOUTS[page.variant] : undefined
 
   return (
     <div className="ck">
       <BenefitHeader
-        lockup={<ClinicLockup />}
+        lockup={<ClinicLockup variant={page.variant} />}
         links={[
           { label: 'How it works', href: '#how' },
           { label: 'Plans', href: '#plans' },
@@ -69,31 +122,49 @@ export default function ClinicKit({ page, onJoin, children }: BenefitKitProps) {
                 </Link>
               </div>
             </div>
-            <div className="ck-hero-art">
-              <img
-                src={getAssetUrl(hero.image.src)}
-                alt={hero.image.alt}
-                width={hero.image.width}
-                height={hero.image.height}
-                fetchPriority="high"
-                className="ck-hero-img"
-              />
-              <div className="ck-plan-card" aria-hidden="true">
-                <p className="ck-plan-card-label">Your plan</p>
-                <p className="ck-plan-card-title">8 daily tasks</p>
-                <ul>
-                  <li>
-                    <CircleCheck /> Sit in silence
-                  </li>
-                  <li>
-                    <CircleCheck /> Pick your one thing
-                  </li>
-                  <li className="is-next">
-                    <span className="ck-dot" /> Do deep work
-                  </li>
-                </ul>
+            {readout ? (
+              <figure className="ck-hero-art">
+                <img
+                  src={getAssetUrl(hero.image.src)}
+                  alt={hero.image.alt}
+                  width={hero.image.width}
+                  height={hero.image.height}
+                  fetchPriority="high"
+                  className="ck-hero-img"
+                />
+                <figcaption className="ck-lab-readout">
+                  {readout.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                </figcaption>
+              </figure>
+            ) : (
+              <div className="ck-hero-art">
+                <img
+                  src={getAssetUrl(hero.image.src)}
+                  alt={hero.image.alt}
+                  width={hero.image.width}
+                  height={hero.image.height}
+                  fetchPriority="high"
+                  className="ck-hero-img"
+                />
+                <div className="ck-plan-card" aria-hidden="true">
+                  <p className="ck-plan-card-label">Your plan</p>
+                  <p className="ck-plan-card-title">8 daily tasks</p>
+                  <ul>
+                    <li>
+                      <CircleCheck /> Sit in silence
+                    </li>
+                    <li>
+                      <CircleCheck /> Pick your one thing
+                    </li>
+                    <li className="is-next">
+                      <span className="ck-dot" /> Do deep work
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
 
@@ -120,10 +191,10 @@ export default function ClinicKit({ page, onJoin, children }: BenefitKitProps) {
               <p className="ck-body">{signs.intro}</p>
             </div>
             <ul className="ck-signs-list">
-              {signs.items.map((item) => (
+              {signs.items.map((item, index) => (
                 <li key={item}>
                   <span className="ck-box" aria-hidden="true">
-                    <Check />
+                    {isVariant ? String(index + 1).padStart(2, '0') : <Check />}
                   </span>
                   {item}
                 </li>
@@ -140,7 +211,9 @@ export default function ClinicKit({ page, onJoin, children }: BenefitKitProps) {
             <ol className="ck-steps">
               {steps.items.map((step, index) => (
                 <li key={step.title} className="ck-step">
-                  <span className="ck-step-n">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="ck-step-n">
+                    {isVariant ? `Step ${String(index + 1).padStart(2, '0')}` : String(index + 1).padStart(2, '0')}
+                  </span>
                   <h3 className="ck-h3">{step.title}</h3>
                   <p className="ck-body">{step.body}</p>
                 </li>
@@ -158,15 +231,35 @@ export default function ClinicKit({ page, onJoin, children }: BenefitKitProps) {
             <ul className="ck-plans">
               {plans.items.map((plan) => (
                 <li key={plan.name} className="ck-plan">
-                  <span className="ck-tag">{plan.tag}</span>
-                  <h3 className="ck-h3">{plan.name}</h3>
-                  <p className="ck-body">{plan.body}</p>
-                  <p className="ck-price">
-                    <strong>$0</strong> / month
-                  </p>
-                  <a href={plan.href} className="ck-link">
-                    Read the passage <ArrowRight aria-hidden="true" />
-                  </a>
+                  {isVariant ? (
+                    <>
+                      <div className="ck-plan-head">
+                        <span className="ck-tag">{plan.tag}</span>
+                        <h3 className="ck-h3">{plan.name}</h3>
+                      </div>
+                      <p className="ck-body">{plan.body}</p>
+                      <div className="ck-plan-meta">
+                        <p className="ck-price">
+                          <strong>$0</strong> / month
+                        </p>
+                        <a href={plan.href} className="ck-link">
+                          Read the passage <ArrowRight aria-hidden="true" />
+                        </a>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="ck-tag">{plan.tag}</span>
+                      <h3 className="ck-h3">{plan.name}</h3>
+                      <p className="ck-body">{plan.body}</p>
+                      <p className="ck-price">
+                        <strong>$0</strong> / month
+                      </p>
+                      <a href={plan.href} className="ck-link">
+                        Read the passage <ArrowRight aria-hidden="true" />
+                      </a>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

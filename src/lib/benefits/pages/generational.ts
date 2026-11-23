@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'generational',
   topic: 'Generational',
   kit: 'ledger',
+  variant: 'heritage-treasury',
   query: 'breaking generational curses',
   title: 'Breaking generational curses, habit by habit | Moltology',
   description:
     'Start breaking generational curses with the everyday habits you learned. Pick what to keep, question an old pattern and practice a different response.',
   keywords: 'breaking generational curses, inherited habits, family patterns, daily choices, personal boundaries',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology offers daily practice, not therapy or financial advice.',
   shareImage: {

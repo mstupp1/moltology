@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'faith',
   topic: 'Faith',
   kit: 'retreat',
+  variant: 'moss-monastery',
   query: 'faith without religion',
   title: 'Faith without religion, on your own terms | Moltology',
   description:
     'Make room for faith without religion. Read a shared passage, choose a promise worth keeping and bring your questions to a quiet daily practice.',
   keywords: 'faith without religion, personal values, secular rituals, trust, shared practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/faith/share.jpg?v=2',

@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Charisma is mostly presence: calm, attention and real interest in people. Moltology is a free daily practice that trains all three, eight small tasks at a time.',
   keywords: 'how to be more charismatic, charisma, presence, confidence, social skills, how to be magnetic',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/charisma/share.jpg?v=2',

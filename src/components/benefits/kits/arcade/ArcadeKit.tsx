@@ -9,7 +9,17 @@ import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './arcade.css'
 
 /** The game studio lockup: the name in pixel type with a split colour shadow. */
-function ArcadeLockup() {
+function ArcadeLockup({ variant }: { variant?: string }) {
+  if (variant) {
+    return (
+      <span className="ar-lockup ar-lockup-variant">
+        <span className="ar-lockup-badge">
+          <BrandIcon aria-hidden="true" tone="inherit" className="ar-lockup-icon" />
+        </span>
+        <span className="ar-lockup-word">Moltology</span>
+      </span>
+    )
+  }
   return (
     <span className="ar-lockup">
       <BrandIcon aria-hidden="true" tone="inherit" className="ar-lockup-icon" />
@@ -26,7 +36,7 @@ export default function ArcadeKit({ page, onJoin, children }: BenefitKitProps) {
   return (
     <div className="ar">
       <BenefitHeader
-        lockup={<ArcadeLockup />}
+        lockup={<ArcadeLockup variant={page.variant} />}
         links={[
           { label: 'Build', href: '#build' },
           { label: 'Quests', href: '#quests' },

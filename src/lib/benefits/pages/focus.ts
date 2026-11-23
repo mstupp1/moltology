@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'focus',
   topic: 'Focus',
   kit: 'clinic',
+  variant: 'cognitive-studio',
   query: 'how to focus better',
   title: 'How to focus better: give one task a turn | Moltology',
   description:
     'Learn how to focus better with a simple work routine: pick one task, mute routine messages and set a stopping time. Read the plan and begin where you are.',
   keywords: 'how to focus better, deep work, distractions at work, single tasking, focus routine',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer:
     'Moltology does not diagnose or treat ADHD; see a qualified professional if focus problems are severe or disrupt your daily life.',

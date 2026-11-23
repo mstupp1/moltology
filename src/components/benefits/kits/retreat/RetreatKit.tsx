@@ -8,14 +8,21 @@ import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import '@/styles/editorial-fonts.css'
 import './retreat.css'
 
+const RETREAT_SUBS: Record<string, string> = {
+  'moss-monastery': 'Monastic daily',
+  'coastal-air': 'Open air practice',
+  'terracotta-courtyard': 'Quiet courtyard',
+  'amber-hearth': 'Listening & practice',
+}
+
 /** The retreat lockup: the name in an easy script over a small spaced line, emblem as a seal. */
-function RetreatLockup() {
+function RetreatLockup({ variant }: { variant?: string }) {
   return (
-    <span className="rt-lockup">
+    <span className={`rt-lockup${variant ? ' rt-lockup-serif' : ''}`}>
       <BrandIcon aria-hidden="true" tone="inherit" className="rt-lockup-icon" />
       <span className="rt-lockup-text">
         <span className="rt-lockup-word">Moltology</span>
-        <span className="rt-lockup-sub">Retreat &amp; practice</span>
+        <span className="rt-lockup-sub">{(variant && RETREAT_SUBS[variant]) ?? 'Retreat & practice'}</span>
       </span>
     </span>
   )
@@ -29,7 +36,7 @@ export default function RetreatKit({ page, onJoin, children }: BenefitKitProps) 
   return (
     <div className="rt">
       <BenefitHeader
-        lockup={<RetreatLockup />}
+        lockup={<RetreatLockup variant={page.variant} />}
         links={[
           { label: 'The practice', href: '#practice' },
           { label: 'Your first week', href: '#week' },

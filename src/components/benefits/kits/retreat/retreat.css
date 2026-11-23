@@ -615,3 +615,521 @@
     text-decoration-color: var(--rt-line);
   }
 }
+
+/* Variant: moss-monastery (faith) --------------------------------------- */
+
+[data-kit='retreat'][data-variant='moss-monastery'] {
+  --rt-linen: #f2f1eb;
+  --rt-sand: #e3e2d8;
+  --rt-ink: #1a2820;
+  --rt-body: #39483e;
+  --rt-muted: #56645a;
+  --rt-sage: #273e30;
+  --rt-clay: #8a6224;
+  --rt-line: #cfcec2;
+  --rt-moss: #1b2b22;
+  --rt-brass: #e2be7d;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .bh {
+  background: rgba(27, 43, 34, 0.96);
+  border-bottom-color: rgba(226, 190, 125, 0.25);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .bh-lockup,
+[data-kit='retreat'][data-variant='moss-monastery'] .bh-link {
+  color: #f2f1eb;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .bh-link:hover {
+  color: var(--rt-brass);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .bh-cta {
+  background: var(--rt-brass);
+  color: var(--rt-moss);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-lockup-serif .rt-lockup-word {
+  font-family: var(--rt-serif);
+  font-size: 1.55rem;
+  letter-spacing: 0.02em;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-lockup-icon {
+  color: var(--rt-brass);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(86svh, 800px);
+  padding: 72px 0;
+  background: var(--rt-moss);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-shade {
+  display: block;
+  background:
+    linear-gradient(92deg, rgba(19, 32, 24, 0.92) 0%, rgba(19, 32, 24, 0.64) 45%, rgba(19, 32, 24, 0.06) 72%),
+    linear-gradient(180deg, rgba(19, 32, 24, 0) 60%, rgba(19, 32, 24, 0.55) 100%);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-copy {
+  position: relative;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-copy > * {
+    max-width: 540px;
+  }
+
+  [data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-copy {
+    padding-left: 48px;
+  }
+
+  [data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-copy::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--rt-brass);
+  }
+}
+
+@media (max-width: 639px) {
+  [data-kit='retreat'][data-variant='moss-monastery'] .rt-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 44px;
+    background: var(--rt-moss);
+  }
+
+  [data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-img {
+    position: static;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 76% center;
+  }
+
+  [data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-shade {
+    display: none;
+  }
+
+  [data-kit='retreat'][data-variant='moss-monastery'] .rt-hero-copy {
+    padding: 28px 20px 0;
+  }
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-hero .rt-kicker {
+  color: var(--rt-brass);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-h1 {
+  color: #fffaf2;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-lede {
+  color: rgba(255, 250, 242, 0.92);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-hero .rt-btn {
+  background: var(--rt-brass);
+  color: var(--rt-moss);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-btn {
+  background: var(--rt-brass);
+  color: var(--rt-moss);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-btn-quiet {
+  color: #fffaf2;
+  text-decoration-color: rgba(255, 250, 242, 0.45);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-intention {
+  background: #22352a;
+  color: #f2f1eb;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-ornament {
+  background: var(--rt-brass);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-quote {
+  color: #ffffff;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-source {
+  color: #d6d3c4;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-source a {
+  color: var(--rt-brass);
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-day {
+  border-radius: 6px;
+  border-top: 3px solid var(--rt-sage);
+  text-align: left;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-day-n {
+  font-family: var(--rt-serif);
+  font-style: italic;
+  font-size: 1.45rem;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-btn-dark {
+  background: var(--rt-moss);
+  color: #f2f1eb;
+}
+
+[data-kit='retreat'][data-variant='moss-monastery'] .rt-btn-dark:hover {
+  background: var(--rt-clay);
+  color: #ffffff;
+}
+
+/* Variant: coastal-air (freedom) ---------------------------------------- */
+
+[data-kit='retreat'][data-variant='coastal-air'] {
+  --rt-linen: #f4f7f9;
+  --rt-sand: #e3ecf1;
+  --rt-ink: #153042;
+  --rt-body: #324b5c;
+  --rt-muted: #50697a;
+  --rt-sage: #1f4f6d;
+  --rt-clay: #944d2e;
+  --rt-line: #cad8e0;
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .bh {
+  background: rgba(244, 247, 249, 0.94);
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-lockup-serif .rt-lockup-word {
+  font-family: var(--rt-serif);
+  font-size: 1.55rem;
+  letter-spacing: 0.03em;
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(86svh, 800px);
+  padding: 72px 0;
+  background: var(--rt-linen);
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-hero-shade {
+  display: block;
+  background: linear-gradient(92deg, rgba(244, 247, 249, 0.97) 0%, rgba(244, 247, 249, 0.88) 43%, rgba(244, 247, 249, 0) 68%);
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-hero-copy {
+  position: relative;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'][data-variant='coastal-air'] .rt-hero-copy > * {
+    max-width: 530px;
+  }
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-kicker {
+  color: var(--rt-sage);
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-h1 {
+  color: var(--rt-ink);
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-lede {
+  color: var(--rt-body);
+}
+
+@media (max-width: 639px) {
+  [data-kit='retreat'][data-variant='coastal-air'] .rt-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 44px;
+    background: var(--rt-linen);
+  }
+
+  [data-kit='retreat'][data-variant='coastal-air'] .rt-hero-img {
+    position: static;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 78% center;
+  }
+
+  [data-kit='retreat'][data-variant='coastal-air'] .rt-hero-shade {
+    display: none;
+  }
+
+  [data-kit='retreat'][data-variant='coastal-air'] .rt-hero-copy {
+    padding: 28px 20px 0;
+  }
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-btn {
+  background: var(--rt-ink);
+  color: #ffffff;
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-btn:hover {
+  background: var(--rt-sage);
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-btn-quiet {
+  color: var(--rt-sage);
+  text-decoration-color: var(--rt-line);
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-ornament {
+  width: 64px;
+  height: 2px;
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-day {
+  border-radius: 0;
+  border: 0;
+  border-top: 2px solid var(--rt-sage);
+  background: transparent;
+  padding: 20px 8px 16px;
+  text-align: left;
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .rt-day-n {
+  font-family: var(--rt-serif);
+  font-size: 1.55rem;
+}
+
+[data-kit='retreat'][data-variant='coastal-air'] .bf-item {
+  border-bottom-color: var(--rt-line);
+}
+
+/* Variant: terracotta-courtyard (emotional) ---------------------------- */
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] {
+  --rt-linen: #faf2eb;
+  --rt-sand: #efe0d3;
+  --rt-ink: #2b1711;
+  --rt-body: #4d3127;
+  --rt-muted: #6c4d42;
+  --rt-sage: #7a3c28;
+  --rt-clay: #9e3d24;
+  --rt-line: #dec7b6;
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .bh {
+  background: rgba(250, 242, 235, 0.94);
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-lockup-serif .rt-lockup-word {
+  font-family: var(--rt-serif);
+  font-size: 1.55rem;
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-hero-shade {
+  background:
+    linear-gradient(90deg, rgba(34, 15, 10, 0.78) 0%, rgba(34, 15, 10, 0.16) 64%),
+    linear-gradient(180deg, rgba(34, 15, 10, 0.6) 0%, rgba(34, 15, 10, 0.18) 55%, rgba(34, 15, 10, 0.75) 100%);
+}
+
+@media (min-width: 640px) {
+  [data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-hero {
+    align-items: flex-start;
+    min-height: min(86svh, 800px);
+  }
+
+  [data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-hero-copy {
+    padding-top: 88px;
+  }
+
+  [data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-hero-copy > * {
+    max-width: 560px;
+  }
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-ornament {
+  width: 48px;
+  height: 2px;
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-rhythm {
+  display: grid;
+  gap: 0;
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-rhythm li {
+  padding: 24px 0;
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid var(--rt-line);
+  background: transparent;
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-rhythm li:first-child {
+  border-top: 2px solid var(--rt-clay);
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-day {
+  border-radius: 0;
+  border-top: 4px solid var(--rt-clay);
+  background: #ffffff;
+}
+
+[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-carry-img {
+  border-radius: 22px;
+}
+
+/* Variant: amber-hearth (empathy) -------------------------------------- */
+
+[data-kit='retreat'][data-variant='amber-hearth'] {
+  --rt-linen: #f9f5eb;
+  --rt-sand: #efe6d2;
+  --rt-ink: #292014;
+  --rt-body: #4a3d2a;
+  --rt-muted: #695944;
+  --rt-sage: #505838;
+  --rt-clay: #945210;
+  --rt-line: #dfd2ba;
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .bh {
+  background: rgba(249, 245, 235, 0.94);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(86svh, 800px);
+  padding: 72px 0;
+  background: var(--rt-linen);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% center;
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-hero-shade {
+  display: block;
+  background: linear-gradient(94deg, rgba(249, 245, 235, 0.97) 0%, rgba(249, 245, 235, 0.87) 43%, rgba(249, 245, 235, 0) 68%);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-hero-copy {
+  position: relative;
+  padding: 0 20px;
+}
+
+@media (min-width: 900px) {
+  [data-kit='retreat'][data-variant='amber-hearth'] .rt-hero-copy > * {
+    max-width: 540px;
+  }
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-kicker {
+  color: var(--rt-clay);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-h1 {
+  color: var(--rt-ink);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-lede {
+  color: var(--rt-body);
+}
+
+@media (max-width: 639px) {
+  [data-kit='retreat'][data-variant='amber-hearth'] .rt-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 44px;
+    background: var(--rt-linen);
+  }
+
+  [data-kit='retreat'][data-variant='amber-hearth'] .rt-hero-img {
+    position: static;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-position: 74% center;
+  }
+
+  [data-kit='retreat'][data-variant='amber-hearth'] .rt-hero-shade {
+    display: none;
+  }
+
+  [data-kit='retreat'][data-variant='amber-hearth'] .rt-hero-copy {
+    padding: 28px 20px 0;
+  }
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-btn {
+  background: var(--rt-clay);
+  color: #ffffff;
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-btn:hover {
+  background: var(--rt-ink);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-btn-quiet {
+  color: var(--rt-ink);
+  text-decoration-color: var(--rt-line);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-intention {
+  background: var(--rt-sand);
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-day {
+  border-radius: 0;
+  border: 0;
+  border-top: 2px solid var(--rt-clay);
+  background: transparent;
+  padding: 20px 8px 16px;
+  text-align: left;
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-day-n {
+  font-family: var(--rt-serif);
+  font-style: italic;
+  font-size: 1.45rem;
+}
+
+[data-kit='retreat'][data-variant='amber-hearth'] .rt-carry-list li {
+  padding-left: 16px;
+  border-left: 2px solid var(--rt-clay);
+}

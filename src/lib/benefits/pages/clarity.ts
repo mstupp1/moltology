@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'clarity',
   topic: 'Clarity',
   kit: 'clinic',
+  variant: 'botanical-lab',
   query: 'brain fog',
   title: 'Brain fog days: begin before the inbox | Moltology',
   description:
     'On brain fog days, start with less to open. Moltology offers a quiet morning practice: sit before your inbox, look back at yesterday and write one next step.',
   keywords: 'brain fog, quiet morning, mental clarity, morning routine, sit in silence',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer:
     'Brain fog can have medical causes; see a doctor about persistent or worrying symptoms, and seek urgent help for sudden confusion.',

@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'resilience',
   topic: 'Resilience',
   kit: 'locker',
+  variant: 'forged-amber',
   query: 'mental resilience',
   title: 'Mental resilience. Recovery belongs here | Moltology',
   description:
     'Make room for mental resilience in the training plan. Read about the soft-shell window, work through eight daily tasks, and close the day with Moltology.',
   keywords: 'mental resilience, setbacks, recovery, boundaries, daily habits',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology is a habit practice and community, not therapy or crisis care.',
   shareImage: {

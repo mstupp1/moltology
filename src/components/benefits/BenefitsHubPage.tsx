@@ -42,9 +42,9 @@ export function BenefitsHubPage() {
                   params={{ slug: item.slug }}
                   className="group flex h-full flex-col overflow-hidden rounded-card border border-line-subtle bg-surface-1 hover:border-line-strong transition-colors"
                 >
-                  <span className="benefit-swatch" data-kit={item.kit} aria-hidden="true">
+                  <span className="benefit-swatch" data-kit={item.kit} data-variant={item.variant} aria-hidden="true">
                     <img
-                      src={getAssetUrl(benefitHeroSrc(item.slug))}
+                      src={getAssetUrl(benefitHeroSrc(item.slug, item.heroSrc))}
                       alt=""
                       width={640}
                       height={400}

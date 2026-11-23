@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'stature',
   topic: 'Stature',
   kit: 'atelier',
+  variant: 'architectural-stone',
   query: 'how to have presence',
   title: 'How to have presence: take your time | Moltology',
   description:
     'Explore how to have presence through everyday habits. Read The Final Attributes, put the phone aside and practice listening before you answer.',
   keywords: 'how to have presence, personal presence, comfortable posture, speaking pace, The Final Attributes',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/stature/share.jpg?v=2',

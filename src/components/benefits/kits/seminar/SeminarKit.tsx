@@ -8,8 +8,30 @@ import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './seminar.css'
 
+const SEMINAR_LABELS: Record<string, string> = {
+  publisher: 'Press',
+  'keynote-stage': 'Keynote',
+  'cobalt-summit': 'Summit',
+  'olive-monograph': 'Monograph',
+  'midnight-folio': 'Folio',
+  'plum-journal': 'Journal',
+}
+
 /** The seminar lockup: a small italic "the", the name in tall capitals and "method" in gold. */
-function SeminarLockup() {
+function SeminarLockup({ variant }: { variant?: string }) {
+  if (variant) {
+    return (
+      <span className="sm-lockup sm-lockup-press">
+        <span className="sm-lockup-seal">
+          <BrandIcon aria-hidden="true" tone="inherit" className="sm-lockup-icon" />
+        </span>
+        <span className="sm-lockup-text">
+          <span className="sm-lockup-word">Moltology</span>
+          <span className="sm-lockup-method">{SEMINAR_LABELS[variant] ?? 'Press'}</span>
+        </span>
+      </span>
+    )
+  }
   return (
     <span className="sm-lockup">
       <span className="sm-lockup-seal">
@@ -28,11 +50,12 @@ function SeminarLockup() {
 export default function SeminarKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'seminar') return null
   const { hero, promise, chapters, passage, agenda } = page.content
+  const isVariant = Boolean(page.variant)
 
   return (
     <div className="sm">
       <BenefitHeader
-        lockup={<SeminarLockup />}
+        lockup={<SeminarLockup variant={page.variant} />}
         links={[
           { label: 'The book', href: '#chapters' },
           { label: 'Agenda', href: '#agenda' },
@@ -102,7 +125,9 @@ export default function SeminarKit({ page, onJoin, children }: BenefitKitProps) 
             <ol className="sm-toc">
               {chapters.items.map((chapter, index) => (
                 <li key={chapter.title} className="sm-toc-item">
-                  <span className="sm-toc-n">Chapter {index + 1}</span>
+                  <span className="sm-toc-n">
+                    {isVariant ? `Chapter ${String(index + 1).padStart(2, '0')}` : `Chapter ${index + 1}`}
+                  </span>
                   <h3 className="sm-h3">{chapter.title}</h3>
                   <p className="sm-body">{chapter.body}</p>
                 </li>

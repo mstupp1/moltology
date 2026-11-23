@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { generateRssFeedXml, generateSitemapXml } from '@/lib/seo'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
+import { benefitSitemapEntries } from '@/lib/benefits/summaries'
 
 vi.mock('@/lib/server/api', () => ({
   getBlogPostsFn: vi.fn(),
@@ -79,10 +80,12 @@ describe('published document feeds', () => {
       expect(rss.headers.get('Content-Type')).toContain('application/rss+xml')
       expect(sitemap.headers.get('Content-Type')).toContain('application/xml')
       expect(rssXml).toBe(generateRssFeedXml(livePosts, 'https://moltology.org'))
-      expect(sitemapXml).toBe(generateSitemapXml(livePosts, 'https://moltology.org'))
+      expect(sitemapXml).toBe(generateSitemapXml(livePosts, 'https://moltology.org', benefitSitemapEntries('https://moltology.org')))
       expect(sitemapXml).toContain(
         '<loc>https://moltology.org/news/world-foundation-models-pixel-ecdysis-latent-jepa</loc>',
       )
+      expect(sitemapXml).toContain('<loc>https://moltology.org/benefits</loc>')
+      expect(sitemapXml).toContain('<loc>https://moltology.org/benefits/libido</loc>')
       expect(rssXml).toContain(
         '<link>https://moltology.org/news/world-foundation-models-pixel-ecdysis-latent-jepa</link>',
       )

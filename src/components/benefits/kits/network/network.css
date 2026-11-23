@@ -578,3 +578,221 @@
   padding: 0 22px 20px;
   line-height: 1.6;
 }
+
+/* Variant: coastal-club (social) ---------------------------------------- */
+
+[data-kit='network'][data-variant='coastal-club'] {
+  --nw-white: #f8fbfc;
+  --nw-lav: #e9f2f4;
+  --nw-ink: #0d2c36;
+  --nw-body: #324f5a;
+  --nw-muted: #506d78;
+  --nw-violet: #0d6a73;
+  --nw-pink: #c94d28;
+  --nw-orange: #e07a38;
+  --nw-line: #cde0e4;
+  --nw-grad: #0d6a73;
+  --nw-round: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+[data-kit='network'][data-variant='coastal-club'] .bh {
+  background: rgba(248, 251, 252, 0.94);
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw {
+  font-weight: 500;
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-hero {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(13, 106, 115, 0.1), transparent 45%),
+    var(--nw-white);
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-phone {
+  transform: none;
+  width: min(440px, 100%);
+  padding: 0;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid var(--nw-line);
+  box-shadow: 0 24px 60px -32px rgba(13, 44, 54, 0.25);
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-phone-screen {
+  border-radius: 16px;
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-photo {
+  margin: 0;
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-photo-img {
+  border-radius: 0;
+  aspect-ratio: 16 / 10;
+}
+
+@media (min-width: 900px) {
+  [data-kit='network'][data-variant='coastal-club'] .nw-hero-grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  [data-kit='network'][data-variant='coastal-club'] .nw-phone {
+    order: -1;
+  }
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-btn {
+  background: var(--nw-violet);
+  box-shadow: none;
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-chip {
+  background: #dff0f3;
+  color: #0b565e;
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-post-tag {
+  background: #fdeae3;
+  color: #a83c1c;
+}
+
+@media (min-width: 720px) {
+  [data-kit='network'][data-variant='coastal-club'] .nw-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-card {
+  border-radius: 16px;
+  border: 1px solid var(--nw-line);
+  border-top: 3px solid var(--nw-violet);
+}
+
+[data-kit='network'][data-variant='coastal-club'] .nw-card.is-0,
+[data-kit='network'][data-variant='coastal-club'] .nw-card.is-1,
+[data-kit='network'][data-variant='coastal-club'] .nw-card.is-2,
+[data-kit='network'][data-variant='coastal-club'] .nw-card.is-3 {
+  background: #ffffff;
+}
+
+/* Variant: editorial-salon (culture) ------------------------------------ */
+
+[data-kit='network'][data-variant='editorial-salon'] {
+  --nw-white: #f8f7fb;
+  --nw-lav: #eeeaf7;
+  --nw-ink: #271c45;
+  --nw-body: #473e61;
+  --nw-muted: #62587c;
+  --nw-violet: #432f7a;
+  --nw-pink: #8f5608;
+  --nw-orange: #b07419;
+  --nw-line: #dad4ea;
+  --nw-grad: #271c45;
+  --nw-round: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --nw-serif: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .bh {
+  background: rgba(248, 247, 251, 0.94);
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw {
+  font-weight: 400;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-lockup-editorial-salon .nw-lockup-word {
+  font-family: var(--nw-serif);
+  font-weight: 400;
+  font-size: 1.5rem;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-h1,
+[data-kit='network'][data-variant='editorial-salon'] .nw-h2,
+[data-kit='network'][data-variant='editorial-salon'] .bf-title {
+  font-family: var(--nw-serif);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-hero {
+  background: var(--nw-white);
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-phone {
+  transform: none;
+  width: min(430px, 100%);
+  padding: 0;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid var(--nw-ink);
+  box-shadow: 10px 10px 0 var(--nw-lav);
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-phone-screen {
+  border-radius: 0;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-photo {
+  margin: 0 16px;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-photo-img {
+  border-radius: 2px;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-btn,
+[data-kit='network'][data-variant='editorial-salon'] .nw-btn-soft {
+  border-radius: 4px;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-btn {
+  background: var(--nw-ink);
+  box-shadow: none;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-card {
+  border-radius: 0;
+  border: 0;
+  border-top: 2px solid var(--nw-ink);
+  padding: 24px 0 8px;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-card:hover {
+  transform: none;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-0,
+[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-1,
+[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-2,
+[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-3 {
+  background: transparent;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-tint {
+  background: var(--nw-ink);
+  color: #e6e1f2;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-tint .nw-h2,
+[data-kit='network'][data-variant='editorial-salon'] .nw-tint .nw-text-link {
+  color: #ffffff;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-tint .nw-body {
+  color: #dcd5ee;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-room {
+  border-radius: 14px;
+  color: var(--nw-ink);
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-room-body {
+  color: #4f4668;
+}
+
+[data-kit='network'][data-variant='editorial-salon'] .nw-post-tag {
+  background: #f7eedc;
+  color: #7a4605;
+}

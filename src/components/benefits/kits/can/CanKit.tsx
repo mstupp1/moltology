@@ -8,10 +8,16 @@ import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './can.css'
 
+const CAN_STAMPS: Record<string, [string, string]> = {
+  'cobalt-shift': ['CLOSE', 'THE DAY'],
+  'solar-chili': ['EXTRA', 'BITE'],
+  'citrus-burst': ['FULL', 'FLAVOR'],
+}
+
 /** The drinks-brand lockup: the word in fat caps on a tilted sticker. */
-function CanLockup() {
+function CanLockup({ variant }: { variant?: string }) {
   return (
-    <span className="cn-lockup">
+    <span className={`cn-lockup${variant ? ' cn-lockup-square' : ''}`}>
       <BrandIcon aria-hidden="true" tone="inherit" className="cn-lockup-icon" />
       <span className="cn-lockup-word">Moltology</span>
     </span>
@@ -23,11 +29,13 @@ export default function CanKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'can') return null
   const { hero, marquee, flavors, label, crash, story } = page.content
   const marqueeRun = [...marquee, ...marquee]
+  const isVariant = Boolean(page.variant)
+  const stamp = page.variant ? CAN_STAMPS[page.variant] : undefined
 
   return (
     <div className="cn">
       <BenefitHeader
-        lockup={<CanLockup />}
+        lockup={<CanLockup variant={page.variant} />}
         links={[
           { label: 'Flavors', href: '#flavors' },
           { label: 'Facts', href: '#facts' },
@@ -58,10 +66,17 @@ export default function CanKit({ page, onJoin, children }: BenefitKitProps) {
               </div>
             </div>
             <div className="cn-hero-art">
-              <span className="cn-burst" aria-hidden="true">
-                <span>0 g</span>
-                <span>sugar</span>
-              </span>
+              {stamp ? (
+                <span className="cn-stamp" aria-hidden="true">
+                  <span>{stamp[0]}</span>
+                  <span>{stamp[1]}</span>
+                </span>
+              ) : (
+                <span className="cn-burst" aria-hidden="true">
+                  <span>0 g</span>
+                  <span>sugar</span>
+                </span>
+              )}
               <img
                 src={getAssetUrl(hero.image.src)}
                 alt={hero.image.alt}
@@ -94,7 +109,7 @@ export default function CanKit({ page, onJoin, children }: BenefitKitProps) {
             <ul className="cn-flavors">
               {flavors.items.map((flavor, index) => (
                 <li key={flavor.name} className={`cn-flavor is-${flavor.tone}`}>
-                  <span className="cn-flavor-n">No. {index + 1}</span>
+                  <span className="cn-flavor-n">{isVariant ? String(index + 1).padStart(2, '0') : `No. ${index + 1}`}</span>
                   <h3 className="cn-h3">{flavor.name}</h3>
                   <p className="cn-flavor-note">{flavor.note}</p>
                 </li>

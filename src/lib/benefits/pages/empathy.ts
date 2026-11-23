@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'empathy',
   topic: 'Empathy',
   kit: 'retreat',
+  variant: 'amber-hearth',
   query: 'how to be more empathetic',
   title: 'How to be more empathetic: begin by listening | Moltology',
   description:
     'Learn how to be more empathetic through small acts of attention. Hear the whole story, ask before offering advice and make time to help a member.',
   keywords: 'how to be more empathetic, listening, understanding others, thoughtful replies, helping others',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/empathy/share.jpg?v=2',

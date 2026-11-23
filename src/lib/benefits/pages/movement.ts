@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'movement',
   topic: 'Movement',
   kit: 'locker',
+  variant: 'gold-sprint',
   query: 'keep moving forward',
   title: 'Keep moving forward when the day stalls | Moltology',
   description:
     'How to keep moving forward when a day stalls: pick the next action, open the file and start. Eight daily tasks, from first light to close, with no workouts.',
   keywords: 'keep moving forward, how to get unstuck, getting started, procrastination, next action',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/movement/share.jpg?v=2',

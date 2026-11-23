@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'emotional',
   topic: 'Emotional',
   kit: 'retreat',
+  variant: 'terracotta-courtyard',
   query: 'emotional regulation',
   title: 'Emotional regulation: let the reply wait | Moltology',
   description:
     'Make time for emotional regulation in an ordinary day. Pause before a reply, name what happened and choose one next step in a quiet daily practice.',
   keywords: 'emotional regulation, pause before replying, naming feelings, daily routine, quiet practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology is not therapy; speak with a qualified professional about ongoing distress.',
   shareImage: {

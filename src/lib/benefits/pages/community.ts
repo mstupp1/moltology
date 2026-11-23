@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Find your people without the feed. Moltology is a free online community for self improvement, built around one shared daily practice and a forum that helps.',
   keywords: 'online community for self improvement, self improvement community, accountability group, find your people, forum',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/community/share.jpg?v=2',

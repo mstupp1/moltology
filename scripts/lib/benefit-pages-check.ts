@@ -88,7 +88,7 @@ export function collectText(value: unknown, out: string[] = []): string[] {
     for (const item of value) collectText(item, out)
   } else if (value && typeof value === 'object') {
     for (const [key, item] of Object.entries(value)) {
-      if (key === 'src' || key === 'href' || key === 'slug' || key === 'kit' || key === 'tone' || key === 'screenshot') continue
+      if (key === 'src' || key === 'heroSrc' || key === 'href' || key === 'slug' || key === 'kit' || key === 'variant' || key === 'tone' || key === 'screenshot') continue
       collectText(item, out)
     }
   }
@@ -130,6 +130,9 @@ export function checkBenefitPages(
     }
     for (const key of ['topic', 'kit', 'indexed', 'updated'] as const) {
       if (summary[key] !== page[key]) add(page.slug, 'summary-drift', `summaries.ts ${key} is "${summary[key]}" but the page says "${page[key]}"`)
+    }
+    if ((summary.variant ?? undefined) !== (page.variant ?? undefined)) {
+      add(page.slug, 'sync', `summaries.ts variant is "${summary.variant ?? ''}" but the page says "${page.variant ?? ''}"`)
     }
   }
   for (const page of pages) {

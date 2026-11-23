@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'culture',
   topic: 'Culture',
   kit: 'network',
+  variant: 'editorial-salon',
   query: 'internet culture',
   title: 'Internet culture, with room for you | Moltology',
   description:
     'Internet culture starts with what you share. Bring your odd question, favorite reference, or desk disaster to General Discussion on Moltology.',
   keywords: 'internet culture, online forums, community etiquette, internet slang, shared jokes, General Discussion',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/culture/share.jpg?v=2',

@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'energy',
   topic: 'Energy',
   kit: 'can',
+  variant: 'cobalt-shift',
   query: 'how to have more energy',
   title: 'How to have more energy after hours | Moltology',
   description:
     'Looking up how to have more energy? Put the midnight inbox down. Close the day, shut the laptop and leave room for sleep.',
   keywords: 'how to have more energy, evening routine, bedtime habits, work shutdown, sleep routine',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/energy/share.jpg?v=2',

@@ -11,9 +11,9 @@ import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './network.css'
 
 /** The social app lockup: the emblem on a gradient app tile and a rounded lowercase name. */
-function NetworkLockup() {
+function NetworkLockup({ variant }: { variant?: string }) {
   return (
-    <span className="nw-lockup">
+    <span className={`nw-lockup${variant ? ` nw-lockup-${variant}` : ''}`}>
       <span className="nw-lockup-tile">
         <BrandIcon aria-hidden="true" tone="inherit" className="nw-lockup-icon" />
       </span>
@@ -36,7 +36,7 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
   return (
     <div className="nw">
       <BenefitHeader
-        lockup={<NetworkLockup />}
+        lockup={<NetworkLockup variant={page.variant} />}
         links={[
           { label: 'Features', href: '#features' },
           { label: 'Boards', href: '#boards' },

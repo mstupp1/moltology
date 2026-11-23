@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'adaptive',
   topic: 'Adaptive',
   kit: 'platform',
+  variant: 'crimson-grid',
   query: 'how to be more adaptable',
   title: 'How to be more adaptable when plans change | Moltology',
   description:
     'Ask how to be more adaptable when the old plan stops fitting. Name what changed, drop one stale routine, and choose your next action with Moltology.',
   keywords: 'how to be more adaptable, adaptability, changing plans, flexible routines, letting go',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/adaptive/share.jpg?v=2',

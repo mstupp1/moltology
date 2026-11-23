@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'beauty',
   topic: 'Beauty',
   kit: 'atelier',
+  variant: 'porcelain-lacquer',
   query: 'inner beauty',
   title: 'Inner beauty, with attention to detail | Moltology',
   description:
     'Make room for inner beauty in your daily routine. Meet your Moltology character, then practice listening, keeping promises and helping someone.',
   keywords: 'inner beauty, everyday kindness, listening habits, personal character, beauty routine',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/beauty/share.jpg?v=2',

@@ -50,7 +50,10 @@ quiz as the fallback. The costume is the parody; the reveal is the offer.
    stiff, hedged and out of costume. Use high effort for copy and include a voice section with
    good and bad headlines and the kit's best page as the benchmark:
    [references/codex-copy-brief.md](references/codex-copy-brief.md) is that brief. Then hand the batch to a fresh reviewer agent before committing.
-4. **List it** in `summaries.ts` (same slug, topic, kit, `indexed: false`, `updated`).
+4. **List it** in `summaries.ts` (same slug, topic, kit, optional `variant`, `indexed: false`, `updated`).
+   When adding a new page inside an existing kit, give it a distinct `variant` string on both
+   the page file and `summaries.ts` (while leaving the 10 original pages without a `variant` so
+   they stay untouched) and add its swatch in `src/components/benefits/benefits.css`.
 5. **Make images** (below), then run `npm run benefits:check` and `npm run benefits:shots`.
 6. Keep `indexed: false` until Myles has seen the page on a preview. Turning it on adds it to the
    sitemap and the hub; add a footer link to `/benefits` once the first page is indexed.
@@ -72,12 +75,26 @@ Design calls stay with Claude; filling pages inside a finished kit can go to Cod
    variables at the top. Raw colours, extra fonts and uppercase are fine inside the costume; the
    reveal, footer and auth modal keep the normal tokens. Self-host any new font in `public/fonts/`
    (OFL, latin woff2, about 25 KB) and declare it in `components/benefits/benefits.css`.
-5. Register it in `BenefitPageShell.tsx` (`KITS`), `summaries.ts` (`BENEFIT_KITS`) and the hub
-   swatch in `benefits.css`.
-6. End the kit's `<main>` with the FAQ (`BenefitFaq`) and then `{children}` (the reveal). The last
+5. **Style kit variants (`data-variant`)** under `[data-kit='<kit>'][data-variant='<variant>']` in
+   `<kit>.css` (never via Tailwind utilities in TSX, so `ui:check` stays green). Respect the image's
+   composition: use full-bleed / full-viewport heroes (`position: absolute; inset: 0` with `min-height`)
+   and edge-to-edge 50/50 split bleeds (`calc(-1 * max(20px, (100vw - (<wrap> - 40px)) / 2))` plus
+   `overflow-x: clip` on the kit wrapper) for `1600x1000` scenes and studio bleeds with negative
+   space; match the scrim background color on full-bleed text overlays (`rgba` over dark or cream)
+   so copy stays legible at desktop and tablet; vary framing geometry (diagonal clips, tall arches,
+   stadium pills, alpha-masked edge fades) instead of repeating boxed squares; keep cardless hairline
+   section rows where a costume suits it; keep the mobile/tablet primary CTA above the fold (`order: 1`
+   copy on `< 900px`) and preserve WCAG AA contrast on every visible element and `.sr-only` text.
+   For an alternate hero image on a variant without disturbing `hero.jpg`, set `heroSrc` on its
+   entry in `summaries.ts` (for `/benefits` thumbnails) as well as `hero.image.src` in the page file.
+6. Register it in `BenefitPageShell.tsx` (`KITS`), `summaries.ts` (`BENEFIT_KITS`) and the hub
+   swatch in `benefits.css` (adding `.benefit-swatch[data-kit=...][data-variant=...]` per variant).
+7. End the kit's `<main>` with the FAQ (`BenefitFaq`) and then `{children}` (the reveal). The last
    section's ground sits under the torn shed edge, so it should contrast with the abyss. Dark kits
-   get the edge rim in `benefits.css` (`.benefit-page[data-kit=…] .benefit-shed-edge`).
-7. Things the review caught on the first ten kits:
+   and dark-bottom variants get the edge rim in `benefits.css`
+   (`.benefit-page[data-kit=…] .benefit-shed-edge`), and light variants of dark kits exclude it via
+   `:not([data-variant='...'])`.
+8. Things the review caught on the first ten kits:
    - Nothing that looks clickable may be dead: no fake chart range tabs, empty checkboxes or a
      prompt box that goes nowhere. Make it a real link or drop the affordance.
    - Grids fill every row at 390, 768 and 1440 (8 items: 2 or 4 columns; 6 items: 2 or 3).

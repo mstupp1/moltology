@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'famous',
   topic: 'Famous',
   kit: 'atelier',
+  variant: 'noir',
   query: 'how to stand out',
   title: 'How to stand out: put your name to it | Moltology',
   description:
     'Thinking about how to stand out? Edit your Moltology profile, share a useful example and take care with the work you put your name beside.',
   keywords: 'how to stand out, public profile, personal style online, useful contributions, community habits',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/famous/share.jpg?v=2',
@@ -67,8 +68,8 @@ const page: BenefitPage = {
       sub: 'The bio can wait until you have finished the thing. Make the draft, share the useful detail and credit the person who helped. Moltology gives your public profile a place beside your activity. Decide what you want to put there.',
       cta: 'Join and make an introduction',
       image: {
-        src: '/images/benefits/famous/hero.jpg?v=2',
-        alt: 'A cobalt-blue crab in a sculpted white coat against a dark set with hard fashion-editorial lighting',
+        src: '/images/benefits/famous/hero-alt.jpg',
+        alt: 'Cora Pearl, a pearl-white lobster wearing a gold creator crown, leaning against a matte black pedestal in a dark fashion studio',
         width: 1024,
         height: 1280,
       },

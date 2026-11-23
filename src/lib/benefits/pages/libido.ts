@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Low drive often follows bad days, not bad genes. Take a free three minute assessment and get eight small daily tasks that bring your focus and energy back.',
   keywords: 'low libido, low drive, how to get your drive back, low motivation, daily routine, focus plan',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer:
     'Moltology is a free practice and community, not a medical service. If a change in libido is sudden or worrying, talk to a doctor.',

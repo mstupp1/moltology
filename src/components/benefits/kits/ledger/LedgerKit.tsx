@@ -8,15 +8,22 @@ import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './ledger.css'
 
+const LEDGER_PILLS: Record<string, string> = {
+  'swiss-private': 'private',
+  'heritage-treasury': 'treasury',
+  'executive-navy': 'brief',
+  'amber-desk': 'ledger',
+}
+
 /** The fintech lockup: a lowercase serif wordmark and a small product pill. */
-function LedgerLockup() {
+function LedgerLockup({ variant }: { variant?: string }) {
   return (
     <span className="lg-lockup">
       <span className="lg-lockup-tile">
         <BrandIcon aria-hidden="true" tone="inherit" className="lg-lockup-icon" />
       </span>
       <span className="lg-lockup-word">moltology</span>
-      <span className="lg-lockup-pill">invest</span>
+      <span className="lg-lockup-pill">{(variant && LEDGER_PILLS[variant]) ?? 'invest'}</span>
     </span>
   )
 }
@@ -40,7 +47,7 @@ export default function LedgerKit({ page, onJoin, children }: BenefitKitProps) {
   return (
     <div className="lg">
       <BenefitHeader
-        lockup={<LedgerLockup />}
+        lockup={<LedgerLockup variant={page.variant} />}
         links={[
           { label: 'How it compounds', href: '#compound' },
           { label: 'Features', href: '#features' },

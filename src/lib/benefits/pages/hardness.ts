@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'hardness',
   topic: 'Hardness',
   kit: 'clinic',
+  variant: 'graphite-protocol',
   query: 'how to toughen up',
   title: 'How to toughen up and keep your kindness | Moltology',
   description:
     'Wondering how to toughen up? Start with a boundary, a short reading and a daily checklist. Practice saying what you mean before typing another apology.',
   keywords: 'how to toughen up, thick skin, emotional toughness, setting boundaries, handling criticism',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer:
     'Moltology is a free practice and community, not mental health care. If distress is getting in the way of daily life, talk to a professional.',

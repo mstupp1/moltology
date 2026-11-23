@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'financial',
   topic: 'Financial',
   kit: 'ledger',
+  variant: 'swiss-private',
   query: 'financial discipline',
   title: 'Financial discipline. Read the terms. | Moltology',
   description:
     'Practice financial discipline with a pause before checkout. Read the currency rules, pick a priority and put your attention into the daily tasks.',
   keywords: 'financial discipline, spending habits, earned currency, daily priorities, purchase decisions',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology is a daily practice, not financial advice.',
   shareImage: {

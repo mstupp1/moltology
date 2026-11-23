@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'grip',
   topic: 'Grip',
   kit: 'locker',
+  variant: 'cobalt-iron',
   query: 'how to get a grip on your life',
   title: 'How to get a grip on your life: pick one thing | Moltology',
   description:
     'How to get a grip on your life starts on the training card: choose one task, start it, and review the work with the eight daily tasks in Moltology.',
   keywords: 'how to get a grip on your life, priorities, follow-through, choosing one task',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/grip/share.jpg?v=2',
@@ -67,8 +68,8 @@ const page: BenefitPage = {
       sub: 'Twelve tabs. Three urgent lists. Start with one thing you can actually finish. Choose it, work on it, log the day. A new planner is optional.',
       cta: 'Make your first commitment',
       image: {
-        src: '/images/benefits/grip/hero.jpg?v=2',
-        alt: 'A crab gripping a plain notebook in a wide sportswear campaign shot with dark gym lighting',
+        src: '/images/benefits/grip/hero-alt.jpg',
+        alt: 'Maris Slate, a cobalt-blue crab with chalked claws, hanging from a steel pull-up bar on the right side of a dark concrete gym',
         width: 1600,
         height: 1000,
       },

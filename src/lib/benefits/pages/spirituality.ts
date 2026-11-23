@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'A daily spiritual practice without the retreat price: a quiet morning, one honest look at yesterday and a clear close to each day. Free to join, ready today.',
   keywords: 'daily spiritual practice, spiritual routine, morning silence, evening reflection, mindfulness practice, spirituality without religion',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/spirituality/share.jpg',

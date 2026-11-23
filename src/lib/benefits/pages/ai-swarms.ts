@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'ai-swarms',
   topic: 'AI swarms',
   kit: 'platform',
+  variant: 'cyan-console',
   query: 'multi agent ai',
   title: 'Multi agent AI: start with a clear brief | Moltology',
   description:
     'Thinking about multi agent AI? Write the brief, question the answer, and choose the next step with the Oracle AI guide and a forum of people.',
   keywords: 'multi agent ai, AI swarms, AI guide, AI discussion, human review',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/ai-swarms/share.jpg?v=2',

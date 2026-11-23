@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'fitness',
   topic: 'Fitness',
   kit: 'locker',
+  variant: 'chalk-gym',
   query: 'mental fitness',
   title: 'Mental fitness. Bring a training log | Moltology',
   description:
     'Mental fitness, on the daily training card. Read the five character stats, work through eight tasks, and log what you did with Moltology.',
   keywords: 'mental fitness, character stats, daily training, focus practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology is a daily practice, not mental health treatment or a test of intelligence.',
   shareImage: {

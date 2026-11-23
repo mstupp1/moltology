@@ -8,8 +8,26 @@ import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
 import './platform.css'
 
+const PLATFORM_PILLS: Record<string, string> = {
+  'split-prism': 'stack',
+  'cyan-console': 'console',
+  'light-shield': 'shield',
+  'crimson-grid': 'adaptive',
+}
+
 /** The AI startup lockup: the emblem in a gradient tile, a tight sans name and a mono suffix. */
-function PlatformLockup() {
+function PlatformLockup({ variant }: { variant?: string }) {
+  if (variant) {
+    return (
+      <span className="pf-lockup">
+        <span className="pf-lockup-tile">
+          <BrandIcon aria-hidden="true" tone="inherit" className="pf-lockup-icon" />
+        </span>
+        <span className="pf-lockup-word">Moltology</span>
+        <span className="pf-lockup-pill">{PLATFORM_PILLS[variant] ?? 'stack'}</span>
+      </span>
+    )
+  }
   return (
     <span className="pf-lockup">
       <span className="pf-lockup-tile">
@@ -25,11 +43,12 @@ function PlatformLockup() {
 export default function PlatformKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'platform') return null
   const { hero, features, workflow, config, plans } = page.content
+  const isVariant = Boolean(page.variant)
 
   return (
     <div className="pf">
       <BenefitHeader
-        lockup={<PlatformLockup />}
+        lockup={<PlatformLockup variant={page.variant} />}
         links={[
           { label: 'Product', href: '#features' },
           { label: 'Workflow', href: '#workflow' },
@@ -42,42 +61,83 @@ export default function PlatformKit({ page, onJoin, children }: BenefitKitProps)
       <main>
         <section className="pf-hero">
           <div className="pf-glow" aria-hidden="true" />
-          <div className="pf-wrap pf-hero-copy">
-            <a href="#features" className="pf-badge">
-              <Sparkles aria-hidden="true" />
-              {hero.badge}
-              <ArrowRight aria-hidden="true" />
-            </a>
-            <h1 className="pf-h1">{hero.headline}</h1>
-            <p className="pf-lede">{hero.sub}</p>
-            <div className="pf-actions">
-              <button type="button" className="pf-btn" onClick={onJoin}>
-                {hero.cta}
-              </button>
-              <Link to={BENEFIT_LINKS.demo} className="pf-btn-ghost">
-                Open the demo
-              </Link>
+          {isVariant ? (
+            <div className="pf-wrap pf-hero-split">
+              <div className="pf-hero-copy">
+                <a href="#features" className="pf-badge">
+                  <Sparkles aria-hidden="true" />
+                  {hero.badge}
+                  <ArrowRight aria-hidden="true" />
+                </a>
+                <h1 className="pf-h1">{hero.headline}</h1>
+                <p className="pf-lede">{hero.sub}</p>
+                <div className="pf-actions">
+                  <button type="button" className="pf-btn" onClick={onJoin}>
+                    {hero.cta}
+                  </button>
+                  <Link to={BENEFIT_LINKS.demo} className="pf-btn-ghost">
+                    Open the demo
+                  </Link>
+                </div>
+                <Link to="/oracle" className="pf-prompt">
+                  <span className="sr-only">Ask the Oracle, for example: </span>
+                  <span className="pf-prompt-text">{hero.prompt}</span>
+                  <span className="pf-prompt-send" aria-hidden="true">
+                    <ArrowUp />
+                  </span>
+                </Link>
+              </div>
+              <div className="pf-frame">
+                <img
+                  src={getAssetUrl(hero.image.src)}
+                  alt={hero.image.alt}
+                  width={hero.image.width}
+                  height={hero.image.height}
+                  fetchPriority="high"
+                  className="pf-hero-img"
+                />
+              </div>
             </div>
-            <Link to="/oracle" className="pf-prompt">
-              <span className="sr-only">Ask the Oracle, for example: </span>
-              <span className="pf-prompt-text">{hero.prompt}</span>
-              <span className="pf-prompt-send" aria-hidden="true">
-                <ArrowUp />
-              </span>
-            </Link>
-          </div>
-          <div className="pf-wrap">
-            <div className="pf-frame">
-              <img
-                src={getAssetUrl(hero.image.src)}
-                alt={hero.image.alt}
-                width={hero.image.width}
-                height={hero.image.height}
-                fetchPriority="high"
-                className="pf-hero-img"
-              />
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="pf-wrap pf-hero-copy">
+                <a href="#features" className="pf-badge">
+                  <Sparkles aria-hidden="true" />
+                  {hero.badge}
+                  <ArrowRight aria-hidden="true" />
+                </a>
+                <h1 className="pf-h1">{hero.headline}</h1>
+                <p className="pf-lede">{hero.sub}</p>
+                <div className="pf-actions">
+                  <button type="button" className="pf-btn" onClick={onJoin}>
+                    {hero.cta}
+                  </button>
+                  <Link to={BENEFIT_LINKS.demo} className="pf-btn-ghost">
+                    Open the demo
+                  </Link>
+                </div>
+                <Link to="/oracle" className="pf-prompt">
+                  <span className="sr-only">Ask the Oracle, for example: </span>
+                  <span className="pf-prompt-text">{hero.prompt}</span>
+                  <span className="pf-prompt-send" aria-hidden="true">
+                    <ArrowUp />
+                  </span>
+                </Link>
+              </div>
+              <div className="pf-wrap">
+                <div className="pf-frame">
+                  <img
+                    src={getAssetUrl(hero.image.src)}
+                    alt={hero.image.alt}
+                    width={hero.image.width}
+                    height={hero.image.height}
+                    fetchPriority="high"
+                    className="pf-hero-img"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </section>
 
         <section className="pf-section" id="features" aria-labelledby="pf-features">
@@ -87,8 +147,9 @@ export default function PlatformKit({ page, onJoin, children }: BenefitKitProps)
             </h2>
             <p className="pf-body pf-intro">{features.intro}</p>
             <ul className="pf-grid">
-              {features.items.map((item) => (
+              {features.items.map((item, index) => (
                 <li key={item.title} className="pf-cell">
+                  {isVariant ? <span className="pf-cell-n">{String(index + 1).padStart(2, '0')}</span> : null}
                   <h3 className="pf-h3">{item.title}</h3>
                   <p className="pf-body">{item.body}</p>
                 </li>

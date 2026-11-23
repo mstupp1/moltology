@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'physicality',
   topic: 'Physicality',
   kit: 'locker',
+  variant: 'track-club',
   query: 'mind body connection',
   title: 'Mind body connection. Check in before you start | Moltology',
   description:
     'Put mind body connection on the training card. Pause before the inbox, notice your surroundings, and talk daily habits on the Moltology forum.',
   keywords: 'mind body connection, physical awareness, screen habits, daily check-in',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   disclaimer: 'Moltology offers daily habits and community discussion, not medical care or an exercise plan.',
   shareImage: {

@@ -9,7 +9,7 @@ const page: BenefitPage = {
   description:
     'Gamify your life without another grind. Moltology gives you eight daily quests, XP, a weekly leaderboard and a character whose stats grow with you. Free.',
   keywords: 'gamify your life, gamification, life rpg, habit game, daily quests, xp for real life',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/gaming/share.jpg?v=2',

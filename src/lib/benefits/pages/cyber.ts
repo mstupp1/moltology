@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'cyber',
   topic: 'Cyber',
   kit: 'platform',
+  variant: 'light-shield',
   query: 'how to reduce screen time',
   title: 'How to reduce screen time: rules first | Moltology',
   description:
     'Learn how to reduce screen time by deciding what gets through before you start. Pick your exceptions, close the feed, and follow a daily practice.',
   keywords: 'how to reduce screen time, phone boundaries, notification settings, digital habits, focused work',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/cyber/share.jpg?v=2',

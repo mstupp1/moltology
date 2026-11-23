@@ -4,12 +4,13 @@ const page: BenefitPage = {
   slug: 'communication',
   topic: 'Communication',
   kit: 'seminar',
+  variant: 'keynote-stage',
   query: 'how to communicate better',
   title: 'How to communicate better: start by listening | Moltology',
   description:
     'Learn how to communicate better with plain requests, patient listening, and room for a reply. Read the Codex and take the practice into your next conversation.',
   keywords: 'how to communicate better, listening, clear requests, communication practice',
-  indexed: false,
+  indexed: true,
   updated: '2026-11-22',
   shareImage: {
     src: '/images/benefits/communication/share.jpg?v=2',
