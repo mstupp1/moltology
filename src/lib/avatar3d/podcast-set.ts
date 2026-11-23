@@ -198,7 +198,7 @@ export function dressPodcast(members: DressMember[]): Group {
   const strip = new Mesh(new BoxGeometry(width - 0.3, 0.018, 0.012), new MeshStandardMaterial({ color: '#f5b93a', emissive: new Color('#b8720c'), emissiveIntensity: 0.9 }))
   strip.position.set(centreX, deskY - 0.035 - apronH + 0.012, frontZ - 0.045)
   props.add(strip)
-  // Two blackened steel end frames and a low rail; the middle stays open.
+  // Two blackened steel end frames; no rail, so nothing runs along the hosts' feet.
   const steel = mat('#16171a', 0.4, 0.6)
   for (const end of [-1, 1]) {
     const x = centreX + end * (width / 2 - 0.1)
@@ -206,7 +206,6 @@ export function dressPodcast(members: DressMember[]): Group {
     frame.position.set(x, (deskY - 0.035) / 2, centreZ)
     props.add(shadowed(frame))
   }
-  props.add(rod(new Vector3(centreX - width / 2 + 0.1, 0.12, centreZ - depth / 2 + 0.1), new Vector3(centreX + width / 2 - 0.1, 0.12, centreZ - depth / 2 + 0.1), 0.02, steel))
 
   for (const spot of spots) {
     const { member, mouth, ears } = spot
