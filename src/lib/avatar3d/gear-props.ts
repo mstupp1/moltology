@@ -2,7 +2,7 @@
  * Held props: one object in the pinch of one claw, the other claw left bare. Placed like the
  * hammer: from the claw socket, in front of the palm, so it moves with every pose.
  */
-import { BoxGeometry, BufferGeometry, CylinderGeometry, SphereGeometry, TorusGeometry } from 'three'
+import { BoxGeometry, BufferGeometry, CapsuleGeometry, CylinderGeometry, SphereGeometry, TorusGeometry } from 'three'
 import type { Prop } from '../gear/types'
 import { Kit, v } from './gear-kit'
 import { alongY, placed } from './parts'
@@ -43,6 +43,68 @@ const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number) => voi
       kit.add(bone, 'trim', at(new SphereGeometry(w * 0.03, 10, 8), w * (x - 0.45), w * (0.4 + y), w * 0.1))
     }
     kit.add(bone, 'accent', at(new BoxGeometry(w * 0.3, w * 0.03, w * 0.02), 0, w * 0.58, w * 0.08))
+  },
+  tea_cup: (kit, bone, at, S) => {
+    const r = 0.11 * S
+    const h = 0.13 * S
+    // A low stoneware cup on a saucer, tea inside, handle out to the side.
+    kit.add(bone, 'paint', at(new CylinderGeometry(r * 1.85, r * 1.5, 0.012 * S + 0.008, 32), 0, -h * 0.05, 0))
+    kit.add(bone, 'paint', at(new CylinderGeometry(r, r * 0.72, h, 28, 1, true), 0, h * 0.5, 0))
+    kit.add(bone, 'paint', at(new CylinderGeometry(r * 0.72, r * 0.72, 0.01, 24), 0, 0.005, 0))
+    kit.add(bone, 'trim', at(new TorusGeometry(r, 0.006, 6, 28).rotateX(Math.PI / 2), 0, h, 0))
+    kit.add(bone, 'soft', at(new CylinderGeometry(r * 0.94, r * 0.94, 0.004, 28), 0, h * 0.82, 0))
+    kit.add(bone, 'paint', at(new TorusGeometry(h * 0.3, 0.012, 8, 16), r * 1.08, h * 0.55, 0))
+  },
+  watering_can: (kit, bone, at, S) => {
+    const r = 0.13 * S
+    const h = 0.26 * S
+    // Body, a spout rising forward to a rose, a handle arching over the top, a gold coin on the side.
+    kit.add(bone, 'paint', at(new CylinderGeometry(r, r * 1.05, h, 28), 0, h * 0.5, 0))
+    kit.add(bone, 'trim', at(new TorusGeometry(r, 0.008, 6, 28).rotateX(Math.PI / 2), 0, h, 0))
+    const spout = new CylinderGeometry(0.014 * S + 0.006, 0.03 * S + 0.008, 0.36 * S, 12)
+    spout.translate(0, 0.18 * S, 0).rotateX(0.95)
+    kit.add(bone, 'paint', at(spout, 0, h * 0.25, r * 0.8))
+    kit.add(bone, 'trim', at(new CylinderGeometry(0.045 * S, 0.02 * S, 0.04 * S, 16).rotateX(0.95), 0, h * 0.25 + 0.36 * S * Math.cos(0.95), r * 0.8 + 0.36 * S * Math.sin(0.95)))
+    kit.add(bone, 'paint', at(new TorusGeometry(h * 0.48, 0.016, 8, 24, Math.PI).rotateY(Math.PI / 2), 0, h * 0.98, -r * 0.1))
+    kit.add(bone, 'trim', at(new CylinderGeometry(r * 0.38, r * 0.38, 0.012, 24).rotateZ(Math.PI / 2), r + 0.004, h * 0.5, 0))
+    // Two leaves sprouting from the coin.
+    for (const s of [1, -1]) {
+      const leaf = new SphereGeometry(r * 0.32, 12, 8).scale(0.45, 1, 0.12).rotateZ(s * 0.6)
+      kit.add(bone, 'soft', at(leaf, r + 0.01, h * 0.5 + r * 0.42, s * r * 0.18))
+    }
+  },
+  book: (kit, bone, at, S) => {
+    const w = 0.3 * S
+    const h = 0.42 * S
+    const d = 0.075 * S
+    // Held upright, cover facing out: boards, pages, a gold band across the cover.
+    kit.add(bone, 'paint', at(new BoxGeometry(w, h, 0.012), 0, h * 0.35, d / 2))
+    kit.add(bone, 'paint', at(new BoxGeometry(w, h, 0.012), 0, h * 0.35, -d / 2))
+    kit.add(bone, 'paint', at(new BoxGeometry(0.012, h, d + 0.012), -w / 2, h * 0.35, 0))
+    kit.add(bone, 'soft', at(new BoxGeometry(w * 0.96, h * 0.96, d - 0.006), 0.006, h * 0.35, 0))
+    kit.add(bone, 'trim', at(new BoxGeometry(w * 1.01, h * 0.12, 0.004), 0, h * 0.5, d / 2 + 0.008))
+    kit.add(bone, 'soft', at(new BoxGeometry(w * 0.6, h * 0.035, 0.003), 0, h * 0.2, d / 2 + 0.008))
+  },
+  phone: (kit, bone, at, S) => {
+    const w = 0.2 * S
+    const h = 0.4 * S
+    // A dark slab with a lit screen and a camera bump on the back.
+    kit.add(bone, 'paint', at(new CapsuleGeometry(w * 0.12, h - w * 0.24, 4, 12).scale(w / (w * 0.24), 1, 0.15), 0, h * 0.4, 0))
+    kit.add(bone, 'trim', at(new BoxGeometry(w * 1.02, h * 0.9, 0.006), 0, h * 0.4, 0))
+    kit.add(bone, 'accent', at(new BoxGeometry(w * 0.86, h * 0.84, 0.004), 0, h * 0.4, w * 0.04))
+    kit.add(bone, 'paint', at(new BoxGeometry(w * 0.34, w * 0.34, 0.012), -w * 0.2, h * 0.7, -w * 0.04))
+  },
+  marshmallow_stick: (kit, bone, at, S) => {
+    const len = 1.25 * S
+    // A long green stick held low and pointed up and out, a toasted marshmallow on the end.
+    const tilt = 0.35
+    const stick = new CylinderGeometry(0.011, 0.015, len, 8).translate(0, len / 2, 0).rotateX(tilt)
+    kit.add(bone, 'paint', at(stick, 0, -0.05 * S, 0))
+    const tip = (t: number) => [0, -0.05 * S + len * t * Math.cos(tilt), len * t * Math.sin(tilt)] as const
+    const [x, y, z] = tip(0.9)
+    kit.add(bone, 'soft', at(new CylinderGeometry(0.085 * S, 0.085 * S, 0.12 * S, 18).rotateX(tilt), x, y, z))
+    // The toasted side.
+    kit.add(bone, 'tape', at(new CylinderGeometry(0.0855 * S, 0.0855 * S, 0.05 * S, 18, 1, true).rotateX(tilt), x, y - 0.03 * S, z - 0.01 * S))
   },
 }
 

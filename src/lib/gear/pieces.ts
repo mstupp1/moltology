@@ -608,6 +608,36 @@ const COLLECTION_PIECES: GearPiece[] = [
     { key: 'sweatband', n: 55, name: 'Sweatband', flavorText: 'Terry cloth and a pink stripe. Instant afternoon energy.', slot: 'head', rarity: 'common', shape: 'hat', motif: 'none', hat: 'sweatband', colours: 'can-sweatband', construction: 0 },
     { key: 'sticker-hi-tops', n: 56, name: 'Sticker hi-tops', flavorText: 'White hi-tops, loud laces, stickers on the heel.', slot: 'legs', rarity: 'rare', shape: 'shoes', motif: 'hi-top', colours: 'can-hi-tops', construction: 2, surface: 'leather' },
   ]),
+  ...collection('linen-hours', 'ecdysisDiscipline', [
+    { key: 'linen-wrap', n: 57, name: 'Linen wrap', flavorText: 'Undyed linen, crossed over and tied at the side. Slow mornings only.', slot: 'carapace', rarity: 'epic', shape: 'garment', motif: 'wrap', colours: 'retreat-linen', construction: 3, surface: 'cloth', uniquePower: { name: 'Long Exhale', description: 'The room gets quieter when you walk in. Nobody hurries you.' } },
+    { key: 'wide-brim-sun-hat', n: 58, name: 'Wide-brim sun hat', flavorText: 'Woven straw and a sage ribbon, for the walk down to the water.', slot: 'head', rarity: 'uncommon', shape: 'hat', motif: 'none', hat: 'sun_hat', colours: 'retreat-straw', construction: 1 },
+    { key: 'woven-cord-sash', n: 59, name: 'Woven cord sash', flavorText: 'Two cords, one knot, ends left loose.', slot: 'belt', rarity: 'common', shape: 'belt-plate', motif: 'cord', colours: 'retreat-cord', construction: 0, surface: 'cloth' },
+    { key: 'retreat-tea-cup', n: 60, name: 'Tea cup', flavorText: 'Stoneware, still warm. Sip, then begin.', slot: 'claws', rarity: 'common', shape: 'held-prop', motif: 'none', prop: 'tea_cup', colours: 'retreat-cup', construction: 0 },
+  ]),
+  ...collection('private-client', 'depthTolerance', [
+    { key: 'navy-suit-jacket', n: 61, name: 'Navy suit jacket', flavorText: 'Navy wool, a white shirt and a pocket square folded just so.', slot: 'carapace', rarity: 'epic', shape: 'garment', motif: 'jacket', colours: 'ledger-navy', construction: 3, surface: 'cloth', uniquePower: { name: 'Compound Interest', description: 'Small wins stack. The longer you hold, the better it looks.' } },
+    { key: 'gold-buckle-belt', n: 62, name: 'Gold-buckle belt', flavorText: 'Dark leather and a plain gold buckle. Nothing to prove.', slot: 'belt', rarity: 'rare', shape: 'belt-plate', motif: 'dress', colours: 'ledger-belt', construction: 2, surface: 'leather' },
+    { key: 'coin-leaf-watering-can', n: 63, name: 'Coin-leaf watering can', flavorText: 'A little every day, and let it grow.', slot: 'claws', rarity: 'uncommon', shape: 'held-prop', motif: 'none', prop: 'watering_can', colours: 'ledger-can', construction: 1 },
+    { key: 'tortoiseshell-glasses', n: 64, name: 'Tortoiseshell glasses', flavorText: 'For reading the fine print twice.', slot: 'head', rarity: 'uncommon', shape: 'hat', motif: 'none', hat: 'tortoise_glasses', colours: 'ledger-tortoise', construction: 1 },
+  ]),
+  ...collection('workflow', 'neuralLatency', [
+    { key: 'orbiting-glass-panels', n: 65, name: 'Orbiting glass panels', flavorText: 'Three windows open per antenna. Every one of them is useful.', slot: 'antennae', rarity: 'epic', shape: 'antenna-fittings', motif: 'panels', colours: 'platform-glass', construction: 3, uniquePower: { name: 'Context Window', description: 'Holds the whole problem in view at once, and drops nothing.' } },
+    { key: 'holo-glass-visor', n: 66, name: 'Holo glass visor', flavorText: 'Violet glass with the day\'s plan floating in it.', slot: 'head', rarity: 'rare', shape: 'hat', motif: 'none', hat: 'visor', colours: 'platform-visor', construction: 2 },
+    { key: 'zip-hoodie', n: 67, name: 'Zip hoodie', flavorText: 'Black, zipped halfway, hood down. Shipping mode.', slot: 'carapace', rarity: 'uncommon', shape: 'garment', motif: 'hoodie', colours: 'platform-hoodie', construction: 1, surface: 'cloth' },
+    { key: 'badge-lanyard', n: 68, name: 'Badge lanyard', flavorText: 'Violet strap, one badge. Gets you into the build room.', slot: 'belt', rarity: 'common', shape: 'belt-plate', motif: 'lanyard', colours: 'platform-lanyard', construction: 0, surface: 'cloth' },
+  ]),
+  ...collection('main-stage', 'shellHardness', [
+    { key: 'navy-stage-blazer', n: 69, name: 'Navy stage blazer', flavorText: 'Gold satin lapels that catch the spotlight from the back row.', slot: 'carapace', rarity: 'epic', shape: 'garment', motif: 'blazer', colours: 'seminar-navy', construction: 3, surface: 'cloth', uniquePower: { name: 'Stage Presence', description: 'The room leans in for the next sentence.' } },
+    { key: 'headset-microphone', n: 70, name: 'Headset microphone', flavorText: 'A thin boom by the cheek. Hands free for the big gesture.', slot: 'head', rarity: 'rare', shape: 'hat', motif: 'none', hat: 'headset_mic', colours: 'seminar-mic', construction: 2 },
+    { key: 'presence-book', n: 71, name: 'Presence book', flavorText: 'Bright orange cover, gold band, signed on the title page.', slot: 'claws', rarity: 'uncommon', shape: 'held-prop', motif: 'none', prop: 'book', colours: 'seminar-book', construction: 1 },
+    { key: 'speaker-lanyard', n: 72, name: 'Speaker lanyard', flavorText: 'Gold strap and a cream badge that says Speaker.', slot: 'belt', rarity: 'common', shape: 'belt-plate', motif: 'lanyard', colours: 'seminar-lanyard', construction: 0, surface: 'cloth' },
+  ]),
+  ...collection('bonfire', 'depthTolerance', [
+    { key: 'beach-hoodie', n: 73, name: 'Beach hoodie', flavorText: 'Sunset orange and soft inside, for when the sun goes down.', slot: 'carapace', rarity: 'rare', shape: 'garment', motif: 'hoodie', colours: 'network-hoodie', construction: 2, surface: 'cloth' },
+    { key: 'bucket-hat', n: 74, name: 'Bucket hat', flavorText: 'Violet canvas with a pink stitch line. Goes with everything.', slot: 'head', rarity: 'common', shape: 'hat', motif: 'none', hat: 'bucket_hat', colours: 'network-bucket', construction: 0 },
+    { key: 'group-chat-phone', n: 75, name: 'Phone', flavorText: 'Twelve new messages, all from the group chat.', slot: 'claws', rarity: 'common', shape: 'held-prop', motif: 'none', prop: 'phone', colours: 'network-phone', construction: 0 },
+    { key: 'marshmallow-stick', n: 76, name: 'Marshmallow stick', flavorText: 'Golden on one side. Patience is the whole trick.', slot: 'claws', rarity: 'common', shape: 'held-prop', motif: 'none', prop: 'marshmallow_stick', colours: 'network-marshmallow', construction: 0 },
+  ]),
 ]
 
 export const GEAR_PIECES: GearPiece[] = [...ORIGINAL_PIECES, ...COLLECTION_PIECES]

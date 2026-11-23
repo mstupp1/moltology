@@ -6,6 +6,7 @@ import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { BENEFIT_KITS, findBenefitSummary } from '@/lib/benefits/registry'
 import type { BenefitPage } from '@/lib/benefits/types'
 import { BENEFIT_LINKS } from './kit-props'
+import { WearTheLook } from './WearTheLook'
 
 const LazyLandingAuthCtas = lazy(() =>
   import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas })),
@@ -101,7 +102,9 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
           </figure>
         </div>
 
-        <div className="mt-14 grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+        <WearTheLook kit={page.kit} />
+
+        <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <div className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-6">
             <p className="eyebrow">Where this comes from</p>
             <a

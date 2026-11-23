@@ -1,13 +1,15 @@
 import React from 'react'
 import { GearIcon } from '@/components/hud/avatar3d/GearIcon'
+import { Link } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
+import { HudButton } from '@/components/ui/HudButton'
 import { HudBadge } from '@/components/ui/HudBadge'
 import { CATEGORY_LABELS } from '@/lib/chassis-loadout'
 import { RARITY_LABELS } from '@/lib/gear-variants'
 import type { MarketPiece, MarketVariant } from '@/lib/market'
 import {
   MARKET_BUNDLES,
-  MARKET_FEATURED,
+  featuredSlots,
   bundlePrice,
   type MarketBundle,
   type PieceRef,
@@ -68,8 +70,15 @@ function BundleStack({ items, size }: { items: ResolvedRef[]; size: 'sm' | 'lg' 
   )
 }
 
-function BundlePrice({ bundle }: { bundle: MarketBundle }) {
-  const { full, price } = bundlePrice(bundle)
+/** What the bundle costs this member: pieces they already own drop out. */
+function priceFor(bundle: MarketBundle, items: ResolvedRef[]) {
+  const owned = new Set(items.filter((i) => i.variant.owned).map((i) => i.piece.baseKey))
+  return bundlePrice(bundle, (ref) => owned.has(ref.baseKey))
+}
+
+function BundlePrice({ bundle, items }: { bundle: MarketBundle; items: ResolvedRef[] }) {
+  const { full, price, left } = priceFor(bundle, items)
+  if (!left) return <span className="text-xs font-semibold text-ink-muted">All owned</span>
   return (
     <span className="flex items-center gap-2">
       <GemAmount value={price} size="sm" />
@@ -83,7 +92,7 @@ function BundlePrice({ bundle }: { bundle: MarketBundle }) {
 
 /**
  * Top of the Gear tab: one large promo and smaller ones beside it, then a row of bundles.
- * Everything comes from src/lib/market-featured.ts.
+ * Everything comes from src/lib/market-featured.ts; the lead collection changes each week.
  */
 export function MarketFeatured({
   pieces,
@@ -97,7 +106,7 @@ export function MarketFeatured({
   type Slot =
     | { kind: 'piece'; piece: PieceRef; tag: string; blurb?: string; resolved: ResolvedRef }
     | { kind: 'bundle'; tag: string; bundle: MarketBundle; items: ResolvedRef[] }
-  const slots = MARKET_FEATURED.flatMap((slot): Slot[] => {
+  const slots = featuredSlots().flatMap((slot): Slot[] => {
     if (slot.kind === 'piece') {
       const r = resolveRef(pieces, slot.piece)
       return r ? [{ kind: 'piece', piece: slot.piece, tag: slot.tag, blurb: slot.blurb, resolved: r }] : []
@@ -105,9 +114,9 @@ export function MarketFeatured({
     const bundle = MARKET_BUNDLES.find((b) => b.id === slot.bundleId)
     const items = bundle ? resolveBundle(pieces, bundle) : null
     return bundle && items ? [{ kind: 'bundle', tag: slot.tag, bundle, items }] : []
-  })
+  }).filter((slot, i, all) => all.findIndex((o) => (o.kind === 'bundle' ? o.bundle.id : o.piece.baseKey) === (slot.kind === 'bundle' ? slot.bundle.id : slot.piece.baseKey)) === i).slice(0, 3)
   // A bundle already in the banner isn't repeated in the row below.
-  const inBanner = new Set(MARKET_FEATURED.flatMap((f) => (f.kind === 'bundle' ? [f.bundleId] : [])))
+  const inBanner = new Set(slots.flatMap((f) => (f.kind === 'bundle' ? [f.bundle.id] : [])))
   const bundles = MARKET_BUNDLES.filter((b) => !inBanner.has(b.id)).flatMap((b) => {
     const items = resolveBundle(pieces, b)
     return items ? [{ bundle: b, items }] : []
@@ -246,27 +255,42 @@ function BundleTile({
       <span className={cn('font-semibold text-ink leading-tight', large ? 'text-xl' : 'text-ui')}>{bundle.name}</span>
       <span className="text-xs text-ink-muted leading-snug line-clamp-2">{bundle.blurb}</span>
       <span className="flex items-center justify-between gap-2 mt-auto">
-        <BundlePrice bundle={bundle} />
-        <HudBadge variant="neutral">
-          Soon
-        </HudBadge>
+        <BundlePrice bundle={bundle} items={items} />
+        <HudBadge variant="neutral">{bundle.discountPercent}% off</HudBadge>
       </span>
     </button>
   )
 }
 
-/** A bundle's contents. Buying bundles opens later; each piece can be bought on its own now. */
+/** A bundle's contents and its buy button. Each piece can still be opened and bought on its own. */
 export function MarketBundleDetail({
   bundle,
   pieces,
   onOpenPiece,
+  balance,
+  credits,
+  buying,
+  addFree,
+  guest = false,
+  onBuy,
 }: {
   bundle: MarketBundle
   pieces: MarketPiece[]
   onOpenPiece: (ref: PieceRef) => void
+  balance: number
+  credits: number
+  buying: boolean
+  addFree: boolean
+  /** Signed out: the button opens sign-up instead of buying. */
+  guest?: boolean
+  onBuy: (bundle: MarketBundle) => void
 }) {
   const items = resolveBundle(pieces, bundle) ?? []
-  const { full, price } = bundlePrice(bundle)
+  const { full, price, left } = priceFor(bundle, items)
+  const spendable = Math.max(0, balance) + Math.max(0, credits)
+  const short = price - spendable
+  const creditPart = Math.max(0, price - Math.max(0, balance))
+  const owned = items.length - left
   return (
     <div className="flex flex-col gap-3" data-testid="market-bundle-detail">
       <BundleStack items={items} size="lg" />
@@ -303,16 +327,56 @@ export function MarketBundleDetail({
           </li>
         ))}
       </ul>
-      <div className="rounded-card border border-line-subtle bg-surface-2 p-3 flex items-center justify-between gap-3">
-        <span className="text-sm text-ink-muted">Bundle price</span>
-        <span className="flex items-center gap-2">
-          <GemAmount value={price} />
-          <s className="text-xs text-ink-muted tabular-nums">{full.toLocaleString('en-US')}</s>
-        </span>
-      </div>
-      <p className="text-xs text-ink-muted text-center">
-        Bundles open soon. Until then, pick a piece above to buy it on its own.
-      </p>
+      {left ? (
+        <div className="rounded-card border border-line-subtle bg-surface-2 p-3 flex items-center justify-between gap-3">
+          <span className="text-sm text-ink-muted">{owned ? `Bundle price for the ${left} you don't own` : 'Bundle price'}</span>
+          <span className="flex items-center gap-2">
+            <GemAmount value={price} />
+            <s className="text-xs text-ink-muted tabular-nums">{full.toLocaleString('en-US')}</s>
+          </span>
+        </div>
+      ) : null}
+      {!left ? (
+        <Link
+          to="/character"
+          className={cn(
+            'inline-flex min-h-10 items-center justify-center rounded-control border border-line bg-surface-2 px-4 text-sm font-semibold text-ink hover:border-line-strong',
+            focusRing,
+          )}
+        >
+          All owned · wear them from Customize
+        </Link>
+      ) : guest ? (
+        <>
+          <HudButton size="lg" fullWidth onClick={() => onBuy(bundle)}>
+            Sign up to buy
+          </HudButton>
+          <p className="text-xs text-ink-muted text-center">Accounts are free, and gems come from daily liturgies, streaks and firsts.</p>
+        </>
+      ) : addFree ? (
+        <>
+          <HudButton size="lg" fullWidth disabled={buying} onClick={() => onBuy(bundle)}>
+            {buying ? 'Adding…' : 'Add all to collection'}
+          </HudButton>
+          <p className="text-xs text-ink-muted text-center">Admin · free, no gems spent.</p>
+        </>
+      ) : (
+        <>
+          <HudButton size="lg" fullWidth disabled={buying || short > 0} onClick={() => onBuy(bundle)}>
+            {buying ? 'Buying…' : `Buy ${left === 1 ? 'the last piece' : `${left} pieces`} for ${price.toLocaleString('en-US')} gems`}
+          </HudButton>
+          {short <= 0 && creditPart > 0 ? (
+            <p className="text-xs text-ink-muted text-center">
+              Uses {Math.max(0, balance).toLocaleString('en-US')} gems and {creditPart.toLocaleString('en-US')} Molt Credits.
+            </p>
+          ) : null}
+          {short > 0 ? (
+            <p className="text-xs text-ink-muted text-center">
+              You need {short.toLocaleString('en-US')} more gems. Daily liturgies, streaks and firsts all pay out.
+            </p>
+          ) : null}
+        </>
+      )}
     </div>
   )
 }

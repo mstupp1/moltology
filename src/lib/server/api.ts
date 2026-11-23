@@ -58,6 +58,15 @@ export const buyGearFn = createServerFn({ method: 'POST' })
     const { buyGearHandler } = await import('./market')
     return buyGearHandler(args)
   })
+export const buyBundleFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; bundleId: string }) =>
+    z.object({ token: z.string().optional(), bundleId: z.string().min(1).max(80) }).parse(data),
+  )
+  .handler(async (args) => {
+    const { buyBundleHandler } = await import('./market')
+    return buyBundleHandler(args)
+  })
 export const getOracleSkillsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: { token?: string }) => z.object({ token: z.string().optional() }).parse(data))

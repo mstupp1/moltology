@@ -29,6 +29,31 @@ export const GEAR_PALETTES: Readonly<Record<string, GearColours>> = {
   'can-ice': { material: '#83d6fb', trim: '#1b1d1f', accent: '#ffffff' },
   'can-sweatband': { material: '#fbfbf8', trim: '#ff3d7f', accent: '#ff3d7f' },
   'can-hi-tops': { material: '#fbfbf8', trim: '#ff3d7f', accent: '#2cc4ff' },
+  // Linen Hours (retreat): undyed linen, sage, clay, straw.
+  'retreat-linen': { material: '#ece4d4', trim: '#8f4c34', accent: '#6b7a60' },
+  'retreat-straw': { material: '#d8c193', trim: '#55624d', accent: '#8f4c34' },
+  'retreat-cord': { material: '#9a5a3e', trim: '#c9a27a', accent: '#ece4d4' },
+  'retreat-cup': { material: '#f4efe6', trim: '#6b7a60', accent: '#a8743a' },
+  // Private Client (ledger): navy wool, gold hardware, money green.
+  'ledger-navy': { material: '#1d2a45', trim: '#d4af37', accent: '#f4f6f2' },
+  'ledger-belt': { material: '#2b1e17', trim: '#d4af37', accent: '#f1d77a' },
+  'ledger-can': { material: '#0f7a48', trim: '#d4af37', accent: '#7fd6a4' },
+  'ledger-tortoise': { material: '#6a3d1e', trim: '#d4af37', accent: '#e9dcc7' },
+  // Workflow (platform): near-black, violet and blue glass, steel.
+  'platform-hoodie': { material: '#1a1a24', trim: '#c9c9d6', accent: '#8b5cf6' },
+  'platform-glass': { material: '#1a1a26', trim: '#9aa6ff', accent: '#8b5cf6' },
+  'platform-visor': { material: '#1a1a26', trim: '#3b82f6', accent: '#a78bfa' },
+  'platform-lanyard': { material: '#8b5cf6', trim: '#c9c9d6', accent: '#f4f4f7' },
+  // Main Stage (seminar): navy, gold, cream, orange.
+  'seminar-navy': { material: '#14234b', trim: '#ffcf2e', accent: '#fff8e8' },
+  'seminar-mic': { material: '#22252c', trim: '#a9aeb7', accent: '#ffcf2e' },
+  'seminar-book': { material: '#ff8a1f', trim: '#ffcf2e', accent: '#fff8e8' },
+  'seminar-lanyard': { material: '#ffcf2e', trim: '#c9c9d6', accent: '#fff8e8' },
+  // Bonfire (network): sunset orange, violet, pink.
+  'network-hoodie': { material: '#ff9a3c', trim: '#ff4f9a', accent: '#fff3e2' },
+  'network-bucket': { material: '#6b3cff', trim: '#ff4f9a', accent: '#ffffff' },
+  'network-phone': { material: '#1b1530', trim: '#c9c3dd', accent: '#ff4f9a' },
+  'network-marshmallow': { material: '#8a5a33', trim: '#c9c3dd', accent: '#fff6ea' },
 }
 
 /** A piece's colours, whether inline or named. Throws on an unknown palette name. */
