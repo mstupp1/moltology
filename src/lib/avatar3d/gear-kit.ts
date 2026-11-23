@@ -3,7 +3,7 @@
  * and helpers for placing things on the body's surface. Every shape builder (armour in
  * equipment.ts, and any new shape file) is written against these.
  */
-import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Mesh, MeshPhysicalMaterial, Quaternion, SphereGeometry, TorusGeometry, Vector3, type Material } from 'three'
+import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Matrix4, Mesh, MeshPhysicalMaterial, Quaternion, Skeleton, SkinnedMesh, SphereGeometry, TorusGeometry, Vector3, type Bone, type Material } from 'three'
 import { workedSurface } from './materials'
 import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { getEquipmentVisual, tone, type EquipmentVisual } from '../avatar/equipment'
@@ -12,7 +12,7 @@ import { parseVariantKey } from '../gear-variants'
 import { equipAccessory, type GearItem } from './gear'
 import type { Loft } from './loft'
 import { alongY, placed, spike, taperedTube } from './parts'
-import { lookQuaternion, type Rig, type Wearable } from './rig'
+import { lookQuaternion, type Rig, type Weigh, type Wearable } from './rig'
 
 export type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'fabric' | 'dark' | 'paint' | 'tape' | 'seam'
 export type Amount = (local: Vector3, rest: Vector3, normal: Vector3) => number
@@ -44,6 +44,7 @@ function strip(geo: BufferGeometry): BufferGeometry {
 export class Kit {
   private readonly parts = new Map<string, { bone: string; tone: Tone; geos: BufferGeometry[] }>()
   private readonly undo: (() => void)[] = []
+  private readonly bending: { tone: Tone; geo: BufferGeometry; weigh: Weigh }[] = []
 
   constructor(
     readonly rig: Rig,
@@ -56,6 +57,14 @@ export class Kit {
     const entry = this.parts.get(id) ?? { bone, tone, geos: [] }
     entry.geos.push(strip(geo))
     this.parts.set(id, entry)
+  }
+
+  /**
+   * Geometry in character space that bends with several bones, such as a coat skirt that swings
+   * with the legs. `weigh` gives each point's bones and weights (they need not sum to 1).
+   */
+  addBending(tone: Tone, geo: BufferGeometry, weigh: Weigh): void {
+    this.bending.push({ tone, geo, weigh })
   }
 
   /** Geometry in character space. */
@@ -202,6 +211,40 @@ export class Kit {
       mesh.castShadow = true
       mesh.receiveShadow = t !== 'accent'
       this.rig.bone(bone).add(mesh)
+      meshes.push(mesh)
+    }
+    // Bending parts: one skinned mesh each, bound to the rig's bones at their rest pose, so they
+    // follow the body whatever pose it is in when the piece is put on.
+    const p = new Vector3()
+    for (const { tone: t, geo, weigh } of this.bending) {
+      const names: string[] = []
+      const pos = geo.getAttribute('position')
+      const index = new Uint16Array(pos.count * 4)
+      const weight = new Float32Array(pos.count * 4)
+      for (let i = 0; i < pos.count; i++) {
+        const pairs = weigh(p.fromBufferAttribute(pos, i), i).filter(([, w]) => w > 1e-4)
+        if (pairs.length > 4) pairs.sort((a, b) => b[1] - a[1]).length = 4
+        const sum = pairs.reduce((total, [, w]) => total + w, 0) || 1
+        pairs.forEach(([name, w], k) => {
+          let at = names.indexOf(name)
+          if (at < 0) at = names.push(name) - 1
+          index[i * 4 + k] = at
+          weight[i * 4 + k] = w / sum
+        })
+      }
+      geo.setAttribute('skinIndex', new BufferAttribute(index, 4))
+      geo.setAttribute('skinWeight', new BufferAttribute(weight, 4))
+      const mesh = new SkinnedMesh(geo, materials[t])
+      mesh.name = `gear:${v.key}:bend:${t}`
+      mesh.castShadow = true
+      mesh.receiveShadow = true
+      mesh.frustumCulled = false
+      this.rig.root.add(mesh)
+      const inverses = names.map((name) => {
+        const r = this.rig.restWorldOf(name)
+        return new Matrix4().compose(r.position, r.quaternion, new Vector3(1, 1, 1)).invert()
+      })
+      mesh.bind(new Skeleton(names.map((name) => this.rig.bone(name)) as unknown as Bone[], inverses), new Matrix4())
       meshes.push(mesh)
     }
     return {

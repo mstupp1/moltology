@@ -31,8 +31,18 @@ export function garment(kit: Kit, wear: Wearable): void {
   // The body, all the way round, from just under the belt line up to the neck. The belly
   // plates are a separate layer, so they are covered too.
   const hem = Math.min(bottom, belt) - 0.04
-  kit.puff(bone, 'fabric', (_p, w) => LIFT * above(w.y, hem, 0.025))
-  kit.puff(bone, 'fabric', (_p, w) => (LIFT - 0.002) * above(w.y, hem, 0.025), 'belly')
+  const height = top - hem
+  // Coats and jackets with lapels hang open at the chest: a V from the collar down to where the
+  // lapels meet, with a shirt showing underneath.
+  const lapelled = motif !== 'tank' && n >= 2
+  const vBottom = hem + height * (n >= 4 ? 0.42 : 0.46)
+  const opening = (y: number) => (lapelled ? 0.8 * Math.pow(smooth(vBottom, top, y), 0.8) : 0)
+  const covered = (w: Vector3) => above(fromFront(host, w), opening(w.y), 0.03)
+  for (const slot of ['shell', 'belly'] as const) {
+    const lift = slot === 'shell' ? LIFT : LIFT - 0.002
+    kit.puff(bone, 'fabric', (_p, w) => lift * above(w.y, hem, 0.025) * covered(w), slot)
+    if (lapelled) kit.puff(bone, 'dark', (_p, w) => lift * 0.55 * above(w.y, vBottom - 0.03, 0.02) * (1 - covered(w)), slot)
+  }
   if (wear.race === 'crab') {
     // A crab's shell is its body too: the cloth comes up round the lower shell to a collar under
     // the face, higher at the sides and back, so the shell sits in the garment like a head.
@@ -60,7 +70,6 @@ export function garment(kit: Kit, wear: Wearable): void {
     }
   }
 
-  const height = top - hem
   if (motif === 'tank') {
     // Two bold stripes round the chest.
     for (const t of [0.62, 0.74]) {
@@ -72,17 +81,19 @@ export function garment(kit: Kit, wear: Wearable): void {
     return
   }
 
-  if (n >= 2) {
-    // Lapels: a raised V either side of the opening, from the collar to mid chest.
-    const vBottom = hem + height * (n >= 4 ? 0.5 : 0.56)
+  if (lapelled) {
+    // Lapels: folded back either side of the opening, widening toward the collar.
+    const width = (y: number) => 0.12 + 0.26 * smooth(vBottom, top, y)
     kit.puff(bone, 'fabric', (_p, w) => {
       const phi = fromFront(host, w)
-      const t = smooth(vBottom, top, w.y)
-      // The lapel widens toward the collar.
-      return (LIFT + 0.012) * Math.min(within(phi, 0.06, 0.12 + 0.5 * t, 0.04), within(w.y, vBottom, top - 0.02, 0.03))
+      const from = opening(w.y)
+      return (LIFT + 0.012) * Math.min(within(phi, from, from + width(w.y), 0.03), within(w.y, vBottom, top - 0.02, 0.03))
     })
     for (const { s } of SIDES) {
-      kit.addWorld(bone, 'trim', seam(host, [top - 0.02, s * 0.62], [vBottom, s * 0.08], LIFT + 0.013, 0.007, 12))
+      const edge = (y: number) => s * (opening(y) + 0.01)
+      const outer = (y: number) => s * (opening(y) + width(y))
+      kit.addWorld(bone, 'trim', seam(host, [top - 0.02, edge(top - 0.02)], [vBottom, s * 0.02], LIFT + 0.013, 0.007, 12))
+      kit.addWorld(bone, 'trim', seam(host, [top - 0.02, outer(top - 0.02)], [vBottom + 0.01, s * 0.12], LIFT + 0.013, 0.005, 12))
     }
     // The opening down the front, and buttons beside it.
     kit.addWorld(bone, 'trim', seam(host, [vBottom, 0], [hem + 0.01, 0], LIFT + 0.002, 0.006, 8))
@@ -122,12 +133,17 @@ export function garment(kit: Kit, wear: Wearable): void {
  * spare. It rides the torso bone, open a little at the front so the legs show as it walks.
  */
 function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
-  const { loft: host, bone } = wear.torso
-  const length = drop
+  const { bone } = wear.torso
+  // On a crab the coat hangs from the underside of the shell, which it already covers, so it
+  // drops cleanly round the wide stance instead of starting from the narrow body below.
+  const crab = wear.race === 'crab'
+  const host = crab ? wear.head.loft : wear.torso.loft
+  const top = crab ? hem + 0.2 : hem + 0.01
+  const length = drop + (top - hem)
   const cols = 64
-  const rows = 12
-  const split = 0.16
-  const top = hem + 0.01
+  const rows = 14
+  // The fronts meet at the waist; the legs show only when they move apart.
+  const split = 0.018
   const k = host.key(host.sAt(top))
   const cx = k.x ?? 0
   const cz = k.z ?? 0
@@ -199,10 +215,24 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
   const flipped: number[] = []
   for (let i = 0; i < index.length; i += 3) flipped.push(index[i], index[i + 2], index[i + 1])
   inner.setIndex(flipped)
+  // The skirt swings with the legs: the waist stays on the body, and lower down each side
+  // follows its own thigh, blending across the back so the cloth never tears.
+  const weigh = (p: Vector3): [string, number][] => {
+    const leg = 0.92 * smooth(0.05, 0.55, (top - p.y) / length)
+    // Each front panel belongs wholly to its own side, so the coat parts as the legs move apart;
+    // round the back the two sides blend.
+    const angle = Math.atan2(p.x - cx, p.z - cz)
+    const left = Math.cos(angle) > 0 ? (angle > 0 ? 1 : 0) : smooth(-0.35, 0.35, Math.sin(angle))
+    return [
+      [bone, 1 - leg],
+      ['thighL', leg * left],
+      ['thighR', leg * (1 - left)],
+    ]
+  }
   for (const g of [geo, inner]) {
     const welded = mergeVertices(g, 1e-5)
     welded.computeVertexNormals()
-    kit.addWorld(bone, g === geo ? 'fabric' : 'dark', welded)
+    kit.addBending(g === geo ? 'fabric' : 'dark', welded, weigh)
   }
   // Hem line along the bottom edge.
   const edge: Vector3[] = []
@@ -210,7 +240,16 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
     const i = (rows * (cols + 1) + c) * 3
     edge.push(v(verts[i], verts[i + 1], verts[i + 2]))
   }
-  kit.addWorld(bone, 'trim', tube(edge, 0.008, 96))
+  kit.addBending('trim', tube(edge, 0.008, 96), weigh)
+  // A finished edge down each front.
+  for (const c of [0, cols]) {
+    const front: Vector3[] = []
+    for (let r = 0; r <= rows; r++) {
+      const i = (r * (cols + 1) + c) * 3
+      front.push(v(verts[i], verts[i + 1], verts[i + 2]))
+    }
+    kit.addBending('trim', tube(front, 0.006, 48), weigh)
+  }
 }
 
 /**
@@ -218,13 +257,7 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
  * clear of it. Returns where the leg's centre is at a given height, or nothing above the hip.
  */
 function legLines(kit: Kit): ((y: number) => Vector3 | null)[] {
-  const { root } = kit.rig
-  root.updateMatrixWorld(true)
-  const bone = (name: string) => kit.rig.bones.get(name)
-  const at = (name: string) => {
-    const node = bone(name)
-    return node && root.worldToLocal(node.getWorldPosition(new Vector3()))
-  }
+  const at = (name: string) => (kit.rig.bones.has(name) ? kit.rig.restWorldOf(name).position.clone() : undefined)
   return SIDES.flatMap(({ tag }) => {
     const pts = [at(`thigh${tag}`), at(`shin${tag}`), at(`foot${tag}`)]
     if (pts.some((p) => !p)) return []
