@@ -7,14 +7,14 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-11-18",
+  "syncedAt": "2026-11-22",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
     "domains": 12,
-    "rules": 138,
+    "rules": 139,
     "decisions": 66,
-    "anchors": 285,
-    "drifted": 10,
+    "anchors": 287,
+    "drifted": 15,
     "flagged": 8
   },
   "canvas": {
@@ -218,8 +218,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "box": {
         "x": 0,
         "y": 1996,
-        "width": 2010,
-        "height": 816
+        "width": 2587,
+        "height": 826
       },
       "ruleIds": [
         "oracle.request-pipeline",
@@ -235,7 +235,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle.model-routing",
         "oracle.model-fallback",
         "oracle.thread-titles",
-        "oracle.thread-ownership"
+        "oracle.thread-ownership",
+        "oracle.starter-cache"
       ]
     },
     {
@@ -245,7 +246,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Members claim one unique handle, and feeds only show real activity from the member and their friends. Empty stays honest.",
       "overviewHtml": "<p>Social surfaces follow one rule. Show real people and real activity, or show nothing. A quiet new account sees an honest, empty stream instead of fake veterans.</p>",
       "box": {
-        "x": 2106,
+        "x": 2683,
         "y": 1996,
         "width": 904,
         "height": 496
@@ -268,7 +269,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "The app runs inside Neon Free and Vercel Hobby limits. Retention windows, polling rules, and the asset budget keep it there.",
       "overviewHtml": "<p>Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.</p>",
       "box": {
-        "x": 3106,
+        "x": 3683,
         "y": 1996,
         "width": 1196,
         "height": 1252
@@ -298,7 +299,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Private-by-default guest checkout preparation with live quotes, audited operations, and recoverable draft fulfillment.",
       "overviewHtml": "<h1>Store launch preparation</h1>\n<p>The store stays private, test-only and manual until separately authorized. Authored product data,\noperational controls and order snapshots have separate lifecycles. See <code>docs/merch-launch.md</code>.</p>",
       "box": {
-        "x": 4398,
+        "x": 4975,
         "y": 1996,
         "width": 992,
         "height": 988
@@ -325,7 +326,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
       "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
       "box": {
-        "x": 5486,
+        "x": 6063,
         "y": 1996,
         "width": 1196,
         "height": 520
@@ -1267,18 +1268,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar/equipment.ts",
           "symbol": "EQUIPMENT_VISUALS",
-          "line": 62,
+          "line": 82,
           "value": "Object.fromEntries( rows.map(([key, category, material, trim, accent, construction, motif, accessory]) => [ key, { key, category, material, trim, accent, const…",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/equipment.ts#L62"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar/equipment.ts#L82"
         },
         {
           "file": "src/lib/avatar3d/character.ts",
           "symbol": "buildCharacter",
-          "line": 190,
+          "line": 287,
           "value": "buildCharacter(look)",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L190"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d/character.ts#L287"
         }
       ],
       "tests": [
@@ -1359,18 +1360,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/components/hud/SilentSynchronizationDialog.tsx",
           "symbol": "SilentSynchronizationDialog",
-          "line": 82,
+          "line": 72,
           "value": "SilentSynchronizationDialog({ open, onClose, onComplete, avatarUrl, avatarName = 'Your profile', practice = 'silent', })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/SilentSynchronizationDialog.tsx#L82"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/SilentSynchronizationDialog.tsx#L72"
         },
         {
           "file": "src/hooks/useDailyAlignment.tsx",
           "symbol": "AlignmentProvider",
-          "line": 152,
+          "line": 151,
           "value": "AlignmentProvider({ children, reuseRecentSync = false })",
           "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L152"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/hooks/useDailyAlignment.tsx#L151"
         }
       ],
       "tests": [
@@ -2088,17 +2089,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "HIDDEN_PAGES",
           "line": 8,
-          "value": "[ { id: 'premium', path: '/max', }, { id: 'store', path: '/store', }, ] as const",
-          "drift": "ok",
+          "value": "[ { id: 'store', path: '/store', }, ] as const",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L8"
         },
         {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "canViewHiddenPages",
-          "line": 43,
+          "line": 39,
           "value": "canViewHiddenPages(user, profileRole)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L43"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L39"
         }
       ],
       "tests": [
@@ -2122,7 +2123,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 388
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "access.admin-only-paths",
@@ -5196,8 +5197,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "file": "src/lib/community-rules.ts",
           "symbol": "COMMUNITY_RULES",
           "line": 23,
-          "value": "[ { id: 1, title: 'CIVILITY & CONSTRUCTIVE DIALOGUE', shortSummary: 'Maintain intellectual rigor and mutual respect across all initiate stages.', description: …",
-          "drift": "ok",
+          "value": "[ { id: 1, title: 'Civility and respect', shortSummary: 'Keep discussions thoughtful and respectful across all experience levels.', description: 'Add something…",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-rules.ts#L23"
         }
       ],
@@ -5216,7 +5217,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.request-pipeline",
@@ -5224,15 +5225,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Oracle request pipeline",
       "kind": "flow",
       "status": "active",
-      "statement": "Every message passes flood and local input checks. Guests get a capped free-model reply, unsaved. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.",
+      "statement": "Every message passes flood and local input checks. Turn-1 evergreen starter prompts with default settings stream a cached reply without consuming usage allowance. Otherwise guests get a capped free-model reply, unsaved, and members pass usage checks and atomically reserve an allowance slot before model calls. Oversized prompts release the slot. Failed checks return 429 or 503.",
       "anchors": [
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 128,
+          "line": 135,
           "value": "handleOracleChatRequest(request)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L128"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L135"
         }
       ],
       "tests": [
@@ -5248,7 +5249,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle.guest-allowance",
         "oracle.skill-context",
         "oracle.request-caps",
-        "oracle.input-guardrails"
+        "oracle.input-guardrails",
+        "oracle.starter-cache"
       ],
       "decisions": [
         "oracle-usage-and-moderation",
@@ -5478,10 +5480,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "height": 786
       },
       "position": {
-        "x": 1492,
+        "x": 2064,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.rate-limit",
@@ -5520,7 +5522,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flow": null,
       "position": {
         "x": 28,
-        "y": 372
+        "y": 382
       },
       "drift": "ok"
     },
@@ -5633,8 +5635,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 372
+        "x": 612,
+        "y": 382
       },
       "drift": "ok"
     },
@@ -5684,8 +5686,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 506,
-        "y": 528
+        "x": 1083,
+        "y": 538
       },
       "drift": "ok"
     },
@@ -5724,15 +5726,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle.request-pipeline",
         "economy.oracle-skill-prices"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "oracle.starter-cache"
+      ],
       "decisions": [
         "oracle-skills"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1002,
-        "y": 372
+        "x": 320,
+        "y": 382
       },
       "drift": "ok"
     },
@@ -5770,15 +5774,17 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "oracle.input-guardrails"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "oracle.starter-cache"
+      ],
       "decisions": [
         "oracle-skills"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 798,
-        "y": 528
+        "x": 1375,
+        "y": 538
       },
       "drift": "ok"
     },
@@ -5838,8 +5844,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       },
       "flow": null,
       "position": {
-        "x": 1294,
-        "y": 372
+        "x": 897,
+        "y": 382
       },
       "drift": "ok"
     },
@@ -5892,8 +5898,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1586,
-        "y": 372
+        "x": 2163,
+        "y": 382
       },
       "drift": "ok"
     },
@@ -5908,10 +5914,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 128,
+          "line": 135,
           "value": "handleOracleChatRequest(request)",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L128"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L135"
         }
       ],
       "tests": [
@@ -5931,10 +5937,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1090,
-        "y": 528
+        "x": 1667,
+        "y": 538
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "oracle.intent-context",
@@ -5982,8 +5988,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1382,
-        "y": 528
+        "x": 1959,
+        "y": 538
       },
       "drift": "ok"
     },
@@ -6044,8 +6050,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1674,
-        "y": 528
+        "x": 2251,
+        "y": 538
       },
       "drift": "ok"
     },
@@ -6088,8 +6094,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1426,
-        "y": 684
+        "x": 2003,
+        "y": 694
       },
       "drift": "ok"
     },
@@ -6140,8 +6146,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 1718,
-        "y": 684
+        "x": 2295,
+        "y": 694
       },
       "drift": "ok"
     },
@@ -6180,6 +6186,56 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "position": {
         "x": 28,
         "y": 76
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "oracle.starter-cache",
+      "domain": "oracle",
+      "title": "Curated replies for evergreen starter prompts",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Fourteen evergreen starter prompts stream reviewed, cached replies on Turn 1 without calling a model or spending guest or member allowance. New member threads still save with a preset title, and Focus starters attach a matching owned skill when auto-pick is on. Follow-ups, custom settings, picked skills, and live community or page prompts go to the model.",
+      "anchors": [
+        {
+          "file": "src/lib/ai/oracle-starter-cache.ts",
+          "symbol": "lookupCachedStarterReply",
+          "line": 232,
+          "value": "lookupCachedStarterReply(userText)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-starter-cache.ts#L232"
+        },
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.ts",
+          "symbol": "handleOracleChatRequest",
+          "line": 135,
+          "value": "handleOracleChatRequest(request)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L135"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/ai/oracle-starter-cache.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-starter-cache.test.ts"
+        },
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.request-pipeline",
+        "oracle.skill-context",
+        "oracle.custom-instructions"
+      ],
+      "usedBy": [],
+      "decisions": [],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 754,
+        "y": 694
       },
       "drift": "ok"
     },
@@ -6848,7 +6904,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "Route",
           "line": 22,
           "value": "createFileRoute('/news/$slug')({ loader: async ({ params }) => { try { const res = await getBlogPostBySlugFn({ data: params.slug }) if (res) return res } catch…",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/routes/news/$slug.tsx#L22"
         },
         {
@@ -6881,7 +6937,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "data.migrations-via-ci",
@@ -6962,10 +7018,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/lobster-avatar.ts",
           "symbol": "parseLobsterAvatarConfig",
-          "line": 280,
+          "line": 281,
           "value": "parseLobsterAvatarConfig(raw)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L280"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/lobster-avatar.ts#L281"
         },
         {
           "file": "src/lib/avatar/config-schema.ts",
@@ -7009,10 +7065,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/avatar3d-portrait-queue.ts",
           "symbol": "requestStill3D",
-          "line": 137,
+          "line": 144,
           "value": "requestStill3D(config, px, shot, signal)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d-portrait-queue.ts#L137"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/avatar3d-portrait-queue.ts#L144"
         }
       ],
       "tests": [
@@ -7109,26 +7165,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/community-photo.ts",
           "symbol": "photoDue",
-          "line": 81,
+          "line": 97,
           "value": "photoDue(photo, hash, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-photo.ts#L81"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-photo.ts#L97"
         },
         {
           "file": "src/lib/community-photo.ts",
           "symbol": "RETAKE_AFTER_MS",
-          "line": 21,
+          "line": 27,
           "value": "24 * 60 * 60 * 1000",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-photo.ts#L21"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/community-photo.ts#L27"
         },
         {
           "file": "src/lib/server/community-photo.ts",
           "symbol": "saveCommunityPhotoHandler",
-          "line": 122,
+          "line": 133,
           "value": "saveCommunityPhotoHandler({ data, context }, upload, db)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/community-photo.ts#L122"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/community-photo.ts#L133"
         }
       ],
       "tests": [
@@ -7149,7 +7205,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 612,
         "y": 676
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "data.character-atomic-save",
@@ -7224,7 +7280,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "UserAvatar",
           "line": 41,
           "value": "React.memo( ({ user, config, src, name, email, fallbackSrc, fallbackLetter, size = 'md', className = '', alt, borderless = false, glass = true, pending = false…",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/components/UserAvatar.tsx#L41"
         },
         {
@@ -7259,7 +7315,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 364
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "merch.private-pilot",
@@ -7272,10 +7328,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "requireStoreAccess",
-          "line": 28,
+          "line": 27,
           "value": "requireStoreAccess(args)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L28"
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L27"
         }
       ],
       "tests": [
@@ -7301,7 +7357,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 182,
         "y": 76
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "merch.catalog-price",
@@ -7365,10 +7421,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "createQuotedCheckout",
-          "line": 111,
+          "line": 110,
           "value": "createQuotedCheckout(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L111"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L110"
         }
       ],
       "tests": [
@@ -7639,10 +7695,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "createStoreQuote",
-          "line": 81,
+          "line": 80,
           "value": "createStoreQuote(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L81"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L80"
         },
         {
           "file": "src/lib/store.ts",
@@ -7730,18 +7786,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/store.ts",
           "symbol": "getStoreStatus",
-          "line": 191,
+          "line": 190,
           "value": "getStoreStatus(orderId, token)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L191"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L190"
         },
         {
           "file": "src/lib/server/store.ts",
           "symbol": "limitStoreRequest",
-          "line": 59,
+          "line": 58,
           "value": "limitStoreRequest(key, maximum, windowMs)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L59"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/store.ts#L58"
         }
       ],
       "tests": [
@@ -11119,8 +11175,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "public-profiles-and-lessons",
       "date": "2026-11-18",
-      "title": "Open member profiles and Academy lessons to signed-out visitors",
-      "summary": "Anyone can read member profiles, every Academy lesson and the certificate list. Saving progress, quizzes, notes, friend requests and earning certificates still need a free account, and each of those spots asks visitors to sign up.",
+      "title": "Open member profiles and the Academy to browse; starting lessons needs sign-up",
+      "summary": "Anyone can read member profiles and browse the Academy, including lesson pages and the certificate list. Starting lessons, saving progress, quizzes, notes, friend requests, and earning certificates require a free account.",
       "domains": [
         "data"
       ],
@@ -11158,15 +11214,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
         },
         {
           "heading": "Decision",
-          "html": "<ul>\n<li>Member profiles are public: name, stage, avatar, join date, Moltmax rating, bio, traits, bonds and equipped gear. Signed-out visitors see &quot;Sign up to add friend&quot; and &quot;Build your own&quot; (the guest character editor) instead of friend actions.</li>\n<li>Every Academy lesson is readable without an account or enrollment. This supersedes &quot;lessons need an account&quot; in the 2026-11-12 guest-access decision.</li>\n<li>Saving progress, notes and quiz scores still needs an account and enrollment. For visitors, Mark complete reads &quot;Sign up to save your progress&quot; and Submit reads &quot;Sign up to submit&quot;; both open sign-up.</li>\n<li>The certificate list is public. Each certificate offers &quot;Sign up to earn this&quot;.</li>\n<li>Search: Academy tracks, courses and lessons are indexed and listed in the sitemap. Member profiles, member search and credential pages stay noindex, because they name people.</li>\n<li>Member search, the support form, your own profile and Settings stay members-only.</li>\n</ul>"
+          "html": "<ul>\n<li>Member profiles are public: name, stage, avatar, join date, Moltmax rating, bio, traits, bonds and equipped gear. Signed-out visitors see &quot;Sign up to add friend&quot; and &quot;Build your own&quot; (the guest character editor) instead of friend actions.</li>\n<li>Every Academy lesson page is open, so visitors see its title, summary, length and the course syllabus. The material itself (video, reading, quiz) opens on enrolling, which needs an account; visitors see &quot;Sign up to start&quot;. One preview lesson per course stays fully open. This replaces &quot;lessons need an account&quot; in the 2026-11-12 guest-access decision, which kept lesson pages members-only.</li>\n<li>Saving progress, notes and quiz scores needs an account and enrollment. On a preview lesson, Mark complete reads &quot;Sign up to save your progress&quot; for visitors and Submit reads &quot;Sign up to submit&quot;; both open sign-up.</li>\n<li>The certificate list is public. Each certificate offers &quot;Sign up to earn this&quot;.</li>\n<li>Search: Academy tracks, courses and preview lessons are listed in the sitemap. Locked lessons are not listed, since they show only a summary and a sign-up prompt. Member profiles, member search and credential pages stay noindex, because they name people.</li>\n<li>Member search, the support form, your own profile and Settings stay members-only.</li>\n</ul>"
         },
         {
           "heading": "Alternatives",
-          "html": "<ul>\n<li>Keep lessons behind enrollment with one preview lesson per course. Rejected: the preview gave search and visitors too little to judge a course by.</li>\n<li>Index member profiles. Rejected: profiles name members who did not choose to appear in search.</li>\n</ul>"
+          "html": "<ul>\n<li>Open every lesson&#39;s material to read without an account. Rejected: Myles wants visitors to browse freely but sign up before they start the material.</li>\n<li>Index member profiles. Rejected: profiles name members who did not choose to appear in search.</li>\n</ul>"
         },
         {
           "heading": "Consequences",
-          "html": "<ul>\n<li>Lesson bodies and quiz questions are sent to anyone. Quiz answers are still graded on the server and only recorded for signed-in learners.</li>\n<li>The sitemap now looks up each published course to list its lessons; it is cached for a day.</li>\n</ul>"
+          "html": "<ul>\n<li>Locked lessons still withhold body, video and questions on the server; only the preview lesson&#39;s material reaches visitors.</li>\n<li>The sitemap now looks up each published course to list its preview lesson; it is cached for a day.</li>\n</ul>"
         }
       ]
     }
@@ -11897,6 +11953,24 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "source": "access.write-auth",
       "target": "oracle.thread-ownership",
       "crossDomain": true
+    },
+    {
+      "id": "oracle.request-pipeline->oracle.starter-cache",
+      "source": "oracle.request-pipeline",
+      "target": "oracle.starter-cache",
+      "crossDomain": false
+    },
+    {
+      "id": "oracle.skill-context->oracle.starter-cache",
+      "source": "oracle.skill-context",
+      "target": "oracle.starter-cache",
+      "crossDomain": false
+    },
+    {
+      "id": "oracle.custom-instructions->oracle.starter-cache",
+      "source": "oracle.custom-instructions",
+      "target": "oracle.starter-cache",
+      "crossDomain": false
     },
     {
       "id": "social.handle-rules->social.handle-at-character-create",
