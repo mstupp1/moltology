@@ -11,12 +11,19 @@ import { verifyAuthJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt, DEFAULT_ORACLE_PERSONA } from './codex-prompt'
 import { buildOracleScriptureContext } from './scripture-lookup'
-import { buildOracleSkillContext, createOracleSkillTools, joinStepText } from './oracle-skills-prompt'
+import { buildOracleSkillContext, createOracleSkillTools, joinStepText, type OracleSkillPlan } from './oracle-skills-prompt'
 import type { OracleSkill } from './oracle-skills-catalog'
 import { resolveOracleSkillPlan } from '../server/oracle-skill-access'
 import { loadOracleChatSettingsForChat } from '../server/oracle-chat-settings'
 import { buildOracleChatSettingsContext } from './oracle-chat-settings-prompt'
+import {
+  cleanCustomInstructions,
+  DEFAULT_ORACLE_PERSONALITY,
+  personalityOf,
+  type OracleChatSettings,
+} from '../oracle-chat-settings'
 import { ORACLE_SKILL_HEADER, type OracleSkillPart } from '../oracle-skills'
+import { createCachedStarterResponse, lookupCachedStarterReply } from './oracle-starter-cache'
 import { ORACLE_READS_HEADER, encodeReadsHeader, type OracleReadItem, type OracleReadsPart } from '../oracle-reads'
 import {
   buildOraclePageContext,
@@ -175,10 +182,99 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
 
+  const cachedStarter =
+    !body.threadId && messages.length === 1 && !body.skillId
+      ? lookupCachedStarterReply(userText)
+      : null
+
   if (!userId) {
     const lengthError = getOraclePromptLengthError(userText, false)
     if (lengthError) return Response.json({ error: lengthError }, { status: 400 })
+    if (cachedStarter) {
+      return createCachedStarterResponse(cachedStarter.answer, { signal: request.signal })
+    }
     return handleGuestOracleChat(messages, userText, clientIp, request.signal, parseOraclePage(body.page))
+  }
+
+  let prefetchedChatSettings: OracleChatSettings | null = null
+  let hasPrefetchedChatSettings = false
+  let prefetchedSkillPlan: OracleSkillPlan | null = null
+
+  if (cachedStarter) {
+    const [loadedSettings, loadedSkillPlan] = await Promise.all([
+      loadOracleChatSettingsForChat(userId),
+      cachedStarter.skillId ? resolveOracleSkillPlan(userId, null) : Promise.resolve(null),
+    ])
+    prefetchedChatSettings = loadedSettings
+    hasPrefetchedChatSettings = true
+    prefetchedSkillPlan = loadedSkillPlan
+
+    const hasCustomSettings =
+      personalityOf(loadedSettings) !== DEFAULT_ORACLE_PERSONALITY ||
+      cleanCustomInstructions(loadedSettings?.customInstructions).length > 0
+
+    if (!hasCustomSettings) {
+      const activeThreadId = crypto.randomUUID()
+      try {
+        await createAIThread({
+          id: activeThreadId,
+          userId,
+          title: cachedStarter.title,
+          persona: 'oracle',
+        })
+      } catch (error) {
+        if (isChatLimitError(error)) {
+          return Response.json({ error: getChatLimitMessage() }, { status: 409 })
+        }
+        console.warn('[handleOracleChatRequest] Could not reserve new conversation:', error)
+        return Response.json(
+          { error: 'Could not start a new conversation right now. Please try again.' },
+          { status: 503 },
+        )
+      }
+
+      const matchedSkill = cachedStarter.skillId
+        ? loadedSkillPlan?.discoverable.find((s) => s.id === cachedStarter.skillId) ?? null
+        : null
+      const assistantParts: OracleSkillPart[] = matchedSkill
+        ? [{ type: 'skill', id: matchedSkill.id, name: matchedSkill.name, how: 'auto' }]
+        : []
+      const headers: Record<string, string> = {
+        [ORACLE_THREAD_ID_HEADER]: activeThreadId,
+      }
+      if (matchedSkill) {
+        headers[ORACLE_SKILL_HEADER] = matchedSkill.id
+      }
+
+      const userSaveTask = saveAIMessage({
+        threadId: activeThreadId,
+        userId,
+        role: 'user',
+        content: userText,
+      }).catch((dbErr) => {
+        console.warn('[handleOracleChatRequest] DB thread/message logging warning:', dbErr)
+      })
+
+      return createCachedStarterResponse(cachedStarter.answer, {
+        headers,
+        signal: request.signal,
+        onComplete: async (emittedText) => {
+          await userSaveTask
+          if (!emittedText.trim()) return
+          try {
+            await saveAIMessage({
+              threadId: activeThreadId,
+              userId,
+              role: 'assistant',
+              content: emittedText,
+              parts: assistantParts as unknown as Record<string, unknown>[],
+            })
+          } catch (dbErr) {
+            console.warn('[handleOracleChatRequest] DB assistant response logging warning:', dbErr)
+          }
+        },
+      })
+    }
   }
 
   try {
@@ -265,8 +361,8 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   }
 
   const [skillPlan, chatSettings] = await Promise.all([
-    resolveOracleSkillPlan(userId, typeof body.skillId === 'string' ? body.skillId : null),
-    loadOracleChatSettingsForChat(userId),
+    prefetchedSkillPlan ?? resolveOracleSkillPlan(userId, typeof body.skillId === 'string' ? body.skillId : null),
+    hasPrefetchedChatSettings ? prefetchedChatSettings : loadOracleChatSettingsForChat(userId),
   ])
   // Order: fixed prompt (plus the fixed site-reading guidance when tools are on), then the
   // member's preferences (same on every message, so the cached prefix holds), then the

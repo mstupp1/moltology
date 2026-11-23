@@ -3,7 +3,9 @@ import { handleOracleChatRequest, ORACLE_USAGE_UNAVAILABLE_MESSAGE } from './han
 import { ORACLE_THREAD_ID_HEADER, ORACLE_UNAVAILABLE_MESSAGE } from './oracle-chat'
 import { DEFAULT_ORACLE_MODEL_ID, PREMIUM_ORACLE_MODEL_ID, PREMIUM_ORACLE_TITLE_MODEL_ID, ORACLE_TITLE_MODEL_ID } from './oracle-models'
 import { buildSystemPrompt } from './codex-prompt'
-import { getOracleUsageSnapshot, getRecentAIThreadTurns, releaseOracleChatUsage, reserveOracleChatUsage, saveAIMessage, summarizeThreadTitle, updateAIThreadTitle } from './service'
+import { CACHED_STARTER_REPLIES, ORACLE_CACHED_HEADER } from './oracle-starter-cache'
+import { createAIThread, getOracleUsageSnapshot, getRecentAIThreadTurns, releaseOracleChatUsage, reserveOracleChatUsage, saveAIMessage, summarizeThreadTitle, updateAIThreadTitle } from './service'
+import { loadOracleChatSettingsForChat } from '../server/oracle-chat-settings'
 import { buildOracleUsageSnapshot, ORACLE_FREE_LIMITS, ORACLE_MAX_OUTPUT_TOKENS, ORACLE_PREMIUM_LIMITS } from './usage-limits'
 import { validateInputGuardrails } from './guardrails'
 import { getChatLimitError } from './chat-retention'
@@ -1059,5 +1061,263 @@ describe('handleOracleChatRequest site reading tools', () => {
     }))
     expect(decodeReadsHeader(response.headers.get(ORACLE_READS_HEADER))).toHaveLength(1)
     expect(await response.text()).toBe('Guest summary.')
+  })
+})
+
+describe('handleOracleChatRequest cached starter replies', () => {
+  const whatIsMoltology = CACHED_STARTER_REPLIES.find((r) => r.id === 'what-is-moltology')!
+  const focusHour = CACHED_STARTER_REPLIES.find((r) => r.id === 'focus-hour')!
+  const focusRounds = getOracleSkill('focus-rounds')!
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    streamTextMock.mockReset()
+    vi.mocked(createAIThread).mockReset().mockResolvedValue({ id: 'thread-1' } as any)
+    vi.mocked(saveAIMessage).mockReset().mockResolvedValue({ id: 'msg-1' } as any)
+    vi.mocked(summarizeThreadTitle).mockReset().mockResolvedValue('Test Title')
+    vi.mocked(loadOracleChatSettingsForChat).mockReset().mockResolvedValue({})
+    vi.mocked(resolveOracleSkillPlan).mockReset().mockResolvedValue({ discoverable: [] })
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue(TEST_THREAD_ID)
+  })
+
+  it('streams a cached starter reply to a guest without spending guest allowance or calling a model', async () => {
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        page: '/dashboard',
+        messages: [{ role: 'user', content: 'What is Moltology and why should I molt?' }],
+      }),
+    )
+
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toBe('text/plain; charset=utf-8')
+    expect(res.headers.get(ORACLE_CACHED_HEADER)).toBe('1')
+    expect(res.headers.get(ORACLE_THREAD_ID_HEADER)).toBeNull()
+    expect(await res.text()).toBe(whatIsMoltology.answer)
+    expect(reserveGuestOracleMessage).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+    expect(saveAIMessage).not.toHaveBeenCalled()
+  })
+
+  it('sends guest Turn-2 follow-ups to the live model with full history', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Live follow-up') })
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        messages: [
+          { role: 'user', content: 'What is Moltology and why should I molt?' },
+          { role: 'assistant', content: whatIsMoltology.answer },
+          { role: 'user', content: 'Wait, tell me more about tabs' },
+        ],
+      }),
+    )
+
+    expect(res.status).toBe(200)
+    expect(res.headers.get(ORACLE_CACHED_HEADER)).toBeNull()
+    expect(await res.text()).toBe('Live follow-up')
+    expect(reserveGuestOracleMessage).toHaveBeenCalledTimes(1)
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
+    expect(streamTextMock.mock.calls[0][0].messages).toEqual([
+      { role: 'user', content: 'What is Moltology and why should I molt?' },
+      { role: 'assistant', content: whatIsMoltology.answer },
+      { role: 'user', content: 'Wait, tell me more about tabs' },
+    ])
+  })
+
+  it('creates a titled thread, persists user before assistant before EOF, and skips model/quota for default member', async () => {
+    const events: string[] = []
+    let resolveUserSave!: () => void
+    vi.mocked(saveAIMessage)
+      .mockImplementationOnce(
+        (input) =>
+          new Promise((resolve) => {
+            events.push(`start:${input.role}`)
+            resolveUserSave = () => {
+              events.push(`done:${input.role}`)
+              resolve({ id: 'user-msg' } as any)
+            }
+          }),
+      )
+      .mockImplementationOnce(async (input) => {
+        events.push(`start:${input.role}`)
+        events.push(`done:${input.role}`)
+        return { id: 'assistant-msg' } as any
+      })
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({
+        page: '/dashboard',
+        messages: [{ role: 'user', content: 'What is Moltology and why should I molt?' }],
+      }),
+    )
+
+    expect(res.status).toBe(200)
+    expect(res.headers.get(ORACLE_CACHED_HEADER)).toBe('1')
+    expect(res.headers.get(ORACLE_THREAD_ID_HEADER)).toBe(TEST_THREAD_ID)
+    expect(createAIThread).toHaveBeenCalledWith({
+      id: TEST_THREAD_ID,
+      userId: 'usr_from_jwt',
+      title: whatIsMoltology.title,
+      persona: 'oracle',
+    })
+
+    const reader = res.body!.getReader()
+    const decoder = new TextDecoder()
+    let received = ''
+    while (true) {
+      const next = await reader.read()
+      if (next.done) break
+      received += decoder.decode(next.value, { stream: true })
+      if (received === whatIsMoltology.answer) {
+        // Resolve the user save after chunks arrive to verify assistant save waits for it before EOF.
+        resolveUserSave?.()
+      }
+    }
+    received += decoder.decode()
+
+    expect(received).toBe(whatIsMoltology.answer)
+    expect(events).toEqual(['start:user', 'done:user', 'start:assistant', 'done:assistant'])
+    expect(saveAIMessage).toHaveBeenNthCalledWith(1, {
+      threadId: TEST_THREAD_ID,
+      userId: 'usr_from_jwt',
+      role: 'user',
+      content: 'What is Moltology and why should I molt?',
+    })
+    expect(saveAIMessage).toHaveBeenNthCalledWith(2, {
+      threadId: TEST_THREAD_ID,
+      userId: 'usr_from_jwt',
+      role: 'assistant',
+      content: whatIsMoltology.answer,
+      parts: [],
+    })
+    expect(getOracleUsageSnapshot).not.toHaveBeenCalled()
+    expect(reserveOracleChatUsage).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+    expect(summarizeThreadTitle).not.toHaveBeenCalled()
+    expect(updateAIThreadTitle).not.toHaveBeenCalled()
+  })
+
+  it('bypasses cache on an existing member thread even if the message text matches a starter', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Live reply in thread') })
+    vi.mocked(getRecentAIThreadTurns).mockResolvedValueOnce([
+      { role: 'user', content: 'Hi' },
+      { role: 'assistant', content: 'Hello.' },
+    ])
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({
+        threadId: TEST_THREAD_ID,
+        messages: [{ role: 'user', content: 'What is Moltology and why should I molt?' }],
+      }),
+    )
+
+    expect(res.headers.get(ORACLE_CACHED_HEADER)).toBeNull()
+    expect(await res.text()).toBe('Live reply in thread')
+    expect(reserveOracleChatUsage).toHaveBeenCalledTimes(1)
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    { personality: 'straight' as const },
+    { customInstructions: 'Keep replies under three sentences.' },
+  ])('bypasses cache and reuses settings once when member has custom settings: %j', async (settings) => {
+    vi.mocked(loadOracleChatSettingsForChat).mockResolvedValueOnce(settings)
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Custom live reply') })
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({
+        messages: [{ role: 'user', content: 'What is Moltology and why should I molt?' }],
+      }),
+    )
+
+    expect(res.headers.get(ORACLE_CACHED_HEADER)).toBeNull()
+    expect(await res.text()).toBe('Custom live reply')
+    expect(loadOracleChatSettingsForChat).toHaveBeenCalledTimes(1)
+    expect(reserveOracleChatUsage).toHaveBeenCalledTimes(1)
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('bypasses cache when the member explicitly picked a skill', async () => {
+    vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ picked: focusRounds, discoverable: [] })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Picked skill reply') })
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({
+        skillId: 'focus-rounds',
+        messages: [{ role: 'user', content: 'Help me set up one focused hour of work right now.' }],
+      }),
+    )
+
+    expect(res.headers.get(ORACLE_CACHED_HEADER)).toBeNull()
+    expect(await res.text()).toBe('Picked skill reply')
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('attaches matching owned auto-pick skill on Focus starters and omits it when unowned or disabled', async () => {
+    vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ discoverable: [focusRounds] })
+    const withSkill = await handleOracleChatRequest(
+      await authedRequest({
+        messages: [{ role: 'user', content: 'Help me set up one focused hour of work right now.' }],
+      }),
+    )
+
+    expect(withSkill.headers.get(ORACLE_CACHED_HEADER)).toBe('1')
+    expect(withSkill.headers.get(ORACLE_SKILL_HEADER)).toBe('focus-rounds')
+    expect(await withSkill.text()).toBe(focusHour.answer)
+    expect(saveAIMessage).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        role: 'assistant',
+        parts: [{ type: 'skill', id: 'focus-rounds', name: 'Focus rounds', how: 'auto' }],
+      }),
+    )
+
+    vi.clearAllMocks()
+    vi.mocked(resolveOracleSkillPlan).mockResolvedValueOnce({ discoverable: [] })
+    const withoutSkill = await handleOracleChatRequest(
+      await authedRequest({
+        messages: [{ role: 'user', content: 'Help me set up one focused hour of work right now.' }],
+      }),
+    )
+
+    expect(withoutSkill.headers.get(ORACLE_CACHED_HEADER)).toBe('1')
+    expect(withoutSkill.headers.get(ORACLE_SKILL_HEADER)).toBeNull()
+    expect(await withoutSkill.text()).toBe(focusHour.answer)
+    expect(saveAIMessage).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        role: 'assistant',
+        parts: [],
+      }),
+    )
+  })
+
+  it('enforces the member 50-thread limit on cached starter hits', async () => {
+    vi.mocked(createAIThread).mockRejectedValueOnce(getChatLimitError())
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({
+        messages: [{ role: 'user', content: 'What is Moltology and why should I molt?' }],
+      }),
+    )
+
+    expect(res.status).toBe(409)
+    expect(await res.json()).toEqual({
+      error: 'You have 50 conversations. Delete one to start another.',
+    })
+    expect(reserveOracleChatUsage).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
+
+  it('leaves dynamic community starter prompts on the live model path', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Live forum summary') })
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({
+        messages: [{ role: 'user', content: "What are today's top posts on the forum?" }],
+      }),
+    )
+
+    expect(res.headers.get(ORACLE_CACHED_HEADER)).toBeNull()
+    expect(await res.text()).toBe('Live forum summary')
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
   })
 })

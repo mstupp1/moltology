@@ -8,7 +8,7 @@ rules:
   - id: oracle.request-pipeline
     title: Oracle request pipeline
     kind: flow
-    statement: Every message passes flood and local input checks. Guests get a capped free-model reply, unsaved. Members pass usage checks and atomically reserve an allowance slot before chat model calls. Oversized tier-specific prompts release the slot. Read or reservation failures return 503; denied allowance returns 429. Failed thread creation releases the reservation.
+    statement: Every message passes flood and local input checks. Turn-1 evergreen starter prompts with default settings stream a cached reply without consuming usage allowance. Otherwise guests get a capped free-model reply, unsaved, and members pass usage checks and atomically reserve an allowance slot before model calls. Oversized prompts release the slot. Failed checks return 429 or 503.
     anchors:
       - file: src/lib/ai/handle-oracle-chat-request.ts
         symbol: handleOracleChatRequest
@@ -222,6 +222,17 @@ rules:
       - file: src/lib/ai/service.ts
         symbol: getOwnedAIThread
     tests: [src/lib/server/oracle-threads.test.ts]
+  - id: oracle.starter-cache
+    title: Curated replies for evergreen starter prompts
+    kind: flow
+    statement: Fourteen evergreen starter prompts stream reviewed, cached replies on Turn 1 without calling a model or spending guest or member allowance. New member threads still save with a preset title, and Focus starters attach a matching owned skill when auto-pick is on. Follow-ups, custom settings, picked skills, and live community or page prompts go to the model.
+    dependsOn: [oracle.request-pipeline, oracle.skill-context, oracle.custom-instructions]
+    anchors:
+      - file: src/lib/ai/oracle-starter-cache.ts
+        symbol: lookupCachedStarterReply
+      - file: src/lib/ai/handle-oracle-chat-request.ts
+        symbol: handleOracleChatRequest
+    tests: [src/lib/ai/oracle-starter-cache.test.ts, src/lib/ai/handle-oracle-chat-request.test.ts]
 ---
 
 The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member's allowance, then selects a chat model allowed by the verified membership tier. There is no remote moderation call in chat; Laya and Jev remain in forum and signup screening.
