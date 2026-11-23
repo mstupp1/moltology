@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { ALL_EQUIPMENT_CATALOG } from './equipment-seed-data'
 import { computeMoltmaxResult, MOLTMAX_QUESTIONS } from './moltmax-quiz'
@@ -89,11 +89,20 @@ describe('vectors', () => {
     }
   })
 
-  it('ships the current gear numbers in the stats migration', () => {
-    const sql = readFileSync('drizzle/0060_vector_stats.sql', 'utf8')
+  it('ships the current gear numbers in a migration', () => {
+    // Pieces from before the vector move are updated in 0060; later pieces carry their numbers in
+    // their own catalog insert (npm run gear:sql).
+    const stats = readFileSync('drizzle/0060_vector_stats.sql', 'utf8')
+    const all = readdirSync('drizzle')
+      .filter((f) => f.endsWith('.sql'))
+      .map((f) => readFileSync(`drizzle/${f}`, 'utf8'))
+      .join('\n')
     for (const c of ALL_EQUIPMENT_CATALOG) {
       if (c.kind === 'cosmetic') continue
-      expect(sql).toContain(`('${c.id}'::uuid,${c.primaryStat},'${JSON.stringify(c.affixes)}'::jsonb)`)
+      const affixes = `'${JSON.stringify(c.affixes)}'::jsonb`
+      const insert = all.split('\n').find((line) => line.startsWith(`('${c.id}'::uuid,`))
+      const shipped = stats.includes(`('${c.id}'::uuid,${c.primaryStat},${affixes})`) || Boolean(insert?.includes(`,${c.primaryStat},${affixes},`))
+      expect(shipped, c.slug).toBe(true)
     }
   })
 })

@@ -8,180 +8,17 @@
  * Items come from the 2D catalog (`EQUIPMENT_VISUALS`): category picks the builder, motif and
  * construction level pick the details, and the three colours become the three materials.
  */
-import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Mesh, MeshPhysicalMaterial, Quaternion, SphereGeometry, TorusGeometry, Vector3, type Material } from 'three'
-import { workedSurface } from './materials'
-import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import { getEquipmentVisual, tone, type EquipmentVisual } from '../avatar/equipment'
+import { BoxGeometry, BufferGeometry, CatmullRomCurve3, ConeGeometry, CylinderGeometry, Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
+import { getEquipmentVisual } from '../avatar/equipment'
 import type { EquippedAppearance } from '../character-appearance'
 import { parseVariantKey } from '../gear-variants'
-import { equipAccessory, type GearItem } from './gear'
-import type { Loft } from './loft'
-import { alongY, placed, spike, taperedTube } from './parts'
-import { lookQuaternion, type Rig, type Wearable } from './rig'
-
-type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'dark'
-type Amount = (local: Vector3, rest: Vector3, normal: Vector3) => number
-
-const v = (x: number, y: number, z: number) => new Vector3(x, y, z)
-const SIDES = [
-  { s: 1, tag: 'L' },
-  { s: -1, tag: 'R' },
-] as const
-
-/** Rounded plate edge: 1 well inside, 0 on the edge, negative outside so the rim tucks into the body. */
-const bevel = (t: number) => (t <= 0 ? Math.max(t, -1) : t >= 1 ? 1 : 1 - (1 - t) * (1 - t))
-/** 1 between lo and hi, tucking under at both limits over `soft`. */
-const within = (x: number, lo: number, hi: number, soft: number) => bevel(Math.min(x - lo, hi - x) / soft)
-const above = (x: number, lo: number, soft: number) => bevel((x - lo) / soft)
-const below = (x: number, hi: number, soft: number) => bevel((hi - x) / soft)
-const smooth = (a: number, b: number, x: number) => {
-  const t = Math.min(Math.max((x - a) / (b - a), 0), 1)
-  return t * t * (3 - 2 * t)
-}
-
-/** Keep only what gear materials need, so any two parts can merge. */
-function strip(geo: BufferGeometry): BufferGeometry {
-  for (const name of Object.keys(geo.attributes)) if (name !== 'position' && name !== 'normal') geo.deleteAttribute(name)
-  return geo.index ? geo : mergeVertices(geo)
-}
-
-/** Collects one item's parts by bone and material, then turns them into meshes. */
-class Kit {
-  private readonly parts = new Map<string, { bone: string; tone: Tone; geos: BufferGeometry[] }>()
-
-  constructor(
-    readonly rig: Rig,
-    readonly visual: EquipmentVisual,
-  ) {}
-
-  /** Geometry in the bone's local space. */
-  add(bone: string, tone: Tone, geo: BufferGeometry): void {
-    const id = `${bone}|${tone}`
-    const entry = this.parts.get(id) ?? { bone, tone, geos: [] }
-    entry.geos.push(strip(geo))
-    this.parts.set(id, entry)
-  }
-
-  /** Geometry in character space. */
-  addWorld(bone: string, tone: Tone, geo: BufferGeometry): void {
-    this.add(bone, tone, this.rig.localize(bone, geo))
-  }
-
-  /**
-   * A plate over a bone's own surface. `amount` is how far each point lifts off the body; where
-   * it drops to zero or below the plate ends, with its edge sunk into the body.
-   */
-  puff(bone: string, tone: Tone, amount: Amount, slot: 'shell' | 'belly' = 'shell'): void {
-    const mesh = this.rig.mesh(bone, slot)
-    const index = mesh?.geometry.getIndex()
-    const rest = mesh?.geometry.getAttribute('restPos')
-    if (!mesh || !index || !rest) return
-    const pos = mesh.geometry.getAttribute('position')
-    const nor = mesh.geometry.getAttribute('normal')
-    const lift = new Float32Array(pos.count)
-    const moved = new Float32Array(pos.count * 3)
-    const p = new Vector3()
-    const n = new Vector3()
-    const w = new Vector3()
-    for (let i = 0; i < pos.count; i++) {
-      p.fromBufferAttribute(pos, i)
-      n.fromBufferAttribute(nor, i)
-      w.fromBufferAttribute(rest, i)
-      lift[i] = amount(p, w, n)
-      p.addScaledVector(n, lift[i]).toArray(moved, i * 3)
-    }
-    const remap = new Int32Array(pos.count).fill(-1)
-    const verts: number[] = []
-    const tris: number[] = []
-    for (let t = 0; t < index.count; t += 3) {
-      const abc = [index.getX(t), index.getX(t + 1), index.getX(t + 2)]
-      if (abc.every((i) => lift[i] <= 0)) continue
-      for (const i of abc) {
-        if (remap[i] < 0) {
-          remap[i] = verts.length / 3
-          verts.push(moved[i * 3], moved[i * 3 + 1], moved[i * 3 + 2])
-        }
-        tris.push(remap[i])
-      }
-    }
-    if (!tris.length) return
-    const geo = new BufferGeometry()
-    geo.setAttribute('position', new BufferAttribute(new Float32Array(verts), 3))
-    geo.setIndex(tris)
-    const welded = mergeVertices(geo, 1e-4)
-    welded.computeVertexNormals()
-    this.add(bone, tone, welded)
-  }
-
-  finish(): GearItem {
-    const v = this.visual
-    const rarity = parseVariantKey(v.key).rarity
-    // Rare and better pieces carry an engraving inlaid in their trim colour.
-    const engrave = rarity === 'rare' || rarity === 'epic' || rarity === 'legendary' ? v.trim : undefined
-    const plateMetal = v.surface === 'metal' ? 0.6 : 0.05
-    const materials: Record<Tone, Material> = {
-      plate: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), metalness: plateMetal, roughness: v.surface === 'metal' ? 0.4 : 0.5, clearcoat: 0.45, clearcoatRoughness: 0.3 }), v.surface, { engrave }),
-      trim: new MeshPhysicalMaterial({ color: new Color(v.trim), metalness: 0.9, roughness: 0.26 }),
-      accent: new MeshPhysicalMaterial({ color: new Color(v.accent), emissive: new Color(v.accent), emissiveIntensity: 0.85, roughness: 0.3 }),
-      cloth: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.92, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color(v.trim) }), 'cloth'),
-      dark: workedSurface(new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.15, roughness: 0.6 }), 'leather'),
-    }
-    const meshes: Mesh[] = []
-    for (const { bone, tone: t, geos } of this.parts.values()) {
-      const geo = geos.length === 1 ? geos[0] : mergeGeometries(geos, false)
-      if (!geo) continue
-      const mesh = new Mesh(geo, materials[t])
-      mesh.name = `gear:${v.key}:${bone}:${t}`
-      mesh.castShadow = true
-      mesh.receiveShadow = t !== 'accent'
-      this.rig.bone(bone).add(mesh)
-      meshes.push(mesh)
-    }
-    return {
-      dispose: () => {
-        for (const mesh of meshes) {
-          mesh.removeFromParent()
-          mesh.geometry.dispose()
-        }
-        for (const m of Object.values(materials)) m.dispose()
-      },
-    }
-  }
-}
-
-/** A point on an upright body, `lift` off the skin. `phi` is the angle round from the front, positive toward the character's left. */
-function onBody(host: Loft, y: number, phi: number, lift = 0): { at: Vector3; normal: Vector3 } {
-  const s = host.sAt(y)
-  const theta = Math.PI / 2 - phi
-  const normal = host.normal(s, theta)
-  return { at: host.point(s, theta).addScaledVector(normal, lift), normal }
-}
-
-/** Angle round an upright body from its front, 0 to PI, the same on both sides. */
-function fromFront(host: Loft, rest: Vector3): number {
-  const k = host.key(host.sAt(rest.y))
-  return Math.atan2(Math.abs(rest.x - (k.x ?? 0)), rest.z - (k.z ?? 0))
-}
-
-const tube = (points: Vector3[], r: number, rows = 24) => taperedTube(points, r, r, rows)
-
-/** A line on the body's surface between two (height, angle) ends. */
-function seam(host: Loft, from: [number, number], to: [number, number], lift: number, r: number, steps = 7): BufferGeometry {
-  const pts: Vector3[] = []
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps
-    pts.push(onBody(host, from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t, lift).at)
-  }
-  return tube(pts, r, steps * 4)
-}
-
-/** A flattened dome sitting on a surface: bolts, studs, gems and small plates. */
-function stud(at: Vector3, normal: Vector3, rx: number, ry = rx, depth = rx * 0.6): BufferGeometry {
-  const g = new SphereGeometry(1, 14, 10)
-  g.scale(rx, ry, depth)
-  return placed(g, at, lookQuaternion(normal))
-}
-
+import type { GearShape } from '../gear/types'
+import { equipAccessory, equipHat, type GearItem } from './gear'
+import { Kit, SIDES, above, below, bevel, fromFront, onBody, seam, smooth, stud, tube, v, within, type Tone } from './gear-kit'
+import { garment, shoes } from './gear-cloth'
+import { heldProp } from './gear-props'
+import { alongY, placed, spike } from './parts'
+import { type Rig, type Wearable } from './rig'
 function torsoArmour(kit: Kit, wear: Wearable): void {
   const { loft: host, bone, top, bottom } = wear.torso
   const { motif, construction: n } = kit.visual
@@ -328,6 +165,7 @@ function clawGear(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
   const { clawSize: S, claw: style, fore, radius: r } = wear.arm
   const bone = `claw${tag}`
   if (motif === 'hammer') return hammer(kit, wear, tag)
+  if (motif === 'tape') return taped(kit, wear, tag)
   // The pincer opens toward the body, so its outer edge is on the far side from the thumb.
   const outer = tag === 'L' ? 1 : -1
   const halfWidth = 0.24 * style.bulk * S
@@ -361,6 +199,30 @@ function clawGear(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
     const edge = (t: number) => v(outer * (halfWidth * (0.96 + 0.06 * Math.sin(t * Math.PI)) + lift), -(0.1 + t * 0.36) * S, 0)
     kit.add(bone, 'trim', tube([edge(0), edge(0.33), edge(0.66), edge(1)], 0.012 + n * 0.002, 16))
   }
+}
+
+/**
+ * Athletic tape: a smooth wrap over the palm and the base of the thumb, wound on a slant, with a
+ * fine line at the edge of every strip, and two bands round the wrist. The pincer tips stay bare.
+ */
+function taped(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
+  const { clawSize: S, claw: style, fore } = wear.arm
+  const lift = 0.014
+  // Strips run on a slant: u = y + x * slant is constant along each edge.
+  const slant = 0.3
+  const plane = v(slant, 1, 0)
+  const scale = plane.length()
+  plane.normalize()
+  const wrap = (bone: string, from: number, to: number, strip: number, soft: number) => {
+    kit.puff(bone, 'tape', (p) => lift * within(p.dot(plane) * scale, to, from, soft))
+    for (let u = from - strip; u > to + strip * 0.4; u -= strip) {
+      const line = kit.slice(bone, plane, u / scale, lift + 0.001)
+      if (line.length) kit.add(bone, 'seam', tube(line, 0.0035, 80))
+    }
+  }
+  wrap(`claw${tag}`, 0.05 * S, -0.4 * S * style.reach, 0.07 * S, 0.03 * S)
+  wrap(`thumb${tag}`, 0.0, -0.2 * S * style.reach, 0.06 * S, 0.025 * S)
+  wrap(`forearm${tag}`, -fore * 0.6, -fore * 0.92, fore * 0.11, 0.02)
 }
 
 /** Held upright in the pinch: the shaft runs up the front of the claw and the head sits above it. */
@@ -477,10 +339,33 @@ function antennaGear(kit: Kit, wear: Wearable): void {
   }
 }
 
+/** How a shape is built. Claw shapes are built once per claw, with its side. */
+type ShapeBuilder = (kit: Kit, wear: Wearable, side: 'L' | 'R') => void
+
+/**
+ * One builder per shape. A new shape goes here (and in SHAPE_SLOT in src/lib/gear/catalog.ts);
+ * hats are the exception, built by `equipHat` from their own socket.
+ */
+const SHAPE_BUILDERS: Record<Exclude<GearShape, 'hat'>, ShapeBuilder> = {
+  'shell-plate': (kit, wear) => torsoArmour(kit, wear),
+  'belt-plate': (kit, wear) => belt(kit, wear),
+  'leg-plate': (kit, wear) => legArmour(kit, wear),
+  gauntlet: (kit, wear, side) => clawGear(kit, wear, side),
+  hammer: (kit, wear, side) => hammer(kit, wear, side),
+  helmet: (kit, wear) => helmet(kit, wear),
+  'antenna-fittings': (kit, wear) => antennaGear(kit, wear),
+  garment: (kit, wear) => garment(kit, wear),
+  shoes: (kit, wear) => shoes(kit, wear),
+  'held-prop': (kit, wear, side) => heldProp(kit, wear, side),
+}
+
 /** Every catalog item this renderer can build. */
 export function supportsEquipment(key: string): boolean {
   return Boolean(getEquipmentVisual(key))
 }
+
+/** Slots in build order: the body goes on first, so later pieces sit on the bare surface, not on other gear. */
+const BUILD_ORDER = ['carapace', 'belt', 'legs', 'claws-1', 'claws-2', 'antennae', 'head'] as const
 
 /**
  * Build and mount everything a character has equipped. Call after the rig is finalized and the
@@ -490,34 +375,25 @@ export function supportsEquipment(key: string): boolean {
 export function equipAll(rig: Rig, equipment: EquippedAppearance | undefined, accessory: Parameters<typeof equipAccessory>[1]): GearItem[] {
   const wear = rig.wear
   const items: GearItem[] = []
-  const visualOf = (slot: keyof EquippedAppearance) => {
+  let headDone = false
+  for (const slot of BUILD_ORDER) {
     const key = equipment?.[slot]?.visualKey
-    return key ? getEquipmentVisual(key) : undefined
-  }
-  const build = (visual: EquipmentVisual | undefined, make: (kit: Kit, wear: Wearable) => void) => {
-    if (!visual || !wear) return
+    const visual = key ? getEquipmentVisual(key) : undefined
+    if (!visual) continue
+    if (slot === 'head') headDone = true
+    if (visual.shape === 'hat') {
+      // Base hats keep their own colours; rarer versions are tinted like the rest of their tier.
+      const rarity = parseVariantKey(key ?? '').rarity
+      const hat = visual.hat && equipHat(rig, visual.hat, rarity && rarity !== 'common' ? visual : undefined)
+      if (hat) items.push(hat)
+      continue
+    }
+    if (!wear) continue
     const kit = new Kit(rig, visual)
-    make(kit, wear)
+    SHAPE_BUILDERS[visual.shape](kit, wear, slot === 'claws-2' ? 'R' : 'L')
     items.push(kit.finish())
   }
-  // The body goes on first, so later pieces are built over the bare surface, not over other gear.
-  build(visualOf('carapace'), torsoArmour)
-  build(visualOf('belt'), belt)
-  build(visualOf('legs'), legArmour)
-  build(visualOf('claws-1'), (kit, w) => clawGear(kit, w, 'L'))
-  build(visualOf('claws-2'), (kit, w) => clawGear(kit, w, 'R'))
-  build(visualOf('antennae'), antennaGear)
-
-  const head = visualOf('head')
-  if (head?.accessory) {
-    // Base hats keep their own colours; rarer variants are tinted like the rest of their tier.
-    const key = equipment?.head?.visualKey ?? ''
-    const rarity = parseVariantKey(key).rarity
-    const hat = equipAccessory(rig, head.accessory, rarity && rarity !== 'common' ? head : undefined)
-    if (hat) items.push(hat)
-  } else if (head) {
-    build(head, helmet)
-  } else {
+  if (!headDone) {
     const hat = equipAccessory(rig, accessory)
     if (hat) items.push(hat)
   }

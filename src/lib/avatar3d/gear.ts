@@ -2,8 +2,9 @@
  * Gear. Every item is built for a socket of radius 1 and scaled to the socket it lands on, so
  * one hat fits any head shape or species. Items carry their own materials.
  */
-import { CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
+import { BufferAttribute, BufferGeometry, CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
 import type { AvatarAccessory } from '../avatar/traits'
+import type { Hat } from '../gear/types'
 import type { Rig, SocketInfo } from './rig'
 import { workedSurface } from './materials'
 
@@ -63,6 +64,9 @@ interface VisorFit {
   b: number
 }
 
+/** Each eye in face-socket units, as the last visorFit call measured them (glasses sit on these). */
+let lastEyes: { centre: Vector3; wide: number; high: number }[] = []
+
 const VISOR_FALLBACK: VisorFit = { y: 0.02, h: 0.62, cz: -0.98, a: 1.12, b: 1.12 }
 
 /**
@@ -70,6 +74,7 @@ const VISOR_FALLBACK: VisorFit = { y: 0.02, h: 0.62, cz: -0.98, a: 1.12, b: 1.12
  * and outside the shell at every height the lens covers, with a small gap so it never clips.
  */
 function visorFit(rig: Rig): VisorFit | null {
+  lastEyes = []
   const face = rig.sockets.get('face')
   const head = rig.wear?.head
   if (!face?.at || !head) return null
@@ -83,6 +88,7 @@ function visorFit(rig: Rig): VisorFit | null {
     return [{ centre, wide: size * socket.scale.x, high: size * socket.scale.y }]
   })
   if (!eyes.length) return null
+  lastEyes = eyes
   const y = eyes.reduce((s, e) => s + e.centre.y, 0) / eyes.length
   const h = Math.min(...eyes.map((e) => e.high)) * 1.5
   const pts: { x: number; z: number }[] = []
@@ -112,7 +118,8 @@ function visorFit(rig: Rig): VisorFit | null {
   return { y, h, cz, a, b: b + gap }
 }
 
-const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearColours, rig?: Rig) => SocketGear>> = {
+/** Every hat's build. A new hat goes here and in HATS (src/lib/gear/types.ts). */
+const HEAD_GEAR: Record<Hat, (socket?: SocketInfo, c?: GearColours, rig?: Rig) => SocketGear> = {
   crown: (_s, c) =>
     item('head', (add) => {
       const gold = metal(c?.material ?? '#f5b93a')
@@ -153,12 +160,24 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearC
       ridge.scale(1, 0.9, 1.04)
       add(ridge, c ? gloss(c.trim) : shell)
     }),
-  halo: (_s, c) =>
+  halo: (_s, c, rig) =>
     item('head', (add) => {
-      const ring = new TorusGeometry(0.9, 0.09, 12, 48)
-      ring.rotateX(Math.PI / 2)
-      ring.translate(0, 0.85, 0)
-      add(ring, new MeshPhysicalMaterial({ color: new Color(c?.trim ?? '#fff3bf'), emissive: new Color(c?.accent ?? '#ffd76a'), emissiveIntensity: 1.6, roughness: 0.3 }))
+      const { y, z, radius, tilt } = haloFit(rig)
+      const gold = new Color(c?.trim ?? '#ffe7a3')
+      const glow = new Color(c?.accent ?? '#ffd76a')
+      const place = (geo: Mesh['geometry']) => {
+        geo.rotateX(Math.PI / 2 + tilt)
+        geo.translate(0, y, z)
+        return geo
+      }
+      // A bright core ring, a soft glow round it, and a fine inner ring for a second highlight.
+      const core = add(place(new TorusGeometry(radius, 0.09, 16, 96)), new MeshPhysicalMaterial({ color: gold, emissive: glow, emissiveIntensity: 1.8, metalness: 0.3, roughness: 0.25, clearcoat: 1 }))
+      core.castShadow = false
+      const haze = add(place(new TorusGeometry(radius, 0.24, 12, 96)), new MeshPhysicalMaterial({ color: glow, emissive: glow, emissiveIntensity: 1.4, transparent: true, opacity: 0.3, depthWrite: false, roughness: 1 }))
+      haze.castShadow = false
+      haze.receiveShadow = false
+      const inner = add(place(new TorusGeometry(radius * 0.86, 0.028, 8, 72)), new MeshPhysicalMaterial({ color: gold, emissive: glow, emissiveIntensity: 1.4, roughness: 0.3 }))
+      inner.castShadow = false
     }),
   beanie: (_s, c) =>
     item('head', (add) => {
@@ -243,14 +262,169 @@ const HEAD_GEAR: Partial<Record<AvatarAccessory, (socket?: SocketInfo, c?: GearC
         add(end, frameMat)
       }
     }),
+  reading_glasses: (_s, c, rig) => glasses(rig, c, false),
+  sunglasses: (_s, c, rig) => glasses(rig, c, true),
+  sweatband: (_s, c, rig) =>
+    item('face', (add) => {
+      // A soft rolled band wound round the head on a slant: just over the brows in front, lower
+      // round the back of the head, as a real one sits. Built on the head's own surface, pushed
+      // straight out, so it hugs every head shape.
+      const face = rig?.sockets.get('face')
+      const head = rig?.wear?.head
+      if (!face?.at || !head) return
+      const r = face.radius
+      const local = (p: Vector3) => p.clone().sub(face.at!).divideScalar(r)
+      const h = Math.min(0.085, (head.top - head.eyeY) * 0.34)
+      const front = Math.min(head.eyeY + head.eyeRadius * 1.5 + h / 2, head.top - h * 0.75)
+      const back = Math.max(head.eyeY, front - h * 1.6)
+      const cols = 72
+      const rows = 9
+      const at = (theta: number, t: number, lift: number) => {
+        // theta = PI/2 faces forward.
+        const forward = Math.sin(theta)
+        const y = back + (front - back) * (0.5 + 0.5 * forward) + (t - 0.5) * h
+        const s = head.loft.sAt(y)
+        const k = head.loft.key(s)
+        const p = head.loft.point(s, theta)
+        const out = new Vector3(p.x - (k.x ?? 0), 0, p.z - (k.z ?? 0)).normalize()
+        return p.addScaledVector(out, lift)
+      }
+      // The roll: thickest across the middle, rounding into the head at both edges.
+      const roll = (t: number) => 0.006 + 0.03 * Math.sqrt(Math.max(0, Math.sin(Math.PI * t)))
+      const band = (thick: (t: number) => number, t0: number, t1: number, colour: string, extra = 0) => {
+        const verts: number[] = []
+        const index: number[] = []
+        for (let j = 0; j <= rows; j++) {
+          const t = t0 + (t1 - t0) * (j / rows)
+          for (let i = 0; i < cols; i++) {
+            const theta = (i / cols) * Math.PI * 2
+            const q = local(at(theta, t, thick(t) + extra))
+            verts.push(q.x, q.y, q.z)
+          }
+        }
+        for (let j = 0; j < rows; j++) {
+          for (let i = 0; i < cols; i++) {
+            const a = j * cols + i
+            const b = j * cols + ((i + 1) % cols)
+            index.push(a, a + cols, b, b, a + cols, b + cols)
+          }
+        }
+        const geo = new BufferGeometry()
+        geo.setAttribute('position', new BufferAttribute(new Float32Array(verts), 3))
+        geo.setIndex(index)
+        geo.computeVertexNormals()
+        const mat = cloth(colour)
+        mat.side = 2
+        add(geo, mat)
+      }
+      band(roll, 0, 1, c?.material ?? '#ffffff')
+      // The stripe rides the crest of the roll.
+      band(roll, 0.38, 0.62, c?.trim ?? '#ff3d7f', 0.002)
+    }),
+}
+
+/**
+ * Where the halo floats, in head-socket units: clear above the crown, tipped back a little, and
+ * wide enough that both antennae pass well inside the ring wherever they cross its height.
+ */
+function haloFit(rig: Rig | undefined): { y: number; z: number; radius: number; tilt: number } {
+  const fallback = { y: 1.45, z: -0.1, radius: 1.6, tilt: 0.22 }
+  const socket = rig?.sockets.get('head')
+  const wear = rig?.wear
+  if (!socket?.at || !wear) return fallback
+  const r = socket.radius
+  const top = (wear.head.top - socket.at.y) / r
+  const y = top + 1.05
+  const z = -0.1
+  const tilt = 0.22
+  // Sample the antenna and find where it crosses the ring's (tipped) plane.
+  const curve = new CatmullRomCurve3(wear.antenna.path.map((p) => p.clone().sub(socket.at!).divideScalar(r)))
+  const normal = new Vector3(0, Math.cos(tilt), Math.sin(tilt))
+  const centre = new Vector3(0, y, z)
+  let widest = 0
+  let prev = curve.getPoint(0)
+  let side = prev.clone().sub(centre).dot(normal)
+  for (let i = 1; i <= 120; i++) {
+    const p = curve.getPoint(i / 120)
+    const now = p.clone().sub(centre).dot(normal)
+    if (Math.sign(now) !== Math.sign(side)) {
+      const cross = prev.clone().lerp(p, side / (side - now))
+      widest = Math.max(widest, cross.sub(centre).projectOnPlane(normal).length())
+    }
+    prev = p
+    side = now
+  }
+  return { y, z, radius: Math.min(Math.max(1.6, widest + 0.7), 2.6), tilt }
+}
+
+/**
+ * Glasses: a round lens in front of each eye, a bridge between them and arms back to the sides
+ * of the head. Sized from the eyes themselves, so they fit every head shape and eye size.
+ */
+function glasses(rig: Rig | undefined, c: GearColours | undefined, dark: boolean): SocketGear {
+  return item('face', (add) => {
+    const fit = (rig && visorFit(rig)) || VISOR_FALLBACK
+    const eyes = rig && lastEyes.length ? lastEyes : [-0.4, 0.4].map((x) => ({ centre: new Vector3(x, 0, 0), wide: 0.3, high: 0.3 }))
+    const frame = dark ? gloss(c?.material ?? '#17171a') : metal(c?.material ?? '#a3acb5', 0.3)
+    const lensMat = new MeshPhysicalMaterial({
+      color: new Color(dark ? (c?.accent ?? '#24262c') : (c?.accent ?? '#dfe9ee')),
+      roughness: 0.05,
+      metalness: dark ? 0.4 : 0,
+      clearcoat: 1,
+      transparent: true,
+      opacity: dark ? 0.92 : 0.18,
+      side: 2,
+      depthWrite: false,
+    })
+    const thick = dark ? 0.075 : 0.032
+    const lenses = eyes
+      .map((e) => {
+        const r = Math.max(e.wide, e.high) * (dark ? 0.98 : 0.92)
+        // Just in front of the eye, square to the face.
+        const at = new Vector3(e.centre.x, e.centre.y, e.centre.z + e.wide * 1.05 + 0.04)
+        return { at, r }
+      })
+      .sort((a, b) => a.at.x - b.at.x)
+    // Eyes set close together would make the lenses overlap: shrink both to leave a bridge.
+    if (lenses.length === 2) {
+      const room = (lenses[1].at.x - lenses[0].at.x) / 2 - thick * 2.5
+      for (const l of lenses) l.r = Math.min(l.r, room / (dark ? 1.06 : 1))
+    }
+    for (const { at, r } of lenses) {
+      const ring = new TorusGeometry(r, thick, 10, 40)
+      if (dark) ring.scale(1.06, 0.86, 1)
+      ring.translate(at.x, at.y, at.z)
+      add(ring, frame)
+      const lens = new CylinderGeometry(r, r, 0.02, 40)
+      lens.rotateX(Math.PI / 2)
+      if (dark) lens.scale(1.06, 0.86, 1)
+      lens.translate(at.x, at.y, at.z)
+      add(lens, lensMat).castShadow = false
+    }
+    if (lenses.length === 2) {
+      const [l, r] = lenses
+      const a = new Vector3(l.at.x + l.r * (dark ? 1.06 : 1), l.at.y + l.r * 0.15, l.at.z)
+      const b = new Vector3(r.at.x - r.r * (dark ? 1.06 : 1), r.at.y + r.r * 0.15, r.at.z)
+      const mid = a.clone().lerp(b, 0.5).add(new Vector3(0, 0.05, 0.02))
+      add(new TubeGeometry(new CatmullRomCurve3([a, mid, b]), 12, thick * 0.8, 8, false), frame)
+    }
+    // Arms from each outer edge back along the side of the head.
+    for (const { at, r } of lenses) {
+      const side = Math.sign(at.x) || 1
+      const hinge = new Vector3(at.x + side * r * (dark ? 1.06 : 1), at.y, at.z)
+      const back = new Vector3(side * (fit.a + 0.02), at.y + 0.02, fit.cz)
+      const bend = new Vector3(side * (fit.a + 0.04), at.y + 0.02, (hinge.z + fit.cz) / 2)
+      add(new TubeGeometry(new CatmullRomCurve3([hinge, bend, back]), 16, thick * 0.7, 8, false), frame)
+    }
+  })
 }
 
 /** Accessories this renderer can already build. */
-export const SUPPORTED_ACCESSORIES = Object.keys(HEAD_GEAR) as AvatarAccessory[]
+export const SUPPORTED_ACCESSORIES = Object.keys(HEAD_GEAR) as Hat[]
 
-/** Mount an accessory on its socket. Returns null when the item has no 3D build yet. */
-export function equipAccessory(rig: Rig, accessory: AvatarAccessory, colours?: GearColours): GearItem | null {
-  const make = HEAD_GEAR[accessory]
+/** Mount a hat on its socket, in catalog colours when given. */
+export function equipHat(rig: Rig, hat: Hat, colours?: GearColours): GearItem | null {
+  const make = HEAD_GEAR[hat]
   if (!make) return null
   const gear = make(rig.sockets.get('ears'), colours, rig)
   const socket = rig.sockets.get(gear.socket)
@@ -258,4 +432,9 @@ export function equipAccessory(rig: Rig, accessory: AvatarAccessory, colours?: G
   gear.node.scale.setScalar(socket.radius)
   socket.node.add(gear.node)
   return gear
+}
+
+/** The character config's old `accessory` field: a hat worn without a catalog piece. */
+export function equipAccessory(rig: Rig, accessory: AvatarAccessory): GearItem | null {
+  return accessory === 'none' ? null : equipHat(rig, accessory)
 }

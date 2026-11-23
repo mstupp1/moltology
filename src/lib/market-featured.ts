@@ -1,5 +1,7 @@
 import type { EquipmentRarity } from '../db/schema'
 import { GEAR_PRICES } from './gear-variants'
+import { GEAR_COLLECTIONS } from './gear/collections'
+import { GEAR_PIECES } from './gear/pieces'
 
 /**
  * Market promos and bundles. Static for now: edit this file to change what the Gear tab
@@ -24,7 +26,8 @@ export type FeaturedSlot =
   | { kind: 'piece'; piece: PieceRef; tag: string; blurb?: string }
   | { kind: 'bundle'; bundleId: string; tag: string }
 
-export const MARKET_BUNDLES: MarketBundle[] = [
+/** Hand-picked bundles. Collections add their own below. */
+const PICKED_BUNDLES: MarketBundle[] = [
   {
     id: 'oracle-regalia',
     name: 'Oracle Regalia',
@@ -71,6 +74,17 @@ export const MARKET_BUNDLES: MarketBundle[] = [
     discountPercent: 20,
   },
 ]
+
+/** One bundle per shop collection: every piece in it, at the piece's own rarity. */
+const COLLECTION_BUNDLES: MarketBundle[] = GEAR_COLLECTIONS.map((c) => ({
+  id: `collection-${c.id}`,
+  name: c.name,
+  blurb: c.blurb,
+  pieces: GEAR_PIECES.filter((p) => p.collection === c.id).map((p) => ({ baseKey: p.key, rarity: p.rarity })),
+  discountPercent: c.discountPercent,
+}))
+
+export const MARKET_BUNDLES: MarketBundle[] = [...PICKED_BUNDLES, ...COLLECTION_BUNDLES]
 
 /** The first slot is the large banner; the rest sit beside it. */
 export const MARKET_FEATURED: FeaturedSlot[] = [

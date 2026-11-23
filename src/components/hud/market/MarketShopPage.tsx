@@ -21,6 +21,8 @@ import {
 } from '@/lib/chassis-loadout'
 import { equipmentAppearance } from '@/lib/character-appearance'
 import { RARITY_LABELS, RARITY_ORDER } from '@/lib/gear-variants'
+import { GEAR_PIECE_BY_KEY } from '@/lib/gear/catalog'
+import { GEAR_COLLECTIONS, gearCollection } from '@/lib/gear/collections'
 import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import type { MarketPayload, MarketPiece, MarketVariant } from '@/lib/market'
 import { MARKET_BUNDLES, type PieceRef } from '@/lib/market-featured'
@@ -58,11 +60,13 @@ const SORTS: { value: Sort; label: string }[] = [
 interface GearFilters {
   slot: EquipmentCategory | null
   rarity: EquipmentRarity | null
+  /** Shop collection id (src/lib/gear/collections.ts). */
+  collection: string | null
   sort: Sort
   hideOwned: boolean
   page: number
 }
-const DEFAULT_FILTERS: GearFilters = { slot: null, rarity: null, sort: 'featured', hideOwned: false, page: 1 }
+const DEFAULT_FILTERS: GearFilters = { slot: null, rarity: null, collection: null, sort: 'featured', hideOwned: false, page: 1 }
 
 /** Filters live in the address so a refresh or a shared link keeps them. */
 function readFilters(search: string): GearFilters {
@@ -70,10 +74,12 @@ function readFilters(search: string): GearFilters {
   const slot = q.get('slot') as EquipmentCategory | null
   const rarity = q.get('rarity') as EquipmentRarity | null
   const sort = q.get('sort') as Sort | null
+  const collection = q.get('collection')
   const page = Number(q.get('page'))
   return {
     slot: slot && SLOTS.includes(slot) ? slot : null,
     rarity: rarity && RARITY_ORDER.includes(rarity) ? rarity : null,
+    collection: collection && gearCollection(collection) ? collection : null,
     sort: sort && SORTS.some((s) => s.value === sort) ? sort : 'featured',
     hideOwned: q.get('owned') === 'hide',
     page: Number.isInteger(page) && page > 1 ? page : 1,
@@ -86,6 +92,7 @@ function writeFilters(f: GearFilters) {
   const set = (k: string, v: string | null) => (v ? url.searchParams.set(k, v) : url.searchParams.delete(k))
   set('slot', f.slot)
   set('rarity', f.rarity)
+  set('collection', f.collection)
   set('sort', f.sort === 'featured' ? null : f.sort)
   set('owned', f.hideOwned ? 'hide' : null)
   set('page', f.page > 1 ? String(f.page) : null)
@@ -189,7 +196,7 @@ export function MarketShopPage() {
     window.history.replaceState(window.history.state, '', url.pathname + url.search)
   }
   const [filters, setFilters] = useState<GearFilters>(DEFAULT_FILTERS)
-  const { slot, rarity, sort, hideOwned, page } = filters
+  const { slot, rarity, collection, sort, hideOwned, page } = filters
   const [selected, setSelected] = useState<{ baseKey: string; rarity: EquipmentRarity } | null>(null)
   const [openBundle, setOpenBundle] = useState<string | null>(null)
   const gridTop = useRef<HTMLDivElement>(null)
@@ -288,17 +295,18 @@ export function MarketShopPage() {
     () =>
       sortPieces(
         (market?.pieces ?? []).flatMap((piece) => {
-          const shown = !slot || piece.category === slot ? shownVariant(piece, rarity, hideOwned) : undefined
+          const inCollection = !collection || GEAR_PIECE_BY_KEY.get(piece.baseKey)?.collection === collection
+          const shown = inCollection && (!slot || piece.category === slot) ? shownVariant(piece, rarity, hideOwned) : undefined
           return shown ? [{ piece, shown }] : []
         }),
         sort,
       ),
-    [market, slot, rarity, hideOwned, sort],
+    [market, slot, rarity, collection, hideOwned, sort],
   )
   const pageCount = Math.max(1, Math.ceil(matches.length / PAGE_SIZE))
   const currentPage = Math.min(page, pageCount)
   const pageItems = matches.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-  const unfiltered = !slot && !rarity && !hideOwned && currentPage === 1
+  const unfiltered = !slot && !rarity && !collection && !hideOwned && currentPage === 1
   const bundle = MARKET_BUNDLES.find((b) => b.id === openBundle) ?? null
 
   const selectedPiece = market?.pieces.find((p) => p.baseKey === selected?.baseKey) ?? null
@@ -473,13 +481,20 @@ export function MarketShopPage() {
                   options={[{ value: '', label: 'Any rarity' }, ...RARITY_ORDER.map((r) => ({ value: r, label: RARITY_LABELS[r] }))]}
                 />
                 <HudSelect
+                  aria-label="Collection"
+                  className="min-h-9 text-ui sm:w-44"
+                  value={collection ?? ''}
+                  onChange={(e) => updateFilters({ collection: e.target.value || null })}
+                  options={[{ value: '', label: 'Any collection' }, ...GEAR_COLLECTIONS.map((c) => ({ value: c.id, label: c.name }))]}
+                />
+                <HudSelect
                   aria-label="Sort"
                   className="min-h-9 text-ui sm:w-48"
                   value={sort}
                   onChange={(e) => updateFilters({ sort: e.target.value as Sort })}
                   options={SORTS}
                 />
-                <LitTile active={hideOwned} onClick={() => updateFilters({ hideOwned: !hideOwned })} className="col-span-2 sm:col-span-1">
+                <LitTile active={hideOwned} onClick={() => updateFilters({ hideOwned: !hideOwned })}>
                   Hide owned
                 </LitTile>
                 <span className="hidden sm:block ml-auto pr-1 text-xs text-ink-muted tabular-nums" aria-live="polite">
@@ -489,7 +504,7 @@ export function MarketShopPage() {
             </div>
             {matches.length === 0 ? (
               <p className="text-sm text-ink-muted p-4">
-                {hideOwned && !slot && !rarity ? 'You own every piece. Nice.' : 'Nothing matches these filters.'}
+                {hideOwned && !slot && !rarity && !collection ? 'You own every piece. Nice.' : 'Nothing matches these filters.'}
               </p>
             ) : (
               <div className="grid grid-cols-3 sm:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-2">
