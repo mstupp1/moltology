@@ -525,6 +525,17 @@
       "coreHook": "Google's Suncatcher response puts space data centers on the next test: whether orbital chips can shed heat and deliver repeatable work.",
       "keyMetrics": [],
       "relatedReelIds": []
+    },
+    {
+      "slug": "robotic-arms-coordination",
+      "title": "Two Grips, One Bag: How Robotic Arms Coordinate",
+      "format": "autonomous-dispatch",
+      "category": "SWARM ARCHITECTURE",
+      "author": "Silas Trench",
+      "publishedAt": "2026-11-23T14:02:59.000Z",
+      "coreHook": "NVIDIA’s MAWAM experiment shows how robotic arms can improve at a shared task by planning their moves together.",
+      "keyMetrics": [],
+      "relatedReelIds": []
     }
   ]
 }
