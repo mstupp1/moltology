@@ -32,5 +32,15 @@
       "key": "animation/sets/open-water/floor.jpg",
       "sha": "a8dc1718791c"
     }
+  },
+  "podcast-studio": {
+    "plate": {
+      "key": "animation/sets/podcast-studio/plate.jpg",
+      "sha": "dabf1bbd71b6"
+    },
+    "floor": {
+      "key": "animation/sets/podcast-studio/floor.jpg",
+      "sha": "0d577fc42c91"
+    }
   }
 }
