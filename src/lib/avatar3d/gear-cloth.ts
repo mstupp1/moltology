@@ -22,14 +22,32 @@ export function garment(kit: Kit, wear: Wearable): void {
   const { motif, construction: n } = kit.visual
   const sleeves = motif !== 'tank'
 
-  // A lobster's swimmerets would poke through the cloth.
-  for (const { tag } of SIDES) for (let i = 0; i < SWIMMERETS.length; i++) kit.tuck(`swimmeret${i}${tag}`)
+  // A lobster's swimmerets and both species' short walking legs would poke through the cloth.
+  for (const { tag } of SIDES) {
+    for (let i = 0; i < SWIMMERETS.length; i++) kit.tuck(`swimmeret${i}${tag}`)
+    for (const leg of [1, 2]) kit.tuck(`sideLeg${leg}a${tag}`)
+  }
 
   // The body, all the way round, from just under the belt line up to the neck. The belly
   // plates are a separate layer, so they are covered too.
   const hem = Math.min(bottom, belt) - 0.04
   kit.puff(bone, 'fabric', (_p, w) => LIFT * above(w.y, hem, 0.025))
   kit.puff(bone, 'fabric', (_p, w) => (LIFT - 0.002) * above(w.y, hem, 0.025), 'belly')
+  if (wear.race === 'crab') {
+    // A crab's shell is its body too: the cloth comes up round the lower shell to a collar under
+    // the face, higher at the sides and back, so the shell sits in the garment like a head.
+    const { loft: shell, bone: shellBone, eyeY, eyeRadius } = wear.head
+    const front = eyeY - eyeRadius * (motif === 'tank' ? 2.6 : 2.25)
+    const back = front + (motif === 'tank' ? 0.1 : 0.2)
+    const collar = (phi: number) => front + (back - front) * smooth(0.5, 2.3, phi)
+    kit.puff(shellBone, 'fabric', (_p, w) => LIFT * below(w.y, collar(fromFront(shell, w)), 0.03))
+    const ring: Vector3[] = []
+    for (let i = 0; i <= 64; i++) {
+      const phi = -Math.PI + (i / 64) * Math.PI * 2
+      ring.push(onBody(shell, collar(Math.abs(phi)), phi, LIFT + 0.002).at)
+    }
+    kit.addWorld(shellBone, n >= 2 ? 'trim' : 'fabric', tube(ring, 0.016, 160))
+  }
   if (sleeves) {
     const { fore } = wear.arm
     for (const { tag } of SIDES) {

@@ -14,7 +14,7 @@ import type { Loft } from './loft'
 import { alongY, placed, spike, taperedTube } from './parts'
 import { lookQuaternion, type Rig, type Wearable } from './rig'
 
-export type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'fabric' | 'dark' | 'paint'
+export type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'fabric' | 'dark' | 'paint' | 'tape' | 'seam'
 export type Amount = (local: Vector3, rest: Vector3, normal: Vector3) => number
 
 export const v = (x: number, y: number, z: number) => new Vector3(x, y, z)
@@ -121,6 +121,57 @@ export class Kit {
     this.undo.push(() => node.scale.copy(before))
   }
 
+  /**
+   * A closed line round a bone's surface where it meets the plane `normal . p = at` (bone-local),
+   * lifted off the surface by `lift`. For limbs and claws, whose cross-sections are convex.
+   */
+  slice(bone: string, normal: Vector3, at: number, lift: number): Vector3[] {
+    const mesh = this.rig.mesh(bone)
+    const index = mesh?.geometry.getIndex()
+    if (!mesh || !index) return []
+    const pos = mesh.geometry.getAttribute('position')
+    const nor = mesh.geometry.getAttribute('normal')
+    const hits: Vector3[] = []
+    const a = new Vector3()
+    const b = new Vector3()
+    const na = new Vector3()
+    const nb = new Vector3()
+    for (let t = 0; t < index.count; t += 3) {
+      for (let e = 0; e < 3; e++) {
+        const i = index.getX(t + e)
+        const j = index.getX(t + ((e + 1) % 3))
+        if (i > j) continue
+        a.fromBufferAttribute(pos, i)
+        b.fromBufferAttribute(pos, j)
+        const da = a.dot(normal) - at
+        const db = b.dot(normal) - at
+        if (da * db >= 0) continue
+        const k = da / (da - db)
+        na.fromBufferAttribute(nor, i)
+        nb.fromBufferAttribute(nor, j)
+        const n = na.lerp(nb, k).normalize()
+        hits.push(a.clone().lerp(b, k).addScaledVector(n, lift))
+      }
+    }
+    if (hits.length < 6) return []
+    // Order the hits round their centre, in the plane.
+    const centre = hits.reduce((c, p) => c.add(p), new Vector3()).divideScalar(hits.length)
+    const u = new Vector3(1, 0, 0).projectOnPlane(normal).normalize()
+    if (u.lengthSq() < 0.5) u.set(0, 0, 1).projectOnPlane(normal).normalize()
+    const w = normal.clone().cross(u)
+    const angle = (p: Vector3) => {
+      const d = p.clone().sub(centre)
+      return Math.atan2(d.dot(w), d.dot(u))
+    }
+    hits.sort((p, q) => angle(p) - angle(q))
+    // Thin out to an even spacing so the tube is smooth.
+    const out: Vector3[] = []
+    const steps = 40
+    for (let i = 0; i < steps; i++) out.push(hits[Math.floor((i / steps) * hits.length)])
+    out.push(out[0].clone())
+    return out
+  }
+
   finish(): GearItem {
     const v = this.visual
     const rarity = parseVariantKey(v.key).rarity
@@ -136,6 +187,10 @@ export class Kit {
       fabric: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.88, sheen: 0.6, sheenRoughness: 0.7, sheenColor: new Color(tone(v.material, 0.35)) }), 'cloth'),
       // Painted plastic or card in the main colour: props, soles, anything that is not metal or cloth.
       paint: new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.42, clearcoat: 0.5, clearcoatRoughness: 0.35 }),
+      // Athletic tape: smooth and matte, with a soft sheen across the weave.
+      tape: new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.72, sheen: 0.5, sheenRoughness: 0.5, sheenColor: new Color('#ffffff') }),
+      // A matte line in the trim colour: the edges of wound strips.
+      seam: new MeshPhysicalMaterial({ color: new Color(v.trim), roughness: 0.8 }),
       dark: workedSurface(new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.15, roughness: 0.6 }), 'leather'),
     }
     const meshes: Mesh[] = []

@@ -590,7 +590,7 @@ const COLLECTION_PIECES: GearPiece[] = [
   ...collection('heavy-day', 'shellHardness', [
     { key: 'lifting-belt', n: 42, name: 'Lifting belt', flavorText: 'Thick leather and a steel buckle. Brace, then lift.', slot: 'belt', rarity: 'rare', shape: 'belt-plate', motif: 'plate', colours: 'heavy-day-leather', construction: 2, surface: 'leather' },
     { key: 'volt-compression-tank', n: 43, name: 'Volt compression tank', flavorText: 'Black with a volt stripe. Built for the main lift.', slot: 'carapace', rarity: 'uncommon', shape: 'garment', motif: 'tank', colours: 'heavy-day-volt', construction: 1, surface: 'cloth' },
-    { key: 'taped-claws', n: 44, name: 'Taped claws', flavorText: 'Wrapped on the bench before the first set.', slot: 'claws', rarity: 'common', shape: 'gauntlet', motif: 'mitten', colours: 'heavy-day-tape', construction: 0, surface: 'cloth' },
+    { key: 'taped-claws', n: 44, name: 'Taped claws', flavorText: 'Wrapped on the bench before the first set.', slot: 'claws', rarity: 'common', shape: 'gauntlet', motif: 'tape', colours: 'heavy-day-tape', construction: 0, surface: 'leather' },
     { key: 'knee-sleeves', n: 45, name: 'Knee sleeves', flavorText: 'Snug and warm. Squat day feels shorter.', slot: 'legs', rarity: 'uncommon', shape: 'leg-plate', motif: 'rib', colours: 'heavy-day-volt', construction: 1, surface: 'cloth' },
   ]),
   ...collection('clinic-whites', 'neuralLatency', [

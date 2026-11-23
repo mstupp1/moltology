@@ -34,6 +34,7 @@ export type GearShape =
 /** The detail family inside a shape: ribbed, vented, crowned... */
 export type GearMotif =
   | 'plate'
+  | 'tape'
   | 'rib'
   | 'vent'
   | 'crown'

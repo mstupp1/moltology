@@ -6,6 +6,7 @@
  *   npm run gear:board                                # every base piece, front three-quarter
  *   npm run gear:board -- --collection heavy-day --views front,back
  *   npm run gear:board -- --pieces lifting-belt,taped-claws --rarity legendary
+ *   npm run gear:board -- --pieces sweatband --shot close --views front,side
  *   npm run gear:board -- --out tmp/gear-board/before
  *   npm run gear:board -- --out tmp/gear-board/after --compare tmp/gear-board/before
  *
@@ -38,10 +39,11 @@ interface Args {
   size: number
   compare?: string
   force: boolean
+  shot: 'wide' | 'close' | 'medium'
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { views: ['front'], out: 'tmp/gear-board/latest', size: 640, force: false }
+  const args: Args = { views: ['front'], out: 'tmp/gear-board/latest', size: 640, force: false, shot: 'wide' }
   const list = (v: string) => v.split(',').map((s) => s.trim()).filter(Boolean)
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -53,6 +55,7 @@ function parseArgs(argv: string[]): Args {
     else if (a === '--size') args.size = Number(argv[++i])
     else if (a === '--compare') args.compare = argv[++i]
     else if (a === '--force') args.force = true
+    else if (a === '--shot') args.shot = argv[++i] as Args['shot']
     else throw new Error(`Unknown option ${a}`)
   }
   for (const v of args.views) if (!(v in VIEWS)) throw new Error(`Unknown view "${v}" (${Object.keys(VIEWS).join(', ')})`)
@@ -110,7 +113,7 @@ function packOutfits(pieces: Piece[]): Partial<Record<EquipSlotId, Piece>>[] {
   return outfits
 }
 
-function timeline(species: (typeof SPECIES)[number], outfit: Partial<Record<EquipSlotId, Piece>>, yaw: number, size: number): AnimationTimeline {
+function timeline(species: (typeof SPECIES)[number], outfit: Partial<Record<EquipSlotId, Piece>>, yaw: number, size: number, shot: Args['shot']): AnimationTimeline {
   const equipment = Object.fromEntries(Object.entries(outfit).map(([slot, p]) => [slot, { visualKey: p!.key, rarity: 'common' }]))
   const config = parseLobsterAvatarConfig({
     style: LOBSTER_AVATAR_STYLE,
@@ -134,7 +137,7 @@ function timeline(species: (typeof SPECIES)[number], outfit: Partial<Record<Equi
     fps: 30,
     frames: 18,
     look: lookFromConfig(config),
-    cues: [{ t: 0, camera: { ...SHOTS.wide, zoom: 0.8, pan: 0, cut: true }, yaw, look: { x: 0, y: 0 } }],
+    cues: [{ t: 0, camera: shot === 'wide' ? { ...SHOTS.wide, zoom: 0.8, pan: 0, cut: true } : { ...SHOTS[shot], pan: 0, cut: true }, yaw, look: { x: 0, y: 0 } }],
     talk: [],
     lighting: 'studio',
   }
@@ -172,7 +175,7 @@ async function main() {
       for (const view of args.views) {
         const out = path.join(dir, `outfit-${String(i + 1).padStart(2, '0')}-${species}-${view}.png`)
         files.push(out)
-        if (args.force || !fs.existsSync(out)) jobs.push({ timeline: timeline(species, outfit, VIEWS[view], args.size), out, shadows: false })
+        if (args.force || !fs.existsSync(out)) jobs.push({ timeline: timeline(species, outfit, VIEWS[view], args.size, args.shot), out, shadows: false })
       }
     }
     grid.push({ label: Object.values(outfit).map((p) => p!.name).join(' · '), files })

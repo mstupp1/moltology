@@ -165,6 +165,7 @@ function clawGear(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
   const { clawSize: S, claw: style, fore, radius: r } = wear.arm
   const bone = `claw${tag}`
   if (motif === 'hammer') return hammer(kit, wear, tag)
+  if (motif === 'tape') return taped(kit, wear, tag)
   // The pincer opens toward the body, so its outer edge is on the far side from the thumb.
   const outer = tag === 'L' ? 1 : -1
   const halfWidth = 0.24 * style.bulk * S
@@ -198,6 +199,30 @@ function clawGear(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
     const edge = (t: number) => v(outer * (halfWidth * (0.96 + 0.06 * Math.sin(t * Math.PI)) + lift), -(0.1 + t * 0.36) * S, 0)
     kit.add(bone, 'trim', tube([edge(0), edge(0.33), edge(0.66), edge(1)], 0.012 + n * 0.002, 16))
   }
+}
+
+/**
+ * Athletic tape: a smooth wrap over the palm and the base of the thumb, wound on a slant, with a
+ * fine line at the edge of every strip, and two bands round the wrist. The pincer tips stay bare.
+ */
+function taped(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
+  const { clawSize: S, claw: style, fore } = wear.arm
+  const lift = 0.014
+  // Strips run on a slant: u = y + x * slant is constant along each edge.
+  const slant = 0.3
+  const plane = v(slant, 1, 0)
+  const scale = plane.length()
+  plane.normalize()
+  const wrap = (bone: string, from: number, to: number, strip: number, soft: number) => {
+    kit.puff(bone, 'tape', (p) => lift * within(p.dot(plane) * scale, to, from, soft))
+    for (let u = from - strip; u > to + strip * 0.4; u -= strip) {
+      const line = kit.slice(bone, plane, u / scale, lift + 0.001)
+      if (line.length) kit.add(bone, 'seam', tube(line, 0.0035, 80))
+    }
+  }
+  wrap(`claw${tag}`, 0.05 * S, -0.4 * S * style.reach, 0.07 * S, 0.03 * S)
+  wrap(`thumb${tag}`, 0.0, -0.2 * S * style.reach, 0.06 * S, 0.025 * S)
+  wrap(`forearm${tag}`, -fore * 0.6, -fore * 0.92, fore * 0.11, 0.02)
 }
 
 /** Held upright in the pinch: the shaft runs up the front of the claw and the head sits above it. */
