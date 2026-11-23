@@ -64,7 +64,7 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Daily check-in · zero equipment',
-      headline: 'Mind body connection. Start where you are.',
+      headline: 'Mind body connection. Train both.',
       sub: 'Lunch beside the laptop. Phone in your hand. Your day has a physical side. Before the next set of emails, pause and notice it. Then work through the eight daily tasks.',
       cta: 'Join the daily practice',
       image: {

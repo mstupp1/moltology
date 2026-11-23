@@ -63,7 +63,7 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Less setup. More starts.',
-      headline: 'Keep moving forward when the day stalls.',
+      headline: 'Keep moving forward.',
       sub: 'The reply is drafted. The send button is right there. Take the next step before opening another tab about getting started. Eight daily tasks take you from a quiet start to clocking off.',
       cta: 'Start the daily routine',
       image: {

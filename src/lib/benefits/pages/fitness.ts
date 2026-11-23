@@ -64,7 +64,7 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Training log included',
-      headline: 'Mental fitness, on a daily training card.',
+      headline: 'Mental fitness. Daily reps.',
       sub: 'Read the stats. Pick the work. Log the session. Moltology puts eight daily tasks beside a character sheet with five stats. Bring the same attention to the task as you bring to the numbers.',
       cta: 'Join and open your task card',
       image: {

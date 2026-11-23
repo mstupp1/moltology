@@ -64,7 +64,7 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Recovery is in the program',
-      headline: 'Make recovery part of mental resilience.',
+      headline: 'Mental resilience. Recover, repeat.',
       sub: 'Some days call for a lighter brief. Pick the work that fits today, ask for help, and stop when the day is done. Moltology’s eight daily tasks include quiet, a reset and an ending.',
       cta: 'Join at your own pace',
       image: {

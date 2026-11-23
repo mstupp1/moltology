@@ -63,7 +63,7 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Single-task training',
-      headline: 'Get a grip on your life. Pick one thing first.',
+      headline: 'Get a grip on your life.',
       sub: 'Twelve tabs. Three urgent lists. Start with one thing you can actually finish. Choose it, work on it, log the day. A new planner is optional.',
       cta: 'Make your first commitment',
       image: {
