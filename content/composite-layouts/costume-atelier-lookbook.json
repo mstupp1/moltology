@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "name": "costume-atelier-lookbook",
+  "aspect": "4:5",
+  "costume": "atelier",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "masthead",
+      "type": "brand",
+      "size": 110,
+      "align": "center",
+      "box": {
+        "x": 5,
+        "y": 5,
+        "w": 90
+      }
+    },
+    {
+      "id": "rule",
+      "type": "shape",
+      "shape": "line",
+      "color": "ink",
+      "thickness": 2,
+      "box": {
+        "x": 7,
+        "y": 22,
+        "w": 86
+      }
+    },
+    {
+      "id": "issue",
+      "type": "text",
+      "text": "Issue 08 \u00b7 The collection",
+      "size": 36,
+      "minSize": 36,
+      "box": {
+        "x": 7,
+        "y": 24,
+        "w": 86,
+        "h": 4
+      },
+      "font": "body",
+      "uppercase": true,
+      "tracking": 0.16,
+      "align": "center",
+      "color": "muted"
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "The new shell.",
+      "size": 150,
+      "minSize": 105,
+      "box": {
+        "x": 7,
+        "y": 31,
+        "w": 86,
+        "h": 18
+      },
+      "italic": true,
+      "align": "center"
+    },
+    {
+      "id": "sub",
+      "type": "text",
+      "text": "Eight looks for an ordinary day.",
+      "size": 44,
+      "minSize": 36,
+      "box": {
+        "x": 7,
+        "y": 50,
+        "w": 86,
+        "h": 6
+      },
+      "font": "body",
+      "align": "center"
+    },
+    {
+      "id": "looks",
+      "type": "list",
+      "items": [
+        "Look 01  Silent synchronization",
+        "Look 03  Learn something hard",
+        "Look 06  Help a member",
+        "Look 08  Close the day"
+      ],
+      "size": 38,
+      "marker": "none",
+      "gap": 18,
+      "color": "text",
+      "box": {
+        "x": 16,
+        "y": 60,
+        "w": 68,
+        "h": 22
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "See the collection",
+      "size": 36,
+      "box": {
+        "x": 25,
+        "y": 85,
+        "w": 50,
+        "h": 7
+      }
+    }
+  ]
+}

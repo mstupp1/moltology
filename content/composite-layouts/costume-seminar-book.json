@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "name": "costume-seminar-book",
+  "aspect": "4:5",
+  "costume": "seminar",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 46,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 86
+      }
+    },
+    {
+      "id": "kicker",
+      "type": "text",
+      "text": "The method in one chapter",
+      "size": 40,
+      "minSize": 36,
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 86,
+        "h": 5
+      },
+      "font": "serif",
+      "italic": true,
+      "color": "gold",
+      "uppercase": false
+    },
+    {
+      "id": "book",
+      "type": "panel",
+      "color": "gold",
+      "radius": 6,
+      "box": {
+        "x": 22,
+        "y": 23,
+        "w": 56,
+        "h": 52
+      }
+    },
+    {
+      "id": "book-title",
+      "type": "text",
+      "text": "The grip",
+      "size": 120,
+      "minSize": 84,
+      "box": {
+        "x": 26,
+        "y": 28,
+        "w": 48,
+        "h": 16
+      },
+      "color": "navy",
+      "align": "center"
+    },
+    {
+      "id": "book-sub",
+      "type": "text",
+      "text": "Name one thing before the day names it for you",
+      "size": 38,
+      "minSize": 36,
+      "box": {
+        "x": 27,
+        "y": 46,
+        "w": 46,
+        "h": 15
+      },
+      "font": "serif",
+      "color": "navy",
+      "align": "center",
+      "italic": true
+    },
+    {
+      "id": "book-author",
+      "type": "text",
+      "text": "The Moltology Method",
+      "size": 36,
+      "minSize": 36,
+      "box": {
+        "x": 27,
+        "y": 66,
+        "w": 46,
+        "h": 5
+      },
+      "font": "body",
+      "color": "navy",
+      "align": "center",
+      "uppercase": true,
+      "tracking": 0.1
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Read chapter one",
+      "size": 40,
+      "box": {
+        "x": 18,
+        "y": 81,
+        "w": 64,
+        "h": 8
+      }
+    }
+  ]
+}

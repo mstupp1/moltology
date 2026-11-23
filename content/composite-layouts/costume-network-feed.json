@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "name": "costume-network-feed",
+  "aspect": "4:5",
+  "costume": "network",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 52,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 60
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Find your people. Then do the thing.",
+      "size": 92,
+      "minSize": 64,
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 86,
+        "h": 22
+      },
+      "highlight": "do the thing"
+    },
+    {
+      "id": "post",
+      "type": "panel",
+      "box": {
+        "x": 7,
+        "y": 41,
+        "w": 86,
+        "h": 33
+      }
+    },
+    {
+      "id": "avatar",
+      "type": "shape",
+      "shape": "circle",
+      "color": "violet",
+      "box": {
+        "x": 12,
+        "y": 45,
+        "w": 9,
+        "h": 7
+      }
+    },
+    {
+      "id": "name",
+      "type": "text",
+      "text": "Juno Marsh",
+      "size": 40,
+      "minSize": 36,
+      "box": {
+        "x": 24,
+        "y": 45,
+        "w": 60,
+        "h": 4
+      },
+      "font": "display",
+      "color": "text"
+    },
+    {
+      "id": "handle",
+      "type": "text",
+      "text": "@juno \u00b7 Forum",
+      "size": 36,
+      "minSize": 36,
+      "box": {
+        "x": 24,
+        "y": 49.5,
+        "w": 60,
+        "h": 4
+      },
+      "font": "body",
+      "color": "muted"
+    },
+    {
+      "id": "post-text",
+      "type": "text",
+      "text": "Day 12 of closing the laptop at six. Who is in for day 13?",
+      "size": 44,
+      "minSize": 36,
+      "box": {
+        "x": 12,
+        "y": 56,
+        "w": 76,
+        "h": 13
+      },
+      "font": "body",
+      "color": "text"
+    },
+    {
+      "id": "chips",
+      "type": "pill",
+      "text": "#closetheday",
+      "size": 30,
+      "box": {
+        "x": 12,
+        "y": 68.5,
+        "w": 60
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Join the forum",
+      "size": 42,
+      "box": {
+        "x": 7,
+        "y": 79,
+        "w": 86,
+        "h": 8
+      }
+    }
+  ]
+}

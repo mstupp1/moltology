@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "name": "costume-ledger-returns",
+  "aspect": "4:5",
+  "costume": "ledger",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 50,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 70
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "Compound your days, not your screen time.",
+      "size": 92,
+      "minSize": 64,
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 86,
+        "h": 24
+      },
+      "highlight": "days"
+    },
+    {
+      "id": "card",
+      "type": "panel",
+      "box": {
+        "x": 7,
+        "y": 42,
+        "w": 86,
+        "h": 33
+      }
+    },
+    {
+      "id": "card-label",
+      "type": "text",
+      "text": "Example practice balance",
+      "size": 36,
+      "minSize": 36,
+      "box": {
+        "x": 12,
+        "y": 46,
+        "w": 76,
+        "h": 4
+      },
+      "font": "body",
+      "color": "muted"
+    },
+    {
+      "id": "balance",
+      "type": "stat",
+      "value": "4,280 XP",
+      "label": "30 days of small daily tasks",
+      "size": 110,
+      "box": {
+        "x": 12,
+        "y": 51,
+        "w": 76,
+        "h": 14
+      }
+    },
+    {
+      "id": "chart",
+      "type": "shape",
+      "shape": "line",
+      "color": "chart",
+      "thickness": 8,
+      "box": {
+        "x": 12,
+        "y": 70,
+        "w": 76,
+        "h": 1,
+        "rotate": -6
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Start free",
+      "size": 42,
+      "box": {
+        "x": 7,
+        "y": 79,
+        "w": 86,
+        "h": 8
+      }
+    },
+    {
+      "id": "disclaimer",
+      "type": "text",
+      "text": "An example, not real returns. XP is not money.",
+      "size": 36,
+      "minSize": 36,
+      "box": {
+        "x": 7,
+        "y": 89,
+        "w": 86,
+        "h": 6
+      },
+      "font": "body",
+      "color": "muted",
+      "align": "center"
+    }
+  ]
+}

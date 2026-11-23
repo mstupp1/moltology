@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { COSTUME_KEYS } from '@/lib/benefits/costumes'
+import type { BenefitKit } from '@/lib/benefits/types'
 import { COMPOSITE_DIMENSIONS, type CompositeAspectRatio } from './CompositeContainer'
 
 /**
@@ -35,7 +37,7 @@ const boxSchema = z.object({
   rotate: z.number().min(-180).max(180).optional(),
 })
 
-const fontSchema = z.enum(['display', 'body', 'serif', 'mono'])
+const fontSchema = z.enum(['display', 'body', 'serif', 'mono', 'script'])
 
 const layerBase = {
   id: z.string().optional(),
@@ -205,6 +207,11 @@ export const layoutSpecSchema = z.object({
   aspect: aspectSchema.optional(),
   /** Reference library id this layout recreates, for traceability. */
   referenceId: z.string().optional(),
+  /**
+   * Wear a benefit-page costume (src/lib/benefits/costumes.ts): its fonts, colors, corners and
+   * lockup become the defaults, and its color names (`ground`, `accent`, `volt`...) work as tokens.
+   */
+  costume: z.enum(COSTUME_KEYS as [BenefitKit, ...BenefitKit[]]).optional(),
   background: layoutBackgroundSchema.optional(),
   /** Inner safe margin in percent, used by the overlay guide and lint. */
   safeArea: z.number().min(0).max(25).optional(),
@@ -257,6 +264,7 @@ export const FONT_STACKS: Record<z.infer<typeof fontSchema>, string> = {
   body: "'Inter', 'Space Grotesk', ui-sans-serif, system-ui, sans-serif",
   serif: "'EB Garamond', Georgia, serif",
   mono: "ui-monospace, 'SFMono-Regular', Menlo, monospace",
+  script: "'EB Garamond', Georgia, serif",
 }
 
 /**

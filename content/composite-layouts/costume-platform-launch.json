@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "name": "costume-platform-launch",
+  "aspect": "4:5",
+  "costume": "platform",
+  "safeArea": 5,
+  "layers": [
+    {
+      "id": "glow",
+      "type": "shape",
+      "shape": "glow",
+      "color": "violet",
+      "opacity": 0.35,
+      "blur": 120,
+      "box": {
+        "x": 20,
+        "y": 10,
+        "w": 80,
+        "h": 40
+      }
+    },
+    {
+      "id": "brand",
+      "type": "brand",
+      "size": 50,
+      "box": {
+        "x": 7,
+        "y": 6,
+        "w": 60
+      }
+    },
+    {
+      "id": "badge",
+      "type": "pill",
+      "text": "New: Oracle skills",
+      "size": 30,
+      "color": "text",
+      "background": "surface",
+      "border": "line",
+      "box": {
+        "x": 7,
+        "y": 15,
+        "w": 60
+      }
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "text": "An AI guide that knows your day.",
+      "size": 100,
+      "minSize": 70,
+      "box": {
+        "x": 7,
+        "y": 22,
+        "w": 86,
+        "h": 24
+      },
+      "highlight": "knows your day"
+    },
+    {
+      "id": "prompt",
+      "type": "panel",
+      "border": "line",
+      "borderWidth": 2,
+      "box": {
+        "x": 7,
+        "y": 50,
+        "w": 86,
+        "h": 13
+      }
+    },
+    {
+      "id": "prompt-text",
+      "type": "text",
+      "text": "> plan my deep work block for 2pm",
+      "size": 38,
+      "minSize": 36,
+      "box": {
+        "x": 11,
+        "y": 53,
+        "w": 78,
+        "h": 7
+      },
+      "font": "mono",
+      "color": "body",
+      "weight": 500,
+      "valign": "center"
+    },
+    {
+      "id": "features",
+      "type": "list",
+      "items": [
+        "Reads your daily tasks",
+        "Skills for focus and planning",
+        "Free to start"
+      ],
+      "size": 38,
+      "marker": "check",
+      "gap": 16,
+      "box": {
+        "x": 7,
+        "y": 67,
+        "w": 86,
+        "h": 15
+      }
+    },
+    {
+      "id": "cta",
+      "type": "button",
+      "text": "Try it free",
+      "size": 40,
+      "box": {
+        "x": 7,
+        "y": 85,
+        "w": 86,
+        "h": 8
+      }
+    }
+  ]
+}
