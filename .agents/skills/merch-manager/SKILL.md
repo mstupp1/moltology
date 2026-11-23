@@ -28,6 +28,11 @@ provider mappings in `content/merch/printful-sync.json`. See [launch state and o
 - Use a dedicated Printful Manual order platform/API store, never the Etsy store. The pilot uses
   Stripe test mode and Printful drafts. Never enable paid fulfillment as part of a content run.
 
+- A design can borrow a benefit-page costume ([costumes](../../../content/costumes.md)): a can-label tee,
+  a clinic tote, an arcade patch, a ledger "statement" mug. Use the costume's colours and fonts
+  (`npm run costumes:brief -- --kit <costume>`) and its lockup from the canonical emblem; imitate the
+  industry, never one brand's packaging, and make no health or money claims on the product.
+
 ## Create and publish a private listing
 
 1. Add a new stable catalog `n` (never renumber/reuse IDs) and versioned design keys. The slug is the

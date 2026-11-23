@@ -33,6 +33,10 @@ Needs `YOUTUBE_API_KEY`, or `GEMINI_API_KEY` with the YouTube Data API v3 enable
 - **Negative evidence:** each title is tagged with formats (`TITLE_FORMATS` in `scripts/lib/youtube-research.ts`). A format is validated only with 8+ scored videos and more wins than flops (0.5x median or less). Never copy a format from one outlier.
 - **Structure:** "Winner length" shows the typical length of a format's winners. Check how the winners are built (a fast 20-point list vs a slow 3-point breakdown) by watching two or three before copying the format.
 
+## Benefit topics as seeds
+
+The 48 benefit landing pages each target one plain search phrase (`npm run costumes:brief -- --list`, then `--topic <slug>` for the phrase and the questions people ask). They make good seed queries for `yt:research` alongside our usual angles, since each one is a benefit people already search for. An idea that wins can borrow its page's costume for the thumbnail or a cold-open bit (see [costumes](../../../content/costumes.md)); the video itself stays in the channel's look and makes no health or money claims.
+
 ## Turning results into ideas
 
 For each idea, record the outlier(s) it maps to, the validated format, the outcome and the molting mechanism it pairs, and the title in our words. Present the top 10 to Myles and let him pick. Adapt formats to our audience's psychographics; don't copy entertainment-creator titles. When an idea moves to scripting, the title and first 30 seconds follow the [writing playbook](../../../content/writing-playbook.md) hooks at loudness 2, and the script passes its boredom check.

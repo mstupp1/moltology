@@ -54,6 +54,8 @@ Open each new reference's `preview.jpg` and fill `analysis` in its `reference.js
 - `copyPattern`: the shape of the words ("question hook, one-line answer, CTA"), not the words.
 - `whyItWorks`, `borrow`, `avoid`, and `startFrom` (closest layout in `content/composite-layouts/` or built-in template).
 
+When a reference comes from one of the benefit-page industries (telehealth, energy drinks, wellness, fashion, fintech, sportswear, AI software, gaming, self-help, social apps), name the matching costume in `startFrom` (for example `costume-can-label.json`) and recreate it with `"costume"` set, so it picks up that costume's fonts, colours and lockup instead of hard-coded values. Costume tokens and rules: [costumes](../../../content/costumes.md).
+
 Work in batches; analysis of ten references is one pass of viewing ten previews.
 
 ## 3. Recreate

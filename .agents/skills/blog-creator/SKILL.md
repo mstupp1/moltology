@@ -82,6 +82,8 @@ News picks the story; search demand picks how we frame and title it. Before draf
 5. **Optional manual check:** the script prints a Google Trends compare link. Mention it to the user if relative interest would settle a close call; Google Trends has no free API, so the script doesn't fetch it.
 6. **If a source fails** (rate limit, network), the script reports it and keeps the others. Continue with whatever came back and tell the user which signal was missing.
 
+7. **Benefit topics.** When the story touches one of the 48 benefit angles (focus, energy, investing, community...; `npm run costumes:brief -- --list`), add that page's search phrase to the phrases you test, and link the benefit page once in the body if it is live (the brief says when a page is still a draft). The dispatch keeps the news look; costumes are for social, see [costumes](../../../content/costumes.md).
+
 #### 4. Continuity Check & Slug Deduplication
 * Inspect `content/news/blog-history.json` or check existing slugs in `content/news/` to verify that this topic or slug has not already been published.
 * Confirm the angle is distinct from the last 3–5 published articles.

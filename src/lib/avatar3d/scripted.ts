@@ -126,6 +126,14 @@ export function timelinePlayer(stage: TimelineStage, timeline: AnimationTimeline
   for (const c of everyone) c.avoidContacts(true, everyone.filter((o) => o !== c).flatMap((o) => o.contacts()))
   const set = timeline.set && options.set !== false ? buildSet(timeline.set, timeline.setArt) : null
   if (set) stage.setProps(set.root)
+  if (set?.dress) {
+    const placed = timeline.cast?.length ? timeline.cast : [{ x: 0, z: 0 }]
+    set.dress(
+      placed
+        .map((m, i) => ({ character: stage.member(i), x: m.x, z: m.z ?? 0 }))
+        .filter((m): m is { character: NonNullable<typeof m.character>; x: number; z: number } => Boolean(m.character))
+    )
+  }
   const apply = (cue: TimelineCue) => {
     const who = cue.who ?? 0
     const character = stage.member(who)

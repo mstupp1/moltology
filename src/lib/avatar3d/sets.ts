@@ -20,8 +20,9 @@ import {
   TextureLoader,
   type Texture,
 } from 'three'
+import { dressPodcast, type DressMember } from './podcast-set'
 
-export const SET_NAMES = ['codex-study', 'reef-office', 'open-water'] as const
+export const SET_NAMES = ['codex-study', 'reef-office', 'open-water', 'podcast-studio'] as const
 export type SetName = (typeof SET_NAMES)[number]
 
 /** Painted art for a set (image URLs, usually data URLs). Any missing slot keeps the plain look. */
@@ -33,6 +34,8 @@ export interface BuiltSet {
   update: (t: number) => void
   /** Resolves once every art texture has loaded, so the first frame already shows it. */
   ready: Promise<void>
+  /** Fit furniture to the cast once it is on stage (the podcast desk, mics and headphones). */
+  dress?: (members: DressMember[]) => void
 }
 
 /**
@@ -45,6 +48,7 @@ const SETS: Record<SetName, { floor: string; rug?: string; lamp?: [number, numbe
   'codex-study': { floor: '#5a3f2c', rug: '#6e2f2b', lamp: [1.6, 1.4, -2.6] },
   'reef-office': { floor: '#c9bfa8' },
   'open-water': { floor: '#8a7a5c' },
+  'podcast-studio': { floor: '#3b2a20', lamp: [-1.7, 1.6, -2.4] },
 }
 
 /** Loads art textures and puts them on materials once they arrive. */
@@ -140,6 +144,7 @@ export function buildSet(name: SetName, art: SetArt = {}): BuiltSet {
   return {
     root,
     ready: Promise.all(paint.pending).then(() => undefined),
+    dress: name === 'podcast-studio' ? (members) => root.add(dressPodcast(members)) : undefined,
     update(t) {
       if (flicker) flicker.intensity = 2.2 + Math.sin(t * 7.3) * 0.05 + Math.sin(t * 2.1) * 0.05
     },

@@ -17,7 +17,7 @@ import { buildTimeline, castLook, castOf, lessonProblems, reelDraftFrom, softenC
 import { rehearse, type FrameClip } from '../src/lib/avatar3d/rehearse'
 import { voiceLesson } from './lib/character-animation/voices'
 import { renderFrames } from './lib/character-animation/render'
-import { defaultBackdrop, headlineOverlays, normaliseBackdrop, OUT_H, OUT_W, renderHeadlineCards, renderOutroText, renderSceneClip } from './lib/character-animation/compose'
+import { defaultBackdrop, headlineOverlays, normaliseBackdrop, OUT_H, OUT_W, renderHeadlineCards, renderOutroText, renderSceneClip, renderTagCard } from './lib/character-animation/compose'
 import { tokenizeScriptText } from './lib/tts-engine'
 import { setArtFiles, textureUrls } from './lib/character-animation/set-art'
 import { SHOTS } from '../src/lib/avatar3d/scripted'
@@ -265,6 +265,8 @@ async function main() {
   const defaultSet = await setBackdrop()
   const hookCount = tokenizeScriptText(lesson.hookHeadline).length
   const cards = renderHeadlineCards(lesson.hookHeadline, path.join(outDir, 'headline'))
+  // Molt Pod and other show-style series carry a small tag on every scene.
+  const tag = lesson.tag ? renderTagCard(lesson.tag, path.join(outDir, 'tag.png')) : null
   const clips: string[] = []
   const durations: number[] = []
   for (let i = 0; i < lesson.scenes.length; i++) {
@@ -282,7 +284,10 @@ async function main() {
         count: last - first,
         backdrop,
         outPath: path.join(outDir, `scene-${i + 1}.mp4`),
-        overlays: i === 0 ? headlineOverlays(cards, words.slice(0, hookCount), hookEnd) : [],
+        overlays: [
+          ...(tag ? [{ png: tag, from: 0, to: (last - first) / FPS + 1 }] : []),
+          ...(i === 0 ? headlineOverlays(cards, words.slice(0, hookCount), hookEnd) : []),
+        ],
       })
     )
     durations.push((last - first) / FPS)

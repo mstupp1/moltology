@@ -42,6 +42,10 @@ Score each concept from 1 to 5 on:
 
 Build the highest total. A concept scoring under 3 on Stop or Laugh gets rewritten before it can win. Record the scores and the winner in the draft.
 
+### Costumes
+
+A concept may wear one of the benefit-page [costumes](../../../content/costumes.md): a can-style tier list, a clinic "symptoms" checklist for a habit, arcade patch notes for your week, a seminar book cover for one rule. Start from the page (`npm run costumes:brief -- --topic <slug>`) and its costume's starter layout (`content/composite-layouts/costume-<costume>-*.json`), build the slides as layout specs with `"costume"` set, and end on one slide in the house look that names the real feature. Loud costumes (can, locker, arcade) suit loudness 4 to 5; retreat and atelier read best at 1 to 2. At most one Swipe Lab deck in three wears a costume; record `costume` and `benefit` in the draft.
+
 ## 2. Hooks and swipe mechanics
 
 The cover is most of the post. Write five candidate cover lines for the winner and pick the strongest. Proven hook shapes:
