@@ -117,6 +117,11 @@ export interface GearPiece {
    * off for designed pieces whose colours are the point (collection pieces).
    */
   ladder?: boolean
+  /**
+   * Out of the shop for good. Never delete a shipped piece: members who own it keep wearing it,
+   * so it stays in the catalog with this flag instead.
+   */
+  retired?: boolean
   /** Shop collection this piece belongs to (collections.ts). */
   collection?: string
   sortOrder: number

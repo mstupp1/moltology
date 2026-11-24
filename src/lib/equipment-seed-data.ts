@@ -27,6 +27,8 @@ export interface EquipmentCatalogSeed {
   kind?: EquipmentKind
   artKey?: string | null
   appearanceKey?: string
+  /** Out of the shop; owners keep it (GearPiece.retired). */
+  retired?: boolean
 }
 
 /** A piece definition (src/lib/gear/pieces.ts) as a catalog row. */
@@ -46,6 +48,7 @@ function catalogRow(p: GearPiece): EquipmentCatalogSeed {
     sortOrder: p.sortOrder,
     kind: 'gear',
     appearanceKey: p.key,
+    ...(p.retired ? { retired: true } : {}),
   }
 }
 
@@ -76,6 +79,28 @@ export const VARIANT_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = GEAR_PIECES.fil
 })
 
 export const ALL_EQUIPMENT_CATALOG = [...BASE_EQUIPMENT_CATALOG, ...VARIANT_EQUIPMENT_CATALOG]
+
+/**
+ * The catalog, in shop order, as the rows the server reads. Code is the source of truth; the
+ * equipment_catalog table mirrors it (src/lib/server/gear-catalog.ts).
+ */
+export const GEAR_CATALOG: readonly EquipmentCatalogSeed[] = [...ALL_EQUIPMENT_CATALOG].sort((a, b) => a.sortOrder - b.sortOrder)
+
+const CATALOG_BY_ID = new Map(GEAR_CATALOG.map((row) => [row.id, row]))
+const CATALOG_BY_KEY = new Map(GEAR_CATALOG.map((row) => [row.appearanceKey ?? row.slug, row]))
+
+/** A catalog row by id, retired pieces included. */
+export function gearCatalogRow(id: string): EquipmentCatalogSeed | undefined {
+  return CATALOG_BY_ID.get(id)
+}
+
+/** A catalog row by appearance key (variants use `<baseKey>--<rarity>`). */
+export function gearCatalogRowByKey(key: string): EquipmentCatalogSeed | undefined {
+  return CATALOG_BY_KEY.get(key)
+}
+
+/** What the shop sells: every row except retired pieces. */
+export const SHOP_CATALOG: readonly EquipmentCatalogSeed[] = GEAR_CATALOG.filter((row) => !row.retired)
 
 /** Two copies of every claw style; 19 instances total, all fitting in an empty vault. */
 export const STARTER_EQUIPMENT_CATALOG_IDS: string[] = [
