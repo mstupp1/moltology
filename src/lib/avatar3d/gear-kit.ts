@@ -5,6 +5,7 @@
  */
 import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Matrix4, Mesh, MeshPhysicalMaterial, Quaternion, Skeleton, SkinnedMesh, SphereGeometry, TorusGeometry, Vector3, type Bone, type Material } from 'three'
 import { workedSurface } from './materials'
+import type { GearSurface } from './textures'
 import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { getEquipmentVisual, tone, type EquipmentVisual } from '../avatar/equipment'
 import type { EquippedAppearance } from '../character-appearance'
@@ -13,6 +14,19 @@ import { equipAccessory, type GearItem } from './gear'
 import type { Loft } from './loft'
 import { alongY, placed, spike, taperedTube } from './parts'
 import { lookQuaternion, type Rig, type Weigh, type Wearable } from './rig'
+
+/** Surfaces that are garment cloths. */
+const CLOTHS: readonly GearSurface[] = ['cloth', 'knit', 'denim', 'velvet', 'fleece', 'nylon']
+
+/** How each cloth catches light: velvet has a deep sheen, nylon a slick one, knit and fleece stay soft. */
+const FABRIC_FINISH: Partial<Record<GearSurface, { roughness: number; sheen: number; sheenRoughness: number; clearcoat?: number; clearcoatRoughness?: number }>> = {
+  cloth: { roughness: 0.88, sheen: 0.6, sheenRoughness: 0.7 },
+  knit: { roughness: 0.95, sheen: 0.5, sheenRoughness: 0.9 },
+  denim: { roughness: 0.9, sheen: 0.35, sheenRoughness: 0.6 },
+  velvet: { roughness: 0.75, sheen: 1, sheenRoughness: 0.35 },
+  fleece: { roughness: 0.97, sheen: 0.8, sheenRoughness: 0.95 },
+  nylon: { roughness: 0.45, sheen: 0.3, sheenRoughness: 0.4, clearcoat: 0.35, clearcoatRoughness: 0.4 },
+}
 
 export type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'fabric' | 'dark' | 'paint' | 'tape' | 'seam' | 'soft' | 'glass'
 export type Amount = (local: Vector3, rest: Vector3, normal: Vector3) => number
@@ -187,13 +201,15 @@ export class Kit {
     // Rare and better pieces carry an engraving inlaid in their trim colour.
     const engrave = rarity === 'rare' || rarity === 'epic' || rarity === 'legendary' ? v.trim : undefined
     const plateMetal = v.surface === 'metal' ? 0.6 : 0.05
+    // Garment cloth: the piece's own weave when it names one, plain woven cloth otherwise.
+    const weave: GearSurface = CLOTHS.includes(v.surface) ? v.surface : 'cloth'
     const materials: Record<Tone, Material> = {
       plate: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), metalness: plateMetal, roughness: v.surface === 'metal' ? 0.4 : 0.5, clearcoat: 0.45, clearcoatRoughness: 0.3 }), v.surface, { engrave }),
       trim: new MeshPhysicalMaterial({ color: new Color(v.trim), metalness: 0.9, roughness: 0.26 }),
       accent: new MeshPhysicalMaterial({ color: new Color(v.accent), emissive: new Color(v.accent), emissiveIntensity: 0.85, roughness: 0.3 }),
-      cloth: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.92, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color(v.trim) }), 'cloth'),
+      cloth: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.92, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color(v.trim) }), weave),
       // Garment fabric: soft and matte, with a faint lighter sheen of its own colour.
-      fabric: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.88, sheen: 0.6, sheenRoughness: 0.7, sheenColor: new Color(tone(v.material, 0.35)) }), 'cloth'),
+      fabric: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.material), ...FABRIC_FINISH[weave] ?? FABRIC_FINISH.cloth, sheenColor: new Color(tone(v.material, 0.35)) }), weave),
       // Painted plastic or card in the main colour: props, soles, anything that is not metal or cloth.
       paint: new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.42, clearcoat: 0.5, clearcoatRoughness: 0.35 }),
       // Athletic tape: smooth and matte, with a soft sheen across the weave.

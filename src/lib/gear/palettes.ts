@@ -82,6 +82,7 @@ export const GEAR_PALETTES: Readonly<Record<string, GearColours>> = {
   'street-cap': { material: '#1b1c1f', trim: '#1b1c1f', accent: '#ff6a1a' },
   'street-cap-orange': { material: '#ff6a1a', trim: '#1b1c1f', accent: '#ffffff' },
   'street-plaid': { material: '#a12a2a', trim: '#1b1c1f', accent: '#f1e7d2' },
+  'street-denim': { material: '#4a6b94', trim: '#b8743a', accent: '#e8e2d4' },
   'street-hi-tops': { material: '#ff6a1a', trim: '#f4f4f1', accent: '#1b1c1f' },
   // Polar Shelf: oatmeal knit, navy, berry red, fleece white.
   'polar-oat': { material: '#d9cbb0', trim: '#b9a988', accent: '#f4efe4' },
