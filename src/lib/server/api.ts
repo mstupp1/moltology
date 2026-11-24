@@ -1442,3 +1442,51 @@ export const getOracleCardsFn = createServerFn({ method: 'POST' })
     const { token, ...refs } = data
     return getOracleCardsHandler(refs, token)
   })
+
+/* ── Arcade ─────────────────────────────────────────────── */
+
+export type { ArcadeBoard, ArcadeBoardEntry, ArcadeRunResult, ArcadeRunTicket } from './arcade'
+
+const arcadeGameSchema = z.enum(['riptide'])
+
+/** A seed for the next run, and a run id when a signed-in member's score will be recorded. */
+export const startArcadeRunFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; game: 'riptide' }) =>
+    z.object({ token: z.string().optional(), game: arcadeGameSchema }).parse(data),
+  )
+  .handler(async (args) => {
+    const { startArcadeRunHandler } = await import('./arcade')
+    return startArcadeRunHandler(args)
+  })
+
+/** Records a finished run's score (checked against its time) and any XP it earns. */
+export const finishArcadeRunFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; game: 'riptide'; runId: string; score: number }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        game: arcadeGameSchema,
+        runId: z.string().uuid(),
+        score: z.number().int().min(0).max(9999),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { finishArcadeRunHandler } = await import('./arcade')
+    return finishArcadeRunHandler(args)
+  })
+
+/** Public: a game's top 10 this week or all time, plus the viewer's own place. */
+export const getArcadeBoardFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; game: 'riptide'; window?: 'week' | 'all' }) =>
+    z
+      .object({ token: z.string().optional(), game: arcadeGameSchema, window: z.enum(['week', 'all']).default('week') })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { getArcadeBoardHandler } = await import('./arcade')
+    return getArcadeBoardHandler(args)
+  })

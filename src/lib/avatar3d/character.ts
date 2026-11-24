@@ -79,6 +79,8 @@ const Yaxis = new Vector3(0, 1, 0)
 const LEG_UP = 1
 /** How long a middle leg's lift-and-tap fidget takes, in seconds. */
 const LEG_TAP_SECONDS = 0.9
+/** How long one swimming stroke takes, power and glide. */
+const SWIM_STROKE_SECONDS = 0.55
 /** How far the ankle rises per radian the foot rolls onto its toes, as a share of the shin. */
 const TOE_REACH = 0.45
 /** How far the toes point down, in radians, at the push off of a jump. */
@@ -104,6 +106,14 @@ export interface Character3D {
   lookAt: (at: { x: number; y: number } | null) => void
   /** Play a short reaction over the current pose. `side` is 1 for the character's left claw. */
   react: (kind: Reaction, side?: 1 | -1) => void
+  /**
+   * Swimming, over whatever pose it holds: body leaning into the swim, feet off the floor and
+   * trailing, claws reaching ahead, middle legs and tail paddling. Eases in and out. Used by the
+   * arcade and free for scripted animation (a character swimming across a scene).
+   */
+  setSwim: (on: boolean) => void
+  /** One swimming stroke while swimming: claws sweep back and down, legs and tail kick, then a glide. */
+  stroke: () => void
   /**
    * How loud the character is speaking right now, 0 (silent) to 1, for scripted animation, and
    * the cartoon mouth shape for the sound being made (mouth-shapes.ts). Without a shape the mouth
@@ -565,6 +575,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   let talkAccent = 0
   /** Talking gestures playing over the pose (scripted animation only). */
   let gestures: { kind: Gesture; side: 1 | -1; amount: number; start: number | null }[] = []
+  /** Swimming: whether it is on, how far it has eased in (0..1), and when the last stroke began. */
+  const swim = { on: false, weight: 0, strokeAt: null as number | null, strokeQueued: false }
 
   const overlay = (name: string, axis: Vector3, angle: number) => {
     const bone = rig.bones.get(name)
@@ -935,6 +947,50 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       // Bright eyes: the upper lids lift off a sleepy resting look (a cheer, being pleased).
       let bright = 0
 
+      if (swim.on || swim.weight > 0.001) {
+        swim.weight += ((swim.on ? 1 : 0) - swim.weight) * (1 - Math.exp(-dt * 6))
+        const w = swim.weight
+        if (swim.strokeQueued) {
+          swim.strokeAt = time
+          swim.strokeQueued = false
+        }
+        // A stroke: a quick power phase (claws sweep back, legs and tail kick), then a long glide
+        // back to the reach.
+        const sp = swim.strokeAt === null ? 1 : Math.min(1, (time - swim.strokeAt) / SWIM_STROKE_SECONDS)
+        if (sp >= 1) swim.strokeAt = null
+        const r = sp < 0.28 ? Math.sin((sp / 0.28) * (Math.PI / 2)) : sp < 1 ? 1 - ((sp - 0.28) / 0.72) ** 0.6 : 0
+        const power = Math.max(0, Math.min(1, r))
+        const flutter = Math.sin(time * 7.5)
+        // Leaning into the swim, tucking a little on each stroke.
+        overlay('chest', X, (0.3 + 0.12 * power) * w)
+        overlay('pelvis', X, (0.16 - 0.08 * power) * w)
+        // Feet off the floor, pointed and trailing, fluttering; drawn up on the kick.
+        lift = Math.max(lift, (0.2 + 0.05 * flutter + 0.12 * power) * legLength * w)
+        toe = Math.max(toe, (0.35 + 0.15 * power) * w)
+        for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
+          // Gliding, the claws reach ahead and a little out; on the stroke they sweep back and down.
+          aimAt.set(s * (0.55 - 0.2 * power), -0.1 - 0.65 * power, 0.85 - 1.4 * power)
+          aim(`arm${tag}`, aimAt, 0.85 * w)
+          aimAt.set(s * (0.25 - 0.15 * power), 0.1 - 1.1 * power, 1 - 1.2 * power)
+          aim(`forearm${tag}`, aimAt, 0.8 * w)
+          // Pincers part to scoop water on the stroke.
+          overlay(`thumb${tag}`, Zaxis, -s * (0.15 + 0.35 * power) * w)
+          // Antennae stream back.
+          overlay(`antenna${tag}`, X, (0.25 + 0.1 * power) * w)
+        }
+        // The middle legs paddle in a quick wave, front to back.
+        for (const leg of sideLegs) {
+          const ph = time * 9 - leg.k * 1.1 + (leg.s > 0 ? 0 : Math.PI)
+          legPose(leg, 0.22 * Math.sin(ph) * w, (0.2 + 0.12 * Math.max(0, Math.sin(ph + 1))) * w, 0.25 * w, 0.1 * w)
+        }
+        // Tail and swimmerets beat hard; the fan spreads to push.
+        overlay('tail', X, (Math.sin(time * 6) * 0.16 + 0.35 * power) * w)
+        swimmerets.forEach((name, k) => overlay(name, X, Math.sin(time * 10 - Math.floor(k / 2) * 0.9) * 0.35 * w))
+        fanSpread += (0.1 + 0.08 * power) * w
+        // Effort on the stroke: a small open mouth, brows set.
+        mouthOpen = Math.max(mouthOpen, 0.25 * power * w)
+        browKnit = Math.max(browKnit, 0.12 * w)
+      }
       if (reaction) {
         if (reaction.start === null) {
           reaction.start = time
@@ -1229,6 +1285,13 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     },
     lookAt(at) {
       pointer = at
+    },
+    setSwim(on) {
+      swim.on = on
+      if (!on) swim.strokeAt = null
+    },
+    stroke() {
+      if (swim.on) swim.strokeQueued = true
     },
     react(kind, side = 1) {
       if (held) aimPose(held)

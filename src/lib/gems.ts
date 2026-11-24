@@ -52,6 +52,7 @@ export type GemSource =
   | 'stage'
   | 'first'
   | 'referral'
+  | 'arcade'
   | 'simulation'
   | 'purchase'
   | 'refund'

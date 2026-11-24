@@ -8,6 +8,7 @@ import {
   Layers,
   Users,
   MessagesSquare,
+  Gamepad2,
   LifeBuoy,
   CircleUser,
   Shell,
@@ -40,6 +41,8 @@ export function CommandCatalogIcon({ icon }: { icon: CommandIconId }) {
       return <Layers className={`${ICON_CLASS} text-purple-400`} />
     case 'forum':
       return <MessagesSquare className={`${ICON_CLASS} text-cyan-glow`} />
+    case 'arcade':
+      return <Gamepad2 className={`${ICON_CLASS} text-cyan-glow`} />
     case 'stream':
       return <Activity className={`${ICON_CLASS} text-cyan-glow`} />
     case 'landing':

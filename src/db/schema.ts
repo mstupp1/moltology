@@ -452,6 +452,26 @@ export const gemTransactions = pgTable('gem_transactions', {
   }),
 ])
 
+// Arcade runs: one row per game started by a signed-in member, finished with its score. The
+// server-measured time between start and finish bounds the score (src/lib/arcade.ts).
+export const arcadeRuns = pgTable('arcade_runs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  game: text('game').$type<import('../lib/arcade').ArcadeGameId>().notNull(),
+  seed: integer('seed').notNull(),
+  score: integer('score'),
+  startedAt: timestamp('startedAt').notNull().defaultNow(),
+  finishedAt: timestamp('finishedAt'),
+}, (table) => [
+  index('arcade_runs_game_finished_idx').on(table.game, table.finishedAt),
+  index('arcade_runs_user_started_idx').on(table.userId, table.startedAt),
+  pgPolicy('arcade_runs_server_only', {
+    for: 'all',
+    using: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+    withCheck: sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`,
+  }),
+])
+
 export type CreditSource = 'stripe' | 'refund' | 'purchase' | 'admin'
 
 // Molt Credit ledger: bought packs, spends and refunds. profiles.moltCredits is the cached sum.

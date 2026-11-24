@@ -470,6 +470,13 @@
       "when": 1795477612229,
       "tag": "0066_landing_collections_two",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1795534047682,
+      "tag": "0067_arcade_runs",
+      "breakpoints": true
     }
   ]
 }
