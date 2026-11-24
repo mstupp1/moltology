@@ -55,6 +55,9 @@ export const EYE_STRETCH: Record<Avatar3DLook['eyeShape'], [number, number]> = {
 /** How far stalk eyes stand off the face, in eye radii, and how much they lean up. */
 const STALK = { reach: 1.5, rise: 1.3 }
 
+/** With stalk eyes standing up at the front, hats sit a little higher and further back, behind them. */
+const stalkSeat = (look: Avatar3DLook) => (look.eyeShape === 'stalk' ? v(0, 0.04, -0.07) : v(0, 0, 0))
+
 /** Brow ridge size against the original soft brow: width, then height. */
 const BROW_SIZE = { soft: [1, 1], thick: [1.5, 1.55], thin: [0.55, 0.62], none: [0, 0] } as const
 
@@ -806,7 +809,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   // Hats seat a little below the crown, where the head is wide enough to carry a brim.
   const top = carapace.key(0).d
   const seat = carapace.key(carapace.sAt(top - 0.085))
-  rig.addSocket('head', 'chest', v(0, seat.d, seat.z ?? 0), seat.r)
+  rig.addSocket('head', 'chest', v(0, seat.d, seat.z ?? 0).add(stalkSeat(look)), seat.r)
   rig.addSocket('face', 'chest', carapace.point(carapace.sAt(1.515), Math.PI / 2), 0.26)
   const ear = carapace.key(carapace.sAt(1.5))
   rig.addSocket('ears', 'chest', v(0, 1.5, ear.z ?? 0), ear.r, undefined, top - 1.5)
@@ -947,7 +950,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     footLength: 0.37,
   })
 
-  rig.addSocket('head', 'chest', v(0, shell.key(0).d - 0.035, 0.02), 0.2)
+  rig.addSocket('head', 'chest', v(0, shell.key(0).d - 0.035, 0.02).add(stalkSeat(look)), 0.2)
   rig.addSocket('face', 'chest', shell.point(shell.sAt(1.315), Math.PI / 2), 0.4)
   rig.addSocket('ears', 'chest', v(0, 1.3, 0), shell.key(shell.sAt(1.3)).r, undefined, shell.key(0).d - 1.3)
   rig.addSocket('back', 'chest', shell.point(shell.sAt(1.25), -Math.PI / 2), 0.4)
