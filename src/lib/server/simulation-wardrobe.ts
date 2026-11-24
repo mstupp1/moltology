@@ -10,11 +10,11 @@
  */
 import { and, eq, sql } from 'drizzle-orm'
 import type { getDb } from '../../db'
-import { equipmentCatalog, gearUnlocks, profiles, userGearItems } from '../../db/schema'
+import { gearUnlocks, profiles, userGearItems } from '../../db/schema'
 import { getEquipmentVisual } from '../avatar/equipment'
 import { LOBSTER_AVATAR_STYLE } from '../lobster-avatar'
 import { EQUIP_SLOT_IDS, equipSlotCategory, type EquipSlotId } from '../chassis-loadout'
-import { STARTER_EQUIPMENT_CATALOG_IDS, STARTER_EQUIPPED_SLOTS } from '../equipment-seed-data'
+import { shopCatalog, STARTER_EQUIPMENT_CATALOG_IDS, STARTER_EQUIPPED_SLOTS } from '../equipment-seed-data'
 import { GEAR_PRICES } from '../gear-variants'
 import type { EquipmentCategory, EquipmentRarity } from '../../db/schema'
 import { buyGear } from './market'
@@ -131,9 +131,8 @@ async function isSimulated(db: Db, userId: string) {
 }
 
 /** Gear in the market: wearable pieces outside the starter set. */
-async function loadMarket(db: Db) {
-  const rows = await db.select().from(equipmentCatalog).where(eq(equipmentCatalog.kind, 'gear'))
-  return rows.filter((c) => {
+async function loadMarket(_db: Db) {
+  return shopCatalog().filter((c) => {
     const key = c.appearanceKey || c.slug
     return typeof key === 'string' && Boolean(getEquipmentVisual(key))
   })

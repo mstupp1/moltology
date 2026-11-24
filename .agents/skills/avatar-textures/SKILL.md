@@ -83,6 +83,12 @@ Use the shell detail rules (greyscale height, white is high, flat shadowless lig
 - **gear-coral**: Coral surface: dense small round polyp cups and pits packed together (like star coral), each about 1/30 of the tile, with thin ridges between them.
 - **gear-bone**: Polished bone or old chitin: mostly smooth with faint long fibrous streaks running one way and a sprinkling of tiny pores. Very subtle.
 
+- **gear-knit**: Chunky hand knit: rows of interlocking V-shaped stitches (stockinette), about 24 stitches across the tile, soft and slightly fuzzy, even all over.
+- **gear-denim**: Denim twill: fine diagonal twill lines running bottom-left to top-right, about 60 across the tile, with faint irregular slubs. No seams, no fades.
+- **gear-velvet**: Crushed velvet pile: very soft, low-contrast swirls and patches where the pile lies in different directions. Very subtle, almost smooth.
+- **gear-fleece**: Polar fleece: a dense even field of tiny soft nubs and pills, fuzzy, no direction.
+- **gear-nylon**: Ripstop nylon: a fine smooth fabric with a faint square grid of slightly raised threads about 1/16 of the tile apart. Very subtle.
+
 ### Gear engraving (mask)
 
 - **gear-engraving**: Ornate engraved filigree for armour: thin flowing scrollwork lines with curls, small leaves and dots, evenly spread, like engraving on a sword guard. Lines only, no filled shapes, no text or symbols. Use the marking mask ending, but roughly 20-30% white.

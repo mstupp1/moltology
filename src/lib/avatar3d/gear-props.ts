@@ -2,7 +2,7 @@
  * Held props: one object in the pinch of one claw, the other claw left bare. Placed like the
  * hammer: from the claw socket, in front of the palm, so it moves with every pose.
  */
-import { BoxGeometry, BufferGeometry, CapsuleGeometry, CylinderGeometry, SphereGeometry, TorusGeometry } from 'three'
+import { BoxGeometry, BufferGeometry, CapsuleGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, OctahedronGeometry, SphereGeometry, TorusGeometry } from 'three'
 import type { Prop } from '../gear/types'
 import { Kit, v } from './gear-kit'
 import { alongY, placed } from './parts'
@@ -105,6 +105,76 @@ const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number) => voi
     kit.add(bone, 'soft', at(new CylinderGeometry(0.085 * S, 0.085 * S, 0.12 * S, 18).rotateX(tilt), x, y, z))
     // The toasted side.
     kit.add(bone, 'tape', at(new CylinderGeometry(0.0855 * S, 0.0855 * S, 0.05 * S, 18, 1, true).rotateX(tilt), x, y - 0.03 * S, z - 0.01 * S))
+  },
+  lantern: (kit, bone, at, S) => {
+    const r = 0.1 * S
+    const h = 0.26 * S
+    // Held by its bail, hanging below the claw: a glass chimney with a glowing core, a brass cap,
+    // base and four guard wires.
+    const top = -0.06 * S
+    kit.add(bone, 'trim', at(new TorusGeometry(0.07 * S, 0.008, 8, 20, Math.PI).rotateZ(Math.PI), 0, top + 0.07 * S, 0))
+    kit.add(bone, 'trim', at(new ConeGeometry(r * 1.05, h * 0.22, 20), 0, top - h * 0.05, 0))
+    kit.add(bone, 'glass', at(new CylinderGeometry(r * 0.82, r * 0.82, h * 0.62, 24, 1, true), 0, top - h * 0.48, 0))
+    kit.add(bone, 'accent', at(new SphereGeometry(r * 0.38, 16, 12).scale(1, 1.4, 1), 0, top - h * 0.48, 0))
+    kit.add(bone, 'trim', at(new CylinderGeometry(r, r * 1.1, h * 0.14, 24), 0, top - h * 0.86, 0))
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2 + Math.PI / 4
+      kit.add(bone, 'trim', at(new CylinderGeometry(0.005, 0.005, h * 0.66, 6), Math.cos(a) * r * 0.9, top - h * 0.48, Math.sin(a) * r * 0.9))
+    }
+  },
+  staff: (kit, bone, at, S) => {
+    const len = 1.5 * S
+    // A tall walking staff, gripped a third of the way up, a carved knot at the head with a
+    // glowing pearl, and a wrap of cord under the grip.
+    kit.add(bone, 'paint', at(new CylinderGeometry(0.018 * S + 0.006, 0.024 * S + 0.006, len, 10), 0, len * 0.15, 0))
+    kit.add(bone, 'paint', at(new SphereGeometry(0.06 * S, 14, 10).scale(1, 1.3, 1), 0, len * 0.65, 0))
+    kit.add(bone, 'trim', at(new TorusGeometry(0.055 * S, 0.012 * S, 8, 20).rotateX(Math.PI / 2), 0, len * 0.62, 0))
+    kit.add(bone, 'accent', at(new SphereGeometry(0.04 * S, 16, 12), 0, len * 0.65 + 0.075 * S, 0))
+    for (let i = 0; i < 4; i++) kit.add(bone, 'soft', at(new TorusGeometry(0.028 * S + 0.006, 0.006, 6, 16).rotateX(Math.PI / 2), 0, -0.1 * S - i * 0.018 * S, 0))
+  },
+  sceptre: (kit, bone, at, S) => {
+    const len = 0.62 * S
+    // A short gold rod with ringed bands, an orb on top crowned with a faceted gem.
+    kit.add(bone, 'trim', at(new CylinderGeometry(0.016 * S + 0.004, 0.022 * S + 0.004, len, 12), 0, len * 0.25, 0))
+    for (const t of [-0.15, 0.2, 0.52]) kit.add(bone, 'trim', at(new TorusGeometry(0.03 * S, 0.01 * S, 8, 18).rotateX(Math.PI / 2), 0, len * t, 0))
+    kit.add(bone, 'trim', at(new SphereGeometry(0.075 * S, 18, 14), 0, len * 0.62, 0))
+    kit.add(bone, 'paint', at(new TorusGeometry(0.076 * S, 0.008 * S, 6, 24).rotateX(Math.PI / 2), 0, len * 0.62, 0))
+    kit.add(bone, 'accent', at(new OctahedronGeometry(0.05 * S, 0).scale(0.8, 1.3, 0.8), 0, len * 0.62 + 0.11 * S, 0))
+    kit.add(bone, 'trim', at(new SphereGeometry(0.03 * S, 12, 10), 0, -len * 0.25, 0))
+  },
+  mug: (kit, bone, at, S) => {
+    const r = 0.1 * S
+    const h = 0.18 * S
+    // A chunky mug with a thick rim, cocoa inside, a band round the middle and a handle.
+    kit.add(bone, 'paint', at(new CylinderGeometry(r, r * 0.92, h, 28, 1, true), 0, h * 0.5, 0))
+    kit.add(bone, 'paint', at(new CylinderGeometry(r * 0.92, r * 0.92, 0.012, 24), 0, 0.006, 0))
+    kit.add(bone, 'paint', at(new TorusGeometry(r, 0.008, 6, 28).rotateX(Math.PI / 2), 0, h, 0))
+    kit.add(bone, 'dark', at(new CylinderGeometry(r * 0.94, r * 0.94, 0.004, 28), 0, h * 0.86, 0))
+    kit.add(bone, 'soft', at(new SphereGeometry(r * 0.3, 12, 8).scale(1, 0.5, 1), r * 0.25, h * 0.9, 0))
+    kit.add(bone, 'soft', at(new SphereGeometry(r * 0.24, 12, 8).scale(1, 0.5, 1), -r * 0.3, h * 0.9, r * 0.2))
+    kit.add(bone, 'trim', at(new CylinderGeometry(r * 1.004, r * 0.98, h * 0.22, 28, 1, true), 0, h * 0.5, 0))
+    kit.add(bone, 'paint', at(new TorusGeometry(h * 0.28, 0.016, 8, 16), r * 1.08, h * 0.5, 0))
+  },
+  ice_lolly: (kit, bone, at, S) => {
+    const w = 0.13 * S
+    const h = 0.26 * S
+    // A two-colour ice lolly on a wooden stick, a bite out of one corner.
+    kit.add(bone, 'soft', at(new BoxGeometry(0.02 * S + 0.004, 0.16 * S, 0.008), 0, 0.02 * S, 0))
+    kit.add(bone, 'paint', at(new CapsuleGeometry(w * 0.5, h * 0.5, 6, 16).scale(1, 1, 0.42), 0, 0.12 * S + h * 0.32, 0))
+    kit.add(bone, 'accent', at(new CapsuleGeometry(w * 0.52, h * 0.12, 6, 16).scale(1, 1, 0.44), 0, 0.12 * S + h * 0.72, 0))
+    kit.add(bone, 'trim', at(new IcosahedronGeometry(w * 0.06, 0), w * 0.1, 0.12 * S + h * 0.35, w * 0.24))
+    kit.add(bone, 'trim', at(new IcosahedronGeometry(w * 0.05, 0), -w * 0.15, 0.12 * S + h * 0.5, w * 0.24))
+  },
+  gift: (kit, bone, at, S) => {
+    const w = 0.24 * S
+    // A wrapped box held up on the palm: ribbon both ways round it and a looped bow on top.
+    kit.add(bone, 'paint', at(new BoxGeometry(w, w * 0.8, w), 0, w * 0.45, 0))
+    kit.add(bone, 'trim', at(new BoxGeometry(w * 1.01, w * 0.81, w * 0.16), 0, w * 0.45, 0))
+    kit.add(bone, 'trim', at(new BoxGeometry(w * 0.16, w * 0.81, w * 1.01), 0, w * 0.45, 0))
+    for (const s of [1, -1]) {
+      kit.add(bone, 'trim', at(new TorusGeometry(w * 0.16, w * 0.045, 8, 16).scale(1, 0.7, 0.6).rotateZ(s * 0.5), s * w * 0.15, w * 0.92, 0))
+    }
+    kit.add(bone, 'accent', at(new SphereGeometry(w * 0.07, 12, 10), 0, w * 0.88, 0))
   },
 }
 

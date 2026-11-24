@@ -291,6 +291,11 @@ export function MarketShopPage() {
     }
   }, [userId, isPending])
 
+  // Collections with something on sale (a timed drop stays out of the filter until it lands).
+  const onSale = useMemo(
+    () => new Set((market?.pieces ?? []).flatMap((p) => GEAR_PIECE_BY_KEY.get(p.baseKey)?.collection ?? [])),
+    [market?.pieces],
+  )
   const matches = useMemo(
     () =>
       sortPieces(
@@ -522,7 +527,7 @@ export function MarketShopPage() {
                   className="min-h-9 text-ui sm:w-44"
                   value={collection ?? ''}
                   onChange={(e) => updateFilters({ collection: e.target.value || null })}
-                  options={[{ value: '', label: 'Any collection' }, ...GEAR_COLLECTIONS.map((c) => ({ value: c.id, label: c.name }))]}
+                  options={[{ value: '', label: 'Any collection' }, ...GEAR_COLLECTIONS.filter((c) => onSale.has(c.id)).map((c) => ({ value: c.id, label: c.name }))]}
                 />
                 <HudSelect
                   aria-label="Sort"

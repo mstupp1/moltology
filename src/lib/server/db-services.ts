@@ -7,7 +7,7 @@ import {
   DISABLED_REMOTE_INBOX_MARK_READ,
   isRemoteInboxEnabled,
 } from '../notifications-refresh'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, practiceDaySchedules, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, routineDaySummaries, routineStreakCarries, practiceDaySchedules, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull, getTableColumns } from 'drizzle-orm'
 import { union } from 'drizzle-orm/pg-core'
@@ -16,7 +16,8 @@ import { MAX_PAGE_SIZE, PAGE_SIZES, clampOffset, clampPageSize, nextOffsetFor, t
 import { olderThanRow } from './keyset'
 import type { ChangelogEntry } from '../changelogs-data'
 import { tryCheckGemMilestones } from './gems'
-import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
+import { GEAR_CATALOG, STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
+import { ensureGearCatalog } from './gear-catalog'
 import { guestStarterItems } from '../guest-character'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
@@ -4053,18 +4054,16 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
   // One statement gives config, revision, and owned placements the same MVCC snapshot.
   // Separate concurrent SELECTs could pair a newer revision with older equipment.
   const result = await dbClient.execute<{
-    catalog: (typeof equipmentCatalog.$inferSelect)[]
     items: (typeof userGearItems.$inferSelect)[]
     profile: typeof profiles.$inferSelect
     unlocks: string[]
     stats: { moltmaxDimensionScores: Record<string, number> | null; moltmaxCompletedAt: string | null } | null
   }>(sql`SELECT
-    (SELECT COALESCE(jsonb_agg(c ORDER BY c."sortOrder"), '[]'::jsonb) FROM public.equipment_catalog c) AS catalog,
     (SELECT COALESCE(jsonb_agg(g ORDER BY g.id), '[]'::jsonb) FROM public.user_gear_items g WHERE g."userId"=${userId}) AS items,
     (SELECT to_jsonb(p) FROM public.profiles p WHERE p.id=${userId}) AS profile,
     (SELECT COALESCE(jsonb_agg(u."catalogItemId"), '[]'::jsonb) FROM public.gear_unlocks u WHERE u."userId"=${userId}) AS unlocks,
     (SELECT jsonb_build_object('moltmaxDimensionScores', s."moltmaxDimensionScores", 'moltmaxCompletedAt', s."moltmaxCompletedAt") FROM public.user_stats s WHERE s."userId"=${userId}) AS stats`)
-  const { catalog: catalogRows, items: gearRows, profile, unlocks, stats } = result.rows[0]
+  const { items: gearRows, profile, unlocks, stats } = result.rows[0]
   const items = gearRows.map(toGearState)
   // Everyone, admins included, wears what they own: the starter set, anything unlocked, and anything already placed.
   const owned = new Set<string>([
@@ -4072,10 +4071,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<Chassis
     ...(unlocks ?? []),
     ...items.map((i) => i.catalogItemId),
   ])
-  const catalog = catalogRows
-    .filter((c) => c.kind !== 'cosmetic' && getEquipmentVisual(c.appearanceKey || c.slug))
-    .filter((c) => owned.has(c.id))
-    .map(toCatalogRef)
+  const catalog = GEAR_CATALOG.filter((c) => owned.has(c.id) && getEquipmentVisual(c.appearanceKey || c.slug)).map(toCatalogRef)
   return {
     catalog,
     items,
@@ -4115,6 +4111,7 @@ async function applyAdminGearChanges(
     await dbClient
       .delete(userGearItems)
       .where(and(eq(userGearItems.userId, userId), inArray(userGearItems.id, released)))
+  if (grants.length) await ensureGearCatalog(dbClient)
   if (grants.length)
     await dbClient
       .insert(userGearItems)
@@ -4196,14 +4193,7 @@ export async function saveCharacterHandler({ data, context }: ServerFnArgs<SaveC
  */
 async function loadGuestChassisPayload(dbClient: Db): Promise<ChassisLoadoutPayload> {
   const owned = new Set(STARTER_EQUIPMENT_CATALOG_IDS)
-  const rows = await dbClient
-    .select()
-    .from(equipmentCatalog)
-    .where(inArray(equipmentCatalog.id, [...owned]))
-    .orderBy(asc(equipmentCatalog.sortOrder))
-  const catalog = rows
-    .filter((c) => c.kind !== 'cosmetic' && getEquipmentVisual(c.appearanceKey || c.slug))
-    .map(toCatalogRef)
+  const catalog = GEAR_CATALOG.filter((c) => owned.has(c.id) && getEquipmentVisual(c.appearanceKey || c.slug)).map(toCatalogRef)
   const listed = new Set(catalog.map((c) => c.id))
   const items = guestStarterItems().filter((i) => listed.has(i.catalogItemId))
   return {
@@ -4304,17 +4294,12 @@ async function loadMemberEquippedLoadout(dbClient: Db, targetUserId: string) {
   const vectorBase = resolveVectorBase(stats, targetUserId)
   if (owner?.version !== 1)
     return { catalog: [], items: [], totals: computeLoadoutTotals([], new Map()), vectorBase }
-  const catalogRows = await dbClient
-    .select()
-    .from(equipmentCatalog)
-    .orderBy(asc(equipmentCatalog.sortOrder))
-
   const gearRows = await dbClient
     .select()
     .from(userGearItems)
     .where(eq(userGearItems.userId, targetUserId))
 
-  const catalog = catalogRows.map(toCatalogRef)
+  const catalog = GEAR_CATALOG.map(toCatalogRef)
   const items = gearRows.map(toGearState).filter((item) => item.equippedSlot != null)
   const catalogById = new Map(catalog.map((c) => [c.id, c]))
   const totals = computeLoadoutTotals(items, catalogById)

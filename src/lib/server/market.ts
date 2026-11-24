@@ -1,13 +1,15 @@
 import { and, eq, inArray, sql } from 'drizzle-orm'
-import { getDb } from '../../db'
-import { equipmentCatalog, gearUnlocks, profiles, userGearItems } from '../../db/schema'
+import type { getDb } from '../../db'
+import { gearUnlocks, profiles, userGearItems } from '../../db/schema'
 import { getEquipmentVisual } from '../avatar/equipment'
-import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
+import { gearCatalogRow, gearCatalogRowByKey, shopCatalog, STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
 import { GEAR_PRICES } from '../gear-variants'
+import { collectionReleased } from '../gear/collections'
 import { GEM_FIRSTS } from '../gems'
 import { buildMarketPieces, type BuyGearResult, type MarketPayload, type WalletBalances } from '../market'
 import { bundlePrice, bundleRefKey, marketBundle, type MarketBundle } from '../market-featured'
 import { isAdmin } from '../permissions'
+import { ensureGearCatalog } from './gear-catalog'
 import { balanceRefresh, getGemWallet } from './gems'
 import { canBuyCredits, creditBalanceRefresh } from './molt-credits'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
@@ -17,9 +19,8 @@ type Db = ReturnType<typeof getDb>
 const STARTER = new Set(STARTER_EQUIPMENT_CATALOG_IDS)
 
 export async function getMarket(db: Db, userId: string): Promise<MarketPayload> {
-  const [wallet, catalog, unlocks, placed, profileRows] = await Promise.all([
+  const [wallet, unlocks, placed, profileRows] = await Promise.all([
     getGemWallet(db, userId),
-    db.select().from(equipmentCatalog).where(eq(equipmentCatalog.kind, 'gear')),
     db.select({ id: gearUnlocks.catalogItemId }).from(gearUnlocks).where(eq(gearUnlocks.userId, userId)),
     db.select({ id: userGearItems.catalogItemId }).from(userGearItems).where(eq(userGearItems.userId, userId)),
     db
@@ -35,7 +36,7 @@ export async function getMarket(db: Db, userId: string): Promise<MarketPayload> 
     addFree: isAdmin(null, profileRows[0]?.role),
     moltCredits: Number(profileRows[0]?.moltCredits ?? 0),
     creditsLive: canBuyCredits(profileRows[0]?.role, profileRows[0]?.experiments),
-    pieces: buildMarketPieces(catalog, owned),
+    pieces: buildMarketPieces(shopCatalog(), owned),
   }
 }
 
@@ -45,6 +46,7 @@ export async function getMarket(db: Db, userId: string): Promise<MarketPayload> 
  * idempotency key in both ledgers. Returns the balances after, and whether every piece unlocked.
  */
 async function charge(db: Db, userId: string, ids: string[], price: number, key: string, label: string) {
+  await ensureGearCatalog(db)
   const [lock, gemUpdate] = balanceRefresh(db, userId)
   const [, creditUpdate] = creditBalanceRefresh(db, userId)
   const idList = sql.join(
@@ -91,15 +93,10 @@ async function charge(db: Db, userId: string, ids: string[], price: number, key:
 
 /** Charges gems and unlocks one piece. */
 export async function buyGear(db: Db, userId: string, catalogItemId: string): Promise<BuyGearResult> {
-  const [item] = await db
-    .select()
-    .from(equipmentCatalog)
-    .where(and(eq(equipmentCatalog.id, catalogItemId), eq(equipmentCatalog.kind, 'gear')))
-    .limit(1)
+  const item = shopRow(catalogItemId)
   const balanceOf = async () =>
     (await db.select({ g: profiles.chitinGems }).from(profiles).where(eq(profiles.id, userId)).limit(1))[0]?.g ?? 0
-  if (!item || !getEquipmentVisual(item.appearanceKey || item.slug))
-    return { ok: false, balance: await balanceOf(), credits: 0, error: 'That piece is not in the market.' }
+  if (!item) return { ok: false, balance: await balanceOf(), credits: 0, error: 'That piece is not in the market.' }
   if (STARTER.has(item.id)) return { ok: false, balance: await balanceOf(), credits: 0, error: 'You already own this piece.' }
   const price = GEAR_PRICES[item.rarity]
   const { balance, credits, unlocked } = await charge(db, userId, [item.id], price, `purchase:${item.id}`, `Bought ${item.name} (${item.rarity})`)
@@ -107,16 +104,16 @@ export async function buyGear(db: Db, userId: string, catalogItemId: string): Pr
   return { ok: false, balance, credits, error: `You need ${price - balance - credits} more gems for this piece.` }
 }
 
-/** The catalog rows behind a bundle's pieces, or null when any is missing from the catalog. */
-async function bundleRows(db: Db, bundle: MarketBundle) {
-  const keys = bundle.pieces.map(bundleRefKey)
-  const rows = await db
-    .select({ id: equipmentCatalog.id, appearanceKey: equipmentCatalog.appearanceKey, slug: equipmentCatalog.slug })
-    .from(equipmentCatalog)
-    .where(and(inArray(equipmentCatalog.appearanceKey, keys), eq(equipmentCatalog.kind, 'gear')))
-  const byKey = new Map(rows.map((r) => [r.appearanceKey || r.slug, r.id]))
-  const ids = keys.map((k) => byKey.get(k))
-  return ids.every((id): id is string => Boolean(id)) ? bundle.pieces.map((ref, i) => ({ ref, id: ids[i] as string })) : null
+/** A piece the shop sells (not retired, with a 3D look), by catalog id. */
+function shopRow(catalogItemId: string) {
+  const row = gearCatalogRow(catalogItemId)
+  return row && !row.retired && collectionReleased(row.collection) && getEquipmentVisual(row.appearanceKey || row.slug) ? row : undefined
+}
+
+/** The catalog ids behind a bundle's pieces, or null when any is missing from the shop. */
+function bundleRows(bundle: MarketBundle) {
+  const rows = bundle.pieces.map((ref) => ({ ref, row: gearCatalogRowByKey(bundleRefKey(ref)) }))
+  return rows.every(({ row }) => row && shopRow(row.id)) ? rows.map(({ ref, row }) => ({ ref, id: row!.id })) : null
 }
 
 async function ownedIds(db: Db, userId: string, ids: string[]): Promise<Set<string>> {
@@ -137,7 +134,7 @@ export async function buyBundle(db: Db, userId: string, bundleId: string): Promi
     const [row] = await db.select({ g: profiles.chitinGems, c: profiles.moltCredits }).from(profiles).where(eq(profiles.id, userId)).limit(1)
     return { balance: row?.g ?? 0, credits: Math.max(0, Number(row?.c ?? 0)) }
   }
-  const rows = bundle ? await bundleRows(db, bundle) : null
+  const rows = bundle ? bundleRows(bundle) : null
   if (!bundle || !rows) return { ok: false, ...(await wallet()), error: 'That bundle is not in the market.' }
   const owned = await ownedIds(db, userId, rows.map((r) => r.id))
   const left = rows.filter((r) => !owned.has(r.id))
@@ -153,23 +150,20 @@ export async function buyBundle(db: Db, userId: string, bundleId: string): Promi
 /** Admins: add every piece of a bundle without spending anything. */
 export async function addBundleFree(db: Db, userId: string, bundleId: string): Promise<BuyGearResult> {
   const bundle = marketBundle(bundleId)
-  const rows = bundle ? await bundleRows(db, bundle) : null
+  const rows = bundle ? bundleRows(bundle) : null
   const [wallet] = await db.select({ balance: profiles.chitinGems, credits: profiles.moltCredits }).from(profiles).where(eq(profiles.id, userId)).limit(1)
   const balance = wallet?.balance ?? 0
   const credits = Math.max(0, Number(wallet?.credits ?? 0))
   if (!rows) return { ok: false, balance, credits, error: 'That bundle is not in the market.' }
   const ids = rows.map((r) => r.id).filter((id) => !STARTER.has(id))
+  await ensureGearCatalog(db)
   if (ids.length) await db.insert(gearUnlocks).values(ids.map((catalogItemId) => ({ userId, catalogItemId, source: 'admin' as const }))).onConflictDoNothing()
   return { ok: true, balance, credits }
 }
 
 /** Admins: add a piece to the collection without spending anything. */
 export async function addGearFree(db: Db, userId: string, catalogItemId: string): Promise<BuyGearResult> {
-  const [item] = await db
-    .select({ id: equipmentCatalog.id, slug: equipmentCatalog.slug, appearanceKey: equipmentCatalog.appearanceKey })
-    .from(equipmentCatalog)
-    .where(and(eq(equipmentCatalog.id, catalogItemId), eq(equipmentCatalog.kind, 'gear')))
-    .limit(1)
+  const item = shopRow(catalogItemId)
   const [wallet] = await db
     .select({ balance: profiles.chitinGems, credits: profiles.moltCredits })
     .from(profiles)
@@ -177,8 +171,8 @@ export async function addGearFree(db: Db, userId: string, catalogItemId: string)
     .limit(1)
   const balance = wallet?.balance ?? 0
   const credits = Math.max(0, Number(wallet?.credits ?? 0))
-  if (!item || !getEquipmentVisual(item.appearanceKey || item.slug))
-    return { ok: false, balance, credits, error: 'That piece is not in the market.' }
+  if (!item) return { ok: false, balance, credits, error: 'That piece is not in the market.' }
+  await ensureGearCatalog(db)
   if (!STARTER.has(item.id))
     await db.insert(gearUnlocks).values({ userId, catalogItemId: item.id, source: 'admin' }).onConflictDoNothing()
   return { ok: true, balance, credits }
@@ -210,21 +204,20 @@ export async function getWalletBalancesHandler(args: { data?: { token?: string }
 }
 
 /** What a signed-out visitor sees: the full catalog, the starter set owned, nothing to spend. */
-export async function getGuestMarket(db: Db): Promise<MarketPayload> {
-  const catalog = await db.select().from(equipmentCatalog).where(eq(equipmentCatalog.kind, 'gear'))
+export async function getGuestMarket(_db?: Db): Promise<MarketPayload> {
   return {
     wallet: { balance: 0, history: [], firsts: GEM_FIRSTS.map((f) => ({ ...f, done: false })) },
     addFree: false,
     moltCredits: 0,
     creditsLive: false,
     guest: true,
-    pieces: buildMarketPieces(catalog, new Set(STARTER)),
+    pieces: buildMarketPieces(shopCatalog(), new Set(STARTER)),
   }
 }
 
 export async function getMarketHandler(args: { data?: { token?: string }; context?: WriteAuthContext }) {
   const auth = await resolveWriteAuth({ ...args, requireAuth: false })
-  if (!auth) return getGuestMarket(args.context?.db || getDb())
+  if (!auth) return getGuestMarket()
   return getMarket(auth.dbClient, auth.userId)
 }
 

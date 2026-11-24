@@ -22,7 +22,7 @@ export const TEXTURE_MARKINGS = ['lace', 'tide', 'camo', 'scales', 'rosettes', '
 export type TextureMarking = (typeof TEXTURE_MARKINGS)[number]
 
 /** Gear surfaces with their own height tile (gear-<surface>.webp). */
-export const GEAR_SURFACES = ['metal', 'cloth', 'leather', 'coral', 'bone'] as const
+export const GEAR_SURFACES = ['metal', 'cloth', 'leather', 'coral', 'bone', 'knit', 'denim', 'velvet', 'fleece', 'nylon'] as const
 export type GearSurface = (typeof GEAR_SURFACES)[number]
 
 export const isTextureMarking = (m: ShellMarking | undefined): m is TextureMarking => (TEXTURE_MARKINGS as readonly string[]).includes(m ?? '')

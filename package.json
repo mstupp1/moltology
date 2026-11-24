@@ -68,7 +68,7 @@
     "anim:art": "tsx scripts/anim-art.ts",
     "cast:render": "tsx scripts/render-cast.ts",
     "gear:board": "tsx scripts/gear-board.ts",
-    "gear:sql": "tsx scripts/gear-sql.ts",
+    "gear:sync": "tsx scripts/gear-sync.ts",
     "avatar:textures": "tsx scripts/avatar3d/pack-textures.ts",
     "shorts:create": "tsx scripts/create-reel.ts",
     "video:create": "tsx scripts/create-reel.ts",

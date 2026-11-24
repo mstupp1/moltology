@@ -142,6 +142,12 @@ const GEAR_SURFACE_LOOK: Record<GearSurface, { freq: number; bump: number; pits:
   leather: { freq: 3.5, bump: 0.006, pits: 0.14, rough: 0.15 },
   coral: { freq: 2.5, bump: 0.009, pits: 0.22, rough: 0.2 },
   bone: { freq: 2, bump: 0.003, pits: 0.06, rough: 0.12 },
+  // Garment cloths (gear-kit.ts uses these for fabric when a piece names one).
+  knit: { freq: 4, bump: 0.012, pits: 0.1, rough: 0.12 },
+  denim: { freq: 6, bump: 0.007, pits: 0.12, rough: 0.1 },
+  velvet: { freq: 5, bump: 0.003, pits: 0.04, rough: 0.06 },
+  fleece: { freq: 5, bump: 0.01, pits: 0.2, rough: 0.14 },
+  nylon: { freq: 5, bump: 0.004, pits: 0.04, rough: 0.05 },
 }
 
 export interface WorkedOptions {

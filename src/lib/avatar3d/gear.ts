@@ -2,7 +2,7 @@
  * Gear. Every item is built for a socket of radius 1 and scaled to the socket it lands on, so
  * one hat fits any head shape or species. Items carry their own materials.
  */
-import { BufferAttribute, BufferGeometry, CatmullRomCurve3, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
+import { BufferAttribute, BufferGeometry, CatmullRomCurve3, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
 import type { AvatarAccessory } from '../avatar/traits'
 import type { Hat } from '../gear/types'
 import type { Rig, SocketInfo } from './rig'
@@ -346,6 +346,170 @@ const HEAD_GEAR: Record<Hat, (socket?: SocketInfo, c?: GearColours, rig?: Rig) =
       const led = new SphereGeometry(0.03, 10, 8)
       led.translate(1.15, 0.06, 0.08)
       add(led, new MeshPhysicalMaterial({ color: new Color(c?.accent ?? '#ffcf2e'), emissive: new Color(c?.accent ?? '#ffcf2e'), emissiveIntensity: 1.2, roughness: 0.3 }))
+    }),
+  cap: (_s, c) =>
+    item('head', (add) => {
+      // A six-panel cap: a soft crown with seams and a top button, and a curved bill to the front.
+      const canvas = cloth(c?.material ?? '#1f2a44')
+      const dome = new SphereGeometry(1.1, 36, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+      dome.scale(1, 0.82, 1.02)
+      add(dome, canvas)
+      const seamMat = cloth(c ? darker(c.material, 0.25) : '#141c30')
+      for (let i = 0; i < 6; i++) {
+        const seamLine = new TorusGeometry(1.105, 0.012, 6, 24, Math.PI / 2)
+        seamLine.rotateY(Math.PI / 2)
+        seamLine.scale(1, 0.82, 1.02)
+        seamLine.rotateY((i / 6) * Math.PI * 2)
+        add(seamLine, seamMat)
+      }
+      const button = new SphereGeometry(0.1, 14, 10)
+      button.scale(1, 0.5, 1)
+      button.translate(0, 0.9, 0)
+      add(button, seamMat)
+      // The bill: a half ellipse out the front, curved down at the sides like a broken-in cap.
+      const bill = new CircleGeometry(1, 40, 0, Math.PI)
+      bill.rotateX(Math.PI / 2)
+      bill.scale(1.05, 1, 0.95)
+      const pos = bill.getAttribute('position')
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i)
+        pos.setY(i, -0.22 * x * x)
+      }
+      bill.translate(0, 0.06, 0.78)
+      bill.computeVertexNormals()
+      const billMat = cloth(c?.trim ?? '#1f2a44')
+      billMat.side = 2
+      add(bill, billMat)
+      const under = bill.clone()
+      under.translate(0, -0.04, 0)
+      add(under, cloth(c ? darker(c.trim, 0.35) : '#141c30')).castShadow = false
+      const edge = new TorusGeometry(1, 0.03, 6, 40, Math.PI)
+      edge.rotateX(Math.PI / 2)
+      edge.scale(1.05, 1, 0.95)
+      const epos = edge.getAttribute('position')
+      for (let i = 0; i < epos.count; i++) epos.setY(i, epos.getY(i) - 0.22 * epos.getX(i) ** 2)
+      edge.translate(0, 0.04, 0.78)
+      edge.computeVertexNormals()
+      add(edge, billMat)
+      const band = new TorusGeometry(1.1, 0.04, 8, 48)
+      band.rotateX(Math.PI / 2)
+      band.translate(0, 0.02, 0)
+      add(band, canvas)
+      if (c) {
+        // A round patch on the front panel in the accent colour.
+        const patch = new CylinderGeometry(0.22, 0.22, 0.03, 24)
+        patch.rotateX(Math.PI / 2 - 0.45)
+        patch.translate(0, 0.42, 0.96)
+        add(patch, cloth(c.accent))
+      }
+    }),
+  flower_crown: (_s, c) =>
+    item('head', (add) => {
+      // A woven vine round the crown with blooms all the way round and small leaves between.
+      const vine = cloth(c?.trim ?? '#5b8a3c')
+      const ring = new TorusGeometry(1.08, 0.07, 8, 64)
+      ring.rotateX(Math.PI / 2)
+      ring.translate(0, 0.12, 0)
+      add(ring, vine)
+      const petals = [c?.material ?? '#ff8fb1', c?.accent ?? '#fff2a8']
+      for (let i = 0; i < 9; i++) {
+        const a = (i / 9) * Math.PI * 2 + 0.2
+        const big = i % 3 === 0
+        const at = new Vector3(Math.cos(a) * 1.12, 0.2 + (i % 2) * 0.04, Math.sin(a) * 1.12)
+        const out = new Vector3(Math.cos(a), 0.7, Math.sin(a)).normalize()
+        const size = big ? 0.42 : 0.32
+        const petal = gloss(petals[i % 2])
+        petal.clearcoat = 0.2
+        petal.roughness = 0.6
+        for (let k = 0; k < 5; k++) {
+          const t = (k / 5) * Math.PI * 2
+          const leaf = new SphereGeometry(size * 0.6, 12, 8)
+          leaf.scale(1, 0.32, 0.62)
+          leaf.translate(size * 0.62, 0, 0)
+          leaf.rotateY(t)
+          leaf.lookAt(out)
+          // lookAt turns +Z to `out`; tip the petal disc to face along it.
+          leaf.translate(at.x, at.y, at.z)
+          add(leaf, petal)
+        }
+        const heart = new SphereGeometry(size * 0.32, 12, 10)
+        heart.translate(at.x + out.x * 0.04, at.y + out.y * 0.04, at.z + out.z * 0.04)
+        add(heart, gloss(c ? c.trim : '#f5b93a'))
+        const leafA = new SphereGeometry(0.2, 10, 8)
+        leafA.scale(1, 0.25, 0.45)
+        const b = a + Math.PI / 9
+        leafA.rotateY(-b)
+        leafA.translate(Math.cos(b) * 1.16, 0.12, Math.sin(b) * 1.16)
+        add(leafA, vine)
+      }
+    }),
+  diving_helmet: (_s, c, rig) =>
+    item('face', (add) => {
+      // A round brass helmet over the whole head: a big front porthole with a bolted rim and a
+      // guard grille, small side ports, a valve on top. Sized from the head round the eyes.
+      const fit = (rig && visorFit(rig)) || VISOR_FALLBACK
+      const face = rig?.sockets.get('face')
+      const head = rig?.wear?.head
+      const r = face?.radius ?? 1
+      const top = face?.at && head ? (head.top - face.at.y) / r : 1.2
+      const crab = rig?.wear?.race === 'crab'
+      const cy = fit.y + 0.1
+      const R = Math.min(Math.max(fit.a, fit.b, crab ? 0 : top - cy) + 0.32, 2.6)
+      const cz = fit.cz + 0.05
+      const brass = metal(c?.material ?? '#c08a3e', 0.32)
+      const copper = metal(c?.trim ?? '#9a5a2e', 0.36)
+      const hole = 0.62
+      // The shell, with its pole forward so the porthole is a clean round opening.
+      const shell = new SphereGeometry(R, 48, 32, 0, Math.PI * 2, hole, Math.PI - hole)
+      shell.rotateX(Math.PI / 2)
+      shell.translate(0, cy, cz)
+      brass.side = 2
+      add(shell, brass)
+      const glass = new MeshPhysicalMaterial({ color: new Color(c?.accent ?? '#bfe7f0'), roughness: 0.04, clearcoat: 1, transparent: true, opacity: 0.16, side: 2, depthWrite: false })
+      const pane = new SphereGeometry(R * 0.995, 32, 8, 0, Math.PI * 2, 0, hole)
+      pane.rotateX(Math.PI / 2)
+      pane.translate(0, cy, cz)
+      add(pane, glass).castShadow = false
+      const rimR = Math.sin(hole) * R
+      const rimZ = cz + Math.cos(hole) * R
+      const rim = new TorusGeometry(rimR, 0.07, 12, 48)
+      rim.translate(0, cy, rimZ)
+      add(rim, copper)
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2
+        const bolt = new SphereGeometry(0.05, 10, 8)
+        bolt.translate(Math.cos(a) * rimR, cy + Math.sin(a) * rimR, rimZ + 0.06)
+        add(bolt, brass)
+      }
+      // Guard grille: three bars across the porthole.
+      for (const dy of [-0.4, 0, 0.4]) {
+        const half = Math.sqrt(Math.max(0, 1 - dy * dy)) * rimR
+        const bar = new CylinderGeometry(0.025, 0.025, half * 2, 8)
+        bar.rotateZ(Math.PI / 2)
+        bar.translate(0, cy + dy * rimR, rimZ + 0.03)
+        add(bar, copper)
+      }
+      for (const side of [-1, 1]) {
+        const port = new TorusGeometry(R * 0.22, 0.05, 10, 32)
+        port.rotateY(Math.PI / 2)
+        port.translate(side * R * 0.97, cy + 0.05, cz + 0.1)
+        add(port, copper)
+        const disc = new CylinderGeometry(R * 0.21, R * 0.21, 0.02, 24)
+        disc.rotateZ(Math.PI / 2)
+        disc.translate(side * R * 0.99, cy + 0.05, cz + 0.1)
+        add(disc, gloss(c?.accent ? darker(c.accent, 0.5) : '#3d6b75'))
+      }
+      const valve = new CylinderGeometry(0.12, 0.16, 0.26, 16)
+      valve.translate(0, cy + R + 0.08, cz - 0.1)
+      add(valve, copper)
+      const cap = new SphereGeometry(0.15, 14, 10)
+      cap.translate(0, cy + R + 0.24, cz - 0.1)
+      add(cap, brass)
+      // The air hose fitting at the back.
+      const fitting = new CylinderGeometry(0.14, 0.14, 0.3, 16)
+      fitting.rotateX(Math.PI / 2)
+      fitting.translate(0, cy + 0.2, cz - R - 0.08)
+      add(fitting, copper)
     }),
   sweatband: (_s, c, rig) =>
     item('face', (add) => {
