@@ -298,8 +298,8 @@ describe('options added 2026-11-24', () => {
 
   it('keeps the new paint and face fields through a parse', async () => {
     const { parseLobsterAvatarConfig } = await import('./lobster-avatar')
-    const parsed = parseLobsterAvatarConfig({ seed: 'x', tipColor: 'midnight', eyeColorRight: 'teal', brows: 'thick', blush: true, shellFinish: 'velvet', marking: 'flames', eyeVariant: 'stalk' })
-    expect(parsed).toMatchObject({ tipColor: 'midnight', eyeColorRight: 'teal', brows: 'thick', blush: true, shellFinish: 'velvet', marking: 'flames', eyeVariant: 'stalk' })
+    const parsed = parseLobsterAvatarConfig({ seed: 'x', tipColor: 'midnight', eyeColorRight: 'teal', brows: 'thick', blush: true, shellFinish: 'velvet', marking: 'flames', eyeVariant: 'button' })
+    expect(parsed).toMatchObject({ tipColor: 'midnight', eyeColorRight: 'teal', brows: 'thick', blush: true, shellFinish: 'velvet', marking: 'flames', eyeVariant: 'button' })
     expect(parseLobsterAvatarConfig({ seed: 'x', tipColor: 'nope', brows: 'huge' })).not.toHaveProperty('tipColor')
   })
 })

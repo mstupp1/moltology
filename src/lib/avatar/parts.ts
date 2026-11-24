@@ -20,7 +20,7 @@ export const EYE_COLOR_SWATCH: Readonly<Record<AvatarEyeColor, { inner: string; 
   lime: { inner: '#f4ffc4', mid: '#9ee21e', outer: '#4a7a06', ring: '#182a02' },
 }
 
-export type EyeShape = 'round' | 'wide' | 'tall' | 'almond' | 'button' | 'stalk'
+export type EyeShape = 'round' | 'wide' | 'tall' | 'almond' | 'button'
 export type PupilStyle = 'standard' | 'big' | 'sparkle' | 'keen'
 export type Expression = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried' | 'sad' | 'smug' | 'shocked' | 'wink'
 export type Gaze = 'ahead' | 'left' | 'right' | 'up' | 'down'

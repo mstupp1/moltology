@@ -225,11 +225,9 @@ function portraitFrame(rig: Rig, height: number, scale: number, hat: boolean, li
   const size = Math.min(shellFit, Math.max(faceFit, shellFit * 0.72)) * (hat ? 1.16 : 1)
   const mid = (head.top + bottom) / 2
   const faceMid = (brow.y + mouth.y) / 2
-  // Stalk eyes stand above the shell: keep their brows in the picture.
-  const top = Math.max(head.top, brow.y + 0.5 * head.eyeRadius)
-  const shellY = Math.max(mid - size * 0.05, top - size * 0.47)
+  const shellY = Math.max(mid - size * 0.05, head.top - size * 0.47)
   // Closer in, the face (not the middle of the shell) is what sits in the middle of the picture.
-  const y = Math.max(shellY + (faceMid - size * 0.04 - shellY) * Math.min(1, (shellFit - size) / (shellFit * 0.2)), top - size * 0.47) + (hat ? size * 0.06 : 0)
+  const y = Math.max(shellY + (faceMid - size * 0.04 - shellY) * Math.min(1, (shellFit - size) / (shellFit * 0.2)), head.top - size * 0.47) + (hat ? size * 0.06 : 0)
   return { y: (y + lift) * scale, size: size * scale }
 }
 

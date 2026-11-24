@@ -48,15 +48,7 @@ export const EYE_STRETCH: Record<Avatar3DLook['eyeShape'], [number, number]> = {
   tall: [1.1, 1.12],
   almond: [1.4, 0.76],
   button: [0.84, 0.84],
-  // Stalk eyes keep the round eye; they stand out on stalks instead (addFace).
-  stalk: [1.08, 1.04],
 }
-
-/** How far stalk eyes stand off the face, in eye radii, and how much they lean up. */
-const STALK = { reach: 1.5, rise: 1.3 }
-
-/** With stalk eyes standing up at the front, hats sit a little higher and further back, behind them. */
-const stalkSeat = (look: Avatar3DLook) => (look.eyeShape === 'stalk' ? v(0, 0.04, -0.07) : v(0, 0, 0))
 
 /** Brow ridge size against the original soft brow: width, then height. */
 const BROW_SIZE = { soft: [1, 1], thick: [1.5, 1.55], thin: [0.55, 0.62], none: [0, 0] } as const
@@ -202,7 +194,6 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   const eyes: EyeSpot[] = []
 
   const cheeks: FaceRig['cheeks'] = []
-  const stalks = look.eyeShape === 'stalk'
   const browSize = BROW_SIZE[look.brows ?? 'soft']
 
   for (const { s, tag } of SIDES) {
@@ -211,15 +202,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     const normal = f.shell.normal(sEye, theta)
     // Eyes face more forward than the shell does, so both read from the front.
     const facing = normal.clone().multiplyScalar(0.45).add(v(0, 0.06, 0.55)).normalize()
-    let centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.3)
-    if (stalks) {
-      // Out on short stalks, leaning up and a little apart, like a crab's.
-      const out = normal.clone().add(v(0.04 * s, STALK.rise, 0.15)).normalize()
-      centre = surface.clone().addScaledVector(out, f.eyeRadius * STALK.reach)
-      const root = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.25)
-      const mid = surface.clone().addScaledVector(out, f.eyeRadius * STALK.reach * 0.5)
-      rig.addWorld(f.bone, 'shell', withAo(taperedTube([root, mid, centre], f.eyeRadius * 0.46, f.eyeRadius * 0.36, 12), 0.9))
-    }
+    const centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.3)
     // The cheek: on the face just under the eye and a touch toward the side.
     {
       const sc = f.shell.sAt(f.eyeY - f.eyeRadius * 1.35)
@@ -249,24 +232,13 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
 
     // Brow: a soft ridge arching over the eye, on its own bone so expressions can tilt and lift it.
     const sBrow = f.shell.sAt(f.browY)
-    let browPoints = [-1, -0.5, 0, 0.5, 1].map((a) => {
+    const browPoints = [-1, -0.5, 0, 0.5, 1].map((a) => {
       const along = theta - s * (a * f.browSpan + f.browSpan * 0.18)
       const drop = a * a * f.eyeRadius * f.browArch
       const sp = f.shell.sAt(f.browY - drop)
       return f.shell.point(sp, along).addScaledVector(f.shell.normal(sp, along), 0.008)
     })
-    let browNormal = f.shell.normal(sBrow, theta)
-    if (stalks) {
-      // On stalks the brow rides over the eye itself, arched round its top.
-      const side = v(1, 0, 0).applyQuaternion(lookQuaternion(facing))
-      const up = v(0, 1, 0).applyQuaternion(lookQuaternion(facing))
-      browPoints = [-1, -0.5, 0, 0.5, 1].map((a) => {
-        const ang = a * 0.95
-        const r = f.eyeRadius * (EYE_STRETCH.stalk[1] * 1.1 + 0.04)
-        return centre.clone().addScaledVector(up, Math.cos(ang) * r).addScaledVector(side, Math.sin(ang) * r * EYE_STRETCH.stalk[0] * s).addScaledVector(facing, f.eyeRadius * 0.35)
-      })
-      browNormal = facing.clone().add(up.clone().multiplyScalar(0.6)).normalize()
-    }
+    const browNormal = f.shell.normal(sBrow, theta)
     const browAt = browPoints[2].clone()
     const brow = rig.addBone(`brow${tag}`, f.bone, browAt, { quaternion: lookQuaternion(browNormal) })
     if (browSize[0] > 0) rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.25 * browSize[0], f.eyeRadius * 0.26 * browSize[1]))
@@ -809,7 +781,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   // Hats seat a little below the crown, where the head is wide enough to carry a brim.
   const top = carapace.key(0).d
   const seat = carapace.key(carapace.sAt(top - 0.085))
-  rig.addSocket('head', 'chest', v(0, seat.d, seat.z ?? 0).add(stalkSeat(look)), seat.r)
+  rig.addSocket('head', 'chest', v(0, seat.d, seat.z ?? 0), seat.r)
   rig.addSocket('face', 'chest', carapace.point(carapace.sAt(1.515), Math.PI / 2), 0.26)
   const ear = carapace.key(carapace.sAt(1.5))
   rig.addSocket('ears', 'chest', v(0, 1.5, ear.z ?? 0), ear.r, undefined, top - 1.5)
@@ -950,7 +922,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
     footLength: 0.37,
   })
 
-  rig.addSocket('head', 'chest', v(0, shell.key(0).d - 0.035, 0.02).add(stalkSeat(look)), 0.2)
+  rig.addSocket('head', 'chest', v(0, shell.key(0).d - 0.035, 0.02), 0.2)
   rig.addSocket('face', 'chest', shell.point(shell.sAt(1.315), Math.PI / 2), 0.4)
   rig.addSocket('ears', 'chest', v(0, 1.3, 0), shell.key(shell.sAt(1.3)).r, undefined, shell.key(0).d - 1.3)
   rig.addSocket('back', 'chest', shell.point(shell.sAt(1.25), -Math.PI / 2), 0.4)

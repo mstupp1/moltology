@@ -128,7 +128,7 @@ export const LOBSTER_GAZE_LABELS: Readonly<Record<LobsterGaze, string>> = {
   down: 'Down',
 }
 
-export const LOBSTER_EYE_VARIANTS = ['round', 'wide', 'tall', 'almond', 'button', 'stalk'] as const
+export const LOBSTER_EYE_VARIANTS = ['round', 'wide', 'tall', 'almond', 'button'] as const
 /** Seeded characters roll from the original three shapes, so new ones never change an existing member's look. */
 const SEEDED_EYE_VARIANTS = LOBSTER_EYE_VARIANTS.slice(0, 3)
 export type LobsterEyeVariant = (typeof LOBSTER_EYE_VARIANTS)[number]
@@ -139,7 +139,6 @@ export const LOBSTER_EYE_VARIANT_LABELS: Readonly<Record<LobsterEyeVariant, stri
   tall: 'Tall',
   almond: 'Sleepy',
   button: 'Button',
-  stalk: 'Stalks',
 }
 
 export const LOBSTER_PUPIL_VARIANTS = ['standard', 'big', 'sparkle', 'keen'] as const
