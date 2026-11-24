@@ -84,6 +84,9 @@ export interface Stage {
   focus: (slot: string | null, zoom?: number) => void
   /** Play a short reaction (a flinch, a claw snap, trying on gear, a celebration). */
   react: (kind: Reaction, side?: 1 | -1) => void
+  /** Swim in place over the current pose (Character3D.setSwim), and take one stroke. */
+  setSwim: (on: boolean) => void
+  stroke: () => void
   /** Zoom (1 is the whole figure) and tilt back to where they started. */
   resetView: () => void
   /**
@@ -648,6 +651,14 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     react(kind, side) {
       if (options.reducedMotion) return
       character?.react(kind, side)
+      wake()
+    },
+    setSwim(on) {
+      character?.setSwim(on)
+      wake()
+    },
+    stroke() {
+      character?.stroke()
       wake()
     },
     resetView() {

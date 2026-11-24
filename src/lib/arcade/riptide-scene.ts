@@ -339,9 +339,9 @@ function ridge(width: number, height: number, rand: () => number, color: Color, 
 
 function seabedTile(width: number, rand: () => number, material: Material): Mesh {
   // Deep enough that its near edge is out of shot.
-  const geo = new PlaneGeometry(width, 20, 48, 10)
+  const geo = new PlaneGeometry(width, 70, 48, 14)
   geo.rotateX(-Math.PI / 2)
-  geo.translate(0, 0, 4)
+  geo.translate(0, 0, 29)
   const pos = geo.getAttribute('position')
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i)
@@ -376,7 +376,11 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
   scene.environment = env.texture
 
   const camera = new PerspectiveCamera(30, FIELD_W / FIELD_H, 0.1, 80)
-  const distance = FIELD_H / 2 / Math.tan((15 * Math.PI) / 180)
+  // The camera always takes in the whole field: on a tall screen it backs off until the field's
+  // width fits (showing more water above and sand below, never more of the way ahead); on a wide one
+  // the field's height fits and the page dims what lies beyond its sides.
+  const HALF_FOV = Math.tan((15 * Math.PI) / 180)
+  let distance = FIELD_H / 2 / HALF_FOV
   camera.position.set(0, FIELD_H / 2, distance)
   camera.lookAt(0, FIELD_H / 2, 0)
 
@@ -518,6 +522,7 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
     plane.renderOrder = -2
     t.repeat.set(1, 1)
     backdrop = plane
+    placeBackdrop()
     scene.add(plane)
     // The painting has its own ridges; the drawn ones would only flatten it.
     far.visible = false
@@ -536,12 +541,30 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
   let lastPhase: RiptideState['phase'] = 'ready'
   let restPose = false
 
+  /** Keep the painted reef line just above where the sand meets the water, at any camera distance. */
+  function placeBackdrop() {
+    if (!backdrop) return
+    const back = 30
+    const k = (distance + back) / (FIELD_H / 2 / HALF_FOV + back)
+    // Height on the backdrop where the far edge of the sand (6 back, 5 below the camera) lines up.
+    const horizon = FIELD_H / 2 - ((FIELD_H / 2 - FLOOR_Y) * (distance + back)) / (distance + 6)
+    backdrop.scale.set(k * 1.2, k, 1)
+    backdrop.position.y = horizon - 1 + 16 * k
+  }
+
   const resize = () => {
     const w = canvas.clientWidth || 1
     const h = canvas.clientHeight || 1
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     camera.updateProjectionMatrix()
+    const halfHeight = Math.max(FIELD_H, FIELD_W / camera.aspect) / 2
+    distance = halfHeight / HALF_FOV
+    if (scene.fog instanceof Fog) {
+      scene.fog.near = distance
+      scene.fog.far = distance + 22
+    }
+    placeBackdrop()
   }
   resize()
 
@@ -563,7 +586,7 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
         character.root.removeFromParent()
         character.dispose()
       }
-      const built = low ? withLoftDetail(0.8, () => buildCharacter({ ...look, pose: 'ready' })) : buildCharacter({ ...look, pose: 'ready' })
+      const built = low ? withLoftDetail(0.8, () => buildCharacter({ ...look, pose: 'rest' })) : buildCharacter({ ...look, pose: 'rest' })
       character = built
       scale = SWIMMER_HEIGHT / built.height
       built.root.scale.setScalar(scale)
@@ -574,6 +597,7 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
         for (const m of Array.isArray(material) ? material : material ? [material] : []) m.dithering = true
       })
       swimmer.add(built.root)
+      built.setSwim(true)
       built.bake(renderer, low ? { directions: 24, size: 384 } : undefined)
       restPose = false
     },
@@ -639,19 +663,24 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
 
       // The swimmer: bobs while waiting, noses up on a kick and down as it sinks.
       const bob = state.phase === 'ready' && !options.reducedMotion ? Math.sin(time * 2.2) * 0.22 : 0
-      swimmer.position.set(PLAYER_X, (state.phase === 'ready' ? START_Y : state.y) + bob, 0)
-      const want = state.phase === 'ready' ? Math.sin(time * 2.2) * 0.08 : Math.max(-0.55, Math.min(0.4, state.vy * 0.05))
+      // Settled on the sand after a crash, it stands on it rather than sitting in it.
+      const y = state.phase === 'ready' ? START_Y + bob : restPose ? FLOOR_Y + SWIMMER_HEIGHT / 2 : state.y
+      swimmer.position.set(PLAYER_X, swimmer.position.y + (y - swimmer.position.y) * (restPose ? Math.min(1, dt * 8) : 1), 0)
+      const want = state.phase === 'ready' ? Math.sin(time * 2.2) * 0.08 : restPose ? 0 : Math.max(-0.55, Math.min(0.4, state.vy * 0.05))
       tilt += (want - tilt) * Math.min(1, dt * 10)
       // Turned to face the way it swims, the body leans about its own forward axis.
       swimmer.rotation.set(0, SWIM_YAW, 0)
       swimmer.rotateOnWorldAxis(Z_AXIS, tilt)
       if (state.phase === 'dead' && lastPhase !== 'dead') shake = 0.35
+      // Down on the sand it stops swimming, stands and shrugs it off; a new run puts it back in the water.
       if (state.phase === 'dead' && state.vy === 0 && !restPose && character) {
+        character.setSwim(false)
         character.setPose('shrug')
         restPose = true
       }
       if (state.phase !== 'dead' && restPose && character) {
-        character.setPose('ready')
+        character.setPose('rest')
+        character.setSwim(true)
         restPose = false
       }
       lastPhase = state.phase
@@ -668,7 +697,7 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
       renderer.render(scene, camera)
     },
     kick() {
-      character?.react('snap')
+      character?.stroke()
       if (options.reducedMotion) return
       const pos = bubbleGeo.getAttribute('position') as BufferAttribute
       for (let n = 0; n < 5; n++) {

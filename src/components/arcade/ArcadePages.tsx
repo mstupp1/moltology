@@ -111,38 +111,17 @@ export function ArcadeHome() {
   )
 }
 
-/** Riptide's own page: the game, and its leaderboard beside it. */
+/** Riptide's own page: the game alone, full screen. Its leaderboard is on the arcade page. */
 export function RiptidePage() {
-  const player = usePlayerCharacter()
   return (
-    <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans">
-      <HudTitlePanel
-        treatment="band"
-        title={riptide.title}
-        description={riptide.tagline}
-        hideDescriptionOnPhone
-        actions={
-          <Link
-            to="/arcade"
-            className="inline-flex min-h-8 items-center gap-1 rounded-control px-2 text-ui font-medium text-ink-body hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
-          >
-            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-            Arcade
-          </Link>
-        }
-      />
-      <div className="grid gap-2 sm:gap-4 lg:gap-5 lg:grid-cols-[1fr_22rem] items-start">
-        <Suspense
-          fallback={
-            <div className="mx-auto flex aspect-[3/4] w-full max-w-[min(100%,calc((100dvh-11rem)*0.75))] items-center justify-center rounded-card border border-line-subtle bg-abyss">
-              <HUDSpinner />
-            </div>
-          }
-        >
-          <LazyRiptideGame />
-        </Suspense>
-        <ArcadeBoard game="riptide" userId={player.userId} />
-      </div>
-    </div>
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 z-[100050] flex items-center justify-center bg-abyss">
+          <HUDSpinner />
+        </div>
+      }
+    >
+      <LazyRiptideGame />
+    </Suspense>
   )
 }

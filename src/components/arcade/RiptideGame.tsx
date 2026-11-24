@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
-import { Play, RotateCcw, Shell, UserPlus } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Play, RotateCcw, Shell, Trophy, UserPlus, X } from 'lucide-react'
 import { HudButton } from '@/components/ui/HudButton'
 import { HUDSpinner } from '@/components/ui/HUDSpinner'
 import { AuthModal } from '@/components/AuthModal'
@@ -14,7 +15,6 @@ import { createRiptide, stepRiptide, type RiptideState } from '@/lib/arcade/ript
 import type { RiptideScene } from '@/lib/arcade/riptide-scene'
 import { finishArcadeRunFn, startArcadeRunFn, type ArcadeRunResult } from '@/lib/server/api'
 import { authToken } from '@/lib/query/account'
-import { cn } from '@/lib/utils'
 import { usePlayerCharacter } from './usePlayerCharacter'
 
 const STEP = 1 / 120
@@ -284,110 +284,138 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
   const showResults = screen === 'over' && outcome
   const xp = outcome?.result?.xp ?? 0
 
-  return (
-    <div className="w-full max-w-[min(100%,calc((100dvh-11rem)*0.75))] mx-auto">
-      <div
-        className="relative w-full aspect-[3/4] overflow-hidden rounded-card border border-line-subtle bg-abyss select-none touch-none"
-        onPointerDown={(event) => {
-          if ((event.target as HTMLElement).closest('button, a')) return
-          event.preventDefault()
-          press()
-        }}
-        data-testid="riptide-game"
-        data-screen={screen}
-      >
-        {support !== false && <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" aria-label="Riptide game" />}
+  // The game owns the whole screen: nothing else scrolls or sits on top of it while it is open.
+  useEffect(() => {
+    const html = document.documentElement
+    const before = html.style.overflow
+    html.style.overflow = 'hidden'
+    return () => {
+      html.style.overflow = before
+    }
+  }, [])
 
-        {support === false && (
-          <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-ink-muted">
-            This game needs 3D graphics, which this browser has turned off.
-          </div>
+  const game = (
+    <div
+      className="fixed inset-0 z-[100050] overflow-hidden bg-abyss font-sans text-ink select-none touch-none overscroll-none"
+      onPointerDown={(event) => {
+        if ((event.target as HTMLElement).closest('button, a, [role="dialog"]')) return
+        event.preventDefault()
+        press()
+      }}
+      data-testid="riptide-game"
+      data-screen={screen}
+    >
+      {support !== false && <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-label="Riptide game" />}
+
+      {/* On a wide screen the field is a 3:4 column in the middle (so no one sees further ahead);
+          the reef either side of it is dimmed. */}
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-[max(0px,calc((100vw-100dvh*0.75)/2))] bg-gradient-to-r from-abyss/85 to-abyss/55" />
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-[max(0px,calc((100vw-100dvh*0.75)/2))] bg-gradient-to-l from-abyss/85 to-abyss/55" />
+
+      {support === false && (
+        <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-ink-muted">
+          This game needs 3D graphics, which this browser has turned off.
+        </div>
+      )}
+
+      {screen === 'loading' && support !== false && (
+        <div className="absolute inset-0 flex items-center justify-center bg-abyss">
+          <HUDSpinner />
+        </div>
+      )}
+
+      {/* Top bar: best on the left, the score in the middle, close on the right. */}
+      <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <span className="mt-1.5 rounded-full bg-abyss/60 px-2.5 py-1 text-xs text-ink-body tabular-nums">Best {best}</span>
+        {screen !== 'loading' && (
+          <span className="rounded-full bg-abyss/60 px-4 py-1 font-grotesk text-2xl font-semibold text-ink tabular-nums" aria-live="polite">
+            {score}
+          </span>
         )}
+        <Link
+          to="/arcade"
+          aria-label="Close game"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-abyss/60 text-ink-body hover:bg-surface-2 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+        >
+          <X className="h-5 w-5" aria-hidden="true" />
+        </Link>
+      </div>
 
-        {screen === 'loading' && support !== false && (
-          <div className="absolute inset-0 flex items-center justify-center bg-abyss">
-            <HUDSpinner />
-          </div>
-        )}
-
-        {(screen === 'playing' || screen === 'paused' || screen === 'ready' || screen === 'over') && (
-          <div className="pointer-events-none absolute inset-x-0 top-3 flex items-start justify-between px-3">
-            <span className="rounded-full bg-abyss/60 px-2.5 py-1 text-xs text-ink-muted tabular-nums">Best {best}</span>
-            <span className="rounded-full bg-abyss/60 px-3.5 py-1 font-grotesk text-2xl font-semibold text-ink tabular-nums" aria-live="polite">
-              {score}
-            </span>
-            <span className="w-16" aria-hidden="true" />
-          </div>
-        )}
-
-        {screen === 'ready' && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-[18%] flex flex-col items-center gap-1.5 text-center">
-            <span className="rounded-full bg-abyss/70 px-4 py-2 text-sm font-medium text-ink">Tap to swim</span>
-            <span className="text-xs text-ink-body">Space or click works too</span>
-            {player.standIn && (
-              <Link
-                to="/character"
-                className="pointer-events-auto mt-2 inline-flex items-center gap-1.5 rounded-full bg-abyss/70 px-3 py-1.5 text-xs text-cyan-glow hover:text-cyan-hover"
-              >
-                <Shell className="w-3.5 h-3.5" aria-hidden="true" />
-                Make your own character first
-              </Link>
-            )}
-          </div>
-        )}
-
-        {screen === 'paused' && (
-          <div className="absolute inset-0 flex items-center justify-center bg-abyss/50">
-            <span className="inline-flex items-center gap-2 rounded-full bg-surface-2 px-4 py-2 text-sm font-medium text-ink">
-              <Play className="w-4 h-4" aria-hidden="true" /> Paused. Tap to carry on
-            </span>
-          </div>
-        )}
-
-        {showResults && (
-          <div className="absolute inset-0 flex items-end sm:items-center justify-center bg-abyss/40 p-3 sm:p-6">
-            <div
-              role="dialog"
-              aria-label="Run over"
-              className="w-full max-w-xs rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 text-center shadow-menu"
+      {screen === 'ready' && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-[max(18%,calc(env(safe-area-inset-bottom)+6rem))] flex flex-col items-center gap-1.5 px-4 text-center">
+          <p className="font-grotesk text-2xl font-semibold tracking-tight text-ink">Riptide</p>
+          <span className="rounded-full bg-abyss/70 px-4 py-2 text-sm font-medium text-ink">Tap to swim</span>
+          <span className="rounded-full bg-abyss/60 px-3 py-1 text-xs text-ink-body">Space or click works too. Touch anything and the run ends.</span>
+          {player.standIn && (
+            <Link
+              to="/character"
+              className="pointer-events-auto mt-2 inline-flex items-center gap-1.5 rounded-full bg-abyss/70 px-3 py-1.5 text-xs text-cyan-glow hover:text-cyan-hover"
             >
-              <p className="eyebrow">Run over</p>
-              <p className="mt-1 font-grotesk text-2xl font-semibold text-ink tabular-nums">{outcome.score}</p>
-              <p className="mt-1 text-sm text-ink-muted">
-                {outcome.isBest ? <span className="text-emerald-500">New best</span> : <>Best {outcome.best}</>}
-                {outcome.result?.weekRank ? <> · #{outcome.result.weekRank} this week</> : null}
+              <Shell className="w-3.5 h-3.5" aria-hidden="true" />
+              Make your own character first
+            </Link>
+          )}
+        </div>
+      )}
+
+      {screen === 'paused' && (
+        <div className="absolute inset-0 flex items-center justify-center bg-abyss/50">
+          <span className="inline-flex items-center gap-2 rounded-full bg-surface-2 px-4 py-2 text-sm font-medium text-ink">
+            <Play className="w-4 h-4" aria-hidden="true" /> Paused. Tap to carry on
+          </span>
+        </div>
+      )}
+
+      {showResults && (
+        <div className="absolute inset-0 flex items-end sm:items-center justify-center bg-abyss/40 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-6">
+          <div
+            role="dialog"
+            aria-label="Run over"
+            className="w-full max-w-xs rounded-card border border-line-subtle bg-surface-1 p-4 sm:p-5 text-center shadow-menu"
+          >
+            <p className="eyebrow">Run over</p>
+            <p className="mt-1 font-grotesk text-2xl font-semibold text-ink tabular-nums">{outcome.score}</p>
+            <p className="mt-1 text-sm text-ink-muted">
+              {outcome.isBest ? <span className="text-emerald-500">New best</span> : <>Best {outcome.best}</>}
+              {outcome.result?.weekRank ? <> · #{outcome.result.weekRank} this week</> : null}
+            </p>
+            {signedIn && (
+              <p className="mt-2 text-xs text-ink-muted">
+                {outcome.unsaved
+                  ? 'This score could not be saved.'
+                  : xp > 0
+                    ? `+${xp} XP`
+                    : outcome.result && outcome.result.xpRunsLeft === 0
+                      ? "You've earned today's arcade XP."
+                      : `Score 3 or more to earn ${ARCADE_XP_PER_RUN} XP.`}
               </p>
-              {signedIn && (
-                <p className="mt-2 text-xs text-ink-muted">
-                  {outcome.unsaved
-                    ? 'This score could not be saved.'
-                    : xp > 0
-                      ? `+${xp} XP`
-                      : outcome.result && outcome.result.xpRunsLeft === 0
-                        ? "You've earned today's arcade XP."
-                        : `Score 3 or more to earn ${ARCADE_XP_PER_RUN} XP.`}
-                </p>
-              )}
-              <div className="mt-4 flex flex-col gap-2">
-                <HudButton type="button" variant="primary" fullWidth onClick={restart} icon={<RotateCcw className="w-4 h-4" />}>
-                  Play again
+            )}
+            <div className="mt-4 flex flex-col gap-2">
+              <HudButton type="button" variant="primary" fullWidth onClick={restart} icon={<RotateCcw className="w-4 h-4" />}>
+                Play again
+              </HudButton>
+              {!signedIn ? (
+                <HudButton type="button" variant="secondary" fullWidth onClick={() => setAuthOpen(true)} icon={<UserPlus className="w-4 h-4" />}>
+                  Sign up to save scores
                 </HudButton>
-                {!signedIn && (
-                  <HudButton type="button" variant="secondary" fullWidth onClick={() => setAuthOpen(true)} icon={<UserPlus className="w-4 h-4" />}>
-                    Sign up to save scores
-                  </HudButton>
-                )}
-              </div>
+              ) : (
+                <Link
+                  to="/arcade"
+                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-control border border-line-subtle bg-surface-2 px-4 text-ui font-medium text-ink hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
+                >
+                  <Trophy className="w-4 h-4" aria-hidden="true" />
+                  Leaderboard
+                </Link>
+              )}
             </div>
           </div>
-        )}
-      </div>
-      <p className={cn('mt-2 text-center text-xs text-ink-muted', screen === 'playing' && 'invisible')}>
-        Tap, click or press space to kick upward. Touch anything and the run ends.
-      </p>
+        </div>
+      )}
       {!signedIn && <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode="signup" />}
     </div>
   )
+
+  return typeof document === 'undefined' ? null : createPortal(game, document.body)
 }
 
 export default RiptideGame
