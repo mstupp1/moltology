@@ -87,6 +87,12 @@ export interface Stage {
   /** Swim in place over the current pose (Character3D.setSwim), and take one stroke. */
   setSwim: (on: boolean) => void
   stroke: () => void
+  /** Run, duck, leap, land and tumble over the current pose (Character3D.setRun and friends). */
+  setRun: (on: boolean, pace?: number) => void
+  setDuck: (on: boolean) => void
+  leap: () => void
+  land: () => void
+  tumble: () => void
   /** Zoom (1 is the whole figure) and tilt back to where they started. */
   resetView: () => void
   /**
@@ -659,6 +665,26 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     },
     stroke() {
       character?.stroke()
+      wake()
+    },
+    setRun(on, pace) {
+      character?.setRun(on, pace)
+      wake()
+    },
+    setDuck(on) {
+      character?.setDuck(on)
+      wake()
+    },
+    leap() {
+      character?.leap()
+      wake()
+    },
+    land() {
+      character?.land()
+      wake()
+    },
+    tumble() {
+      character?.tumble()
       wake()
     },
     resetView() {
