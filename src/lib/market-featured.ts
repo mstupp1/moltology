@@ -1,7 +1,7 @@
 import type { EquipmentRarity } from '../db/schema'
 import { GEAR_PRICES, variantKey } from './gear-variants'
 import { GEAR_PIECE_BY_KEY } from './gear/catalog'
-import { GEAR_COLLECTIONS } from './gear/collections'
+import { collectionReleased, GEAR_COLLECTIONS } from './gear/collections'
 import { GEAR_PIECES } from './gear/pieces'
 
 /**
@@ -109,7 +109,8 @@ const WEEK = 7 * 24 * 60 * 60 * 1000
  */
 export function featuredSlots(now: Date = new Date()): FeaturedSlot[] {
   const week = Math.floor(now.getTime() / WEEK)
-  const c = GEAR_COLLECTIONS[((week % GEAR_COLLECTIONS.length) + GEAR_COLLECTIONS.length) % GEAR_COLLECTIONS.length]
+  const out = GEAR_COLLECTIONS.filter((x) => collectionReleased(x.id, now))
+  const c = out[((week % out.length) + out.length) % out.length]
   const top = c ? GEAR_PIECES.filter((p) => p.collection === c.id).sort((a, b) => RARITY_RANK[b.rarity] - RARITY_RANK[a.rarity] || a.n - b.n)[0] : undefined
   return [
     ...(c ? [{ kind: 'bundle' as const, bundleId: `collection-${c.id}`, tag: 'Collection of the week' }] : []),

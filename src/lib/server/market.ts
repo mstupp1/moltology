@@ -2,8 +2,9 @@ import { and, eq, inArray, sql } from 'drizzle-orm'
 import type { getDb } from '../../db'
 import { gearUnlocks, profiles, userGearItems } from '../../db/schema'
 import { getEquipmentVisual } from '../avatar/equipment'
-import { gearCatalogRow, gearCatalogRowByKey, SHOP_CATALOG, STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
+import { gearCatalogRow, gearCatalogRowByKey, shopCatalog, STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
 import { GEAR_PRICES } from '../gear-variants'
+import { collectionReleased } from '../gear/collections'
 import { GEM_FIRSTS } from '../gems'
 import { buildMarketPieces, type BuyGearResult, type MarketPayload, type WalletBalances } from '../market'
 import { bundlePrice, bundleRefKey, marketBundle, type MarketBundle } from '../market-featured'
@@ -35,7 +36,7 @@ export async function getMarket(db: Db, userId: string): Promise<MarketPayload> 
     addFree: isAdmin(null, profileRows[0]?.role),
     moltCredits: Number(profileRows[0]?.moltCredits ?? 0),
     creditsLive: canBuyCredits(profileRows[0]?.role, profileRows[0]?.experiments),
-    pieces: buildMarketPieces(SHOP_CATALOG, owned),
+    pieces: buildMarketPieces(shopCatalog(), owned),
   }
 }
 
@@ -106,7 +107,7 @@ export async function buyGear(db: Db, userId: string, catalogItemId: string): Pr
 /** A piece the shop sells (not retired, with a 3D look), by catalog id. */
 function shopRow(catalogItemId: string) {
   const row = gearCatalogRow(catalogItemId)
-  return row && !row.retired && getEquipmentVisual(row.appearanceKey || row.slug) ? row : undefined
+  return row && !row.retired && collectionReleased(row.collection) && getEquipmentVisual(row.appearanceKey || row.slug) ? row : undefined
 }
 
 /** The catalog ids behind a bundle's pieces, or null when any is missing from the shop. */
@@ -210,7 +211,7 @@ export async function getGuestMarket(_db?: Db): Promise<MarketPayload> {
     moltCredits: 0,
     creditsLive: false,
     guest: true,
-    pieces: buildMarketPieces(SHOP_CATALOG, new Set(STARTER)),
+    pieces: buildMarketPieces(shopCatalog(), new Set(STARTER)),
   }
 }
 

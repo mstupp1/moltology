@@ -82,7 +82,7 @@ export const HATS = ['hard_hat', 'crown', 'visor', 'headset', 'halo', 'bow', 'be
 export type Hat = (typeof HATS)[number]
 
 /** Things a claw can hold (src/lib/avatar3d/gear-props.ts). */
-export const PROPS = ['clipboard', 'can', 'controller', 'tea_cup', 'watering_can', 'book', 'phone', 'marshmallow_stick', 'lantern', 'staff', 'sceptre', 'mug', 'ice_lolly'] as const
+export const PROPS = ['clipboard', 'can', 'controller', 'tea_cup', 'watering_can', 'book', 'phone', 'marshmallow_stick', 'lantern', 'staff', 'sceptre', 'mug', 'ice_lolly', 'gift'] as const
 export type Prop = (typeof PROPS)[number]
 
 /**

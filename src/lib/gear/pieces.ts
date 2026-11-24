@@ -697,6 +697,15 @@ const COLLECTION_PIECES: GearPiece[] = [
   ...collection('molt-street', 'shellHardness', [
     { key: 'denim-jacket', n: 118, name: 'Denim jacket', flavorText: 'Mid-wash denim, copper buttons, broken in already.', slot: 'carapace', rarity: 'rare', shape: 'garment', motif: 'jacket', colours: 'street-denim', construction: 2, surface: 'denim' },
   ]),
+  ...collection('winter-molt', 'ecdysisDiscipline', [
+    { key: 'snowflake-sweater', n: 119, name: 'Snowflake sweater', flavorText: 'Berry red knit dotted with snow. Worn from the first cold night to the last.', slot: 'carapace', rarity: 'epic', shape: 'garment', motif: 'sweater', print: 'dots', colours: 'winter-red', construction: 2, surface: 'knit', uniquePower: { name: 'Long Night', description: 'The darkest week of the year passes quickly in good company.' } },
+    { key: 'holly-scarf', n: 120, name: 'Holly scarf', flavorText: 'Evergreen and red, wound twice, fringed.', slot: 'belt', rarity: 'uncommon', shape: 'belt-plate', motif: 'scarf', print: 'stripes', colours: 'winter-holly', construction: 2, surface: 'knit' },
+    { key: 'snow-pom-beanie', n: 121, name: 'Snow pom beanie', flavorText: 'Snow white with a red pom, for the walk home in the dark.', slot: 'head', rarity: 'common', shape: 'hat', motif: 'none', hat: 'beanie', colours: 'winter-beanie', construction: 0, surface: 'knit' },
+    { key: 'snow-boots', n: 122, name: 'Snow boots', flavorText: 'White suede, a fleece cuff and a good grip on the ice.', slot: 'legs', rarity: 'rare', shape: 'shoes', motif: 'boot', colours: 'winter-boots', construction: 1, surface: 'leather' },
+    { key: 'peppermint-cocoa', n: 123, name: 'Peppermint cocoa', flavorText: 'A candy-stripe mug, two marshmallows, peppermint on top.', slot: 'claws', rarity: 'common', shape: 'held-prop', motif: 'none', prop: 'mug', colours: 'winter-mug', construction: 0 },
+    { key: 'wrapped-gift', n: 124, name: 'Wrapped gift', flavorText: 'Green paper, gold ribbon. For someone who showed up all year.', slot: 'claws', rarity: 'uncommon', shape: 'held-prop', motif: 'none', prop: 'gift', colours: 'winter-gift', construction: 1 },
+    { key: 'evergreen-cape', n: 125, name: 'Evergreen cape', flavorText: 'Deep green velvet edged in snow white, clasped with a berry.', slot: 'belt', rarity: 'legendary', shape: 'belt-plate', motif: 'cape', colours: 'winter-evergreen', construction: 3, surface: 'velvet', uniquePower: { name: 'First Snow', description: 'Everything goes quiet for a moment when you arrive.' } },
+  ]),
 ]
 
 export const GEAR_PIECES: GearPiece[] = [...ORIGINAL_PIECES, ...COLLECTION_PIECES]

@@ -165,6 +165,17 @@ const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number) => voi
     kit.add(bone, 'trim', at(new IcosahedronGeometry(w * 0.06, 0), w * 0.1, 0.12 * S + h * 0.35, w * 0.24))
     kit.add(bone, 'trim', at(new IcosahedronGeometry(w * 0.05, 0), -w * 0.15, 0.12 * S + h * 0.5, w * 0.24))
   },
+  gift: (kit, bone, at, S) => {
+    const w = 0.24 * S
+    // A wrapped box held up on the palm: ribbon both ways round it and a looped bow on top.
+    kit.add(bone, 'paint', at(new BoxGeometry(w, w * 0.8, w), 0, w * 0.45, 0))
+    kit.add(bone, 'trim', at(new BoxGeometry(w * 1.01, w * 0.81, w * 0.16), 0, w * 0.45, 0))
+    kit.add(bone, 'trim', at(new BoxGeometry(w * 0.16, w * 0.81, w * 1.01), 0, w * 0.45, 0))
+    for (const s of [1, -1]) {
+      kit.add(bone, 'trim', at(new TorusGeometry(w * 0.16, w * 0.045, 8, 16).scale(1, 0.7, 0.6).rotateZ(s * 0.5), s * w * 0.15, w * 0.92, 0))
+    }
+    kit.add(bone, 'accent', at(new SphereGeometry(w * 0.07, 12, 10), 0, w * 0.88, 0))
+  },
 }
 
 export function heldProp(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {

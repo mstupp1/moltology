@@ -96,6 +96,14 @@ export const GEAR_PALETTES: Readonly<Record<string, GearColours>> = {
   'lumen-cyan': { material: '#121a2b', trim: '#2b3b5e', accent: '#ff5ce1' },
   'lumen-jelly': { material: '#3a2d63', trim: '#5a4a93', accent: '#47f5ff' },
   // Royal Reef: coral red, pearl, old gold, deep navy velvet.
+  // Winter Molt: berry red, evergreen, snow white, candy stripe.
+  'winter-red': { material: '#a3192f', trim: '#f6f2ea', accent: '#f6f2ea' },
+  'winter-holly': { material: '#1f5a3a', trim: '#c8233b', accent: '#f6f2ea' },
+  'winter-beanie': { material: '#f6f2ea', trim: '#c8233b', accent: '#c8233b' },
+  'winter-boots': { material: '#efeae0', trim: '#6b4a32', accent: '#f8f6f0' },
+  'winter-mug': { material: '#f6f2ea', trim: '#c8233b', accent: '#fffaf0' },
+  'winter-gift': { material: '#1f5a3a', trim: '#e6c15c', accent: '#c8233b' },
+  'winter-evergreen': { material: '#1d4a33', trim: '#f6f2ea', accent: '#a3192f' },
   'royal-coral': { material: '#e0533f', trim: '#e6c15c', accent: '#f6ecd9' },
   'royal-navy': { material: '#1d2547', trim: '#e6c15c', accent: '#b9283f' },
   'royal-pearl': { material: '#f1ead9', trim: '#e6c15c', accent: '#ff8f7a' },
