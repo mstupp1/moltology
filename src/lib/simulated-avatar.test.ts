@@ -22,9 +22,9 @@ describe('simulated avatars', () => {
   })
 
   it('spreads a cast across races and every shell colour', () => {
-    const cast = rollSimulatedCast(24, 'batch')
+    const cast = rollSimulatedCast(SHELL_PALETTES.length + 4, 'batch')
     const races = cast.map((c) => c.race)
-    expect(races.filter((r) => r === 'crab')).toHaveLength(12)
+    expect(races.filter((r) => r === 'crab')).toHaveLength(Math.floor(cast.length / 2))
     expect(new Set(cast.slice(0, SHELL_PALETTES.length).map((c) => c.shellColor)).size).toBe(SHELL_PALETTES.length)
     expect(new Set(cast.map((c) => `${c.headShape}/${c.build}`)).size).toBeGreaterThan(6)
   })

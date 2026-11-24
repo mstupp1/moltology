@@ -4,6 +4,7 @@ import type { AvatarEyeColor, Expression, EyeShape, Gaze, PupilStyle } from './p
 import type {
   AvatarAccessory,
   AvatarAntennae,
+  AvatarBrows,
   AvatarBuild,
   AvatarClaws,
   AvatarHeadShape,
@@ -17,6 +18,10 @@ export interface CharacterSpec {
   equipment?: EquippedAppearance
   race: AvatarRace
   eyeColor: AvatarEyeColor
+  /** The right eye's colour when it differs from the left. */
+  eyeColorRight?: AvatarEyeColor
+  /** Brow ridge style; unset is the original soft brow. */
+  brows?: AvatarBrows
   eyeShape: EyeShape
   pupil: PupilStyle
   expression: Expression

@@ -280,3 +280,26 @@ describe('retired painted avatar configs', () => {
     })).toEqual({ style: 'critters', seed: 'saved-member', race: 'crab', shellColor: 'coral' })
   })
 })
+
+describe('options added 2026-11-24', () => {
+  it('never reach a seeded look, so existing members keep theirs', async () => {
+    const { SEEDED_PALETTES, SEEDED_FINISHES } = await import('./avatar/traits')
+    const { SEEDED_EYE_COLORS } = await import('./avatar/parts')
+    const palettes = new Set(SEEDED_PALETTES.map((p) => p.id))
+    expect(palettes.size).toBe(12)
+    for (let i = 0; i < 400; i++) {
+      const seeded = getLobsterAvatarSeededOptions(`member-${i}`)
+      expect(palettes.has(seeded.shellColor)).toBe(true)
+      expect(SEEDED_FINISHES).toContain(seeded.shellFinish)
+      expect(SEEDED_EYE_COLORS).toContain(seeded.eyeColor)
+      expect(['round', 'wide', 'tall']).toContain(seeded.eyeVariant)
+    }
+  })
+
+  it('keeps the new paint and face fields through a parse', async () => {
+    const { parseLobsterAvatarConfig } = await import('./lobster-avatar')
+    const parsed = parseLobsterAvatarConfig({ seed: 'x', tipColor: 'midnight', eyeColorRight: 'teal', brows: 'thick', blush: true, shellFinish: 'velvet', marking: 'flames', eyeVariant: 'button' })
+    expect(parsed).toMatchObject({ tipColor: 'midnight', eyeColorRight: 'teal', brows: 'thick', blush: true, shellFinish: 'velvet', marking: 'flames', eyeVariant: 'button' })
+    expect(parseLobsterAvatarConfig({ seed: 'x', tipColor: 'nope', brows: 'huge' })).not.toHaveProperty('tipColor')
+  })
+})

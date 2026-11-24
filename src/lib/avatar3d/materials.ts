@@ -12,6 +12,8 @@ import { EYE_COLOR_SWATCH, type AvatarEyeColor } from '../avatar/parts'
 import type { MaterialSlot } from './rig'
 import { detailOnUniform, detailSlopeUniform, detailUniform, engravingMask, FLAT_DETAIL, gearTile, isTextureMarking, markingMask, NO_MARK, shellDetail, slopeOn, type GearSurface } from './textures'
 
+const WHITE = new Color('#ffffff')
+
 const MARKING_INDEX: Record<ShellMarking, number> = {
   none: 0,
   spots: 1,
@@ -26,6 +28,14 @@ const MARKING_INDEX: Record<ShellMarking, number> = {
   lace: 9,
   tide: 9,
   camo: 9,
+  scales: 9,
+  rosettes: 9,
+  flames: 9,
+  honeycomb: 9,
+  barnacles: 9,
+  ripple: 9,
+  constellation: 9,
+  marble: 9,
 }
 
 export const NOISE_GLSL = /* glsl */ `
@@ -320,6 +330,10 @@ export interface ShellMaterialOptions {
   markingScale?: number
   /** Thin enough for light to come through at the edges (antennae, fins, membrane). */
   thin?: boolean
+  /** Colour the shell fades to toward its tips (see `setShellCore`). */
+  tip?: string
+  /** Blush colour for the cheeks (see `setShellCore`). */
+  blush?: string
 }
 
 /** Set a shell material's colours, finish and marking. Used to make one and to repaint it. */
@@ -335,6 +349,20 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
   // Polished metal that still reads as the shell's colour: not a full mirror, which shows the
   // room as blotches on rounded shells.
   if (finish === 'chrome') Object.assign(material, { roughness: 0.2, metalness: 0.45, clearcoat: 1, clearcoatRoughness: 0.05, sheen: 0, envMapIntensity: 2.2 })
+  // Chalky and soft: no clear coat, so the light spreads instead of sitting on top as a sheen.
+  if (finish === 'matte') Object.assign(material, { roughness: 0.85, clearcoat: 0, sheen: 0, envMapIntensity: 0.8 })
+  // Peach fuzz: a broad sheen of the light colour round the edges of every form.
+  if (finish === 'velvet') {
+    Object.assign(material, { roughness: 0.92, clearcoat: 0, sheen: 1, sheenRoughness: 0.5, envMapIntensity: 0.85 })
+    material.sheenColor.set(o.highlight).lerp(WHITE, 0.35)
+  }
+  // Jewel beetle: coloured metal under a hard coat, its colour sliding with the angle.
+  if (finish === 'beetle') Object.assign(material, { roughness: 0.24, metalness: 0.55, clearcoat: 1, clearcoatRoughness: 0.06, sheen: 0, iridescence: 1, iridescenceIOR: 2.0, envMapIntensity: 1.8 })
+  // Glassy candy: very smooth, a little pearly, lit from inside toward the edges (see uThin below).
+  if (finish === 'crystal') Object.assign(material, { roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.02, sheen: 0, iridescence: 0.6, iridescenceIOR: 1.5, envMapIntensity: 1.9 })
+  if (finish === 'beetle') material.iridescenceThicknessRange = [320, 720]
+  else if (finish === 'crystal') material.iridescenceThicknessRange = [200, 420]
+  else material.iridescenceThicknessRange = [100, 400]
   const u = material.userData.uniforms as ShellUniforms
   u.uShade.value.set(o.shade)
   u.uMark.value.set(o.markingColor ?? o.shade)
@@ -350,14 +378,21 @@ export function paintShell(material: MeshPhysicalMaterial, o: ShellMaterialOptio
       })
     : NO_MARK
   u.uMarkScale.value = 1 / Math.min(1.8, Math.max(0.5, o.markingScale ?? 1))
-  u.uGrain.value = (o.grain ?? (finish === 'chrome' ? 0.015 : 0.07)) * CLAY_GRAIN
+  u.uGrain.value = (o.grain ?? (finish === 'chrome' || finish === 'crystal' || finish === 'beetle' ? 0.015 : finish === 'velvet' ? 0.12 : 0.07)) * CLAY_GRAIN
   // Polished finishes keep a smoother shell, so their reflections stay clean.
-  u.uDetail.value = (o.detail ?? 1) * (finish === 'chrome' ? 0.3 : finish === 'glossy' || finish === 'pearl' ? 0.6 : 1) * CLAY_DETAIL
-  u.uGlow.value = finish === 'glow' ? 0.45 : 0
+  const smooth = finish === 'chrome' || finish === 'crystal' ? 0.3 : finish === 'glossy' || finish === 'pearl' || finish === 'beetle' ? 0.6 : 1
+  u.uDetail.value = (o.detail ?? 1) * smooth * CLAY_DETAIL
+  u.uGlow.value = finish === 'glow' ? 0.45 : finish === 'crystal' ? 0.1 : 0
   u.uMarkGlow.value = o.marking === 'circuit' ? 0.35 : 0
-  u.uThin.value = o.thin ? 1 : 0
-  // Water beads on the shell, less so on polished metal; the plain belly and brows stay dry-looking.
-  u.uWet.value = (o.detail ?? 1) === 0 ? 0 : finish === 'chrome' ? 0.4 : 1
+  u.uThin.value = o.thin ? 1 : finish === 'crystal' ? 1.6 : 0
+  // Water beads on the shell, less so on polished metal; the plain belly and brows stay dry-looking,
+  // and so do the soft finishes.
+  u.uWet.value = (o.detail ?? 1) === 0 || finish === 'matte' || finish === 'velvet' ? 0 : finish === 'chrome' || finish === 'beetle' ? 0.4 : 1
+  u.uTipOn.value = o.tip ? 1 : 0
+  u.uTip.value.set(o.tip ?? o.base)
+  u.uCrystal.value = finish === 'crystal' ? 1 : 0
+  u.uBlushOn.value = o.blush ? 1 : 0
+  u.uBlush.value.set(o.blush ?? o.base)
   // A change of finish can switch shader features on or off.
   material.needsUpdate = true
 }
@@ -419,6 +454,15 @@ const shellUniforms = () => ({
   uThin: { value: 0 },
   uWet: { value: 0 },
   uMarkMap: { value: NO_MARK as Texture },
+  // Tip fade: the colour, and the body's middle (xyz) and reach (w) in rest space.
+  uTip: { value: new Color() },
+  uTipOn: { value: 0 },
+  uCore: { value: new Vector4(0, 0.6, 0, 1) },
+  // Cheeks: where each sits in rest space (xyz) and its radius (w).
+  uBlush: { value: new Color() },
+  uBlushOn: { value: 0 },
+  uCrystal: { value: 0 },
+  uCheek: { value: [new Vector4(0, -1000, 0, 0.01), new Vector4(0, -1000, 0, 0.01)] },
   // Shared by every shell, so the tile is swapped in once when it arrives.
   uDetailMap: detailUniform,
   uDetailOn: detailOnUniform,
@@ -434,6 +478,18 @@ export function shadeWith(materials: Record<MaterialSlot, Material>, spheres: Ve
     u.uOcc.value = spheres
     u.uOccN.value = count
     u.uBaked.value = baked ? 1 : 0
+  }
+}
+
+/**
+ * Where a character's body sits, for the paint that depends on it: `core` is the middle of the
+ * body and how far its tips reach (the tip fade), `cheeks` the two cheek spots and their radius.
+ */
+export function setShellCore(materials: Record<MaterialSlot, Material>, core: Vector4, cheeks: Vector4[]): void {
+  for (const slot of SHELL_SLOTS) {
+    const u = (materials[slot] as MeshPhysicalMaterial).userData.uniforms as ShellUniforms
+    u.uCore.value = core
+    if (cheeks.length === 2) u.uCheek.value = cheeks
   }
 }
 
@@ -470,6 +526,8 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         uniform vec3 uShade; uniform vec3 uMark; uniform vec3 uSplit; uniform vec3 uSoft;
         uniform int uMarking; uniform float uMarkScale; uniform float uGrain; uniform float uDetail; uniform float uGlow; uniform float uMarkGlow;
         uniform sampler2D uMarkMap; uniform sampler2D uDetailMap; uniform float uDetailOn; uniform float uDetailSloped;
+        uniform vec3 uTip; uniform float uTipOn; uniform vec4 uCore;
+        uniform vec3 uBlush; uniform float uBlushOn; uniform vec4 uCheek[2]; uniform float uCrystal;
         // Shell detail tiles about every 0.18 units; image markings about every 1.3.
         #define A3_DETAIL_FREQ 5.5
         #define A3_MARK_FREQ 0.75
@@ -510,6 +568,11 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         vec3 a3Tint = diffuse;
         // The partner colour takes the viewer's right half, as in the 2D drawing.
         if (uMarking == 7 && vRest.x > 0.0) a3Tint = uSplit;
+        // Tip fade: the shell turns to the second colour out toward the claws, feet, feelers and tail.
+        if (uTipOn > 0.5) {
+          float a3Reach = length((vRest - uCore.xyz) * vec3(1.0, 0.85, 1.0)) / uCore.w;
+          a3Tint = mix(a3Tint, uTip, smoothstep(0.5, 1.05, a3Reach));
+        }
         a3Mask = uMarking == 7 ? 0.0 : uMarking == 9 ? smoothstep(0.38, 0.62, a3MarkTex) : a3Marking(uMarking, vRest * uMarkScale);
         a3Mask *= 1.0 - a3Soft;
         a3Tint = mix(a3Tint, uMark, a3Mask);
@@ -525,6 +588,13 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         a3Tint *= 1.0 + uGrain * (a3Grain - 0.5);
         // Pores and pits from the detail tile sit a little darker.
         a3Tint *= 1.0 - 0.08 * smoothstep(0.5, 0.15, a3Height);
+        // Rosy cheeks: two soft round flushes under the eyes, painted on before the creases.
+        if (uBlushOn > 0.5) {
+          for (int i = 0; i < 2; i++) {
+            float a3C = length(vRest - uCheek[i].xyz) / uCheek[i].w;
+            a3Tint = mix(a3Tint, uBlush, 0.62 * (1.0 - smoothstep(0.2, 1.0, a3C)));
+          }
+        }
         // Joints are soft, pale membrane, not shell.
         a3Tint = mix(a3Tint, uSoft, a3Soft * 0.8);
         // Creases take the palette's shade colour instead of going grey.
@@ -605,6 +675,12 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         reflectedLight.directDiffuse *= mix(1.0, a3Occ, 0.55) * mix(1.0, a3Baked, 0.75);
         reflectedLight.directSpecular *= mix(1.0, a3Occ, 0.4) * mix(1.0, a3Baked, 0.6);
         a3Occ *= a3Baked;
+        // Crystal: like coloured glass, deeper where the shell faces you and bright toward its edges.
+        if (uCrystal > 0.5) {
+          float a3Face = abs(dot(normal, normalize(vViewPosition)));
+          reflectedLight.directDiffuse *= mix(1.0, 0.62, smoothstep(0.35, 0.95, a3Face));
+          reflectedLight.indirectDiffuse *= mix(1.0, 0.7, smoothstep(0.35, 0.95, a3Face));
+        }
         // Light through thin parts: fins, feelers and soft joints glow warm toward their edges.
         float a3Thin = max(uThin, a3Soft * 0.6);
         if (a3Thin > 0.0) {
@@ -616,6 +692,10 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
         totalEmissiveRadiance += diffuseColor.rgb * uGlow + uMark * a3Mask * uMarkGlow;
+        if (uCrystal > 0.5) {
+          float a3Edge = pow(1.0 - saturate(abs(dot(normal, normalize(vViewPosition)))), 2.0);
+          totalEmissiveRadiance += mix(diffuseColor.rgb, vec3(1.0), 0.45) * a3Edge * 0.55;
+        }
         // Soft rim: a bright edge round the silhouette, stronger on the tops of forms, so the
         // character lifts off the background.
         {
@@ -624,7 +704,7 @@ export function shellMaterial(o: ShellMaterialOptions): MeshPhysicalMaterial {
         }`,
       )
   }
-  material.customProgramCacheKey = () => 'avatar3d-shell-11'
+  material.customProgramCacheKey = () => 'avatar3d-shell-12'
   return material
 }
 
@@ -737,6 +817,8 @@ export interface LookMaterials {
   finish: ShellFinish
   marking: ShellMarking
   eyeColor: AvatarEyeColor
+  /** The right eye's colour, when it differs. */
+  eyeColorRight?: AvatarEyeColor
   pupilScale?: number
   /** How far the eye socket is widened and heightened. */
   eyeStretch?: [number, number]
@@ -745,6 +827,9 @@ export interface LookMaterials {
   /** Palette whose colour the marking is drawn in, instead of the shell's own marking colour. */
   markingColor?: string
   markingScale?: number
+  /** Palette id the shell fades to toward its tips. */
+  tipColor?: string
+  blush?: boolean
 }
 
 function shellOptions(look: LookMaterials): Record<'shell' | 'belly' | 'brow', ShellMaterialOptions> {
@@ -752,8 +837,9 @@ function shellOptions(look: LookMaterials): Record<'shell' | 'belly' | 'brow', S
   const split = SHELL_PALETTE_MAP[p.splitWith] ?? p
   const belly = (look.bellyColor && SHELL_PALETTE_MAP[look.bellyColor]) || p
   const mark = look.markingColor ? SHELL_PALETTE_MAP[look.markingColor] : undefined
+  const tip = look.tipColor ? SHELL_PALETTE_MAP[look.tipColor] : undefined
   // Stardust and circuit traces are drawn in light, as in the 2D art; the rest in the darker marking colour.
-  const light = look.marking === 'stardust' || look.marking === 'circuit'
+  const light = look.marking === 'stardust' || look.marking === 'circuit' || look.marking === 'constellation'
   return {
     shell: {
       base: p.base,
@@ -765,6 +851,9 @@ function shellOptions(look: LookMaterials): Record<'shell' | 'belly' | 'brow', S
       splitBase: split.base,
       finish: look.finish,
       soft: '#' + new Color(p.base).lerp(new Color(belly.bellyShade), 0.55).getHexString(),
+      tip: tip?.base,
+      // A rosy pink that shows on red shells too: the palette's blush lifted toward light pink.
+      blush: look.blush ? '#' + new Color(p.blush).lerp(new Color('#ffc2d4'), 0.35).getHexString() : undefined,
     },
     belly: { base: belly.belly, shade: belly.bellyShade, highlight: '#ffffff', finish: 'satin', grain: 0.04, detail: 0 },
     brow: { base: '#' + new Color(p.base).lerp(new Color(p.shade), 0.6).getHexString(), shade: p.shade, highlight: p.highlight, finish: 'satin', detail: 0 },
@@ -777,10 +866,11 @@ export function buildMaterials(look: LookMaterials): Record<MaterialSlot, Materi
   const o = shellOptions(look)
   return {
     shell: shellMaterial(o.shell),
-    fin: shellMaterial({ ...o.shell, thin: true }),
+    fin: shellMaterial({ ...o.shell, thin: true, blush: undefined }),
     belly: shellMaterial(o.belly),
     brow: shellMaterial(o.brow),
     eye: eyeMaterial(look.eyeColor, look.pupilScale, look.eyeStretch),
+    eyeR: eyeMaterial(look.eyeColorRight ?? look.eyeColor, look.pupilScale, look.eyeStretch),
     mouth: new MeshStandardMaterial({ color: new Color(p.deep), roughness: 0.7 }),
     teeth: new MeshStandardMaterial({ color: new Color('#fffaf0'), roughness: 0.35 }),
     tongue: new MeshStandardMaterial({ color: new Color('#ff7d93'), roughness: 0.5 }),
@@ -792,10 +882,11 @@ export function buildMaterials(look: LookMaterials): Record<MaterialSlot, Materi
 export function repaintMaterials(materials: Record<MaterialSlot, Material>, look: LookMaterials): void {
   const o = shellOptions(look)
   paintShell(materials.shell as MeshPhysicalMaterial, o.shell)
-  paintShell(materials.fin as MeshPhysicalMaterial, { ...o.shell, thin: true })
+  paintShell(materials.fin as MeshPhysicalMaterial, { ...o.shell, thin: true, blush: undefined })
   paintShell(materials.belly as MeshPhysicalMaterial, o.belly)
   paintShell(materials.brow as MeshPhysicalMaterial, o.brow)
   paintEye(materials.eye as MeshPhysicalMaterial, look.eyeColor, look.pupilScale)
+  paintEye(materials.eyeR as MeshPhysicalMaterial, look.eyeColorRight ?? look.eyeColor, look.pupilScale)
   ;(materials.mouth as MeshStandardMaterial).color.set(look.palette.deep)
 }
 

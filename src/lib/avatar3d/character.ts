@@ -3,7 +3,7 @@
  * overshoot, breathing, blinking, feet that step round as it turns, and springy antennae, tail,
  * claws and hats. Changing the look rebuilds the character; changing the pose only retargets bones.
  */
-import { Box3, BufferAttribute, Mesh, Quaternion, SkinnedMesh, Vector3, type Group, type Material, type Object3D, type WebGLRenderer } from 'three'
+import { Box3, BufferAttribute, Mesh, Quaternion, SkinnedMesh, Vector3, Vector4, type Group, type Material, type Object3D, type WebGLRenderer } from 'three'
 import type { AvatarPose, AvatarTemperament } from '../avatar/traits'
 import { equipAll } from './equipment'
 import { shapeKey, type Avatar3DLook } from './look'
@@ -11,14 +11,23 @@ import { loftDetail } from './loft'
 import { bakeOcclusion, prepareBake, type BakeOptions } from './bake'
 import { BODY, bodySpheres, SWINGS, type BodySphere } from './collide'
 import { buildOccluders, buildSprings, type Spring } from './flex'
-import { bakeWorkPos, buildMaterials, disposeMaterials, repaintMaterials, shadeWith } from './materials'
+import { bakeWorkPos, buildMaterials, disposeMaterials, repaintMaterials, setShellCore, shadeWith } from './materials'
 import { arc, GESTURE_SECONDS, gestureCurve, hops, jitter, jump, legTap, MOODS, REACTION_SECONDS, type Gesture, type Mood, type Reaction } from './motion'
 import { blendMouth, LIP_TUBE, MOUTH_HOLE, MOUTH_PARAMS, mouthParams, type MouthParams, type MouthShape } from './mouth-shapes'
 import { POSES, poseExtras, poseTargets } from './poses'
 import { aimQuaternion, Rig, type MaterialSlot } from './rig'
 import { buildCrab, buildLobster, EYE_STRETCH, SWIMMERETS, TAIL_FAN, type FaceRig } from './species'
 
+/**
+ * The open smile: the top edge flattens (toward a D on its back) and the whole mouth curves up
+ * at the corners. `grinY` takes a point on the unit oval (x across, y up) to its height.
+ */
+const GRIN = { flatten: 0.72, curve: 0.5, widen: 0.12 }
+const grinY = (x: number, y: number, grin: number) => (y > 0 ? y * (1 - GRIN.flatten * grin) : y) + GRIN.curve * grin * (x * x - 0.35)
+
 const PUPIL_SCALE = { standard: 1, big: 1.28, sparkle: 1.1, keen: 0.72 } as const
+/** How far from the chest the tip fade is complete, as a share of the character's height. */
+const TIP_REACH = 0.62
 /** How long a pose change takes, wind-up and settle included. */
 const POSE_SECONDS = 0.62
 /** How far behind the body each part of an arm starts a pose change, in seconds. */
@@ -294,14 +303,24 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     finish: of.finish,
     marking: of.marking,
     eyeColor: of.eyeColor,
+    eyeColorRight: of.eyeColorRight,
     eyeStretch: EYE_STRETCH[of.eyeShape],
-    pupilScale: PUPIL_SCALE[of.pupil] * (of.expression === 'shocked' ? 0.6 : 1),
+    // Button eyes are mostly pupil.
+    pupilScale: PUPIL_SCALE[of.pupil] * (of.expression === 'shocked' ? 0.6 : 1) * (of.eyeShape === 'button' ? 1.5 : 1),
     bellyColor: of.bellyColor,
     markingColor: of.markingColor,
     markingScale: of.markingScale,
+    tipColor: of.tipColor,
+    blush: of.blush,
   })
   const materials: Record<MaterialSlot, Material> = buildMaterials(paint(look))
   rig.finalize(materials)
+  {
+    // The body's middle and reach, for the tip fade, and the cheeks, for the blush.
+    const chest = rig.bones.get('chest')
+    const middle = chest ? chest.getWorldPosition(new Vector3()) : new Vector3(0, built.height * 0.6, 0)
+    setShellCore(materials, new Vector4(middle.x, middle.y, middle.z, built.height * TIP_REACH), face.cheeks.map(([x, y, z, r]) => new Vector4(x, y, z, r)))
+  }
 
   // Bake where each vertex sits in the rest pose, so markings stay put when bones move.
   const p = new Vector3()
@@ -466,13 +485,13 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
    * (face.mouthBend): from the side the mouth stays on the face instead of standing off it like a
    * flat sticker. A few hundred points, and only while the mouth is open.
    */
-  const bendPart = (part: Bendable | null, sx: number, sy: number, sz: number, ox: number, oy: number) => {
+  const bendPart = (part: Bendable | null, sx: number, sy: number, sz: number, ox: number, oy: number, grin = 0) => {
     if (!part) return
     const { pos, nor, base, baseNormal } = part
     const bx = face.mouthBend.x
     for (let i = 0; i < pos.count; i++) {
-      const x = base[i * 3] * sx
-      const y = base[i * 3 + 1] * sy
+      const x = base[i * 3] * sx * (1 + GRIN.widen * grin)
+      const y = grinY(base[i * 3] / MOUTH_HOLE.x, base[i * 3 + 1] / MOUTH_HOLE.y, grin) * MOUTH_HOLE.y * sy
       const X = x + ox
       const Y = y + oy
       const by = Y > 0 ? face.mouthBend.up : face.mouthBend.down
@@ -486,7 +505,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     nor.needsUpdate = true
   }
   /** The lip: a soft roll of shell round the opening, the same oval as the open mouth. */
-  const shapeLip = (W: number, H: number, oy: number) => {
+  const shapeLip = (W: number, H: number, oy: number, grin = 0) => {
     const part = mouthShape.lip
     if (!part) return
     const { pos, nor, base } = part
@@ -502,8 +521,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       const out = base[i * 3 + 2] / (MOUTH_HOLE.x * LIP_TUBE)
       const cu = Math.cos(u)
       const su = Math.sin(u)
-      const x = (W + t * ring) * cu
-      const y = (H + t * ring) * su
+      const x = (W * (1 + GRIN.widen * grin) + t * ring) * cu
+      const y = (H * grinY(cu, su, grin) + t * ring * su)
       const X = x
       const Y = y + oy
       const by = Y > 0 ? face.mouthBend.up : face.mouthBend.down
@@ -591,8 +610,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     const jaw = open ? -0.22 * Math.max(0, H - MOUTH_HOLE.y * 0.3) * m.speech : 0
     if (mouthRest) mouthBone.position.copy(mouthRest.at).add(partAt.set(0, jaw, 0).applyQuaternion(mouthRest.facing))
     if (open) {
-      bendPart(mouthShape.hole, sx, sy, MOUTH_SINK, 0, jaw)
-      shapeLip(W, H, jaw)
+      bendPart(mouthShape.hole, sx, sy, MOUTH_SINK, 0, jaw, m.grin)
+      shapeLip(W, H, jaw, m.grin)
     }
     /** How far forward the oval's surface is at height y (in the mouth's own space). */
     const front = (y: number) => MOUTH_HOLE.z * MOUTH_SINK * Math.sqrt(Math.max(0, 1 - (y / H) ** 2))
@@ -1094,6 +1113,8 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         Object.assign(want, MOUTH_PARAMS.X)
         want.open = mouthOpen * (1 + 0.35 * mouthRound)
         want.width = ((1 - 0.42 * mouthRound) * (1 + 0.45 * (1 - mouthRound))) / 1.2
+        // A cheer is an open smile, not an O; a gasp stays round.
+        want.grin = Math.max(0, 1 - 1.6 * mouthRound)
       }
       // Shapes change within a frame or two: snappy like a drawn mouth, never a one-frame flicker.
       blendMouth(mouthNow, want, idle && !talkMouth ? 1 - Math.exp(-dt * 40) : 1)

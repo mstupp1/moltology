@@ -46,7 +46,12 @@ export const EYE_STRETCH: Record<Avatar3DLook['eyeShape'], [number, number]> = {
   round: [1.2, 1],
   wide: [1.36, 0.96],
   tall: [1.1, 1.12],
+  almond: [1.4, 0.76],
+  button: [0.84, 0.84],
 }
+
+/** Brow ridge size against the original soft brow: width, then height. */
+const BROW_SIZE = { soft: [1, 1], thick: [1.5, 1.55], thin: [0.55, 0.62], none: [0, 0] } as const
 
 /**
  * Looking straight ahead on the references is a relaxed side glance: both eyes a little toward
@@ -111,6 +116,8 @@ export interface FaceRig {
    * mouth faces, so the open mouth can follow it.
    */
   mouthBend: { x: number; up: number; down: number }
+  /** Cheek spots for the blush: where each sits (xyz) and its radius (w), in rest space. */
+  cheeks: [number, number, number, number][]
 }
 
 interface FaceLayout {
@@ -186,20 +193,29 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   const spread = (lo + hi) / 2
   const eyes: EyeSpot[] = []
 
+  const cheeks: FaceRig['cheeks'] = []
+  const browSize = BROW_SIZE[look.brows ?? 'soft']
+
   for (const { s, tag } of SIDES) {
     const theta = Math.PI / 2 - s * spread
     const surface = f.shell.point(sEye, theta)
     const normal = f.shell.normal(sEye, theta)
-    const centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.3)
     // Eyes face more forward than the shell does, so both read from the front.
     const facing = normal.clone().multiplyScalar(0.45).add(v(0, 0.06, 0.55)).normalize()
+    const centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.3)
+    // The cheek: on the face just under the eye and a touch toward the side.
+    {
+      const sc = f.shell.sAt(f.eyeY - f.eyeRadius * 1.35)
+      const cheek = f.shell.point(sc, theta - s * 0.14)
+      cheeks.push([cheek.x, cheek.y, cheek.z, f.eyeRadius * 0.85])
+    }
     const socket = rig.addBone(`eyeSocket${tag}`, f.bone, centre, { quaternion: lookQuaternion(facing) })
     socket.scale.copy(eyeScale)
     eyes.push({ centre, toEye: lookQuaternion(facing).invert(), wide, high, radius: f.eyeRadius })
     const pose: LidPose = tag === 'R' ? { ...expression, ...expression.right } : expression
 
     const eye = rig.addBone(`eye${tag}`, `eyeSocket${tag}`, centre, { quaternion: lookQuaternion(facing) })
-    rig.add(`eye${tag}`, 'eye', eyeball(f.eyeRadius))
+    rig.add(`eye${tag}`, tag === 'R' ? 'eyeR' : 'eye', eyeball(f.eyeRadius))
     eye.rotateY(deg(yaw + GAZE_REST.glance - s * GAZE_REST.converge)).rotateX(deg(pitch + GAZE_REST.drop))
     rig.rest.get(`eye${tag}`)!.quaternion.copy(eye.quaternion)
 
@@ -225,7 +241,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
     const browNormal = f.shell.normal(sBrow, theta)
     const browAt = browPoints[2].clone()
     const brow = rig.addBone(`brow${tag}`, f.bone, browAt, { quaternion: lookQuaternion(browNormal) })
-    rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.25, f.eyeRadius * 0.26))
+    if (browSize[0] > 0) rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.25 * browSize[0], f.eyeRadius * 0.26 * browSize[1]))
     brow.rotateZ(s * deg(pose.browTilt ?? 0))
     brow.position.y += pose.browLift ?? 0
     const rest = rig.rest.get(`brow${tag}`)!
@@ -234,7 +250,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   }
 
   const mouthBend = addMouth(rig, look.mouth, f, eyeClearance(eyes))
-  return { lidOpen, mouthBend }
+  return { lidOpen, mouthBend, cheeks }
 }
 
 /** Where an eye sits, for keeping the mouth clear of it. */

@@ -62,6 +62,15 @@ Common ending for every marking prompt:
 - **coral-lace**: A net of thin branching coral-like lines that join into irregular rounded cells, like lace coral or a sea fan. Lines vary from thin to medium; cells about 1/8 to 1/5 of the tile.
 - **tide-rings**: Clusters of concentric wavy rings, like agate bands or ripples on sand, 4 to 6 overlapping ring clusters, ring bands of uneven width.
 - **reef-camo**: Disruptive camouflage of organic rounded blotches with irregular edges, some blotches merging, some with small satellite spots, sizes from 1/20 to 1/6 of the tile.
+- Added 2026-11-24 (variant picked in brackets):
+  - **scales** [b]: Overlapping fish or reptile scales in even rows, each scale a rounded arch shape with a thin white outline and a softly filled centre, about 14 scales across the tile, slightly irregular sizes.
+  - **rosettes** [a]: Leopard or jaguar rosettes: broken rings of 3-5 irregular blobs around an empty centre, mixed with a few small solid spots, about 20 rosettes over the tile.
+  - **flames** [a]: Stylised flame licks rising upward, like hot-rod flame decals: long tapering tongues with curled tips, in loose interlocking rows, sizes from 1/10 to 1/4 of the tile.
+  - **honeycomb** [b]: Organic honeycomb: slightly irregular hexagonal cells with medium-thick white walls, cells about 1/12 of the tile, a few merged or squashed.
+  - **barnacles** [b]: Scattered barnacles seen from above: little volcano rings with a dark centre slit, in groups of 3-8 with some loners, 1/40 to 1/15 of the tile.
+  - **ripple** [a]: Wavy parallel stripes like ripples on sand: long flowing lines that bend, split and merge, width thin to medium, running roughly one direction.
+  - **constellation** [b]: Star chart: small dots of 3 sizes scattered evenly, some joined by thin straight lines into small constellations of 3-6 stars, a few tiny four-point sparkles. 10-15% white. Drawn in the light colour, like stardust.
+  - **marble** [a]: Marble veining: thin branching veins with a few thicker meandering main veins and faint crackle veins between, white veins on black. 15-25% white.
 - Avoid script or glyph patterns: tried 2026-11-21, they came out sparse and read as emoji (smileys, wifi arcs) on the shell.
 
 ### Gear materials (height maps)

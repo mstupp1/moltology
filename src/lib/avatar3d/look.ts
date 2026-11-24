@@ -15,6 +15,10 @@ export interface Avatar3DLook extends CharacterSpec {
   markingColor?: string
   /** Size of the marking, 0.5 (fine) to 1.8 (bold). */
   markingScale?: number
+  /** Palette id the shell fades to toward its tips. */
+  tipColor?: string
+  /** Rosy cheeks. */
+  blush?: boolean
 }
 
 /** The approved reference look for a species: coral shell, green eyes, easy smile. */
@@ -53,6 +57,8 @@ export function lookFromConfig(config: LobsterAvatarConfig): Avatar3DLook {
     finish: traits.shellFinish,
     marking: traits.marking,
     eyeColor: traits.eyeColor,
+    eyeColorRight: config.eyeColorRight && config.eyeColorRight !== traits.eyeColor ? config.eyeColorRight : undefined,
+    brows: config.brows && config.brows !== 'soft' ? config.brows : undefined,
     eyeShape: traits.eyeVariant,
     pupil: traits.pupilVariant,
     expression: traits.eyelidStyle,
@@ -73,12 +79,14 @@ export function lookFromConfig(config: LobsterAvatarConfig): Avatar3DLook {
     bellyColor: config.bellyColor,
     markingColor: config.markingColor,
     markingScale: config.markingScale,
+    tipColor: config.tipColor && config.tipColor !== traits.shellColor ? config.tipColor : undefined,
+    blush: config.blush || undefined,
   }
 }
 
 /** Fields that only change how a character moves, and fields that only change its paint. */
 const MOTION_KEYS = ['pose', 'temperament'] as const
-const PAINT_KEYS = ['palette', 'finish', 'marking', 'eyeColor', 'pupil', 'bellyColor', 'markingColor', 'markingScale'] as const
+const PAINT_KEYS = ['palette', 'finish', 'marking', 'eyeColor', 'eyeColorRight', 'pupil', 'bellyColor', 'markingColor', 'markingScale', 'tipColor', 'blush'] as const
 
 /** Everything that decides a character's shape and pose: two looks with the same key bake alike. */
 export function shapeKey(look: Avatar3DLook): string {
