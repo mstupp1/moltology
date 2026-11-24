@@ -39,13 +39,32 @@ export const SHELL_PALETTES: readonly ShellPalette[] = [
   { id: 'ghost', label: 'Ghost', highlight: '#ffffff', base: '#e6e2f4', shade: '#b4acd4', deep: '#4f4878', belly: '#ffffff', bellyShade: '#d8d3ec', marking: '#9d94cb', blush: '#ff9ab8', splitWith: 'obsidian' },
   { id: 'obsidian', label: 'Obsidian', highlight: '#7b8ea4', base: '#2f3948', shade: '#181f2a', deep: '#05070b', belly: '#a4b5c6', bellyShade: '#6f8195', marking: '#00e5ff', blush: '#ff6f91', splitWith: 'ghost' },
   { id: 'gold', label: 'Molten Gold', highlight: '#fff3bf', base: '#f2b632', shade: '#c47d12', deep: '#5c3604', belly: '#fff8de', bellyShade: '#eed18b', marking: '#8a5008', blush: '#ff7a5c', splitWith: 'obsidian' },
+  // Added 2026-11-24. Seeded characters never roll these (SEEDED_PALETTES), so no existing look changes.
+  { id: 'lobsterblue', label: 'Lobster blue', highlight: '#a9d6f2', base: '#3f7fae', shade: '#245079', deep: '#0c2238', belly: '#d9e9f3', bellyShade: '#9dbbd0', marking: '#173a5b', blush: '#ff8aa8', splitWith: 'tangerine' },
+  { id: 'midnight', label: 'Midnight', highlight: '#8fa2ff', base: '#2e3c96', shade: '#1b2466', deep: '#080c2e', belly: '#dfe4ff', bellyShade: '#a3acd9', marking: '#121a4a', blush: '#ff7aa8', splitWith: 'sunflower' },
+  { id: 'sky', label: 'Sky', highlight: '#eaf7ff', base: '#8ccdfa', shade: '#4f9ad3', deep: '#163e66', belly: '#f5fbff', bellyShade: '#c4ddef', marking: '#2f72aa', blush: '#ff8fb0', splitWith: 'peach' },
+  { id: 'mint', label: 'Mint', highlight: '#ecfff6', base: '#8ee3c0', shade: '#4cad8a', deep: '#154a3a', belly: '#f6fffb', bellyShade: '#c4ecdc', marking: '#2a876a', blush: '#ff8f9f', splitWith: 'lilac' },
+  { id: 'lime', label: 'Lime', highlight: '#f6ffb8', base: '#b6e22e', shade: '#7ca414', deep: '#2e4205', belly: '#fbffe6', bellyShade: '#dcec9f', marking: '#587808', blush: '#ff8a6a', splitWith: 'plum' },
+  { id: 'olive', label: 'Olive', highlight: '#cfcb92', base: '#76733f', shade: '#4d4b26', deep: '#1d1c0c', belly: '#efe6c8', bellyShade: '#c9ba8c', marking: '#34321a', blush: '#ff8a6a', splitWith: 'rust' },
+  { id: 'sand', label: 'Sand', highlight: '#fff4da', base: '#e2c38c', shade: '#b69159', deep: '#4f3a1c', belly: '#fffaf0', bellyShade: '#ecdcbc', marking: '#96703c', blush: '#ff8f80', splitWith: 'midnight' },
+  { id: 'peach', label: 'Peach', highlight: '#ffe8da', base: '#ffad86', shade: '#de7c56', deep: '#6b2e18', belly: '#fff6f0', bellyShade: '#f5cdb8', marking: '#c25e3a', blush: '#ff6f7a', splitWith: 'sky' },
+  { id: 'rust', label: 'Rust', highlight: '#f2ab7c', base: '#b4531e', shade: '#823612', deep: '#3a1405', belly: '#f8dcc4', bellyShade: '#d9a888', marking: '#5e220a', blush: '#ff6a5a', splitWith: 'olive' },
+  { id: 'plum', label: 'Plum', highlight: '#e6a0c8', base: '#8c2c6c', shade: '#5e1748', deep: '#2a051f', belly: '#f6dcec', bellyShade: '#d4a3c2', marking: '#400d31', blush: '#ff7ab8', splitWith: 'lime' },
+  { id: 'lilac', label: 'Lilac', highlight: '#f7efff', base: '#c6adf3', shade: '#9177cf', deep: '#3a2766', belly: '#fdf8ff', bellyShade: '#e0d3f2', marking: '#7658b4', blush: '#ff8fc4', splitWith: 'mint' },
+  { id: 'rosegold', label: 'Rose gold', highlight: '#ffe4da', base: '#e6a193', shade: '#bb7062', deep: '#5c2e26', belly: '#fff4f0', bellyShade: '#efcfc6', marking: '#985346', blush: '#ff7a8a', splitWith: 'midnight' },
+  { id: 'albino', label: 'Albino', highlight: '#ffffff', base: '#f6e9e3', shade: '#d9b7ae', deep: '#7a5a54', belly: '#ffffff', bellyShade: '#ece0dc', marking: '#e09c9c', blush: '#ff94a6', splitWith: 'obsidian' },
 ] as const
+
+/** Seeded (never customised) characters roll from the original twelve, so adding colours never changes an existing member's look. */
+export const SEEDED_PALETTES = SHELL_PALETTES.slice(0, 12)
 
 export const SHELL_PALETTE_MAP: Readonly<Record<string, ShellPalette>> = Object.fromEntries(
   SHELL_PALETTES.map((p) => [p.id, p])
 )
 
-export const SHELL_FINISHES = ['glossy', 'satin', 'pearl', 'chrome', 'glow'] as const
+export const SHELL_FINISHES = ['glossy', 'satin', 'pearl', 'chrome', 'glow', 'matte', 'velvet', 'beetle', 'crystal'] as const
+/** Seeded characters roll from the original five, so adding finishes never changes an existing member's look. */
+export const SEEDED_FINISHES = SHELL_FINISHES.slice(0, 5)
 export type ShellFinish = (typeof SHELL_FINISHES)[number]
 export const SHELL_FINISH_LABELS: Readonly<Record<ShellFinish, string>> = {
   glossy: 'Glossy',
@@ -53,9 +72,13 @@ export const SHELL_FINISH_LABELS: Readonly<Record<ShellFinish, string>> = {
   pearl: 'Pearlescent',
   chrome: 'Chrome',
   glow: 'Bioluminescent',
+  matte: 'Matte',
+  velvet: 'Velvet',
+  beetle: 'Beetle sheen',
+  crystal: 'Crystal',
 }
 
-export const SHELL_MARKINGS = ['none', 'spots', 'freckles', 'bands', 'tiger', 'stardust', 'calico', 'split', 'circuit', 'lace', 'tide', 'camo'] as const
+export const SHELL_MARKINGS = ['none', 'spots', 'freckles', 'bands', 'tiger', 'stardust', 'calico', 'split', 'circuit', 'lace', 'tide', 'camo', 'scales', 'rosettes', 'flames', 'honeycomb', 'barnacles', 'ripple', 'constellation', 'marble'] as const
 /** Seeded (never customised) characters roll from the original set, so adding markings never changes an existing member's look. */
 export const SEEDED_MARKINGS = SHELL_MARKINGS.slice(0, 9)
 export type ShellMarking = (typeof SHELL_MARKINGS)[number]
@@ -72,6 +95,14 @@ export const SHELL_MARKING_LABELS: Readonly<Record<ShellMarking, string>> = {
   lace: 'Coral lace',
   tide: 'Tide rings',
   camo: 'Reef camo',
+  scales: 'Scales',
+  rosettes: 'Rosettes',
+  flames: 'Flames',
+  honeycomb: 'Honeycomb',
+  barnacles: 'Barnacles',
+  ripple: 'Ripples',
+  constellation: 'Constellation',
+  marble: 'Marble',
 }
 
 export const AVATAR_MOUTHS = ['grin', 'smile', 'beam', 'smirk', 'tongue', 'fang', 'oh', 'frown', 'wobble'] as const
@@ -153,6 +184,16 @@ export const AVATAR_ACCESSORY_LABELS: Readonly<Record<AvatarAccessory, string>> 
   halo: 'Halo',
   bow: 'Bow',
   beanie: 'Beanie',
+}
+
+/** Brow ridge over each eye. Unset keeps the original soft brow. */
+export const AVATAR_BROWS = ['soft', 'thick', 'thin', 'none'] as const
+export type AvatarBrows = (typeof AVATAR_BROWS)[number]
+export const AVATAR_BROW_LABELS: Readonly<Record<AvatarBrows, string>> = {
+  soft: 'Soft',
+  thick: 'Bushy',
+  thin: 'Thin',
+  none: 'None',
 }
 
 /** Head silhouette. For crabs this is the shell, so the labels change with the race. */

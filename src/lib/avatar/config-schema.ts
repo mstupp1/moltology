@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   AVATAR_ACCESSORIES,
   AVATAR_ANTENNAE,
+  AVATAR_BROWS,
   AVATAR_BUILDS,
   AVATAR_CLAWS,
   AVATAR_HEAD_SHAPES,
@@ -14,6 +15,7 @@ import {
   SHELL_MARKINGS,
   SHELL_PALETTES,
 } from './traits'
+import { AVATAR_EYE_COLORS } from './parts'
 
 const shellColorIds = SHELL_PALETTES.map((p) => p.id) as [string, ...string[]]
 
@@ -38,6 +40,10 @@ export const avatarConfigShape = {
   bellyColor: z.enum(shellColorIds).optional(),
   markingColor: z.enum(shellColorIds).optional(),
   markingScale: z.number().min(0.5).max(1.8).optional(),
+  tipColor: z.enum(shellColorIds).optional(),
+  eyeColorRight: z.enum(AVATAR_EYE_COLORS).optional(),
+  brows: z.enum(AVATAR_BROWS).optional(),
+  blush: z.boolean().optional(),
   backgroundTheme: z.string().max(64).optional(),
   backgroundPattern: z.string().max(64).optional(),
   backgroundTexture: z.string().max(64).optional(),
@@ -46,8 +52,8 @@ export const avatarConfigShape = {
   patternPulse: z.enum(['pulse', 'steady']).optional(),
   patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
   eyelidStyle: z.enum(['open', 'relaxed', 'cheerful_squint', 'focused', 'chill', 'angry', 'worried', 'sad', 'smug', 'shocked', 'wink']).optional(),
-  eyeColor: z.enum(['amber', 'sapphire', 'emerald', 'amethyst', 'ruby', 'topaz']).optional(),
-  eyeVariant: z.enum(['round', 'wide', 'tall']).optional(),
+  eyeColor: z.enum(AVATAR_EYE_COLORS).optional(),
+  eyeVariant: z.enum(['round', 'wide', 'tall', 'almond', 'button', 'stalk']).optional(),
   pupilVariant: z.enum(['standard', 'big', 'sparkle', 'keen']).optional(),
   gaze: z.enum(['ahead', 'left', 'right', 'up', 'down']).optional(),
   backgroundMotion: z.enum(['drift_diagonal', 'drift_horizontal', 'radar_sweep', 'wave_undulate', 'pulse_breathe', 'static']).optional(),

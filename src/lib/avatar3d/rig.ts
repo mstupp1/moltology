@@ -12,7 +12,7 @@ import type { Loft } from './loft'
 import { merge, type ClawStyle } from './parts'
 
 /** `fin` is shell that is thin enough for light to come through: antennae, the tail fan, swimmerets. */
-export type MaterialSlot = 'shell' | 'fin' | 'belly' | 'eye' | 'mouth' | 'brow' | 'teeth' | 'tongue' | 'glow'
+export type MaterialSlot = 'shell' | 'fin' | 'belly' | 'eye' | 'eyeR' | 'mouth' | 'brow' | 'teeth' | 'tongue' | 'glow'
 
 export interface BoneOptions {
   /** Point the bone's -Y toward this position. */
@@ -238,7 +238,7 @@ export class Rig {
       const mesh = new SkinnedMesh(merge(geos), materials[slot])
       mesh.name = `skin:${slot}`
       mesh.castShadow = true
-      mesh.receiveShadow = slot !== 'eye' && slot !== 'glow'
+      mesh.receiveShadow = slot !== 'eye' && slot !== 'eyeR' && slot !== 'glow'
       // It moves with its bones, so its resting bounds say little about where it is.
       mesh.frustumCulled = false
       this.root.add(mesh)
@@ -273,7 +273,7 @@ export class Rig {
       const mesh = new Mesh(merge(geos), materials[slot])
       mesh.name = `${bone}:${slot}`
       mesh.castShadow = true
-      mesh.receiveShadow = slot !== 'eye' && slot !== 'glow'
+      mesh.receiveShadow = slot !== 'eye' && slot !== 'eyeR' && slot !== 'glow'
       this.bone(bone).add(mesh)
       this.meshes.push(mesh)
     }

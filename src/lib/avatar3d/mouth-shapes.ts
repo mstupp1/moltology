@@ -35,19 +35,21 @@ export interface MouthParams {
   press: number
   /** 1 while speaking a shape: speech mouths are drawn a size up from a reaction's. */
   speech: number
+  /** 0 an oval, 1 an open smile: a flatter top edge and both edges curving up at the corners. */
+  grin: number
 }
 
 export const MOUTH_PARAMS: Record<MouthShape, MouthParams> = {
-  X: { open: 0, width: 1, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0 },
+  X: { open: 0, width: 1, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0, grin: 0 },
   // Pressed lips are a thin dark line, not the resting smile: a mid-word close must not read as a grin.
-  A: { open: 0.075, width: 0.82, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 1, speech: 0 },
-  B: { open: 0.3, width: 1.08, teethUp: 1, teethLo: 1, bite: 0, tongueUp: 0, press: 0, speech: 0 },
-  C: { open: 0.58, width: 1.02, teethUp: 0.9, teethLo: 0.35, bite: 0, tongueUp: 0, press: 0, speech: 0 },
-  D: { open: 1, width: 1.06, teethUp: 0.75, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0 },
-  E: { open: 0.66, width: 0.66, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0 },
-  F: { open: 0.38, width: 0.42, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0 },
-  G: { open: 0.34, width: 0.98, teethUp: 1, teethLo: 0, bite: 1, tongueUp: 0, press: 0, speech: 0 },
-  H: { open: 0.72, width: 0.98, teethUp: 0.7, teethLo: 0, bite: 0, tongueUp: 1, press: 0, speech: 0 },
+  A: { open: 0.075, width: 0.82, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 1, speech: 0, grin: 0 },
+  B: { open: 0.3, width: 1.08, teethUp: 1, teethLo: 1, bite: 0, tongueUp: 0, press: 0, speech: 0, grin: 0 },
+  C: { open: 0.58, width: 1.02, teethUp: 0.9, teethLo: 0.35, bite: 0, tongueUp: 0, press: 0, speech: 0, grin: 0 },
+  D: { open: 1, width: 1.06, teethUp: 0.75, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0, grin: 0 },
+  E: { open: 0.66, width: 0.66, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0, grin: 0 },
+  F: { open: 0.38, width: 0.42, teethUp: 0, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 0, grin: 0 },
+  G: { open: 0.34, width: 0.98, teethUp: 1, teethLo: 0, bite: 1, tongueUp: 0, press: 0, speech: 0, grin: 0 },
+  H: { open: 0.72, width: 0.98, teethUp: 0.7, teethLo: 0, bite: 0, tongueUp: 1, press: 0, speech: 0, grin: 0 },
 }
 
 const KEYS = Object.keys(MOUTH_PARAMS.X) as (keyof MouthParams)[]
@@ -66,7 +68,7 @@ export function blendMouth(now: MouthParams, target: MouthParams, k: number): Mo
 export const isMouthShape = (value: unknown): value is MouthShape => typeof value === 'string' && (MOUTH_SHAPES as readonly string[]).includes(value)
 
 /** Between words in a phrase the mouth relaxes slightly open rather than snapping shut. */
-export const MOUTH_RELAXED: MouthParams = { open: 0.14, width: 0.98, teethUp: 0.35, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 1 }
+export const MOUTH_RELAXED: MouthParams = { open: 0.14, width: 0.98, teethUp: 0.35, teethLo: 0, bite: 0, tongueUp: 0, press: 0, speech: 1, grin: 0 }
 
 const mix = (a: MouthParams, b: MouthParams, k: number) => blendMouth({ ...a }, b, k)
 /** How different two mouths look: mostly how open, then how wide. */
@@ -117,7 +119,7 @@ export function speechMouthTrack(letters: string, options: { fps: number; size?:
       return
     }
     for (let f = run.from; f < run.to; f++) {
-      const want = { ...MOUTH_PARAMS[run.shape], speech: 1 }
+      const want = { ...MOUTH_PARAMS[run.shape], speech: 1, grin: 0 }
       const s = size?.[f] ?? 0.5
       // Pressed lips stay one thin line whatever the stress.
       if (run.shape !== 'A') want.open = Math.min(1.3, want.open * (0.62 + 0.76 * s))

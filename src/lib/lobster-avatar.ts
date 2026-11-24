@@ -37,10 +37,11 @@ import {
 import type { EquippedAppearance } from './character-appearance'
 import { getEquipmentVisual } from './avatar/equipment'
 import { EQUIP_SLOT_IDS, EQUIPMENT_RARITIES, equipSlotCategory } from './chassis-loadout'
-import { AVATAR_EYE_COLORS } from './avatar/parts'
+import { AVATAR_EYE_COLORS, SEEDED_EYE_COLORS } from './avatar/parts'
 import {
   AVATAR_ACCESSORIES,
   AVATAR_ANTENNAE,
+  AVATAR_BROWS,
   AVATAR_BUILDS,
   AVATAR_HEAD_SHAPES,
   AVATAR_CLAWS,
@@ -50,9 +51,11 @@ import {
   AVATAR_RACES,
   AVATAR_TEMPERAMENTS,
   SHELL_FINISHES,
+  SEEDED_FINISHES,
   SHELL_MARKINGS,
   SEEDED_MARKINGS,
   SHELL_PALETTES,
+  SEEDED_PALETTES,
   SHELL_PALETTE_MAP,
   isOneOf,
   pickFrom,
@@ -60,6 +63,7 @@ import {
   type AvatarAccessory,
   type AvatarTemperament,
   type AvatarAntennae,
+  type AvatarBrows,
   type AvatarBuild,
   type AvatarClaws,
   type AvatarHeadShape,
@@ -105,6 +109,12 @@ export const LOBSTER_EYE_COLOR_LABELS: Readonly<Record<LobsterEyeColor, string>>
   amethyst: 'Amethyst',
   ruby: 'Ruby',
   topaz: 'Topaz',
+  hazel: 'Hazel',
+  teal: 'Teal',
+  rose: 'Rose',
+  ice: 'Ice',
+  onyx: 'Onyx',
+  lime: 'Lime',
 }
 
 /** Where the pupils point. Unset keeps the original slight inward look. */
@@ -118,13 +128,18 @@ export const LOBSTER_GAZE_LABELS: Readonly<Record<LobsterGaze, string>> = {
   down: 'Down',
 }
 
-export const LOBSTER_EYE_VARIANTS = ['round', 'wide', 'tall'] as const
+export const LOBSTER_EYE_VARIANTS = ['round', 'wide', 'tall', 'almond', 'button', 'stalk'] as const
+/** Seeded characters roll from the original three shapes, so new ones never change an existing member's look. */
+const SEEDED_EYE_VARIANTS = LOBSTER_EYE_VARIANTS.slice(0, 3)
 export type LobsterEyeVariant = (typeof LOBSTER_EYE_VARIANTS)[number]
 
 export const LOBSTER_EYE_VARIANT_LABELS: Readonly<Record<LobsterEyeVariant, string>> = {
   round: 'Round',
   wide: 'Wide',
   tall: 'Tall',
+  almond: 'Sleepy',
+  button: 'Button',
+  stalk: 'Stalks',
 }
 
 export const LOBSTER_PUPIL_VARIANTS = ['standard', 'big', 'sparkle', 'keen'] as const
@@ -204,6 +219,14 @@ export interface LobsterAvatarConfig {
   /** Palette ids for a belly or pattern in another colour than the shell's own. */
   bellyColor?: string
   markingColor?: string
+  /** Palette id the shell fades to toward its tips (claws, legs, feelers, tail). Unset, no fade. */
+  tipColor?: string
+  /** A different colour for the right eye. Unset, both eyes match. */
+  eyeColorRight?: LobsterEyeColor
+  /** Brow ridge style. Unset keeps the original soft brow. */
+  brows?: AvatarBrows
+  /** Rosy cheeks under the eyes. */
+  blush?: boolean
   /** Pattern size, 0.5 (fine) to 1.8 (bold). */
   markingScale?: number
   backgroundTheme?: string
@@ -323,6 +346,10 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (isOneOf(AVATAR_TEMPERAMENTS, lower(obj.temperament))) config.temperament = lower(obj.temperament) as AvatarTemperament
   if (typeof obj.bellyColor === 'string' && SHELL_PALETTE_MAP[obj.bellyColor.trim()]) config.bellyColor = obj.bellyColor.trim()
   if (typeof obj.markingColor === 'string' && SHELL_PALETTE_MAP[obj.markingColor.trim()]) config.markingColor = obj.markingColor.trim()
+  if (typeof obj.tipColor === 'string' && SHELL_PALETTE_MAP[obj.tipColor.trim()]) config.tipColor = obj.tipColor.trim()
+  if (isOneOf(LOBSTER_EYE_COLORS, lower(obj.eyeColorRight))) config.eyeColorRight = lower(obj.eyeColorRight) as LobsterEyeColor
+  if (isOneOf(AVATAR_BROWS, lower(obj.brows))) config.brows = lower(obj.brows) as AvatarBrows
+  if (typeof obj.blush === 'boolean') config.blush = obj.blush
   if (typeof obj.markingScale === 'number' && Number.isFinite(obj.markingScale)) {
     config.markingScale = Math.min(1.8, Math.max(0.5, Number(obj.markingScale.toFixed(2))))
   }
@@ -453,8 +480,8 @@ export function getLobsterAvatarSeededOptions(seed: string): SeededAvatarOptions
     pulse: LOBSTER_PATTERN_PULSES[Math.abs(hash9) % LOBSTER_PATTERN_PULSES.length],
     sparkles: LOBSTER_PATTERN_SPARKLES[Math.abs(hash10) % LOBSTER_PATTERN_SPARKLES.length],
     eyelidStyle: SEEDED_EYELID_STYLES[Math.abs(hash7 ^ hash8) % SEEDED_EYELID_STYLES.length],
-    eyeColor: LOBSTER_EYE_COLORS[Math.abs(hash12) % LOBSTER_EYE_COLORS.length],
-    eyeVariant: LOBSTER_EYE_VARIANTS[Math.abs(hash3 ^ hash11) % LOBSTER_EYE_VARIANTS.length],
+    eyeColor: SEEDED_EYE_COLORS[Math.abs(hash12) % SEEDED_EYE_COLORS.length],
+    eyeVariant: SEEDED_EYE_VARIANTS[Math.abs(hash3 ^ hash11) % SEEDED_EYE_VARIANTS.length],
     pupilVariant: LOBSTER_PUPIL_VARIANTS[Math.abs(hash4 ^ hash12) % LOBSTER_PUPIL_VARIANTS.length],
     height: LOBSTER_HEIGHTS[Math.abs(hash11) % LOBSTER_HEIGHTS.length],
     motion: {
@@ -464,9 +491,9 @@ export function getLobsterAvatarSeededOptions(seed: string): SeededAvatarOptions
     },
     pose: LEGACY_POSES[Math.abs(hash1) % LEGACY_POSES.length],
     antennae: LEGACY_ANTENNAE[Math.abs(hash2) % LEGACY_ANTENNAE.length],
-    shellColor: pickFrom(rng, SHELL_PALETTES).id,
+    shellColor: pickFrom(rng, SEEDED_PALETTES).id,
     legacyShellColor: pickFrom(seededRandom(`${seed}:legacy-shell`), LEGACY_SHELL_COLORS),
-    shellFinish: pickFrom(rng, SHELL_FINISHES),
+    shellFinish: pickFrom(rng, SEEDED_FINISHES),
     marking: rng() < 0.3 ? 'none' : pickFrom(rng, SEEDED_MARKINGS),
     mouth: pickFrom(rng, SEEDED_MOUTHS),
     claws: pickFrom(rng, AVATAR_CLAWS),
@@ -604,11 +631,22 @@ export function rerollAvatarConfig(config: Pick<LobsterAvatarConfig, 'race'>): L
   const seed = randomLobsterSeed()
   const rng = seededRandom(`${seed}:shape`)
   // New looks roll a shape too; unset shapes stay on the original body for saved members.
-  return {
+  const out: LobsterAvatarConfig = {
     style: LOBSTER_AVATAR_STYLE,
     seed,
     race: config.race ?? 'lobster',
     headShape: pickFrom(rng, AVATAR_HEAD_SHAPES),
     build: pickFrom(rng, AVATAR_BUILDS),
   }
+  // The seed alone only rolls the original colours and shapes (so saved looks never change), so a
+  // fresh roll pins its paint and eyes from every option, new ones included.
+  const paint = seededRandom(`${seed}:paint`)
+  out.shellColor = pickFrom(paint, SHELL_PALETTES).id
+  out.shellFinish = pickFrom(paint, SHELL_FINISHES)
+  out.marking = paint() < 0.3 ? 'none' : pickFrom(paint, SHELL_MARKINGS)
+  out.eyeColor = pickFrom(paint, LOBSTER_EYE_COLORS)
+  out.eyeVariant = pickFrom(paint, LOBSTER_EYE_VARIANTS)
+  if (paint() < 0.15) out.tipColor = pickFrom(paint, SHELL_PALETTES.filter((p) => p.id !== out.shellColor)).id
+  if (paint() < 0.2) out.blush = true
+  return out
 }

@@ -46,7 +46,17 @@ export const EYE_STRETCH: Record<Avatar3DLook['eyeShape'], [number, number]> = {
   round: [1.2, 1],
   wide: [1.36, 0.96],
   tall: [1.1, 1.12],
+  almond: [1.4, 0.76],
+  button: [0.84, 0.84],
+  // Stalk eyes keep the round eye; they stand out on stalks instead (addFace).
+  stalk: [1.08, 1.04],
 }
+
+/** How far stalk eyes stand off the face, in eye radii, and how much they lean up. */
+const STALK = { reach: 1.5, rise: 1.3 }
+
+/** Brow ridge size against the original soft brow: width, then height. */
+const BROW_SIZE = { soft: [1, 1], thick: [1.5, 1.55], thin: [0.55, 0.62], none: [0, 0] } as const
 
 /**
  * Looking straight ahead on the references is a relaxed side glance: both eyes a little toward
@@ -111,6 +121,8 @@ export interface FaceRig {
    * mouth faces, so the open mouth can follow it.
    */
   mouthBend: { x: number; up: number; down: number }
+  /** Cheek spots for the blush: where each sits (xyz) and its radius (w), in rest space. */
+  cheeks: [number, number, number, number][]
 }
 
 interface FaceLayout {
@@ -186,20 +198,38 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   const spread = (lo + hi) / 2
   const eyes: EyeSpot[] = []
 
+  const cheeks: FaceRig['cheeks'] = []
+  const stalks = look.eyeShape === 'stalk'
+  const browSize = BROW_SIZE[look.brows ?? 'soft']
+
   for (const { s, tag } of SIDES) {
     const theta = Math.PI / 2 - s * spread
     const surface = f.shell.point(sEye, theta)
     const normal = f.shell.normal(sEye, theta)
-    const centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.3)
     // Eyes face more forward than the shell does, so both read from the front.
     const facing = normal.clone().multiplyScalar(0.45).add(v(0, 0.06, 0.55)).normalize()
+    let centre = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.3)
+    if (stalks) {
+      // Out on short stalks, leaning up and a little apart, like a crab's.
+      const out = normal.clone().add(v(0.04 * s, STALK.rise, 0.15)).normalize()
+      centre = surface.clone().addScaledVector(out, f.eyeRadius * STALK.reach)
+      const root = surface.clone().addScaledVector(normal, -f.eyeRadius * 0.25)
+      const mid = surface.clone().addScaledVector(out, f.eyeRadius * STALK.reach * 0.5)
+      rig.addWorld(f.bone, 'shell', withAo(taperedTube([root, mid, centre], f.eyeRadius * 0.46, f.eyeRadius * 0.36, 12), 0.9))
+    }
+    // The cheek: on the face just under the eye and a touch toward the side.
+    {
+      const sc = f.shell.sAt(f.eyeY - f.eyeRadius * 1.35)
+      const cheek = f.shell.point(sc, theta - s * 0.14)
+      cheeks.push([cheek.x, cheek.y, cheek.z, f.eyeRadius * 0.85])
+    }
     const socket = rig.addBone(`eyeSocket${tag}`, f.bone, centre, { quaternion: lookQuaternion(facing) })
     socket.scale.copy(eyeScale)
     eyes.push({ centre, toEye: lookQuaternion(facing).invert(), wide, high, radius: f.eyeRadius })
     const pose: LidPose = tag === 'R' ? { ...expression, ...expression.right } : expression
 
     const eye = rig.addBone(`eye${tag}`, `eyeSocket${tag}`, centre, { quaternion: lookQuaternion(facing) })
-    rig.add(`eye${tag}`, 'eye', eyeball(f.eyeRadius))
+    rig.add(`eye${tag}`, tag === 'R' ? 'eyeR' : 'eye', eyeball(f.eyeRadius))
     eye.rotateY(deg(yaw + GAZE_REST.glance - s * GAZE_REST.converge)).rotateX(deg(pitch + GAZE_REST.drop))
     rig.rest.get(`eye${tag}`)!.quaternion.copy(eye.quaternion)
 
@@ -216,16 +246,27 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
 
     // Brow: a soft ridge arching over the eye, on its own bone so expressions can tilt and lift it.
     const sBrow = f.shell.sAt(f.browY)
-    const browPoints = [-1, -0.5, 0, 0.5, 1].map((a) => {
+    let browPoints = [-1, -0.5, 0, 0.5, 1].map((a) => {
       const along = theta - s * (a * f.browSpan + f.browSpan * 0.18)
       const drop = a * a * f.eyeRadius * f.browArch
       const sp = f.shell.sAt(f.browY - drop)
       return f.shell.point(sp, along).addScaledVector(f.shell.normal(sp, along), 0.008)
     })
-    const browNormal = f.shell.normal(sBrow, theta)
+    let browNormal = f.shell.normal(sBrow, theta)
+    if (stalks) {
+      // On stalks the brow rides over the eye itself, arched round its top.
+      const side = v(1, 0, 0).applyQuaternion(lookQuaternion(facing))
+      const up = v(0, 1, 0).applyQuaternion(lookQuaternion(facing))
+      browPoints = [-1, -0.5, 0, 0.5, 1].map((a) => {
+        const ang = a * 0.95
+        const r = f.eyeRadius * (EYE_STRETCH.stalk[1] * 1.1 + 0.04)
+        return centre.clone().addScaledVector(up, Math.cos(ang) * r).addScaledVector(side, Math.sin(ang) * r * EYE_STRETCH.stalk[0] * s).addScaledVector(facing, f.eyeRadius * 0.35)
+      })
+      browNormal = facing.clone().add(up.clone().multiplyScalar(0.6)).normalize()
+    }
     const browAt = browPoints[2].clone()
     const brow = rig.addBone(`brow${tag}`, f.bone, browAt, { quaternion: lookQuaternion(browNormal) })
-    rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.25, f.eyeRadius * 0.26))
+    if (browSize[0] > 0) rig.addWorld(`brow${tag}`, 'brow', ridge(browPoints, browNormal, f.eyeRadius * 0.25 * browSize[0], f.eyeRadius * 0.26 * browSize[1]))
     brow.rotateZ(s * deg(pose.browTilt ?? 0))
     brow.position.y += pose.browLift ?? 0
     const rest = rig.rest.get(`brow${tag}`)!
@@ -234,7 +275,7 @@ function addFace(rig: Rig, look: Avatar3DLook, f: FaceLayout): FaceRig {
   }
 
   const mouthBend = addMouth(rig, look.mouth, f, eyeClearance(eyes))
-  return { lidOpen, mouthBend }
+  return { lidOpen, mouthBend, cheeks }
 }
 
 /** Where an eye sits, for keeping the mouth clear of it. */

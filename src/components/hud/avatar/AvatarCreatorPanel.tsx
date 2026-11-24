@@ -3,6 +3,8 @@ import { Dices } from 'lucide-react'
 import {
   AVATAR_ANTENNAE,
   AVATAR_ANTENNAE_LABELS,
+  AVATAR_BROWS,
+  AVATAR_BROW_LABELS,
   AVATAR_BUILDS,
   AVATAR_BUILD_LABELS,
   AVATAR_EXPRESSION_LABELS,
@@ -306,7 +308,7 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
   }
 
   /** Settings that are not seeded traits: sizes, temperament and the extra colours. */
-  const setField = <K extends 'armScale' | 'headScale' | 'temperament' | 'bellyColor' | 'markingColor' | 'markingScale'>(key: K, next: LobsterAvatarConfig[K]) => {
+  const setField = <K extends 'armScale' | 'headScale' | 'temperament' | 'bellyColor' | 'markingColor' | 'markingScale' | 'tipColor' | 'eyeColorRight' | 'brows' | 'blush'>(key: K, next: LobsterAvatarConfig[K]) => {
     onChange({ ...value, ...traits, [key]: next })
   }
   const temperament = resolveTemperament(value)
@@ -496,6 +498,25 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 />
               ))}
             </OptionGroup>
+            <OptionGroup label="Tip color">
+              <Swatch
+                label="No fade"
+                selected={!value.tipColor || value.tipColor === palette.id}
+                disabled={disabled}
+                onClick={() => setField('tipColor', undefined)}
+                background={`radial-gradient(circle at 35% 30%, ${palette.highlight} 0%, ${palette.base} 48%, ${palette.shade} 100%)`}
+              />
+              {SHELL_PALETTES.filter((p) => p.id !== palette.id).map((p) => (
+                <Swatch
+                  key={p.id}
+                  label={p.label}
+                  selected={value.tipColor === p.id}
+                  disabled={disabled}
+                  onClick={() => setField('tipColor', p.id)}
+                  background={`linear-gradient(135deg, ${palette.base} 0 35%, ${p.base} 75% 100%)`}
+                />
+              ))}
+            </OptionGroup>
             <OptionGroup label="Finish" tiles>
               {SHELL_FINISHES.map((f) => (
                 <Tile
@@ -583,6 +604,31 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                 )
               })}
             </OptionGroup>
+            <OptionGroup label="Right eye">
+              <Swatch
+                label="Match the left"
+                selected={!value.eyeColorRight || value.eyeColorRight === traits.eyeColor}
+                disabled={disabled}
+                onClick={() => setField('eyeColorRight', undefined)}
+                background={(() => {
+                  const s = EYE_COLOR_SWATCH[traits.eyeColor]
+                  return `radial-gradient(circle at 50% 60%, #07070c 0 22%, ${s.inner} 26%, ${s.mid} 55%, ${s.outer} 82%, ${s.ring} 100%)`
+                })()}
+              />
+              {LOBSTER_EYE_COLORS.filter((c) => c !== traits.eyeColor).map((c) => {
+                const s = EYE_COLOR_SWATCH[c]
+                return (
+                  <Swatch
+                    key={c}
+                    label={LOBSTER_EYE_COLOR_LABELS[c]}
+                    selected={value.eyeColorRight === c}
+                    disabled={disabled}
+                    onClick={() => setField('eyeColorRight', c)}
+                    background={`radial-gradient(circle at 50% 60%, #07070c 0 22%, ${s.inner} 26%, ${s.mid} 55%, ${s.outer} 82%, ${s.ring} 100%)`}
+                  />
+                )
+              })}
+            </OptionGroup>
             <OptionGroup label="Expression" tiles>
               {LOBSTER_EYELID_STYLES.map((e) => (
                 <Tile
@@ -619,6 +665,32 @@ export const AvatarCreatorPanel: React.FC<AvatarCreatorPanelProps> = ({
                   selected={traits.eyeVariant === v}
                   disabled={disabled}
                   onClick={() => set('eyeVariant', v)}
+                />
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Brows" tiles>
+              {AVATAR_BROWS.map((b) => (
+                <Tile
+                  key={b}
+                  label={AVATAR_BROW_LABELS[b]}
+                  src={tile({ brows: b }, 'portrait')}
+                  zoom
+                  selected={(value.brows ?? 'soft') === b}
+                  disabled={disabled}
+                  onClick={() => setField('brows', b === 'soft' ? undefined : b)}
+                />
+              ))}
+            </OptionGroup>
+            <OptionGroup label="Cheeks" tiles>
+              {([false, true] as const).map((on) => (
+                <Tile
+                  key={String(on)}
+                  label={on ? 'Rosy' : 'Plain'}
+                  src={tile({ blush: on || undefined }, 'portrait')}
+                  zoom
+                  selected={Boolean(value.blush) === on}
+                  disabled={disabled}
+                  onClick={() => setField('blush', on || undefined)}
                 />
               ))}
             </OptionGroup>

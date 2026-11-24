@@ -18,7 +18,7 @@ import type { ShellMarking } from '../avatar/traits'
 import { getAssetUrl } from '../assets'
 
 /** Markings drawn from an image mask instead of in the shader. */
-export const TEXTURE_MARKINGS = ['lace', 'tide', 'camo'] as const satisfies readonly ShellMarking[]
+export const TEXTURE_MARKINGS = ['lace', 'tide', 'camo', 'scales', 'rosettes', 'flames', 'honeycomb', 'barnacles', 'ripple', 'constellation', 'marble'] as const satisfies readonly ShellMarking[]
 export type TextureMarking = (typeof TEXTURE_MARKINGS)[number]
 
 /** Gear surfaces with their own height tile (gear-<surface>.webp). */
