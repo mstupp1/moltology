@@ -9,6 +9,7 @@ import {
   Scroll,
   Shell,
   MessagesSquare,
+  Gamepad2,
   LifeBuoy,
   Sparkles,
   ChevronRight,
@@ -47,7 +48,7 @@ import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
  * The Oracle is not a page tab: it sits in the middle of the bar as the synaptic core.
  */
 const MOBILE_TAB_IDS = ['hub', 'character', 'forum']
-const MOBILE_MORE_IDS = ['codex', 'academy']
+const MOBILE_MORE_IDS = ['codex', 'academy', 'arcade']
 
 const GUEST_LOCKED_PATHS = new Set(['/member', '/profile'])
 
@@ -245,6 +246,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         { id: 'codex', label: 'Codex', shortLabel: 'Codex', icon: Scroll, path: '/codex' },
         { id: 'academy', label: 'Academy', shortLabel: 'Academy', icon: BookOpen, path: '/academy' },
         { id: 'forum', label: 'Forum', shortLabel: 'Forum', icon: MessagesSquare, path: '/forum' },
+        { id: 'arcade', label: 'Arcade', shortLabel: 'Arcade', icon: Gamepad2, path: '/arcade' },
       ],
     },
   ]

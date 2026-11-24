@@ -53,6 +53,7 @@ describe('command catalog', () => {
       'nav-lectures',
       'nav-pipeline',
       'nav-forum',
+      'nav-arcade',
       'nav-friends',
       'nav-premium',
       'nav-news',

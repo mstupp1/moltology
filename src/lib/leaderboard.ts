@@ -13,8 +13,11 @@ export type CrestRank = 1 | 2 | 3
 /** Rows shown on the full page and in the forum rail card. */
 export const LEADERBOARD_PAGE_SIZE = 25
 export const LEADERBOARD_RAIL_SIZE = 5
-/** One-off ledger rows that would swamp a single week. They still count toward all time. */
-export const LEADERBOARD_EXCLUDED_SOURCES = ['legacy_stage_migration'] as const
+/**
+ * Ledger rows left out of the weekly ranking: one-off rows that would swamp a single week, and
+ * arcade play (it has its own boards). They still count toward all time.
+ */
+export const LEADERBOARD_EXCLUDED_SOURCES = ['legacy_stage_migration', 'arcade'] as const
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const WEEK_MS = 7 * DAY_MS

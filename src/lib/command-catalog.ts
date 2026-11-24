@@ -19,6 +19,7 @@ export type CommandIconId =
   | 'premium'
   | 'pipeline'
   | 'forum'
+  | 'arcade'
   | 'stream'
   | 'landing'
   | 'support'
@@ -43,6 +44,7 @@ export type CommandNavTo =
   | '/character/progress'
   | '/forum'
   | '/forum/$categorySlug'
+  | '/arcade'
   | '/support'
   | '/oracle'
   | '/character'
@@ -160,6 +162,14 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     icon: 'forum',
     to: '/forum',
     keywords: ['forum', 'community', 'boards', 'topics', 'posts'],
+  },
+  {
+    id: 'nav-arcade',
+    label: 'Arcade',
+    category: 'Page',
+    icon: 'arcade',
+    to: '/arcade',
+    keywords: ['arcade', 'games', 'play', 'riptide', 'leaderboard', 'high score', 'swim'],
   },
   {
     id: 'nav-friends',
