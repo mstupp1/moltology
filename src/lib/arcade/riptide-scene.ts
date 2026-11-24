@@ -492,12 +492,15 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
   load(options.art?.rock, (t) => {
     tile(t, 1)
     materials.rock.map = t
+    // The vertex colours are dark slate, made for an untextured rock; lift them so the painted
+    // stone shows its own colour and they only vary it rock to rock.
+    materials.rock.color.setScalar(3.4)
     materials.rock.needsUpdate = true
   })
   load(options.art?.rust, (t) => {
     tile(t, 1)
     materials.pipe.map = t
-    materials.pipe.color.set('#ffffff')
+    materials.pipe.color.setScalar(2.2)
     materials.pipe.needsUpdate = true
   })
   load(options.art?.sand, (t) => {
@@ -510,12 +513,15 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
     t.wrapS = RepeatWrapping
     // Far enough back to sit behind everything; the plane is sized to fill any window.
     const plane = new Mesh(new PlaneGeometry(64, 32), new MeshBasicMaterial({ map: t, fog: false, depthWrite: false }))
-    plane.position.set(0, FIELD_H / 2 + 2, -30)
+    // Its reef line sits just above where the sand meets the water from this camera.
+    plane.position.set(0, 12, -30)
     plane.renderOrder = -2
     t.repeat.set(1, 1)
     backdrop = plane
     scene.add(plane)
+    // The painting has its own ridges; the drawn ones would only flatten it.
     far.visible = false
+    mid.visible = false
   })
 
   let character: Character3D | null = null

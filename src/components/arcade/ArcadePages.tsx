@@ -4,7 +4,7 @@ import { ChevronLeft, Gamepad2, Play } from 'lucide-react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { CharacterStill } from '@/components/hud/avatar3d/CharacterStill'
 import { HUDSpinner } from '@/components/ui/HUDSpinner'
-import { getAssetUrl } from '@/lib/assets'
+import { getAssetUrl, getMediaPath } from '@/lib/assets'
 import { useHydrated } from '@/hooks/useHydrated'
 import { cn } from '@/lib/utils'
 import { ARCADE_GAMES, ARCADE_MIN_REWARD_SCORE, ARCADE_XP_PER_RUN, ARCADE_XP_RUNS_PER_DAY } from '@/lib/arcade'
@@ -22,6 +22,7 @@ export function ArcadeHome() {
   const yourBest = board.data?.viewerBest ?? null
   const hydrated = useHydrated()
   const [cardArt, setCardArt] = useState(false)
+  const [heroArt, setHeroArt] = useState(false)
 
   return (
     <div className="space-y-2 sm:space-y-4 lg:space-y-5 font-sans">
@@ -32,13 +33,30 @@ export function ArcadeHome() {
         hideDescriptionOnPhone
       />
 
+      {/* The arcade hall: art behind a short welcome. Plain dark ground until the art arrives. */}
+      <section aria-label="Welcome" className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1">
+        {hydrated && (
+          <img
+            src={getAssetUrl('images/arcade/v1/arcade-hero.jpg')}
+            alt=""
+            className={cn('absolute inset-0 h-full w-full object-cover transition-opacity duration-500', heroArt ? 'opacity-100' : 'opacity-0')}
+            onLoad={() => setHeroArt(true)}
+          />
+        )}
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-abyss/85 via-abyss/40 to-transparent" />
+        <div className="relative flex min-h-36 sm:min-h-52 lg:min-h-60 flex-col justify-end gap-1 p-4 sm:p-5 lg:p-6">
+          <p className="font-grotesk text-xl sm:text-2xl font-semibold tracking-tight text-ink">Your character, in every game</p>
+          <p className="max-w-md text-sm text-ink-body">Whatever you wear in Customize comes with you into the water.</p>
+        </div>
+      </section>
+
       <section
         aria-label="Riptide"
         className="relative overflow-hidden rounded-card border border-line-subtle bg-surface-1"
       >
         {hydrated && (
           <img
-            src={getAssetUrl('images/arcade/v1/riptide-card.jpg')}
+            src={getMediaPath('images/arcade/v1/riptide-card.jpg')}
             alt=""
             className={cn('absolute inset-0 h-full w-full object-cover transition-opacity duration-500', cardArt ? 'opacity-100' : 'opacity-0')}
             onLoad={() => setCardArt(true)}
@@ -46,6 +64,8 @@ export function ArcadeHome() {
         )}
         {/* Water behind the art (and in place of it until it loads), darker where the words sit. */}
         <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-abyss/90 via-abyss/55 to-transparent" />
+        {/* On phones the words run across the whole picture, so it is dimmed throughout. */}
+        <div aria-hidden className="absolute inset-0 bg-abyss/55 sm:hidden" />
         <div className="relative grid gap-2 sm:gap-4 p-4 sm:p-5 lg:p-6 sm:grid-cols-[1fr_auto] items-center">
           <div className="max-w-md space-y-3">
             <p className="eyebrow">New game</p>
