@@ -286,3 +286,10 @@ Next test / confirmation post:
 
 - Replacement at Myles's request. Juno Marsh (`crab_juno_marsh`) delivers the same practical step. ImageGen cleared the character from the background, then `cast:render --over` placed the site's actual focused point render. The full-frame result and 390px proof were inspected, and the provider image matched the local final byte for byte.
 - Zernio confirmed replacement post-1795385660513 / 6b03693d28129002fb135a23 published November 22 at 5:14 p.m. Eastern at https://www.instagram.com/p/DgD2ovxiA-o/. Drive archive is Social Archive/2026/11/post-43914cdabac146c7f6377f69. The original November 23 queue entry was removed after confirmation. Measure saves and shares from the replacement's publication time. The changed cast and publication slot make this an exploratory comparison.
+
+### November 24, 2026. The out-of-office reply
+
+- Five-slide standalone editorial carousel, loudness 2. An empty chair and a warm desk lamp set the Thanksgiving lead-in. The slides build a reply from a return date, an inbox expectation and a confirmed route for urgent requests. The save invitation follows a fill-in reply.
+- Published comparator: carousel-1793714956021, the November 6 meeting handoff. Test whether a fill-in reply gets more saves per reach than a worked handoff example. Both decks use five slides, an editorial save invitation and a 1 p.m. Eastern slot. Subject, cast, season and weekday also differ, so treat the comparison as exploratory.
+- Assess saves per reach at 24 hours and seven days after publication, with shares per reach secondary. Results pending.
+- Zernio readback confirmed carousel-1795529033025 / 6b05994fe8dedfb225675e31 scheduled for November 25 at 1 p.m. Eastern on moltology_org with the native first comment and AI disclosure. All five 1080×1440 slides match the provider and Drive archive files in order. Drive archive: Social Archive/2026/11/carousel-289038e61162493a9b666698.

@@ -1124,6 +1124,41 @@
       "stopper": "Oversized cursor on a blank page",
       "loudness": 3,
       "createdAt": "2026-11-22T22:14:36.157Z"
+    },
+    {
+      "id": "carousel-1795529033025",
+      "type": "carousel",
+      "topic": "Writing an out-of-office reply that protects a holiday break",
+      "theme": "ecdysis",
+      "mascot": "none",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/11/carousel-289038e61162493a9b666698",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795529034259_e4202ae8575c2f88_01.png",
+        "https://media.zernio.com/temp/1795529035246_1334f91e44376884_02.png",
+        "https://media.zernio.com/temp/1795529036075_7b2d35d0451b2ea7_03.png",
+        "https://media.zernio.com/temp/1795529037307_fe9d035645644f33_04.png",
+        "https://media.zernio.com/temp/1795529038307_cbae399bac7f69b5_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/temp/1795529034259_e4202ae8575c2f88_01.png",
+        "https://media.zernio.com/temp/1795529035246_1334f91e44376884_02.png",
+        "https://media.zernio.com/temp/1795529036075_7b2d35d0451b2ea7_03.png",
+        "https://media.zernio.com/temp/1795529037307_fe9d035645644f33_04.png",
+        "https://media.zernio.com/temp/1795529038307_cbae399bac7f69b5_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "3:4",
+      "caption": "The surface inbox can sit quietly for a long weekend. Before you close it, give people a date for your return and a covered route for anything that genuinely needs attention sooner. Save this reply before you set your out-of-office.",
+      "hashtags": [],
+      "firstComment": "https://moltology.org",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-25T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6b05994fe8dedfb225675e31",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "createdAt": "2026-11-24T14:04:01.737Z"
     }
   ]
 }
