@@ -1130,22 +1130,22 @@
       "type": "carousel",
       "topic": "Writing an out-of-office reply that protects a holiday break",
       "theme": "ecdysis",
-      "mascot": "none",
+      "mascot": "crab_moss_tern",
       "articleSlug": null,
-      "archivePath": "Social Archive/2026/11/carousel-289038e61162493a9b666698",
+      "archivePath": "Social Archive/2026/11/carousel-227f47b15bca03d17f5b1cf6",
       "zernioMediaUrls": [
-        "https://media.zernio.com/temp/1795529034259_e4202ae8575c2f88_01.png",
-        "https://media.zernio.com/temp/1795529035246_1334f91e44376884_02.png",
-        "https://media.zernio.com/temp/1795529036075_7b2d35d0451b2ea7_03.png",
-        "https://media.zernio.com/temp/1795529037307_fe9d035645644f33_04.png",
-        "https://media.zernio.com/temp/1795529038307_cbae399bac7f69b5_05.png"
+        "https://media.zernio.com/media/1795530180881_96eb6d27e94122d6_01.png",
+        "https://media.zernio.com/media/1795530180868_e54802209fc9cf46_02.png",
+        "https://media.zernio.com/media/1795530180878_7ad489edb34e5113_03.png",
+        "https://media.zernio.com/media/1795530180865_a204bcadf0653b84_04.png",
+        "https://media.zernio.com/media/1795530180875_263fa31e2126c3ee_05.png"
       ],
       "slideUrls": [
-        "https://media.zernio.com/temp/1795529034259_e4202ae8575c2f88_01.png",
-        "https://media.zernio.com/temp/1795529035246_1334f91e44376884_02.png",
-        "https://media.zernio.com/temp/1795529036075_7b2d35d0451b2ea7_03.png",
-        "https://media.zernio.com/temp/1795529037307_fe9d035645644f33_04.png",
-        "https://media.zernio.com/temp/1795529038307_cbae399bac7f69b5_05.png"
+        "https://media.zernio.com/media/1795530180881_96eb6d27e94122d6_01.png",
+        "https://media.zernio.com/media/1795530180868_e54802209fc9cf46_02.png",
+        "https://media.zernio.com/media/1795530180878_7ad489edb34e5113_03.png",
+        "https://media.zernio.com/media/1795530180865_a204bcadf0653b84_04.png",
+        "https://media.zernio.com/media/1795530180875_263fa31e2126c3ee_05.png"
       ],
       "slideCount": 5,
       "aspectRatio": "3:4",
@@ -1158,7 +1158,10 @@
       "zernioPostId": "6b05994fe8dedfb225675e31",
       "zernioCommentId": null,
       "isAiGenerated": true,
-      "createdAt": "2026-11-24T14:04:01.737Z"
+      "createdAt": "2026-11-24T14:04:01.737Z",
+      "characters": [
+        "crab_moss_tern"
+      ]
     }
   ]
 }
