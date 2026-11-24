@@ -14,6 +14,106 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    "slug": "2026-11-23-gear-collections-bundles-and-character-options",
+    "version": "2026.11.23",
+    "title": "17 Gear Collections, Bundle Discounts, and New 3D Character Options",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "Design",
+      "UI/UX",
+      "Tools"
+    ],
+    "summary": "Added 85 new 3D gear pieces across 17 live shop collections with buyable discounted bundles, plus 13 new shell colors, four finishes, patterned markings, and expanded eye and face options.",
+    "content": "### 17 Shop Collections and Discounted Bundles\n- Added 85 new 3D gear pieces across 17 live themed collections, introducing coats, hoodies, blazers, sweaters, scarves, capes, footwear, eyewear, hats, and held props in varied weaves and prints.\n- Added a collection filter in the Shop, a featured Collection of the Week spotlight, and one-click collection bundles at a 20% discount that only charge for pieces you do not already own.\n- Connected matching gear collections directly beneath each benefit guide so visitors can try on or wear the look.\n\n### Expanded 3D Character Customization\n- Added 13 new shell colors, an optional tip fade, and four new shell finishes: Matte, Velvet, Beetle sheen, and Crystal.\n- Introduced new patterned shell markings including Coral lace, Tide rings, Reef camo, Scales, Rosettes, Flames, Honeycomb, Barnacles, Ripples, Constellation, and Marble.\n- Expanded face customization with eye colors, mismatched eyes, new eye shapes, adjustable eyebrows, cheek blush, and an open-smile cheer.",
+    "isPublished": true,
+    "releasedAt": "2026-11-23T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-22-benefit-guides-and-instant-oracle-starters",
+    "version": "2026.11.22",
+    "title": "Topic Benefit Guides and Instant Oracle Starters",
+    "category": "Feature",
+    "tags": [
+      "Feature",
+      "AI",
+      "Guides",
+      "UI/UX",
+      "Performance"
+    ],
+    "summary": "Launched a gallery of 48 benefit guides tailored to everyday goals from focus to resilience, plus instant replies for curated Oracle starter prompts.",
+    "content": "### 48 Benefit Guides and Gallery\n- Opened the new Benefits gallery with 48 dedicated pages exploring how daily shedding applies to focus, energy, routines, resilience, and creative work.\n- Styled each guide across ten distinct visual themes before smoothly revealing the core Moltology practice, quiz, and free sign-up path.\n\n### Instant Oracle Starter Replies\n- Curated starter prompts in the Oracle now deliver instant opening replies so new visitors and members can explore topics with zero wait.",
+    "isPublished": true,
+    "releasedAt": "2026-11-22T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-21-glassy-3d-eyes-real-jumps-and-textured-gear",
+    "version": "2026.11.21",
+    "title": "Glassy 3D Eyes, Real Jumps, and Engraved Gear",
+    "category": "Design",
+    "tags": [
+      "Design",
+      "Improvement",
+      "UI/UX",
+      "Media"
+    ],
+    "summary": "Gave 3D characters glassy eyes, a soft sculpted finish, real jumps with stepping feet, and surface-textured gear with rarity engravings.",
+    "content": "### Glassy Eyes and Sculpted Finish\n- Refined character eyes with a clear glass coat, wider relaxed eyelids, and larger irises, paired with a smooth, studio-lit shell finish.\n- Locked shell surface textures firmly to each body part so details stay crisp without shimmering as characters breathe or turn.\n\n### Jumps, Stepping Feet, and Livelier Springs\n- Characters now crouch, push off, and land with bent knees when jumping, and lift their feet into realistic steps when changing poses or turning.\n- Added livelier spring motion to antennae, claws, tail fan plates, and hats.\n\n### Textured Gear and Fitted Visors\n- Added distinct surface materials to 3D gear alongside subtle tone-on-tone engravings on rare and higher-tier pieces.\n- Sized visors cleanly to each character's head shape so eyewear always sits neatly in front of the eyes.",
+    "isPublished": true,
+    "releasedAt": "2026-11-21T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-20-sliding-section-tabs-and-shell-markings",
+    "version": "2026.11.20",
+    "title": "Sliding Section Tabs, Character Markings, and Sharper Forum Views",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "UI/UX",
+      "Navigation",
+      "Design",
+      "Mobile"
+    ],
+    "summary": "Kept page headers steady while switching tabs across Character and Academy, added detailed shell textures and subtle movement to 3D characters, and sharpened the forum group photo.",
+    "content": "### Steady Headers and Sliding Tabs\n- Shared one persistent header across Character and Academy sections with a smooth sliding underline so switching tabs only swaps the content below.\n- Moved the Save and Discard buttons onto the top corner of the character stage whenever you have unsaved changes.\n\n### Detailed Shell Textures and Expressions\n- Added surface shell textures, subtle idle leg motion, and smoother curved mouths so 3D characters feel natural from every angle.\n- Balanced portrait framing across crabs and lobsters so every head shape stays front and center in profile and forum avatars.\n\n### Forum Group Photo and Mobile Polish\n- Upgraded the forum community group photo to a sharper, edge-to-edge banner and turned the mobile board list into a compact horizontal chip strip.\n- Refined copy clarity across the Codex, public site, and daily app prompts.",
+    "isPublished": true,
+    "releasedAt": "2026-11-20T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-19-widescreen-layouts-and-fullscreen-oracle",
+    "version": "2026.11.19",
+    "title": "Widescreen Layouts, Fullscreen Oracle, and Baked Studio Lighting",
+    "category": "Improvement",
+    "tags": [
+      "Improvement",
+      "Design",
+      "Performance",
+      "UI/UX",
+      "AI"
+    ],
+    "summary": "Expanded app pages to fill wide laptop screens with adaptive grids, set the Oracle to open fullscreen by default on desktop, and baked studio lighting across 3D characters and public pages.",
+    "content": "### Widescreen Pages and Aligned Headers\n- Widened the main app panel on larger laptops so Shop and Academy grids fill the screen comfortably without awkward margins.\n- Aligned header bars, action buttons, and the search bar along one steady row, and extended Dashboard and profile heroes edge to edge on phones.\n\n### Fullscreen Oracle and Touch Scrolling\n- Set the Oracle to open fullscreen by default on desktop while still remembering whichever view mode you prefer next.\n- Switched touch devices to clean native overlay scrollbars so phone screens keep every pixel of horizontal space.\n\n### Baked 3D Lighting\n- Baked soft studio lighting and crease shading directly into 3D characters, the site emblem, and public ocean scenes for richer depth and smoother performance on mobile.",
+    "isPublished": true,
+    "releasedAt": "2026-11-19T23:59:00Z"
+  },
+  {
+    "slug": "2026-11-18-public-profiles-and-unified-design",
+    "version": "2026.11.18",
+    "title": "Public Profiles, Academy Previews, and a Unified Design",
+    "category": "Design",
+    "tags": [
+      "Design",
+      "Feature",
+      "UI/UX",
+      "Navigation",
+      "Mobile"
+    ],
+    "summary": "Opened member profiles and Academy course pages for anyone to browse, introduced a cleaner visual system across the app, and launched a public Oracle MAX plan comparison.",
+    "content": "### Open Profiles and Academy Previews\n- Visitors without an account can now view member profiles, see equipped gear, and start building their own character from any profile page.\n- Every Academy course and lesson page is open to browse, with one free preview lesson per course and a quick sign-up prompt to save progress or take quizzes.\n\n### Unified Visual System\n- Updated typography, spacing, and buttons across every page with clean sentence-case labels, rounded filter pills, and consistent top header bands.\n- Kept forum topic footers on a single clean row on phones, made daily task checkoffs smoother, and ensured notification alerts always appear above open menus and readers.\n\n### Public Oracle MAX Comparison and Lighter Water\n- Redesigned the Oracle MAX page as a side-by-side plan comparison and opened it to everyone as Coming soon.\n- Replaced heavy background bubble animations with lighter glass bubbles that pause behind full-screen views and respect reduced-motion preferences.",
+    "isPublished": true,
+    "releasedAt": "2026-11-18T23:59:00Z"
+  },
+  {
     "slug": "2026-11-16-weekly-leaderboard-and-connected-oracle",
     "version": "2026.11.16",
     "title": "Weekly Community Leaderboard and a Connected Oracle",
