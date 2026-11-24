@@ -6,11 +6,13 @@ import type { MarketPayload } from '@/lib/market'
 
 const getMarketFn = vi.fn()
 const buyGearFn = vi.fn()
+const buyBundleFn = vi.fn()
 const createCreditCheckoutFn = vi.fn()
 
 vi.mock('@/lib/server/api', () => ({
   getMarketFn: (...args: unknown[]) => getMarketFn(...args),
   buyGearFn: (...args: unknown[]) => buyGearFn(...args),
+  buyBundleFn: (...args: unknown[]) => buyBundleFn(...args),
   createCreditCheckoutFn: (...args: unknown[]) => createCreditCheckoutFn(...args),
   getChassisLoadoutFn: vi.fn().mockRejectedValue(new Error('no character')),
 }))
@@ -83,6 +85,7 @@ describe('MarketShopPage', () => {
     getMarketFn.mockReset()
     session = { userId: 'member-1' }
     buyGearFn.mockReset()
+    buyBundleFn.mockReset()
   })
 
   it('shows Molt Credits as coming soon (the wallet itself is in the Character band)', async () => {
@@ -171,10 +174,42 @@ describe('MarketShopPage', () => {
     const detail = await screen.findByTestId('market-bundle-detail')
     expect(within(detail).getByText('Abyssal Clasp Girdle')).toBeInTheDocument()
     expect(within(detail).getByText('2,160')).toBeInTheDocument()
-    expect(within(detail).queryByRole('button', { name: /^Buy/ })).not.toBeInTheDocument()
+    // 320 gems is not enough, so the button waits.
+    expect(within(detail).getByRole('button', { name: 'Buy 3 pieces for 2,160 gems' })).toBeDisabled()
+    expect(within(detail).getByText('You need 1,840 more gems. Daily liturgies, streaks and firsts all pay out.')).toBeInTheDocument()
     // Filtering hides the promos.
     fireEvent.click(screen.getByRole('button', { name: 'Belt' }))
     expect(screen.queryByRole('region', { name: 'Featured' })).not.toBeInTheDocument()
+  })
+
+  it('buys a bundle for the pieces not yet owned, at the bundle discount', async () => {
+    const base = payload(5000)
+    const v = base.pieces[0]!.variants[1]!
+    const make = (baseKey: string, name: string, category: 'carapace' | 'belt' | 'legs', owned = false) => ({
+      baseKey,
+      name,
+      flavorText: '',
+      category,
+      variants: [{ ...v, catalogItemId: `${baseKey}-e`, rarity: 'epic' as const, appearanceKey: `${baseKey}--epic`, price: 900, owned }],
+    })
+    getMarketFn.mockResolvedValue({
+      ...base,
+      pieces: [
+        make('abyssal-ward-shell', 'Abyssal Ward Shell', 'carapace', true),
+        make('abyssal-clasp-girdle', 'Abyssal Clasp Girdle', 'belt'),
+        make('void-stride-articulation', 'Void-Stride Articulation', 'legs'),
+      ],
+    })
+    buyBundleFn.mockResolvedValue({ ok: true, balance: 3560, credits: 0 })
+    renderMarket()
+    const featured = await screen.findByRole('region', { name: 'Featured' })
+    fireEvent.click(within(featured).getAllByRole('button', { name: /Abyssal Set bundle/ })[0]!)
+    const detail = await screen.findByTestId('market-bundle-detail')
+    // One of three already owned: two epics (1,800) at 20% off.
+    expect(within(detail).getByText("Bundle price for the 2 you don't own")).toBeInTheDocument()
+    fireEvent.click(within(detail).getByRole('button', { name: 'Buy 2 pieces for 1,440 gems' }))
+    await waitFor(() => expect(buyBundleFn).toHaveBeenCalledWith({ data: { token: 'token', bundleId: 'abyssal-set' } }))
+    await waitFor(() => expect(getMarketFn).toHaveBeenCalledTimes(2))
   })
 
   it('buys a piece with gems and reloads the market', async () => {

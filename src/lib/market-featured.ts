@@ -1,5 +1,6 @@
 import type { EquipmentRarity } from '../db/schema'
-import { GEAR_PRICES } from './gear-variants'
+import { GEAR_PRICES, variantKey } from './gear-variants'
+import { GEAR_PIECE_BY_KEY } from './gear/catalog'
 import { GEAR_COLLECTIONS } from './gear/collections'
 import { GEAR_PIECES } from './gear/pieces'
 
@@ -86,7 +87,7 @@ const COLLECTION_BUNDLES: MarketBundle[] = GEAR_COLLECTIONS.map((c) => ({
 
 export const MARKET_BUNDLES: MarketBundle[] = [...PICKED_BUNDLES, ...COLLECTION_BUNDLES]
 
-/** The first slot is the large banner; the rest sit beside it. */
+/** Standing promos, shown after the week's collection (and in its place if it can't be shown). */
 export const MARKET_FEATURED: FeaturedSlot[] = [
   {
     kind: 'piece',
@@ -98,8 +99,40 @@ export const MARKET_FEATURED: FeaturedSlot[] = [
   { kind: 'piece', piece: { baseKey: 'tideforge-hammer', rarity: 'epic' }, tag: 'New' },
 ]
 
-/** Bundle price in gems, rounded to a tidy 10. */
-export function bundlePrice(bundle: MarketBundle): { full: number; price: number } {
-  const full = bundle.pieces.reduce((sum, p) => sum + GEAR_PRICES[p.rarity], 0)
-  return { full, price: Math.round((full * (100 - bundle.discountPercent)) / 1000) * 10 }
+const RARITY_RANK: Record<EquipmentRarity, number> = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4 }
+const WEEK = 7 * 24 * 60 * 60 * 1000
+
+/**
+ * The Gear tab's promos, in order: the first that can be shown is the large banner and the next
+ * two sit beside it. Each week (UTC, from the epoch) a different collection leads, with its
+ * rarest piece beside it, then the standing promos.
+ */
+export function featuredSlots(now: Date = new Date()): FeaturedSlot[] {
+  const week = Math.floor(now.getTime() / WEEK)
+  const c = GEAR_COLLECTIONS[((week % GEAR_COLLECTIONS.length) + GEAR_COLLECTIONS.length) % GEAR_COLLECTIONS.length]
+  const top = c ? GEAR_PIECES.filter((p) => p.collection === c.id).sort((a, b) => RARITY_RANK[b.rarity] - RARITY_RANK[a.rarity] || a.n - b.n)[0] : undefined
+  return [
+    ...(c ? [{ kind: 'bundle' as const, bundleId: `collection-${c.id}`, tag: 'Collection of the week' }] : []),
+    ...(top ? [{ kind: 'piece' as const, piece: { baseKey: top.key, rarity: top.rarity }, tag: 'New' }] : []),
+    ...MARKET_FEATURED,
+  ]
+}
+
+/**
+ * Bundle price in gems, rounded to a tidy 10. Pieces the member already owns drop out, so the
+ * price is for what is left, still at the bundle's discount.
+ */
+export function bundlePrice(bundle: MarketBundle, owned: (ref: PieceRef) => boolean = () => false): { full: number; price: number; left: number } {
+  const left = bundle.pieces.filter((p) => !owned(p))
+  const full = left.reduce((sum, p) => sum + GEAR_PRICES[p.rarity], 0)
+  return { full, price: Math.round((full * (100 - bundle.discountPercent)) / 1000) * 10, left: left.length }
+}
+
+/** The catalog appearance key for a bundle piece: the piece itself at its own rarity, else its recoloured version. */
+export function bundleRefKey(ref: PieceRef): string {
+  return GEAR_PIECE_BY_KEY.get(ref.baseKey)?.rarity === ref.rarity ? ref.baseKey : variantKey(ref.baseKey, ref.rarity)
+}
+
+export function marketBundle(id: string): MarketBundle | undefined {
+  return MARKET_BUNDLES.find((b) => b.id === id)
 }

@@ -262,8 +262,91 @@ const HEAD_GEAR: Record<Hat, (socket?: SocketInfo, c?: GearColours, rig?: Rig) =
         add(end, frameMat)
       }
     }),
-  reading_glasses: (_s, c, rig) => glasses(rig, c, false),
-  sunglasses: (_s, c, rig) => glasses(rig, c, true),
+  reading_glasses: (_s, c, rig) => glasses(rig, c, 'wire'),
+  sunglasses: (_s, c, rig) => glasses(rig, c, 'dark'),
+  tortoise_glasses: (_s, c, rig) => glasses(rig, c, 'acetate'),
+  sun_hat: (_s, c) =>
+    item('head', (add) => {
+      // Woven straw: a low round crown, a wide brim that dips a little all round, a ribbon band.
+      const straw = cloth(c?.material ?? '#d8c193')
+      straw.side = 2
+      const crown = new SphereGeometry(1.06, 36, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+      crown.scale(1, 0.78, 1)
+      crown.translate(0, 0.06, 0)
+      add(crown, straw)
+      const brim = new CylinderGeometry(1.04, 2.7, 0.34, 64, 1, true)
+      brim.translate(0, -0.05, 0)
+      add(brim, straw)
+      const under = new CylinderGeometry(1.02, 2.67, 0.34, 64, 1, true)
+      under.translate(0, -0.08, 0)
+      add(under, cloth(c ? darker(c.material, 0.18) : '#b9a072'))
+      const lip = new TorusGeometry(2.69, 0.04, 8, 72)
+      lip.rotateX(Math.PI / 2)
+      lip.translate(0, -0.22, 0)
+      add(lip, straw)
+      const band = new CylinderGeometry(1.06, 1.08, 0.2, 40, 1, true)
+      band.translate(0, 0.16, 0)
+      const ribbon = cloth(c?.trim ?? '#55624d')
+      ribbon.side = 2
+      add(band, ribbon)
+      const bow = new SphereGeometry(0.14, 12, 10)
+      bow.scale(1.5, 0.8, 0.5)
+      bow.translate(-0.86, 0.16, 0.62)
+      bow.rotateY(0)
+      add(bow, ribbon)
+    }),
+  bucket_hat: (_s, c) =>
+    item('head', (add) => {
+      // Soft canvas: a straight crown with a flat top, a short brim angled down, stitch rings.
+      const canvas = cloth(c?.material ?? '#6b3cff')
+      canvas.side = 2
+      const crown = new CylinderGeometry(0.96, 1.1, 0.62, 40, 1, true)
+      crown.translate(0, 0.3, 0)
+      add(crown, canvas)
+      const topCap = new SphereGeometry(0.96, 36, 8, 0, Math.PI * 2, 0, Math.PI / 2)
+      topCap.scale(1, 0.16, 1)
+      topCap.translate(0, 0.6, 0)
+      add(topCap, canvas)
+      const brim = new CylinderGeometry(1.1, 1.62, 0.36, 48, 1, true)
+      brim.translate(0, -0.17, 0)
+      add(brim, canvas)
+      const stitch = cloth(c?.trim ?? '#ff4f9a')
+      for (const [r, y] of [[1.25, -0.06], [1.42, -0.18], [1.58, -0.3]]) {
+        const ring = new TorusGeometry(r, 0.018, 6, 56)
+        ring.rotateX(Math.PI / 2)
+        ring.translate(0, y + 0.01, 0)
+        add(ring, stitch)
+      }
+      const rim = new TorusGeometry(1.62, 0.04, 8, 56)
+      rim.rotateX(Math.PI / 2)
+      rim.translate(0, -0.35, 0)
+      add(rim, canvas)
+    }),
+  headset_mic: (socket, c) =>
+    item('ears', (add) => {
+      // A thin band over the crown, a small ear piece on one side and a fine boom that curves
+      // round the cheek to a mic just off the corner of the mouth.
+      const dark = gloss(c?.material ?? '#22252c')
+      const steel = metal(c?.trim ?? '#a9aeb7', 0.3)
+      const band = new TorusGeometry(1.04, 0.03, 8, 48, Math.PI)
+      band.scale(1, ((socket?.rise ?? socket?.radius ?? 1) / (socket?.radius ?? 1)) * 1.06, 1)
+      add(band, steel)
+      for (const side of [1, -1]) {
+        const pad = new CylinderGeometry(side > 0 ? 0.2 : 0.12, side > 0 ? 0.2 : 0.12, 0.1, 20)
+        pad.rotateZ(Math.PI / 2)
+        pad.translate(side * 1.05, 0, 0)
+        add(pad, dark)
+      }
+      const boom = new CatmullRomCurve3([new Vector3(1.1, -0.02, 0.06), new Vector3(1.08, -0.3, 0.45), new Vector3(0.82, -0.48, 0.82), new Vector3(0.5, -0.52, 1.0)])
+      add(new TubeGeometry(boom, 32, 0.022, 8, false), steel)
+      const mic = new SphereGeometry(0.075, 14, 10)
+      mic.scale(1.3, 1, 1)
+      mic.translate(0.46, -0.52, 1.02)
+      add(mic, dark)
+      const led = new SphereGeometry(0.03, 10, 8)
+      led.translate(1.15, 0.06, 0.08)
+      add(led, new MeshPhysicalMaterial({ color: new Color(c?.accent ?? '#ffcf2e'), emissive: new Color(c?.accent ?? '#ffcf2e'), emissiveIntensity: 1.2, roughness: 0.3 }))
+    }),
   sweatband: (_s, c, rig) =>
     item('face', (add) => {
       // A soft rolled band wound round the head on a slant: just over the brows in front, lower
@@ -361,11 +444,12 @@ function haloFit(rig: Rig | undefined): { y: number; z: number; radius: number; 
  * Glasses: a round lens in front of each eye, a bridge between them and arms back to the sides
  * of the head. Sized from the eyes themselves, so they fit every head shape and eye size.
  */
-function glasses(rig: Rig | undefined, c: GearColours | undefined, dark: boolean): SocketGear {
+function glasses(rig: Rig | undefined, c: GearColours | undefined, style: 'wire' | 'dark' | 'acetate'): SocketGear {
+  const dark = style === 'dark'
   return item('face', (add) => {
     const fit = (rig && visorFit(rig)) || VISOR_FALLBACK
     const eyes = rig && lastEyes.length ? lastEyes : [-0.4, 0.4].map((x) => ({ centre: new Vector3(x, 0, 0), wide: 0.3, high: 0.3 }))
-    const frame = dark ? gloss(c?.material ?? '#17171a') : metal(c?.material ?? '#a3acb5', 0.3)
+    const frame = style === 'wire' ? metal(c?.material ?? '#a3acb5', 0.3) : gloss(c?.material ?? (dark ? '#17171a' : '#6a3d1e'))
     const lensMat = new MeshPhysicalMaterial({
       color: new Color(dark ? (c?.accent ?? '#24262c') : (c?.accent ?? '#dfe9ee')),
       roughness: 0.05,
@@ -376,7 +460,7 @@ function glasses(rig: Rig | undefined, c: GearColours | undefined, dark: boolean
       side: 2,
       depthWrite: false,
     })
-    const thick = dark ? 0.075 : 0.032
+    const thick = dark ? 0.075 : style === 'acetate' ? 0.058 : 0.032
     const lenses = eyes
       .map((e) => {
         const r = Math.max(e.wide, e.high) * (dark ? 0.98 : 0.92)

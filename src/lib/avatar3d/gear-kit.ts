@@ -14,7 +14,7 @@ import type { Loft } from './loft'
 import { alongY, placed, spike, taperedTube } from './parts'
 import { lookQuaternion, type Rig, type Weigh, type Wearable } from './rig'
 
-export type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'fabric' | 'dark' | 'paint' | 'tape' | 'seam'
+export type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'fabric' | 'dark' | 'paint' | 'tape' | 'seam' | 'soft' | 'glass'
 export type Amount = (local: Vector3, rest: Vector3, normal: Vector3) => number
 
 export const v = (x: number, y: number, z: number) => new Vector3(x, y, z)
@@ -200,6 +200,10 @@ export class Kit {
       tape: new MeshPhysicalMaterial({ color: new Color(v.material), roughness: 0.72, sheen: 0.5, sheenRoughness: 0.5, sheenColor: new Color('#ffffff') }),
       // A matte line in the trim colour: the edges of wound strips.
       seam: new MeshPhysicalMaterial({ color: new Color(v.trim), roughness: 0.8 }),
+      // Matte cloth or card in the accent colour, with no glow: shirts, pocket squares, pages.
+      soft: workedSurface(new MeshPhysicalMaterial({ color: new Color(v.accent), roughness: 0.85, sheen: 0.4, sheenRoughness: 0.7, sheenColor: new Color('#ffffff') }), 'cloth'),
+      // Tinted glass in the accent colour, lit faintly from inside.
+      glass: new MeshPhysicalMaterial({ color: new Color(v.accent), emissive: new Color(v.accent), emissiveIntensity: 0.35, roughness: 0.08, clearcoat: 1, transparent: true, opacity: 0.42, side: 2, depthWrite: false }),
       dark: workedSurface(new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.15, roughness: 0.6 }), 'leather'),
     }
     const meshes: Mesh[] = []
@@ -208,8 +212,8 @@ export class Kit {
       if (!geo) continue
       const mesh = new Mesh(geo, materials[t])
       mesh.name = `gear:${v.key}:${bone}:${t}`
-      mesh.castShadow = true
-      mesh.receiveShadow = t !== 'accent'
+      mesh.castShadow = t !== 'glass'
+      mesh.receiveShadow = t !== 'accent' && t !== 'glass'
       this.rig.bone(bone).add(mesh)
       meshes.push(mesh)
     }

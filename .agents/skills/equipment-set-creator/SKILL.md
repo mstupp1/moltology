@@ -48,18 +48,23 @@ Prices come from the rarity alone (`GEAR_PRICES` in `gear-variants.ts`). Do not 
 | `hammer` | claws | A hammer held upright in the claw | same |
 | `helmet` | head | A helmet over the crown of the head | same |
 | `antenna-fittings` | antennae | Sleeves, bands and tips riding the character's own antennae | same |
-| `hat` | head | One of the hat builds on the head socket | `src/lib/avatar3d/gear.ts` |
+| `hat` | head | One of the hat builds on the head socket (glasses, visors and mics too). Collection hats wear their palette; the original base hats keep their own colours | `src/lib/avatar3d/gear.ts` |
+| `garment` | carapace | Cloth on the body; motif `tank`, `jacket`, `blazer`, `coat`, `wrap` or `hoodie` | `src/lib/avatar3d/gear-cloth.ts` |
+| `shoes` | legs | `clog` or `hi-top` | same |
+| `held-prop` | claws | One object in one claw; `prop` names it | `src/lib/avatar3d/gear-props.ts` |
+
+`belt-plate` also takes motif `cord` (twisted sash), `dress` (slim belt, frame buckle) or `lanyard` (strap round the neck, badge on the chest). `antenna-fittings` takes motif `panels` (floating glass panels).
 
 A new shape: add it to `GearShape` and `SHAPE_SLOT`, write its builder in its own file under `src/lib/avatar3d/` against the toolkit in [`gear-kit.ts`](../../../src/lib/avatar3d/gear-kit.ts) (`Kit.puff` for anything that follows the body, `onBody`, `seam`, `stud`, `tube` for fittings, `kit.add(bone, tone, geo)` so parts ride the right bone), and register it in `SHAPE_BUILDERS` in `equipment.ts`. A new hat: add it to `HATS` and to `HEAD_GEAR` in `gear.ts`. Hats no longer touch the character's `accessory` trait.
 
-Builders get three colours as five tones: `plate` (material), `trim`, `accent` (lit), `cloth` (material with a soft sheen) and `dark` (material darkened, leather). Keep every piece readable at phone portrait size: a strong silhouette beats fine detail.
+Builders get three colours as tones: `plate` (material), `trim` (metal), `accent` (lit), `cloth` and `fabric` (material, soft sheen), `paint` (material, plastic or card), `tape`, `seam` (matte trim colour), `soft` (matte accent colour: shirts, pages, pocket squares), `glass` (see-through accent) and `dark` (material darkened, leather). Lifts with `onBody` measure from the loft, which can sit inside the drawn body (a lobster's belly plates stand well proud of it); for marks on cloth, puff them from the body (`Kit.puff` on both `shell` and `belly`) instead. Keep every piece readable at phone portrait size: a strong silhouette beats fine detail.
 
 ## Designing a set
 
 1. **Brief.** Theme in one line, where it comes from (a benefit page kit, a season, the lore), the stat it leans on, and the slots it fills. A set does not have to fill every slot; three to five strong pieces beat seven weak ones.
 2. **Palette.** Add one palette per set in `palettes.ts` (material, trim, accent). Variants of a piece in other colours (a flavour range) get their own palettes.
 3. **Rarity spread.** Commons and uncommons for small pieces, one rare-or-better signature piece. Collections use `ladder: false`.
-4. **Define the pieces** at the end of `pieces.ts`, and the collection (if any) in `collections.ts`.
+4. **Define the pieces** at the end of `pieces.ts`, and the collection (if any) in `collections.ts` with its benefit `kit`. A collection with a kit shows on that kit's benefit pages (Wear the look), gets a buyable bundle at its `discountPercent`, and takes a turn as the shop's collection of the week.
 5. **Build** any new shapes or hats.
 6. **Review** with the board (below) on lobster and crab, front and back. Check: no clipping through the shell or eyes in every build (`classic`, `slim`, `chunky`, `barrel`, `tapered`), claws open and closed, all ten poses for anything on the arms.
 7. **Ship.** `npx drizzle-kit generate --custom --name <set>`, then `npm run gear:sql >> drizzle/<that file>.sql`. Apply on dev with `npm run db:migrate`. Prod runs the migration on merge; tell Myles before merging a catalog migration.

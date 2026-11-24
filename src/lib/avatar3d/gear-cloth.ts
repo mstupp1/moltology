@@ -6,6 +6,7 @@
  */
 import { BufferAttribute, BufferGeometry, TorusGeometry, Vector3 } from 'three'
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import type { Loft } from './loft'
 import { Kit, SIDES, above, below, fromFront, onBody, seam, smooth, stud, tube, v, within } from './gear-kit'
 import type { Wearable } from './rig'
 import { SWIMMERETS } from './species'
@@ -13,14 +14,18 @@ import { SWIMMERETS } from './species'
 const LIFT = 0.03
 
 /**
- * A garment's cut comes from its motif: `tank` (no sleeves), `jacket` (sleeves, to the hip) or
- * `coat` (sleeves and a skirt). Construction adds detail: 1 trim stripes, 2 lapels and buttons,
- * 3 a turtleneck collar under the lapels, 4 a belt and double row of buttons (trench).
+ * A garment's cut comes from its motif: `tank` (no sleeves), `jacket` (sleeves, to the hip),
+ * `blazer` (a jacket with satin lapels in the trim colour), `coat` (sleeves and a skirt), `wrap`
+ * (crossed over and tied with a sash, short skirt) or `hoodie` (hood down, drawstrings).
+ * Construction adds detail: 1 trim stripes or a zip, 2 lapels and buttons or a pocket, 3 a
+ * turtleneck (coat) or shirt, tie and pocket square (jacket), 4 a belt and double row of
+ * buttons (trench).
  */
 export function garment(kit: Kit, wear: Wearable): void {
   const { loft: host, bone, top, bottom, belt } = wear.torso
   const { motif, construction: n } = kit.visual
   const sleeves = motif !== 'tank'
+  const tailored = motif === 'coat' || motif === 'jacket' || motif === 'blazer'
 
   // A lobster's swimmerets and both species' short walking legs would poke through the cloth.
   for (const { tag } of SIDES) {
@@ -33,40 +38,38 @@ export function garment(kit: Kit, wear: Wearable): void {
   const hem = Math.min(bottom, belt) - 0.04
   const height = top - hem
   // Coats and jackets with lapels hang open at the chest: a V from the collar down to where the
-  // lapels meet, with a shirt showing underneath.
-  const lapelled = motif !== 'tank' && n >= 2
-  const vBottom = hem + height * (n >= 4 ? 0.42 : 0.46)
-  const opening = (y: number) => (lapelled ? 0.8 * Math.pow(smooth(vBottom, top, y), 0.8) : 0)
+  // lapels meet, with a shirt showing underneath. A wrap crosses over higher and narrower.
+  const lapelled = tailored && n >= 2
+  const vee = lapelled || motif === 'wrap'
+  const vBottom = motif === 'wrap' ? hem + height * 0.58 : hem + height * (n >= 4 ? 0.42 : 0.46)
+  const opening = (y: number) => (lapelled ? 0.8 * Math.pow(smooth(vBottom, top, y), 0.8) : motif === 'wrap' ? 0.55 * smooth(vBottom, top, y) : 0)
   const covered = (w: Vector3) => above(fromFront(host, w), opening(w.y), 0.03)
+  // What shows in the V: a dark knit under a coat, a pressed shirt under a jacket, a soft layer under a wrap.
+  const under = motif === 'coat' ? 'dark' : 'soft'
   for (const slot of ['shell', 'belly'] as const) {
     const lift = slot === 'shell' ? LIFT : LIFT - 0.002
     kit.puff(bone, 'fabric', (_p, w) => lift * above(w.y, hem, 0.025) * covered(w), slot)
-    if (lapelled) kit.puff(bone, 'dark', (_p, w) => lift * 0.55 * above(w.y, vBottom - 0.03, 0.02) * (1 - covered(w)), slot)
+    if (vee) kit.puff(bone, under, (_p, w) => lift * 0.55 * above(w.y, vBottom - 0.03, 0.02) * (1 - covered(w)), slot)
   }
+  const neck = collarLine(wear, motif)
   if (wear.race === 'crab') {
     // A crab's shell is its body too: the cloth comes up round the lower shell to a collar under
     // the face, higher at the sides and back, so the shell sits in the garment like a head.
-    const { loft: shell, bone: shellBone, eyeY, eyeRadius } = wear.head
-    const front = eyeY - eyeRadius * (motif === 'tank' ? 2.6 : 2.25)
-    const back = front + (motif === 'tank' ? 0.1 : 0.2)
-    const collar = (phi: number) => front + (back - front) * smooth(0.5, 2.3, phi)
-    kit.puff(shellBone, 'fabric', (_p, w) => LIFT * below(w.y, collar(fromFront(shell, w)), 0.03))
-    const ring: Vector3[] = []
-    for (let i = 0; i <= 64; i++) {
-      const phi = -Math.PI + (i / 64) * Math.PI * 2
-      ring.push(onBody(shell, collar(Math.abs(phi)), phi, LIFT + 0.002).at)
-    }
-    kit.addWorld(shellBone, n >= 2 ? 'trim' : 'fabric', tube(ring, 0.016, 160))
+    const { loft: shell, bone: shellBone } = wear.head
+    kit.puff(shellBone, 'fabric', (_p, w) => LIFT * below(w.y, neck.y(fromFront(shell, w)), 0.03))
+    kit.addWorld(shellBone, n >= 2 && tailored ? 'trim' : 'fabric', tube(neck.ring(LIFT + 0.002), 0.016, 160))
   }
   if (sleeves) {
     const { fore } = wear.arm
     for (const { tag } of SIDES) {
       kit.puff(`arm${tag}`, 'fabric', () => LIFT * 0.8)
       kit.puff(`forearm${tag}`, 'fabric', (p) => LIFT * 0.8 * above(p.y, -fore * 0.86, 0.02))
-      const cuff = new TorusGeometry(wear.arm.radius * 1.05 + LIFT, 0.014, 8, 28)
+      // Knit cuffs on a hoodie are thicker and in the body colour.
+      const knit = motif === 'hoodie'
+      const cuff = new TorusGeometry(wear.arm.radius * 1.05 + LIFT, knit ? 0.022 : 0.014, 8, 28)
       cuff.rotateX(Math.PI / 2)
       cuff.translate(0, -fore * 0.82, 0)
-      kit.add(`forearm${tag}`, n >= 2 ? 'trim' : 'fabric', cuff)
+      kit.add(`forearm${tag}`, n >= 2 && tailored ? 'trim' : 'fabric', cuff)
     }
   }
 
@@ -80,11 +83,14 @@ export function garment(kit: Kit, wear: Wearable): void {
     }
     return
   }
+  if (motif === 'hoodie') return hoodie(kit, wear, hem, height, neck)
+  if (motif === 'wrap') return wrap(kit, wear, hem, vBottom, opening)
 
   if (lapelled) {
-    // Lapels: folded back either side of the opening, widening toward the collar.
+    // Lapels: folded back either side of the opening, widening toward the collar. A blazer's are
+    // satin, in the trim colour.
     const width = (y: number) => 0.12 + 0.26 * smooth(vBottom, top, y)
-    kit.puff(bone, 'fabric', (_p, w) => {
+    kit.puff(bone, motif === 'blazer' ? 'seam' : 'fabric', (_p, w) => {
       const phi = fromFront(host, w)
       const from = opening(w.y)
       return (LIFT + 0.012) * Math.min(within(phi, from, from + width(w.y), 0.03), within(w.y, vBottom, top - 0.02, 0.03))
@@ -98,20 +104,38 @@ export function garment(kit: Kit, wear: Wearable): void {
     // The opening down the front, and buttons beside it.
     kit.addWorld(bone, 'trim', seam(host, [vBottom, 0], [hem + 0.01, 0], LIFT + 0.002, 0.006, 8))
     const rows = n >= 4 ? [-0.16, 0.16] : [0.09]
+    const count = motif === 'coat' ? 3 : 2
     for (const phi of rows) {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < count; i++) {
         const y = vBottom - 0.04 - i * ((vBottom - hem) / 3.4)
         const at = onBody(host, y, phi, LIFT + 0.004)
-        kit.addWorld(bone, 'dark', stud(at.at, at.normal, 0.016))
+        kit.addWorld(bone, motif === 'coat' ? 'dark' : 'trim', stud(at.at, at.normal, 0.016))
       }
     }
   }
 
-  if (n === 3) {
+  if (motif === 'jacket' && n >= 3) {
+    // A tie down the shirt, and a pocket square at the left breast.
+    for (const slot of ['shell', 'belly'] as const) {
+      kit.puff(bone, 'dark', (_p, w) => 0.042 * Math.min(below(fromFront(host, w), 0.13 - 0.06 * smooth(vBottom, top, w.y), 0.035), within(w.y, vBottom - 0.02, top - 0.025, 0.02)), slot)
+    }
+    // The pocket square: soft points peeking out of the breast pocket, on the cloth itself.
+    const y = vBottom + (top - vBottom) * 0.3
+    const peak = (phi: number) => y + 0.05 + 0.03 * Math.abs(Math.sin((phi - 0.6) * 9))
+    for (const slot of ['shell', 'belly'] as const) {
+      kit.puff(bone, 'soft', (_p, w) => {
+        const phi = fromFront(host, w)
+        return (LIFT + 0.01) * Math.min(within(phi, 0.6, 0.95, 0.02), within(w.y, y, peak(phi), 0.01)) * (w.x < 0 ? 1 : 0)
+      }, slot)
+      kit.puff(bone, 'fabric', (_p, w) => (LIFT + 0.014) * Math.min(within(fromFront(host, w), 0.56, 0.99, 0.02), within(w.y, y - 0.03, y + 0.004, 0.008)) * (w.x < 0 ? 1 : 0), slot)
+    }
+  }
+
+  if (n === 3 && motif === 'coat') {
     // A turtleneck under the coat, filling the collar.
-    const neck: Vector3[] = []
-    for (let i = 0; i <= 40; i++) neck.push(onBody(host, top - 0.015, -Math.PI + (i / 40) * Math.PI * 2, LIFT + 0.01).at)
-    kit.addWorld(bone, 'dark', tube(neck, 0.035, 120))
+    const ring: Vector3[] = []
+    for (let i = 0; i <= 40; i++) ring.push(onBody(host, top - 0.015, -Math.PI + (i / 40) * Math.PI * 2, LIFT + 0.01).at)
+    kit.addWorld(bone, 'dark', tube(ring, 0.035, 120))
   }
 
   if (n >= 4) {
@@ -127,12 +151,113 @@ export function garment(kit: Kit, wear: Wearable): void {
   if (motif === 'coat') skirt(kit, wear, hem, wear.leg.thigh + wear.leg.shin * (n >= 4 ? 0.55 : n === 3 ? 0.3 : -0.25))
 }
 
+/** Where a garment's neckline runs: round the top of the torso, or on a crab round the lower shell under the face. */
+interface Neckline {
+  host: Loft
+  bone: string
+  /** Height of the neckline at an angle from the front. */
+  y: (phi: number) => number
+  /** The closed neckline, lifted off the cloth. */
+  ring: (lift: number) => Vector3[]
+}
+
+function collarLine(wear: Wearable, motif: string): Neckline {
+  const crab = wear.race === 'crab'
+  const host = crab ? wear.head.loft : wear.torso.loft
+  const bone = crab ? wear.head.bone : wear.torso.bone
+  let y: (phi: number) => number
+  if (crab) {
+    const { eyeY, eyeRadius } = wear.head
+    const front = eyeY - eyeRadius * (motif === 'tank' ? 2.6 : 2.25)
+    const back = front + (motif === 'tank' ? 0.1 : 0.2)
+    y = (phi) => front + (back - front) * smooth(0.5, 2.3, phi)
+  } else {
+    y = () => wear.torso.top - 0.015
+  }
+  const ring = (lift: number) => {
+    const pts: Vector3[] = []
+    for (let i = 0; i <= 64; i++) {
+      const phi = -Math.PI + (i / 64) * Math.PI * 2
+      pts.push(onBody(host, y(Math.abs(phi)), phi, lift).at)
+    }
+    return pts
+  }
+  return { host, bone, y, ring }
+}
+
+/**
+ * A hoodie: the hood lies folded behind the neck, drawstrings hang in front, knit band at the hem.
+ * At construction 1 it zips up the front; from 2 it is a pullover with a front pocket.
+ */
+function hoodie(kit: Kit, wear: Wearable, hem: number, height: number, neck: Neckline): void {
+  const { loft: host, bone } = wear.torso
+  const { construction: n } = kit.visual
+  // The folded hood: a soft roll round the back of the neck, a second fold above it.
+  for (const [lift, r, rise, reach] of [[LIFT + 0.04, 0.05, 0, 1.0], [LIFT + 0.06, 0.04, 0.05, 0.75]]) {
+    const pts: Vector3[] = []
+    for (let i = 0; i <= 32; i++) {
+      const phi = (Math.PI - reach) + (i / 32) * reach * 2
+      const a = phi > Math.PI ? phi - Math.PI * 2 : phi
+      pts.push(onBody(neck.host, neck.y(Math.abs(a)) + rise, a, lift).at)
+    }
+    kit.addWorld(neck.bone, 'fabric', tube(pts, r, 64))
+  }
+  // Knit band round the neckline and the hem.
+  kit.addWorld(neck.bone, 'fabric', tube(neck.ring(LIFT + 0.004), 0.02, 160))
+  const band: Vector3[] = []
+  for (let i = 0; i <= 48; i++) band.push(onBody(host, hem + 0.025, -Math.PI + (i / 48) * Math.PI * 2, LIFT + 0.004).at)
+  kit.addWorld(bone, 'fabric', tube(band, 0.024, 120))
+  // Drawstrings hang from the front of the neckline.
+  for (const { s } of SIDES) {
+    const phi = s * 0.2
+    const start = onBody(neck.host, neck.y(0.2) - 0.01, phi, LIFT + 0.02)
+    const end = onBody(neck.host, neck.y(0.2) - 0.16, s * 0.24, LIFT + 0.03)
+    const mid = start.at.clone().lerp(end.at, 0.5).addScaledVector(start.normal, 0.01)
+    kit.addWorld(neck.bone, 'soft', tube([start.at, mid, end.at], 0.007, 12))
+    kit.addWorld(neck.bone, 'trim', stud(end.at, end.normal, 0.011, 0.018, 0.011))
+  }
+  if (n <= 1) {
+    // A zip from the neckline to the hem, with its pull a little below the collar.
+    if (wear.race === 'crab') kit.addWorld(neck.bone, 'trim', seam(neck.host, [neck.y(0), 0], [neck.y(0) - 0.3, 0], LIFT + 0.003, 0.008, 10))
+    kit.addWorld(bone, 'trim', seam(host, [wear.race === 'crab' ? wear.torso.top : wear.torso.top - 0.02, 0], [hem + 0.01, 0], LIFT + 0.003, 0.008, 10))
+    const pull = onBody(neck.host, neck.y(0) - 0.07, 0, LIFT + 0.012)
+    kit.addWorld(neck.bone, 'trim', stud(pull.at, pull.normal, 0.012, 0.026, 0.008))
+    return
+  }
+  // A kangaroo pocket across the lower front, its edges stitched in the trim colour.
+  const lo = hem + 0.045
+  const hi = hem + height * 0.36
+  kit.puff(bone, 'fabric', (_p, w) => (LIFT + 0.01) * Math.min(below(fromFront(host, w), 0.8 - 0.25 * smooth(lo, hi, w.y), 0.03), within(w.y, lo, hi, 0.02)), 'belly')
+  for (const { s } of SIDES) kit.addWorld(bone, 'seam', seam(host, [hi, s * 0.55], [lo + 0.02, s * 0.8], LIFT + 0.012, 0.005, 8))
+  kit.addWorld(bone, 'seam', seam(host, [hi, -0.55], [hi, 0.55], LIFT + 0.012, 0.005, 10))
+}
+
+/** A wrap: the left front crossed over the right, a sash tied at the side, a short skirt. */
+function wrap(kit: Kit, wear: Wearable, hem: number, vBottom: number, opening: (y: number) => number): void {
+  const { loft: host, bone, top, belt } = wear.torso
+  // The crossover edge, from the left shoulder down across the front to the right side.
+  kit.addWorld(bone, 'seam', seam(host, [top - 0.02, opening(top - 0.02) + 0.01], [vBottom, 0], LIFT + 0.004, 0.006, 10))
+  kit.addWorld(bone, 'seam', seam(host, [vBottom, 0], [belt + 0.02, -0.7], LIFT + 0.004, 0.006, 10))
+  kit.addWorld(bone, 'seam', seam(host, [top - 0.02, -opening(top - 0.02) - 0.01], [vBottom + 0.01, -0.04], LIFT + 0.004, 0.005, 10))
+  // The sash: a soft band round the waist, knotted at the right hip, two ends hanging.
+  const ring: Vector3[] = []
+  for (let i = 0; i <= 48; i++) ring.push(onBody(host, belt, -Math.PI + (i / 48) * Math.PI * 2, LIFT + 0.01).at)
+  kit.addWorld(bone, 'soft', tube(ring, 0.024, 120))
+  const knot = onBody(host, belt, -0.85, LIFT + 0.03)
+  kit.addWorld(bone, 'soft', stud(knot.at, knot.normal, 0.038, 0.034, 0.03))
+  for (const [phi, len] of [[-0.78, 0.22], [-0.95, 0.17]]) {
+    const pts = [0, 0.5, 1].map((t) => onBody(host, belt - 0.02 - len * t, phi + t * (phi > -0.85 ? 0.08 : -0.06), LIFT + 0.03 + t * 0.02).at)
+    kit.addWorld(bone, 'soft', tube(pts, 0.016, 16))
+  }
+  skirt(kit, wear, hem, wear.leg.thigh * 0.55, 'seam')
+}
+
 /**
  * The coat below the torso: a ring round the hem, carried down and out so it hangs round the
  * outside of the walking legs, wherever the species and build put them, with a little room to
  * spare. It rides the torso bone, open a little at the front so the legs show as it walks.
  */
-function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
+function skirt(kit: Kit, wear: Wearable, hem: number, drop: number, edges: 'trim' | 'seam' = 'trim'): void {
   const { bone } = wear.torso
   // On a crab the coat hangs from the underside of the shell, which it already covers, so it
   // drops cleanly round the wide stance instead of starting from the narrow body below.
@@ -240,7 +365,7 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
     const i = (rows * (cols + 1) + c) * 3
     edge.push(v(verts[i], verts[i + 1], verts[i + 2]))
   }
-  kit.addBending('trim', tube(edge, 0.008, 96), weigh)
+  kit.addBending(edges, tube(edge, 0.008, 96), weigh)
   // A finished edge down each front.
   for (const c of [0, cols]) {
     const front: Vector3[] = []
@@ -248,7 +373,7 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number): void {
       const i = (r * (cols + 1) + c) * 3
       front.push(v(verts[i], verts[i + 1], verts[i + 2]))
     }
-    kit.addBending('trim', tube(front, 0.006, 48), weigh)
+    kit.addBending(edges, tube(front, 0.006, 48), weigh)
   }
 }
 

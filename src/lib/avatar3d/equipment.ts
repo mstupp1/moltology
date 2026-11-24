@@ -12,13 +12,14 @@ import { BoxGeometry, BufferGeometry, CatmullRomCurve3, ConeGeometry, CylinderGe
 import { getEquipmentVisual } from '../avatar/equipment'
 import type { EquippedAppearance } from '../character-appearance'
 import { parseVariantKey } from '../gear-variants'
+import { GEAR_PIECE_BY_KEY } from '../gear/catalog'
 import type { GearShape } from '../gear/types'
 import { equipAccessory, equipHat, type GearItem } from './gear'
 import { Kit, SIDES, above, below, bevel, fromFront, onBody, seam, smooth, stud, tube, v, within, type Tone } from './gear-kit'
 import { garment, shoes } from './gear-cloth'
 import { heldProp } from './gear-props'
 import { alongY, placed, spike } from './parts'
-import { type Rig, type Wearable } from './rig'
+import { lookQuaternion, type Rig, type Wearable } from './rig'
 function torsoArmour(kit: Kit, wear: Wearable): void {
   const { loft: host, bone, top, bottom } = wear.torso
   const { motif, construction: n } = kit.visual
@@ -101,6 +102,9 @@ function torsoArmour(kit: Kit, wear: Wearable): void {
 function belt(kit: Kit, wear: Wearable): void {
   const { loft: host, bone, belt: y } = wear.torso
   const { motif, construction: n } = kit.visual
+  if (motif === 'cord') return cordSash(kit, wear)
+  if (motif === 'dress') return dressBelt(kit, wear)
+  if (motif === 'lanyard') return lanyard(kit, wear)
   const half = 0.036 + n * 0.003
   const lift = 0.046
   kit.puff(bone, 'plate', (_p, w) => lift * within(w.y, y - half, y + half, 0.014))
@@ -125,6 +129,91 @@ function belt(kit: Kit, wear: Wearable): void {
       kit.addWorld(bone, 'accent', stud(side.at.clone().addScaledVector(side.normal, 0.017), side.normal, 0.008, 0.026, 0.008))
     }
     if (n === 3) kit.addWorld(bone, 'accent', seam(host, [y + half * 0.6, s * 0.36], [y - half * 0.3, s * 0.14], lift + 0.001, 0.006, 3))
+  }
+}
+
+/** Belts sit over whatever garment is worn, so their parts ride out past the cloth. */
+const OVER_CLOTH = 0.05
+
+/** Two cords twisted round the waist, knotted at the left hip, the ends left hanging with tassels. */
+function cordSash(kit: Kit, wear: Wearable): void {
+  const { loft: host, bone, belt: y } = wear.torso
+  for (const k of [0, Math.PI]) {
+    const pts: Vector3[] = []
+    for (let i = 0; i <= 160; i++) {
+      const phi = Math.PI - (i / 160) * Math.PI * 2
+      const twist = phi * 9 + k
+      pts.push(onBody(host, y + 0.011 * Math.sin(twist), phi, OVER_CLOTH - 0.012 + 0.007 * Math.cos(twist)).at)
+    }
+    kit.addWorld(bone, 'fabric', tube(pts, 0.011, 320))
+  }
+  const knot = onBody(host, y, 0.75, OVER_CLOTH + 0.006)
+  kit.addWorld(bone, 'fabric', stud(knot.at, knot.normal, 0.03, 0.028, 0.026))
+  for (const [dphi, len] of [[-0.05, 0.2], [0.07, 0.16]]) {
+    const pts = [0, 0.5, 1].map((t) => onBody(host, y - 0.02 - len * t, 0.75 + dphi * (1 + t), OVER_CLOTH + 0.01 + t * 0.015).at)
+    kit.addWorld(bone, 'fabric', tube(pts, 0.009, 16))
+    const end = pts[2]
+    const tassel = new CylinderGeometry(0.012, 0.022, 0.05, 10)
+    kit.addWorld(bone, 'soft', placed(tassel, end.clone().add(v(0, -0.025, 0))))
+  }
+}
+
+/** A slim leather dress belt with a plain rectangular frame buckle in front. */
+function dressBelt(kit: Kit, wear: Wearable): void {
+  const { loft: host, bone, belt: y } = wear.torso
+  const half = 0.024
+  kit.puff(bone, 'plate', (_p, w) => OVER_CLOTH * within(w.y, y - half, y + half, 0.01))
+  for (const edge of [half - 0.005, -half + 0.005]) {
+    const pts: Vector3[] = []
+    for (let i = 0; i <= 40; i++) pts.push(onBody(host, y + edge, Math.PI - (i / 40) * Math.PI * 2, OVER_CLOTH * 0.9).at)
+    kit.addWorld(bone, 'seam', tube(pts, 0.003, 80))
+  }
+  const front = onBody(host, y, 0, OVER_CLOTH + 0.006)
+  const q = lookQuaternion(front.normal)
+  const w = 0.085
+  const h = 0.07
+  const bar = 0.011
+  for (const [bw, bh, x, by] of [[w, bar, 0, h / 2], [w, bar, 0, -h / 2], [bar, h, w / 2, 0], [bar, h, -w / 2, 0]]) {
+    kit.addWorld(bone, 'trim', placed(new BoxGeometry(bw + bar, bh + (bw === bar ? bar : 0), 0.012), front.at.clone().add(v(x, by, 0).applyQuaternion(q)), q))
+  }
+  // The prong across the middle, and the strap end through a keeper loop to the left.
+  kit.addWorld(bone, 'trim', placed(new BoxGeometry(w * 0.7, 0.007, 0.01), front.at.clone().add(v(0, 0, 0.004).applyQuaternion(q)), q))
+  const keeper = onBody(host, y, 0.32, OVER_CLOTH + 0.004)
+  const kq = lookQuaternion(keeper.normal)
+  kit.addWorld(bone, 'plate', placed(new BoxGeometry(0.018, half * 2.4, 0.01), keeper.at, kq))
+}
+
+/**
+ * A lanyard: a strap round the back of the neck, down both sides of the chest to a badge on a clip.
+ * On a crab it hangs from under the face, over the shell.
+ */
+function lanyard(kit: Kit, wear: Wearable): void {
+  const crab = wear.race === 'crab'
+  const host = crab ? wear.head.loft : wear.torso.loft
+  const bone = crab ? wear.head.bone : wear.torso.bone
+  const neckFront = crab ? wear.head.eyeY - wear.head.eyeRadius * 2.25 : wear.torso.top - 0.03
+  const neck = (phi: number) => (crab ? neckFront + 0.2 * smooth(0.5, 2.3, phi) : neckFront)
+  const badgeY = neckFront - (crab ? 0.15 : Math.min(0.3, (wear.torso.top - wear.torso.belt) * 0.45))
+  const lift = OVER_CLOTH
+  const pts: Vector3[] = []
+  // Down the right side to the clip, round the back of the neck, and down the left side.
+  for (let i = 0; i <= 6; i++) pts.push(onBody(host, badgeY + 0.05 + (neck(0.55) - badgeY - 0.05) * (i / 6), -0.08 - 0.47 * Math.pow(i / 6, 1.4), lift).at)
+  for (let i = 1; i < 24; i++) {
+    const phi = -0.55 - (i / 24) * (Math.PI * 2 - 1.1)
+    const a = phi < -Math.PI ? phi + Math.PI * 2 : phi
+    pts.push(onBody(host, neck(Math.abs(a)), a, lift).at)
+  }
+  for (let i = 6; i >= 0; i--) pts.push(onBody(host, badgeY + 0.05 + (neck(0.55) - badgeY - 0.05) * (i / 6), 0.08 + 0.47 * Math.pow(i / 6, 1.4), lift).at)
+  kit.addWorld(bone, 'fabric', tube(pts, 0.01, 160))
+  const clip = onBody(host, badgeY + 0.045, 0, lift + 0.006)
+  kit.addWorld(bone, 'trim', stud(clip.at, clip.normal, 0.016, 0.022, 0.01))
+  const badge = onBody(host, badgeY - 0.04, 0, lift + 0.01)
+  const q = lookQuaternion(badge.normal)
+  kit.addWorld(bone, 'soft', placed(new BoxGeometry(0.11, 0.14, 0.008), badge.at, q))
+  kit.addWorld(bone, 'paint', placed(new BoxGeometry(0.11, 0.035, 0.01), badge.at.clone().add(v(0, 0.052, 0).applyQuaternion(q)), q))
+  for (const [x, lw] of [[0, 0.07], [-0.012, 0.05]] as const) {
+    const at = badge.at.clone().add(v(x, x ? -0.04 : -0.015, 0.005).applyQuaternion(q))
+    kit.addWorld(bone, 'dark', placed(new BoxGeometry(lw, 0.008, 0.004), at, q))
   }
 }
 
@@ -312,6 +401,10 @@ function antennaGear(kit: Kit, wear: Wearable): void {
       g.rotateX(Math.PI / 2)
       kit.addWorld(at(u), tone, placed(g, curve.getPointAt(u), alongY(curve.getTangentAt(u))))
     }
+    if (motif === 'panels') {
+      panels(kit, curve, at, t, s)
+      continue
+    }
     const sleeve = new CylinderGeometry(t * 1.5, t * 1.75, t * 2.4, 16)
     kit.addWorld(at(0.05), 'plate', placed(sleeve, curve.getPointAt(0.05), alongY(curve.getTangentAt(0.05))))
     ring(0.1, t * 1.6, t * 0.4, 'trim')
@@ -337,6 +430,46 @@ function antennaGear(kit: Kit, wear: Wearable): void {
       kit.addWorld(at(u), 'accent', placed(new SphereGeometry(t * 0.45, 10, 8), curve.getPointAt(u).addScaledVector(out, t * 1.7)))
     }
   }
+}
+
+/**
+ * Small glass panels floating round an antenna, each square to the stalk and turned a little
+ * further round it than the last, with a fine ring marking its orbit. More panels with construction.
+ */
+function panels(kit: Kit, curve: CatmullRomCurve3, at: (u: number) => string, t: number, s: number): void {
+  const n = kit.visual.construction
+  const stops = n >= 3 ? [0.34, 0.6, 0.86] : n >= 1 ? [0.45, 0.8] : [0.6]
+  const sleeve = new CylinderGeometry(t * 1.4, t * 1.6, t * 2, 16)
+  kit.addWorld(at(0.05), 'trim', placed(sleeve, curve.getPointAt(0.05), alongY(curve.getTangentAt(0.05))))
+  stops.forEach((u, i) => {
+    const p = curve.getPointAt(u)
+    const dir = curve.getTangentAt(u)
+    const along = alongY(dir)
+    const radius = t * (3.6 - u)
+    if (i === 1 || stops.length === 1) {
+      const ring = new TorusGeometry(radius, t * 0.1, 6, 40)
+      ring.rotateX(Math.PI / 2)
+      kit.addWorld(at(u), 'accent', placed(ring, p, along))
+    }
+    // Round the stalk: outward to the side for the first, then further round for each one after.
+    const angle = s * (0.9 + i * 2.1)
+    const off = v(Math.cos(angle) * radius, 0, Math.sin(angle) * radius)
+    const centre = p.clone().add(off.clone().applyQuaternion(along))
+    const face = new Quaternion().setFromAxisAngle(v(0, 1, 0), Math.PI / 2 - angle)
+    const q = along.clone().multiply(face)
+    const w = t * (4.4 - u * 1.2)
+    const h = w * 0.68
+    kit.addWorld(at(u), 'glass', placed(new BoxGeometry(w, h, t * 0.25), centre, q))
+    const frame = (bw: number, bh: number, x: number, y: number) => kit.addWorld(at(u), 'trim', placed(new BoxGeometry(bw, bh, t * 0.35), centre.clone().add(v(x, y, 0).applyQuaternion(q)), q))
+    frame(w, t * 0.22, 0, h / 2)
+    frame(w, t * 0.22, 0, -h / 2)
+    frame(t * 0.22, h, w / 2, 0)
+    frame(t * 0.22, h, -w / 2, 0)
+    // A line of "text" across the glass.
+    kit.addWorld(at(u), 'accent', placed(new BoxGeometry(w * 0.55, t * 0.12, t * 0.3), centre.clone().add(v(-w * 0.1, h * 0.12, 0).applyQuaternion(q)), q))
+  })
+  const end = curve.getPointAt(1)
+  kit.addWorld(at(1), 'accent', placed(new SphereGeometry(t * (0.85 + n * 0.14), 16, 12), end))
 }
 
 /** How a shape is built. Claw shapes are built once per claw, with its side. */
@@ -382,9 +515,11 @@ export function equipAll(rig: Rig, equipment: EquippedAppearance | undefined, ac
     if (!visual) continue
     if (slot === 'head') headDone = true
     if (visual.shape === 'hat') {
-      // Base hats keep their own colours; rarer versions are tinted like the rest of their tier.
-      const rarity = parseVariantKey(key ?? '').rarity
-      const hat = visual.hat && equipHat(rig, visual.hat, rarity && rarity !== 'common' ? visual : undefined)
+      // The original base hats keep their own colours; rarer versions are tinted like the rest of
+      // their tier, and collection hats wear their collection's palette.
+      const { baseKey, rarity } = parseVariantKey(key ?? '')
+      const designed = GEAR_PIECE_BY_KEY.get(baseKey)?.ladder === false
+      const hat = visual.hat && equipHat(rig, visual.hat, designed || (rarity && rarity !== 'common') ? visual : undefined)
       if (hat) items.push(hat)
       continue
     }

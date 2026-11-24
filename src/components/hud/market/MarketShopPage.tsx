@@ -9,7 +9,7 @@ import { AuthModal } from '@/components/AuthModal'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { accountKeys, useAppQueryClient } from '@/lib/query/account'
 import { FRESH } from '@/lib/query/content'
-import { buyGearFn, createCreditCheckoutFn, getChassisLoadoutFn, getMarketFn } from '@/lib/server/api'
+import { buyBundleFn, buyGearFn, createCreditCheckoutFn, getChassisLoadoutFn, getMarketFn } from '@/lib/server/api'
 import type { MoltCreditPack } from '@/lib/molt-credits'
 import {
   clearChassisLoadoutCache,
@@ -25,7 +25,7 @@ import { GEAR_PIECE_BY_KEY } from '@/lib/gear/catalog'
 import { GEAR_COLLECTIONS, gearCollection } from '@/lib/gear/collections'
 import { LOBSTER_AVATAR_STYLE, type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import type { MarketPayload, MarketPiece, MarketVariant } from '@/lib/market'
-import { MARKET_BUNDLES, type PieceRef } from '@/lib/market-featured'
+import { MARKET_BUNDLES, type MarketBundle, type PieceRef } from '@/lib/market-featured'
 import { cn } from '@/lib/utils'
 import { HudSectionGhost } from '../HudGhostSkeletons'
 import { MarketCreditsPanel } from './MarketCreditsPanel'
@@ -391,6 +391,33 @@ export function MarketShopPage() {
     }
   }
 
+  const buyBundle = async (target: MarketBundle) => {
+    if (market?.guest) {
+      setAuthOpen(true)
+      return
+    }
+    if (buying) return
+    setBuying(true)
+    try {
+      const token = (await getAuthJWTToken()) ?? undefined
+      const result = await buyBundleFn({ data: { token, bundleId: target.id } })
+      if (result.ok) {
+        clearChassisLoadoutCache()
+        toast?.success(`The ${target.name} pieces are in your inventory. Wear them from Customize.`, {
+          title: market?.addFree ? 'Added to your collection' : 'Bundle unlocked',
+        })
+      } else {
+        toast?.warning(result.error ?? 'That purchase did not go through.')
+      }
+      await load()
+      if (userId) void queryClient.invalidateQueries({ queryKey: accountKeys.wallet(userId) })
+    } catch {
+      toast?.error('That purchase did not go through. Try again.')
+    } finally {
+      setBuying(false)
+    }
+  }
+
   const buyPack = async (pack: MoltCreditPack) => {
     if (buyingPack) return
     setBuyingPack(pack.id)
@@ -410,7 +437,17 @@ export function MarketShopPage() {
   }
 
   const detail = bundle ? (
-    <MarketBundleDetail bundle={bundle} pieces={market.pieces} onOpenPiece={openPiece} />
+    <MarketBundleDetail
+      bundle={bundle}
+      pieces={market.pieces}
+      onOpenPiece={openPiece}
+      balance={market.wallet.balance}
+      credits={market.moltCredits}
+      buying={buying}
+      addFree={market.addFree}
+      guest={market.guest}
+      onBuy={buyBundle}
+    />
   ) : selectedPiece && selectedVariant ? (
       <MarketPieceDetail
         key={selectedPiece.baseKey}
