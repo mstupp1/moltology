@@ -75,7 +75,7 @@ export function CurrentRunnerGame({ onFinished }: { onFinished?: () => void }) {
           reducedMotion,
           onContextLost: mark3DUnavailable,
           art: {
-            backdrop: getAssetUrl('images/arcade/v1/current-runner-backdrop-2.jpg'),
+            backdrop: getAssetUrl('images/arcade/v1/current-runner-backdrop.jpg'),
             sand: getAssetUrl('textures/arcade/v1/runner-sand.webp'),
             rock: getAssetUrl('textures/arcade/v1/rock.webp'),
           },
