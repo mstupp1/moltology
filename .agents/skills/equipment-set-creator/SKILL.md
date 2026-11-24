@@ -49,11 +49,13 @@ Prices come from the rarity alone (`GEAR_PRICES` in `gear-variants.ts`). Do not 
 | `helmet` | head | A helmet over the crown of the head | same |
 | `antenna-fittings` | antennae | Sleeves, bands and tips riding the character's own antennae | same |
 | `hat` | head | One of the hat builds on the head socket (glasses, visors and mics too). Collection hats wear their palette; the original base hats keep their own colours | `src/lib/avatar3d/gear.ts` |
-| `garment` | carapace | Cloth on the body; motif `tank`, `jacket`, `blazer`, `coat`, `wrap` or `hoodie` | `src/lib/avatar3d/gear-cloth.ts` |
-| `shoes` | legs | `clog` or `hi-top` | same |
+| `garment` | carapace | Cloth on the body; motif `tank`, `jacket`, `blazer`, `coat`, `wrap`, `hoodie`, `shirt` (short-sleeved camp shirt), `puffer` (quilted), `sweater` (ribbed, cables from construction 2), `robe` (hood down, to the ankle) or `divesuit` (covers the legs, brass corselet) | `src/lib/avatar3d/gear-cloth.ts` |
+| `shoes` | legs | `clog`, `hi-top`, `boot` (cuff at 1, straps at 2, toe cap at 3) or `sandal` | same |
 | `held-prop` | claws | One object in one claw; `prop` names it | `src/lib/avatar3d/gear-props.ts` |
 
-`belt-plate` also takes motif `cord` (twisted sash), `dress` (slim belt, frame buckle) or `lanyard` (strap round the neck, badge on the chest). `antenna-fittings` takes motif `panels` (floating glass panels).
+`belt-plate` also takes motif `cord` (twisted sash), `dress` (slim belt, frame buckle) or `lanyard` (strap round the neck, badge on the chest), `scarf` (wound twice, fringe from construction 2) or `cape` (from the shoulders to the ground, trim edge at 2, stand-up collar at 3).
+
+Garments and scarves take an optional `print`: `stripes`, `dots`, `plaid` (trim colour) or `flowers` (accent petals, trim centres), laid on the cloth as small flat marks so it stays crisp. A colourway of a piece (same shape, new palette or print) is its own piece with its own `n`. `antenna-fittings` takes motif `panels` (floating glass panels).
 
 A new shape: add it to `GearShape` and `SHAPE_SLOT`, write its builder in its own file under `src/lib/avatar3d/` against the toolkit in [`gear-kit.ts`](../../../src/lib/avatar3d/gear-kit.ts) (`Kit.puff` for anything that follows the body, `onBody`, `seam`, `stud`, `tube` for fittings, `kit.add(bone, tone, geo)` so parts ride the right bone), and register it in `SHAPE_BUILDERS` in `equipment.ts`. A new hat: add it to `HATS` and to `HEAD_GEAR` in `gear.ts`. Hats no longer touch the character's `accessory` trait.
 

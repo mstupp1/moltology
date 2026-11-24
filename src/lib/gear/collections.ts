@@ -6,8 +6,8 @@ import type { BenefitKit } from '../benefits/types'
 
 export interface GearCollection {
   id: string
-  /** The benefit page costume the collection comes from; its pages show the collection. */
-  kit: BenefitKit
+  /** The benefit page costume the collection comes from, if any; its pages show the collection. */
+  kit?: BenefitKit
   name: string
   /** One line for the shop tile. */
   blurb: string
@@ -27,6 +27,14 @@ export const GEAR_COLLECTIONS: GearCollection[] = [
   { id: 'workflow', kit: 'platform', name: 'Workflow', blurb: 'Glass panels round the antennae, a holo visor and a zip hoodie.', discountPercent: 20 },
   { id: 'main-stage', kit: 'seminar', name: 'Main Stage', blurb: 'A stage blazer, a headset mic and the book everyone is quoting.', discountPercent: 20 },
   { id: 'bonfire', kit: 'network', name: 'Bonfire', blurb: 'A beach hoodie, a bucket hat and a marshmallow on a stick.', discountPercent: 20 },
+  // Themed sets of their own, not tied to a benefit page.
+  { id: 'deep-diver', name: 'Deep Diver', blurb: 'A brass helmet, a canvas suit, lead-soled boots and a lantern for the dark.', discountPercent: 20 },
+  { id: 'tidepool-summer', name: 'Tidepool Summer', blurb: 'Camp shirts in three prints, rope sandals, a flower crown and an ice lolly.', discountPercent: 20 },
+  { id: 'codex-scholar', name: 'Codex Scholar', blurb: 'A hooded robe, a walking staff, brass reading glasses and a heavy tome.', discountPercent: 20 },
+  { id: 'molt-street', name: 'Molt Street', blurb: 'Quilted puffers in three colours, a six-panel cap and a plaid hoodie.', discountPercent: 20 },
+  { id: 'polar-shelf', name: 'Polar Shelf', blurb: 'Cable knit, a striped scarf, fleece-cuffed boots and a mug of cocoa.', discountPercent: 20 },
+  { id: 'bioluminescent', name: 'Bioluminescent', blurb: 'Armour with seams that glow like deep water, and a jellyfish lantern.', discountPercent: 20 },
+  { id: 'royal-reef', name: 'Royal Reef', blurb: 'A coral cape, a pearl crown and a sceptre for holding court.', discountPercent: 20 },
 ]
 
 export function gearCollection(id: string): GearCollection | undefined {

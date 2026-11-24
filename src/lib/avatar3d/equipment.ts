@@ -16,7 +16,7 @@ import { GEAR_PIECE_BY_KEY } from '../gear/catalog'
 import type { GearShape } from '../gear/types'
 import { equipAccessory, equipHat, type GearItem } from './gear'
 import { Kit, SIDES, above, below, bevel, fromFront, onBody, seam, smooth, stud, tube, v, within, type Tone } from './gear-kit'
-import { garment, shoes } from './gear-cloth'
+import { cape, garment, scarf, shoes } from './gear-cloth'
 import { heldProp } from './gear-props'
 import { alongY, placed, spike } from './parts'
 import { lookQuaternion, type Rig, type Wearable } from './rig'
@@ -105,6 +105,8 @@ function belt(kit: Kit, wear: Wearable): void {
   if (motif === 'cord') return cordSash(kit, wear)
   if (motif === 'dress') return dressBelt(kit, wear)
   if (motif === 'lanyard') return lanyard(kit, wear)
+  if (motif === 'scarf') return scarf(kit, wear)
+  if (motif === 'cape') return cape(kit, wear)
   const half = 0.036 + n * 0.003
   const lift = 0.046
   kit.puff(bone, 'plate', (_p, w) => lift * within(w.y, y - half, y + half, 0.014))

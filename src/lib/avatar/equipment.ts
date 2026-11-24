@@ -2,7 +2,7 @@
 import type { EquipmentCategory } from '../../db/schema'
 import { GEAR_PIECES } from '../gear/pieces'
 import { resolveColours } from '../gear/palettes'
-import type { GearMotif, GearShape, Hat, Prop } from '../gear/types'
+import type { GearMotif, GearShape, Hat, Print, Prop } from '../gear/types'
 import { TIER_FINISH, mixHex, parseVariantKey } from '../gear-variants'
 import type { GearSurface } from '../avatar3d/textures'
 
@@ -20,6 +20,8 @@ export interface EquipmentVisual {
   hat?: Hat
   /** For held props: what is held. */
   prop?: Prop
+  /** For cloth: a printed pattern. */
+  print?: Print
   /** What the main plates are made of, for their surface texture (default metal). */
   surface: GearSurface
 }
@@ -37,6 +39,7 @@ export const EQUIPMENT_VISUALS: Readonly<Record<string, EquipmentVisual>> = Obje
       motif: p.motif,
       ...(p.hat ? { hat: p.hat } : {}),
       ...(p.prop ? { prop: p.prop } : {}),
+      ...(p.print ? { print: p.print } : {}),
       surface: p.surface ?? 'metal',
     },
   ]),
