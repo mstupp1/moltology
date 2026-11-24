@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   ARCADE_GAMES,
-  ARCADE_MIN_REWARD_SCORE,
   ARCADE_XP_RUNS_PER_DAY,
   arcadeRunEarnsXp,
   arcadeScoreCeiling,
@@ -15,6 +14,7 @@ const riptide = ARCADE_GAMES.riptide
 describe('arcade rules', () => {
   it('knows its games', () => {
     expect(isArcadeGameId('riptide')).toBe(true)
+    expect(isArcadeGameId('current-runner')).toBe(true)
     expect(isArcadeGameId('pong')).toBe(false)
   })
 
@@ -27,9 +27,12 @@ describe('arcade rules', () => {
   })
 
   it('caps rewarded runs per day', () => {
-    expect(arcadeRunEarnsXp(ARCADE_MIN_REWARD_SCORE, 0)).toBe(true)
-    expect(arcadeRunEarnsXp(ARCADE_MIN_REWARD_SCORE - 1, 0)).toBe(false)
-    expect(arcadeRunEarnsXp(50, ARCADE_XP_RUNS_PER_DAY)).toBe(false)
+    expect(arcadeRunEarnsXp(riptide, riptide.minRewardScore, 0)).toBe(true)
+    expect(arcadeRunEarnsXp(riptide, riptide.minRewardScore - 1, 0)).toBe(false)
+    expect(arcadeRunEarnsXp(riptide, 50, ARCADE_XP_RUNS_PER_DAY)).toBe(false)
+    const runner = ARCADE_GAMES['current-runner']
+    expect(arcadeRunEarnsXp(runner, 50, 0)).toBe(false)
+    expect(arcadeRunEarnsXp(runner, runner.minRewardScore, 0)).toBe(true)
   })
 
   it('pays the weekly top 10 only', () => {

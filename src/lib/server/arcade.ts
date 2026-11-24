@@ -13,7 +13,6 @@ import {
   ARCADE_RUNS_PER_HOUR,
   ARCADE_XP_PER_RUN,
   ARCADE_XP_RUNS_PER_DAY,
-  ARCADE_MIN_REWARD_SCORE,
   arcadeDay,
   arcadeRunEarnsXp,
   arcadeWeeklyGems,
@@ -140,7 +139,7 @@ export async function settleArcadeWeek(db: Db, game: ArcadeGameId, weekStart: Da
   const memo = `${game}:${weekKey}`
   if (settledWeeks.has(memo)) return 0
   const ranked = (await rankedBests(db, game, weekStart, addWeeks(weekStart, 1)))
-    .filter((r) => r.score >= ARCADE_MIN_REWARD_SCORE)
+    .filter((r) => r.score >= ARCADE_GAMES[game].minRewardScore)
     .slice(0, ARCADE_BOARD_SIZE)
   const title = ARCADE_GAMES[game].title
   const label = new Date(`${weekKey}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
@@ -242,7 +241,7 @@ export async function finishArcadeRun(
     .where(and(eq(xpTransactions.userId, userId), eq(xpTransactions.source, 'arcade'), gte(xpTransactions.createdAt, dayStart)))
   let xp = 0
   let rewardedToday = Number(rewarded) || 0
-  if (fair && arcadeRunEarnsXp(input.score, rewardedToday)) {
+  if (fair && arcadeRunEarnsXp(game, input.score, rewardedToday)) {
     const inserted = await db
       .insert(xpTransactions)
       .values({

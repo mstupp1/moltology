@@ -12,6 +12,7 @@ import {
   type EquipSlotId,
   type MoveTarget,
 } from '../chassis-loadout'
+import { ARCADE_GAME_IDS, type ArcadeGameId } from '../arcade'
 import { ACTIVITY_FEED_FILTER_IDS } from '../activity-events'
 import { avatarConfigShape } from '../avatar/config-schema'
 
@@ -1447,12 +1448,12 @@ export const getOracleCardsFn = createServerFn({ method: 'POST' })
 
 export type { ArcadeBoard, ArcadeBoardEntry, ArcadeRunResult, ArcadeRunTicket } from './arcade'
 
-const arcadeGameSchema = z.enum(['riptide'])
+const arcadeGameSchema = z.enum(ARCADE_GAME_IDS)
 
 /** A seed for the next run, and a run id when a signed-in member's score will be recorded. */
 export const startArcadeRunFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: { token?: string; game: 'riptide' }) =>
+  .validator((data: { token?: string; game: ArcadeGameId }) =>
     z.object({ token: z.string().optional(), game: arcadeGameSchema }).parse(data),
   )
   .handler(async (args) => {
@@ -1463,13 +1464,13 @@ export const startArcadeRunFn = createServerFn({ method: 'POST' })
 /** Records a finished run's score (checked against its time) and any XP it earns. */
 export const finishArcadeRunFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: { token?: string; game: 'riptide'; runId: string; score: number }) =>
+  .validator((data: { token?: string; game: ArcadeGameId; runId: string; score: number }) =>
     z
       .object({
         token: z.string().optional(),
         game: arcadeGameSchema,
         runId: z.string().uuid(),
-        score: z.number().int().min(0).max(9999),
+        score: z.number().int().min(0).max(99999),
       })
       .parse(data),
   )
@@ -1481,7 +1482,7 @@ export const finishArcadeRunFn = createServerFn({ method: 'POST' })
 /** Public: a game's top 10 this week or all time, plus the viewer's own place. */
 export const getArcadeBoardFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: { token?: string; game: 'riptide'; window?: 'week' | 'all' }) =>
+  .validator((data: { token?: string; game: ArcadeGameId; window?: 'week' | 'all' }) =>
     z
       .object({ token: z.string().optional(), game: arcadeGameSchema, window: z.enum(['week', 'all']).default('week') })
       .parse(data),

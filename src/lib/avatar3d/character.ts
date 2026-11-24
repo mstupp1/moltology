@@ -115,6 +115,26 @@ export interface Character3D {
   /** One swimming stroke while swimming: claws sweep back and down, legs and tail kick, then a glide. */
   stroke: () => void
   /**
+   * Running on the spot, over whatever pose it holds: feet stride in turn, claws pump, body leans
+   * into it and bobs, middle legs patter, antennae stream back. `pace` 1 is a jog, 2 a sprint.
+   * Eases in and out. Used by the arcade's runner and free for scripted animation.
+   */
+  setRun: (on: boolean, pace?: number) => void
+  /** Flattened low, claws tucked in front, antennae and eyes folded back; runs on if running. */
+  setDuck: (on: boolean) => void
+  /**
+   * Off the ground: a quick push off, then feet tucked up, claws thrown up and out, mouth open.
+   * The caller moves the character through the air; `land()` brings the feet down.
+   */
+  leap: () => void
+  /** Feet down after a leap, with a squash through the knees. */
+  land: () => void
+  /**
+   * Running into something: a flinch, claws flung up, legs splayed, then a dazed face held until
+   * it runs again or takes a new pose. The caller tips or knocks the character back.
+   */
+  tumble: () => void
+  /**
    * How loud the character is speaking right now, 0 (silent) to 1, for scripted animation, and
    * the cartoon mouth shape for the sound being made (mouth-shapes.ts). Without a shape the mouth
    * just opens with the level. The head nods a little on the louder syllables either way.
@@ -577,6 +597,32 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
   let gestures: { kind: Gesture; side: 1 | -1; amount: number; start: number | null }[] = []
   /** Swimming: whether it is on, how far it has eased in (0..1), and when the last stroke began. */
   const swim = { on: false, weight: 0, strokeAt: null as number | null, strokeQueued: false }
+  /**
+   * Running, ducking and leaping (the arcade runner, and scripted animation): what is asked for,
+   * how far each has eased in (0..1), the stride phase, and when a push off, landing or crash
+   * began (null for none).
+   */
+  const gait = {
+    run: false,
+    runW: 0,
+    pace: 1,
+    phase: 0,
+    duck: false,
+    duckW: 0,
+    air: false,
+    airW: 0,
+    leapAt: null as number | null,
+    leapQueued: false,
+    landAt: null as number | null,
+    landQueued: false,
+    tumbleAt: null as number | null,
+    tumbleQueued: false,
+    dazed: false,
+  }
+  /** Each foot's stride this frame: how far ahead (+) or behind it reaches, and how high it lifts. */
+  const strideAt = { L: new Vector3(), R: new Vector3() }
+  const strideLift = { L: 0, R: 0 }
+  const footAt = new Vector3()
 
   const overlay = (name: string, axis: Vector3, angle: number) => {
     const bone = rig.bones.get(name)
@@ -844,6 +890,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     // How far the tail fan spreads (radians between paddles) and how far its plates curl, outer first.
     let fanSpread = 0
     let fanCurl = 0
+    strideAt.L.set(0, 0, 0)
+    strideAt.R.set(0, 0, 0)
+    strideLift.L = strideLift.R = 0
 
     if (!idle) {
       if (reaction && held) aimPose(held, true)
@@ -990,6 +1039,144 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         // Effort on the stroke: a small open mouth, brows set.
         mouthOpen = Math.max(mouthOpen, 0.25 * power * w)
         browKnit = Math.max(browKnit, 0.12 * w)
+      }
+
+      // Running, ducking, leaping and tumbling (setRun, setDuck, leap, land, tumble).
+      if (gait.leapQueued) {
+        gait.leapAt = time
+        gait.leapQueued = false
+      }
+      if (gait.landQueued) {
+        gait.landAt = time
+        gait.landQueued = false
+        spring.kick(kickAt.set(0, -0.5, 0))
+      }
+      if (gait.tumbleQueued) {
+        gait.tumbleAt = time
+        gait.tumbleQueued = false
+        spring.kick(kickAt.set(0, 0.6, -0.8))
+      }
+      const easeTo = (from: number, to: number, rate: number) => from + (to - from) * (1 - Math.exp(-dt * rate))
+      gait.runW = easeTo(gait.runW, gait.run ? 1 : 0, 7)
+      gait.duckW = easeTo(gait.duckW, gait.duck ? 1 : 0, 22)
+      gait.airW = easeTo(gait.airW, gait.air ? 1 : 0, 16)
+      if (gait.runW > 0.001 || gait.duckW > 0.001 || gait.airW > 0.001) {
+        const air = gait.airW
+        const duck = gait.duckW * (1 - air)
+        // In the air the legs stop striding; ducked they take shorter, quicker steps.
+        const run = gait.runW * (1 - air)
+        gait.phase += dt * Math.PI * 2 * (1.7 + 0.9 * gait.pace) * (1 + 0.25 * duck)
+        const ph = gait.phase
+        const stride = (0.2 + 0.08 * Math.min(gait.pace, 2)) * legLength * (1 - 0.45 * duck)
+        for (const [tag, off] of [['L', 0], ['R', Math.PI]] as const) {
+          const a = ph + off
+          // The foot swings forward (+z, the way it faces) lifted, and pushes back along the ground.
+          strideAt[tag].z = Math.sin(a) * stride * run
+          strideLift[tag] = Math.max(0, Math.cos(a)) * (0.2 - 0.08 * duck) * legLength * run
+        }
+        // Down at each footfall, up between; the chest leans into the run.
+        dy += (-0.05 + 0.06 * Math.abs(Math.cos(ph))) * legLength * run
+        overlay('chest', X, (0.2 + 0.06 * Math.min(gait.pace, 2)) * run)
+        overlay('pelvis', X, 0.08 * run)
+        overlay('pelvis', Yaxis, Math.sin(ph) * 0.1 * run)
+        overlay('chest', Yaxis, -Math.sin(ph) * 0.07 * run)
+        for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
+          // Claws pump opposite the legs, held bent in front, pincers shut.
+          const pump = Math.sin(ph + (s > 0 ? Math.PI : 0))
+          aim(`arm${tag}`, aimAt.set(s * 0.45, -0.75, 0.25 + 0.45 * pump), 0.7 * run)
+          aim(`forearm${tag}`, aimAt.set(s * 0.15, 0.35, 1), 0.75 * run)
+          overlay(`antenna${tag}`, X, 0.3 * run + 0.55 * duck)
+        }
+        // The middle legs patter twice to every stride.
+        for (const leg of sideLegs) {
+          const step = Math.sin(ph * 2 - leg.k * 1.6 + (leg.s > 0 ? 0 : Math.PI))
+          legPose(leg, 0.18 * step * run, (0.12 + 0.12 * Math.max(0, step)) * run, 0.12 * run, 0.05 * run)
+        }
+        overlay('tail', X, Math.sin(ph * 2) * 0.08 * run + 0.15 * run)
+        // Effort: brows set, a little open mouth on each breath.
+        browKnit = Math.max(browKnit, 0.1 * run)
+        mouthOpen = Math.max(mouthOpen, (0.12 + 0.1 * Math.abs(Math.sin(ph))) * run)
+
+        if (duck > 0.001) {
+          // Flattened low: knees folded deep, chest pitched forward over them, claws tucked in front,
+          // eyes squashed down and antennae flat back.
+          dy -= 0.3 * legLength * duck
+          overlay('chest', X, 0.55 * duck)
+          overlay('pelvis', X, 0.25 * duck)
+          for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
+            aim(`arm${tag}`, aimAt.set(s * 0.6, -0.55, 0.6), 0.8 * duck)
+            aim(`forearm${tag}`, aimAt.set(s * 0.1, -0.1, 1), 0.8 * duck)
+            overlay(`eye${tag}`, X, 0.35 * duck)
+          }
+          browKnit = Math.max(browKnit, 0.18 * duck)
+          for (const leg of sideLegs) legPose(leg, 0, 0.25 * duck, 0.3 * duck, 0.1 * duck)
+        }
+
+        if (air > 0.001) {
+          // Up: feet tucked, toes pointed, claws thrown up and out, a whoop.
+          lift = Math.max(lift, 0.3 * legLength * air)
+          toe = Math.max(toe, 0.8 * air)
+          overlay('chest', X, -0.08 * air)
+          overlay('tail', X, -0.25 * air)
+          for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
+            aim(`arm${tag}`, aimAt.set(s * 0.9, 0.45, 0.25), 0.7 * air)
+            aim(`forearm${tag}`, aimAt.set(s * 0.4, 0.9, 0.3), 0.6 * air)
+            overlay(`thumb${tag}`, Zaxis, -s * 0.35 * air)
+          }
+          for (const leg of sideLegs) legPose(leg, -0.1 * air, 0.3 * air, 0.45 * air, 0.2 * air)
+          mouthOpen = Math.max(mouthOpen, 0.55 * air)
+          bright = Math.max(bright, 0.6 * air)
+          browUp += 0.012 * air
+          fanSpread += 0.12 * air
+        }
+      }
+      if (gait.leapAt !== null) {
+        // The push off: a quick squat, then up onto the toes.
+        const p = (time - gait.leapAt) / 0.14
+        if (p >= 1) gait.leapAt = null
+        else {
+          dy -= 0.1 * arc(p) * legLength
+          toe = Math.max(toe, p)
+        }
+      }
+      if (gait.landAt !== null) {
+        // Landing: through the knees and back up.
+        const p = (time - gait.landAt) / 0.22
+        if (p >= 1) gait.landAt = null
+        else {
+          dy -= 0.14 * arc(p) * (1 - 0.4 * p) * legLength
+          overlay('chest', X, 0.12 * arc(p))
+        }
+      }
+      if (gait.tumbleAt !== null || gait.dazed) {
+        // A crash: eyes wide and a gasp, claws flung up, legs splayed, antennae whipping; then
+        // held dazed (eyes half shut, mouth slack, brows up) until it runs again.
+        const p = gait.tumbleAt === null ? 1 : (time - gait.tumbleAt) / 0.8
+        if (p >= 1) gait.tumbleAt = null
+        else {
+          const k = arc(Math.min(1, p * 1.5))
+          wide = Math.max(wide, 1 - p)
+          closed = 0
+          mouthOpen = Math.max(mouthOpen, 0.9 * k)
+          mouthRound = 1
+          browUp += 0.025 * k
+          for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
+            aim(`arm${tag}`, aimAt.set(s * 0.8, 0.6 + 0.2 * Math.sin(p * 24 + s), 0.1), 0.8 * k)
+            overlay(`thumb${tag}`, Zaxis, -s * 0.5 * k)
+            overlay(`antenna${tag}`, X, Math.sin(p * 30) * 0.25 * (1 - p))
+          }
+          for (const leg of sideLegs) legPose(leg, 0.2 * Math.sin(p * 20 + leg.k), 0.35 * k, 0.1 * k, 0)
+          fanSpread += 0.18 * k
+        }
+        if (gait.dazed && gait.tumbleAt === null) {
+          squint = Math.max(squint, 0.35)
+          closed = Math.max(closed, 0.3)
+          mouthOpen = Math.max(mouthOpen, 0.25)
+          mouthRound = 0.6
+          browUp += 0.01
+          eyeYaw += Math.sin(time * 3) * 10
+          eyePitch += Math.cos(time * 3) * 6
+        }
       }
       if (reaction) {
         if (reaction.start === null) {
@@ -1218,7 +1405,9 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       const step = leg.tag === 'L' ? stepL : stepR
       // A stepping foot peels off heel first and sets down flat.
       const peel = (raise + step) / legLength
-      solveLeg(leg, leg.tag === 'L' ? extra.footL : extra.footR, lift + raise + step, wrap(f.yaw - turned), toe + Math.min(peel * 3, 0.35))
+      footAt.copy(leg.tag === 'L' ? extra.footL : extra.footR).add(strideAt[leg.tag])
+      const stride = strideLift[leg.tag]
+      solveLeg(leg, footAt, lift + raise + step + stride, wrap(f.yaw - turned), toe + Math.min((peel + stride / legLength) * 3, 0.35))
     }
     if (eyeYaw || eyePitch) {
       for (const tag of ['L', 'R'] as const) {
@@ -1269,6 +1458,7 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     },
     setPose(next, immediate = false) {
       pose = next
+      gait.dazed = false
       if (reaction && held && !immediate) held = next
       else {
         held = null
@@ -1292,6 +1482,31 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     },
     stroke() {
       if (swim.on) swim.strokeQueued = true
+    },
+    setRun(on, pace = 1) {
+      gait.run = on
+      gait.pace = Math.max(0.5, Math.min(2.5, pace))
+      if (on) gait.dazed = false
+    },
+    setDuck(on) {
+      gait.duck = on
+    },
+    leap() {
+      gait.air = true
+      gait.duck = false
+      gait.leapQueued = true
+    },
+    land() {
+      if (!gait.air) return
+      gait.air = false
+      gait.landQueued = true
+    },
+    tumble() {
+      gait.run = false
+      gait.air = false
+      gait.duck = false
+      gait.dazed = true
+      gait.tumbleQueued = true
     },
     react(kind, side = 1) {
       if (held) aimPose(held)

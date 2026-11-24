@@ -5,7 +5,7 @@
  * server/arcade.ts. Change reward numbers here; nothing else needs editing.
  */
 
-export const ARCADE_GAME_IDS = ['riptide'] as const
+export const ARCADE_GAME_IDS = ['riptide', 'current-runner'] as const
 export type ArcadeGameId = (typeof ARCADE_GAME_IDS)[number]
 
 export interface ArcadeGame {
@@ -15,7 +15,7 @@ export interface ArcadeGame {
   tagline: string
   /** How to play, in a sentence. */
   howTo: string
-  path: `/arcade/${string}`
+  path: `/arcade/${ArcadeGameId}`
   /**
    * The fewest seconds between two points, at the game's top speed. The server refuses a score
    * that would need points faster than this.
@@ -24,6 +24,10 @@ export interface ArcadeGame {
   /** Seconds before the first point can land. */
   leadInSeconds: number
   maxScore: number
+  /** A run must reach this score to earn XP or place for weekly gems. */
+  minRewardScore: number
+  /** What a point is called on the results card ("metres"), if not just a score. */
+  unit?: string
 }
 
 export const ARCADE_GAMES: Record<ArcadeGameId, ArcadeGame> = {
@@ -37,6 +41,21 @@ export const ARCADE_GAMES: Record<ArcadeGameId, ArcadeGame> = {
     minSecondsPerPoint: 0.8,
     leadInSeconds: 1.5,
     maxScore: 9999,
+    minRewardScore: 3,
+  },
+  'current-runner': {
+    id: 'current-runner',
+    title: 'Current Runner',
+    tagline: 'Run the seafloor as the current picks up speed.',
+    howTo: 'Tap, click or press space to jump urchins and coral; hold it to jump higher. Swipe down or press the down arrow to duck under jellyfish. The current keeps getting faster.',
+    path: '/arcade/current-runner',
+    // A point is a metre; the current tops out at 13 metres a second (current-runner-sim.ts).
+    minSecondsPerPoint: 0.075,
+    leadInSeconds: 0,
+    maxScore: 99999,
+    // About 15 seconds of running.
+    minRewardScore: 100,
+    unit: 'm',
   },
 }
 
@@ -46,13 +65,10 @@ export function isArcadeGameId(value: unknown): value is ArcadeGameId {
 
 /* ── Rewards ─────────────────────────────────────────────── */
 
-/** XP for a finished run that scores at least ARCADE_MIN_REWARD_SCORE. */
+/** XP for a finished run that scores at least its game's minRewardScore. */
 export const ARCADE_XP_PER_RUN = 5
 /** Rewarded runs per member per UTC day, across all games (so 20 XP a day at most). */
 export const ARCADE_XP_RUNS_PER_DAY = 4
-/** A run must reach this score to earn XP or place for gems. */
-export const ARCADE_MIN_REWARD_SCORE = 3
-
 /**
  * Gems for each game's weekly top 10, paid once the week (Monday 00:00 UTC) is over. Arcade XP is
  * left out of the weekly XP leaderboard so play cannot swamp it.
@@ -89,8 +105,8 @@ export function isPlausibleScore(game: ArcadeGame, score: number, elapsedMs: num
 }
 
 /** Whether a run earns XP: high enough score and under the daily cap. */
-export function arcadeRunEarnsXp(score: number, rewardedToday: number): boolean {
-  return score >= ARCADE_MIN_REWARD_SCORE && rewardedToday < ARCADE_XP_RUNS_PER_DAY
+export function arcadeRunEarnsXp(game: ArcadeGame, score: number, rewardedToday: number): boolean {
+  return score >= game.minRewardScore && rewardedToday < ARCADE_XP_RUNS_PER_DAY
 }
 
 /** YYYY-MM-DD in UTC, the day the XP cap counts. */
