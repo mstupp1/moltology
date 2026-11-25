@@ -11,8 +11,8 @@ description: >-
 
 # Arcade game builder
 
-Every arcade game follows the same process. Riptide (tap-to-swim gaps) and Current Runner
-(seafloor runner) are the worked examples; copy their shape rather than inventing a new one.
+Every arcade game follows the same process. Riptide (tap-to-swim gaps), Current Runner
+(seafloor runner) and Vent Hopper (bounce-up climber, tilt or hold-a-side steering) are the worked examples; copy their shape rather than inventing a new one.
 
 ## 1. Plan first, then wait for the go
 
@@ -40,6 +40,9 @@ returning events (`jumped`, `scored`, `died`...). No three.js, no DOM. Seeded ra
 - Fixed 1/120 s steps (the component accumulates real time).
 - Hit boxes a little smaller than the drawing so grazes feel fair.
 - Spawn spacing must always leave room to react at top speed.
+- Nothing the player can use up (a breaking platform) may be the only way on; a used-up step can
+  leave a softlock where the run neither progresses nor ends (Vent Hopper keeps brittle coral off
+  the climbing path).
 
 `<game>-sim.test.ts` must include an **autopilot** that plays well and survives a long run on many
 seeds (proves every run is beatable), plus checks that every autopilot score passes
@@ -82,6 +85,8 @@ and other pages can use them. Existing moves:
 - `setSwim(on)` + `stroke()`: swimming (Riptide).
 - `setRun(on, pace)`, `setDuck(on)`, `leap()`, `land()`, `tumble()`: running, ducking, jumping,
   crashing (Current Runner).
+- `bounce(strength)`, `setFall(on)`: bouncing off pads (2+ for a big launch) and flailing in a fall
+  (Vent Hopper).
 - `react(kind)`: poke, snap, equip, celebrate. `setPose(pose)` for held poses.
 
 A move is an overlay that eases in and out over whatever pose is held, works for crabs and

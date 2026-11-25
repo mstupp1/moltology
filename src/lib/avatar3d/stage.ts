@@ -93,6 +93,9 @@ export interface Stage {
   leap: () => void
   land: () => void
   tumble: () => void
+  /** Bounce off something and flail while falling (Character3D.bounce and setFall). */
+  bounce: (strength?: number) => void
+  setFall: (on: boolean) => void
   /** Zoom (1 is the whole figure) and tilt back to where they started. */
   resetView: () => void
   /**
@@ -685,6 +688,14 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     },
     tumble() {
       character?.tumble()
+      wake()
+    },
+    bounce(strength) {
+      character?.bounce(strength)
+      wake()
+    },
+    setFall(on) {
+      character?.setFall(on)
       wake()
     },
     resetView() {

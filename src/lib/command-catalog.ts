@@ -169,7 +169,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     category: 'Page',
     icon: 'arcade',
     to: '/arcade',
-    keywords: ['arcade', 'games', 'play', 'riptide', 'current runner', 'runner', 'leaderboard', 'high score', 'swim', 'run'],
+    keywords: ['arcade', 'games', 'play', 'riptide', 'current runner', 'runner', 'vent hopper', 'hopper', 'jump', 'bounce', 'climb', 'leaderboard', 'high score', 'swim', 'run'],
   },
   {
     id: 'nav-friends',

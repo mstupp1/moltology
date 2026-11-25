@@ -2,7 +2,11 @@
  * Pieces every arcade scene draws with: light shafts, bubbles, faceted rocks with per-face colour,
  * far ridges for parallax. Kept free of any one game's rules.
  */
-import { BufferAttribute, BufferGeometry, CanvasTexture, Color, IcosahedronGeometry, Mesh, MeshBasicMaterial, Shape, ShapeGeometry } from 'three'
+import { BufferAttribute, BufferGeometry, CanvasTexture, Color, ConeGeometry, IcosahedronGeometry, Mesh, MeshBasicMaterial, Quaternion, Shape, ShapeGeometry, SphereGeometry, Vector3 } from 'three'
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { seededRandom } from './riptide-sim'
+
+const UP = new Vector3(0, 1, 0)
 
 export const ROCK_COLORS = ['#3b4a55', '#46525a', '#38434f', '#4d5560'].map((c) => new Color(c))
 export const CORAL_COLORS = ['#ff6f61', '#ff9f43', '#f78fb3', '#c56cf0', '#ffd166'].map((c) => new Color(c))
@@ -96,3 +100,38 @@ function ridge(width: number, height: number, rand: () => number, color: Color, 
   return mesh
 }
 
+
+/**
+ * A sea urchin: a dark round test bristling with long spines, built once and reused. On the sand
+ * (`full` false) only the upper part has spines and it sits with its base at 0; floating (`full`)
+ * it is spined all round and centred on 0.
+ */
+export function urchinGeometry({ full = false }: { full?: boolean } = {}): BufferGeometry {
+  const rand = seededRandom(31)
+  const parts: BufferGeometry[] = []
+  const body = new SphereGeometry(0.2, 12, 8)
+  body.scale(1, full ? 1 : 0.82, 1)
+  parts.push(tint(body.toNonIndexed(), new Color('#3a1f4a'), rand, 0.12))
+  body.dispose()
+  const spine = new Color('#5b2d6e')
+  const n = full ? 72 : 46
+  const reach = full ? 2 : 1.25
+  for (let i = 0; i < n; i++) {
+    // Spread evenly over the ball (on the sand, over its upper part only).
+    const y = 1 - (i / (n - 1)) * reach
+    const r = Math.sqrt(Math.max(0, 1 - y * y))
+    const a = i * 2.399963
+    const dir = new Vector3(Math.cos(a) * r, full ? y : Math.max(-0.25, y), Math.sin(a) * r).normalize()
+    const len = 0.26 + rand() * 0.14
+    const cone = new ConeGeometry(0.022, len, 4)
+    cone.translate(0, len / 2 + 0.14, 0)
+    cone.applyQuaternion(new Quaternion().setFromUnitVectors(UP, dir))
+    parts.push(tint(cone.toNonIndexed(), spine.clone().lerp(new Color('#c26bd8'), rand() * 0.35), rand, 0.1))
+    cone.dispose()
+  }
+  const merged = mergeGeometries(parts)!
+  for (const p of parts) p.dispose()
+  if (!full) merged.translate(0, 0.17, 0)
+  merged.computeVertexNormals()
+  return merged
+}

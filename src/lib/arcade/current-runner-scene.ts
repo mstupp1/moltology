@@ -9,7 +9,6 @@ import {
   BufferGeometry,
   CanvasTexture,
   Color,
-  ConeGeometry,
   CylinderGeometry,
   DirectionalLight,
   DoubleSide,
@@ -25,7 +24,6 @@ import {
   PMREMGenerator,
   Points,
   PointsMaterial,
-  Quaternion,
   RepeatWrapping,
   Scene,
   SphereGeometry,
@@ -41,7 +39,7 @@ import { withLoftDetail } from '../avatar3d/loft'
 import type { Avatar3DLook } from '../avatar3d/look'
 import { bakedLightTexture } from '../avatar3d/stage-light'
 import { FIELD_H, FIELD_W, PLAYER_X, SPEED_MAX, SPEED_START, seededRandom, type Obstacle, type RunnerState } from './current-runner-sim'
-import { CORAL_COLORS, ROCK_COLORS, bubbleTexture, lumpy, rayTexture, ridge, tint } from './scene-kit'
+import { CORAL_COLORS, ROCK_COLORS, bubbleTexture, lumpy, rayTexture, ridge, tint, urchinGeometry } from './scene-kit'
 
 export interface RunnerSceneOptions {
   quality?: 'high' | 'low'
@@ -73,7 +71,6 @@ const VIEW_BELOW = 1.2
 /** How far back the sand reaches (its far edge), in field units. */
 const SAND_FAR = 6
 const FOG = new Color('#0a3248')
-const UP = new Vector3(0, 1, 0)
 const Z_AXIS = new Vector3(0, 0, 1)
 
 function waterTexture(): CanvasTexture {
@@ -90,36 +87,6 @@ function waterTexture(): CanvasTexture {
   const texture = new CanvasTexture(canvas)
   texture.colorSpace = SRGBColorSpace
   return texture
-}
-
-/** A sea urchin: a dark round test bristling with long spines, built once and reused. */
-function urchinGeometry(): BufferGeometry {
-  const rand = seededRandom(31)
-  const parts: BufferGeometry[] = []
-  const body = new SphereGeometry(0.2, 12, 8)
-  body.scale(1, 0.82, 1)
-  parts.push(tint(body.toNonIndexed(), new Color('#3a1f4a'), rand, 0.12))
-  body.dispose()
-  const spine = new Color('#5b2d6e')
-  const n = 46
-  for (let i = 0; i < n; i++) {
-    // Spread evenly over the upper part of the ball (the sand hides the rest).
-    const y = 1 - (i / (n - 1)) * 1.25
-    const r = Math.sqrt(Math.max(0, 1 - y * y))
-    const a = i * 2.399963
-    const dir = new Vector3(Math.cos(a) * r, Math.max(-0.25, y), Math.sin(a) * r).normalize()
-    const len = 0.26 + rand() * 0.14
-    const cone = new ConeGeometry(0.022, len, 4)
-    cone.translate(0, len / 2 + 0.14, 0)
-    cone.applyQuaternion(new Quaternion().setFromUnitVectors(UP, dir))
-    parts.push(tint(cone.toNonIndexed(), spine.clone().lerp(new Color('#c26bd8'), rand() * 0.35), rand, 0.1))
-    cone.dispose()
-  }
-  const merged = mergeGeometries(parts)!
-  for (const p of parts) p.dispose()
-  merged.translate(0, 0.17, 0)
-  merged.computeVertexNormals()
-  return merged
 }
 
 /** Branching coral on a small rock, about `height` tall. */

@@ -83,6 +83,7 @@ import { Route as HudAdminStoreRouteImport } from './routes/_hud/admin.store'
 import { Route as HudArcadeIndexRouteImport } from './routes/_hud/arcade.index'
 import { Route as HudArcadeCurrentRunnerRouteImport } from './routes/_hud/arcade.current-runner'
 import { Route as HudArcadeRiptideRouteImport } from './routes/_hud/arcade.riptide'
+import { Route as HudArcadeVentHopperRouteImport } from './routes/_hud/arcade.vent-hopper'
 import { Route as HudCharacterIndexRouteImport } from './routes/_hud/character.index'
 import { Route as HudCharacterProgressRouteImport } from './routes/_hud/character.progress'
 import { Route as HudCharacterShopRouteImport } from './routes/_hud/character.shop'
@@ -481,6 +482,11 @@ const HudArcadeRiptideRoute = HudArcadeRiptideRouteImport.update({
   path: '/arcade/riptide',
   getParentRoute: () => HudRoute,
 } as any)
+const HudArcadeVentHopperRoute = HudArcadeVentHopperRouteImport.update({
+  id: '/arcade/vent-hopper',
+  path: '/arcade/vent-hopper',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudCharacterIndexRoute = HudCharacterIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -686,6 +692,7 @@ export interface FileRoutesByFullPath {
   '/admin/store': typeof HudAdminStoreRoute
   '/arcade/current-runner': typeof HudArcadeCurrentRunnerRoute
   '/arcade/riptide': typeof HudArcadeRiptideRoute
+  '/arcade/vent-hopper': typeof HudArcadeVentHopperRoute
   '/character/progress': typeof HudCharacterProgressRoute
   '/character/shop': typeof HudCharacterShopRoute
   '/character/3d': typeof HudCharacter3dRoute
@@ -780,6 +787,7 @@ export interface FileRoutesByTo {
   '/admin/store': typeof HudAdminStoreRoute
   '/arcade/current-runner': typeof HudArcadeCurrentRunnerRoute
   '/arcade/riptide': typeof HudArcadeRiptideRoute
+  '/arcade/vent-hopper': typeof HudArcadeVentHopperRoute
   '/character/progress': typeof HudCharacterProgressRoute
   '/character/shop': typeof HudCharacterShopRoute
   '/character/3d': typeof HudCharacter3dRoute
@@ -881,6 +889,7 @@ export interface FileRoutesById {
   '/_hud/admin/store': typeof HudAdminStoreRoute
   '/_hud/arcade/current-runner': typeof HudArcadeCurrentRunnerRoute
   '/_hud/arcade/riptide': typeof HudArcadeRiptideRoute
+  '/_hud/arcade/vent-hopper': typeof HudArcadeVentHopperRoute
   '/_hud/character/progress': typeof HudCharacterProgressRoute
   '/_hud/character/shop': typeof HudCharacterShopRoute
   '/_hud/character_/3d': typeof HudCharacter3dRoute
@@ -983,6 +992,7 @@ export interface FileRouteTypes {
     | '/admin/store'
     | '/arcade/current-runner'
     | '/arcade/riptide'
+    | '/arcade/vent-hopper'
     | '/character/progress'
     | '/character/shop'
     | '/character/3d'
@@ -1077,6 +1087,7 @@ export interface FileRouteTypes {
     | '/admin/store'
     | '/arcade/current-runner'
     | '/arcade/riptide'
+    | '/arcade/vent-hopper'
     | '/character/progress'
     | '/character/shop'
     | '/character/3d'
@@ -1177,6 +1188,7 @@ export interface FileRouteTypes {
     | '/_hud/admin/store'
     | '/_hud/arcade/current-runner'
     | '/_hud/arcade/riptide'
+    | '/_hud/arcade/vent-hopper'
     | '/_hud/character/progress'
     | '/_hud/character/shop'
     | '/_hud/character_/3d'
@@ -1785,6 +1797,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudArcadeRiptideRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/arcade/vent-hopper': {
+      id: '/_hud/arcade/vent-hopper'
+      path: '/arcade/vent-hopper'
+      fullPath: '/arcade/vent-hopper'
+      preLoaderRoute: typeof HudArcadeVentHopperRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/character/': {
       id: '/_hud/character/'
       path: '/'
@@ -2054,6 +2073,7 @@ interface HudRouteChildren {
   HudAcademySectionsRoute: typeof HudAcademySectionsRouteWithChildren
   HudArcadeCurrentRunnerRoute: typeof HudArcadeCurrentRunnerRoute
   HudArcadeRiptideRoute: typeof HudArcadeRiptideRoute
+  HudArcadeVentHopperRoute: typeof HudArcadeVentHopperRoute
   HudCharacter3dRoute: typeof HudCharacter3dRoute
   HudForumLeaderboardRoute: typeof HudForumLeaderboardRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
@@ -2081,6 +2101,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudAcademySectionsRoute: HudAcademySectionsRouteWithChildren,
   HudArcadeCurrentRunnerRoute: HudArcadeCurrentRunnerRoute,
   HudArcadeRiptideRoute: HudArcadeRiptideRoute,
+  HudArcadeVentHopperRoute: HudArcadeVentHopperRoute,
   HudCharacter3dRoute: HudCharacter3dRoute,
   HudForumLeaderboardRoute: HudForumLeaderboardRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
