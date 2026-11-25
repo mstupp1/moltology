@@ -15,6 +15,7 @@ describe('arcade rules', () => {
   it('knows its games', () => {
     expect(isArcadeGameId('riptide')).toBe(true)
     expect(isArcadeGameId('current-runner')).toBe(true)
+    expect(isArcadeGameId('vent-hopper')).toBe(true)
     expect(isArcadeGameId('pong')).toBe(false)
   })
 

@@ -83,9 +83,7 @@ function steerFor(s: HopperState): number {
   } else {
     aim = reachable(s, pads, -Infinity, s.y + 0.01)[0]
     // Nothing surely in reach: make for whichever pad below is nearest sideways.
-    aim ??= pads
-      .filter((p) => p.y <= s.y && p.y >= s.camY)
-      .sort((a, b) => Math.abs(wrapDelta(s.x, a.x)) - Math.abs(wrapDelta(s.x, b.x)))[0]
+    aim ??= pads.filter((p) => p.y <= s.y && p.y >= s.camY).sort((a, b) => Math.abs(wrapDelta(s.x, a.x)) - Math.abs(wrapDelta(s.x, b.x)))[0]
   }
   // Keep clear of any urchin close by.
   for (const u of s.urchins) {
@@ -99,7 +97,12 @@ function steerFor(s: HopperState): number {
 }
 
 function copyOf(s: HopperState): HopperState {
-  return { ...s, pads: s.pads.map((p) => ({ ...p })), urchins: s.urchins.map((u) => ({ ...u, r: u.r + 0.15 })), rng: () => 0.5 }
+  return {
+    ...s,
+    pads: s.pads.map((p) => ({ ...p })),
+    urchins: s.urchins.map((u) => ({ ...u, r: u.r + 0.15 })),
+    rng: () => 0.5,
+  }
 }
 
 /**
@@ -116,7 +119,10 @@ function plannedSteer(s: HopperState): number {
     let ok = true
     let landedOn = -Infinity
     for (let i = 0; i < 3 * 60; i++) {
-      const e = stepHopper(probe, 1 / 60, { start: false, steer: i < hold * 60 ? steer : steerFor(probe) })
+      const e = stepHopper(probe, 1 / 60, {
+        start: false,
+        steer: i < hold * 60 ? steer : steerFor(probe),
+      })
       // Falling close to the bottom of the view counts as lost.
       if (e.hit || probe.phase === 'dead' || probe.y < probe.camY + 1) {
         ok = false
@@ -183,7 +189,16 @@ describe('vent hopper sim', () => {
     const state = createHopper(3)
     stepHopper(state, DT, { start: true, steer: 0 })
     state.pads = []
-    state.pads.push({ id: 999, kind: 'brittle', x: state.x, y: state.y + 2, w: 1.5, vx: 0, broken: false, variant: 0 })
+    state.pads.push({
+      id: 999,
+      kind: 'brittle',
+      x: state.x,
+      y: state.y + 2,
+      w: 1.5,
+      vx: 0,
+      broken: false,
+      variant: 0,
+    })
     let broke = false
     for (let i = 0; i < 240 && !broke; i++) broke = stepHopper(state, DT, { start: false, steer: 0 }).broke
     expect(broke).toBe(true)
@@ -194,8 +209,26 @@ describe('vent hopper sim', () => {
     const state = createHopper(4)
     stepHopper(state, DT, { start: true, steer: 0 })
     for (let i = 0; i < 60; i++) stepHopper(state, DT, { start: false, steer: 0 })
-    state.pads = [{ id: 997, kind: 'sponge', x: state.x, y: state.y - 0.5, w: 1.5, vx: 0, broken: false, variant: 0 }]
-    state.urchins.push({ id: 998, x: state.x, y: state.y + 1.2, vx: 0, r: 0.34, variant: 0 })
+    state.pads = [
+      {
+        id: 997,
+        kind: 'sponge',
+        x: state.x,
+        y: state.y - 0.5,
+        w: 1.5,
+        vx: 0,
+        broken: false,
+        variant: 0,
+      },
+    ]
+    state.urchins.push({
+      id: 998,
+      x: state.x,
+      y: state.y + 1.2,
+      vx: 0,
+      r: 0.34,
+      variant: 0,
+    })
     let hit = false
     for (let i = 0; i < 120 && !hit; i++) hit = stepHopper(state, DT, { start: false, steer: 1 }).hit
     expect(hit).toBe(true)
@@ -207,7 +240,16 @@ describe('vent hopper sim', () => {
     expect(events.some((e) => e.bounced)).toBe(false)
     expect(state.y).toBeLessThan(state.pads[0].y)
     // Once it wears off, a pad catches it again.
-    state.pads.push({ id: 996, kind: 'sponge', x: state.x, y: state.y - 4, w: 3, vx: 0, broken: false, variant: 0 })
+    state.pads.push({
+      id: 996,
+      kind: 'sponge',
+      x: state.x,
+      y: state.y - 4,
+      w: 3,
+      vx: 0,
+      broken: false,
+      variant: 0,
+    })
     let bounced = false
     for (let i = 0; i < 120 && !bounced; i++) bounced = stepHopper(state, DT, { start: false, steer: 0 }).bounced !== null
     expect(bounced).toBe(true)

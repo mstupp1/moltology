@@ -247,7 +247,16 @@ export function createHopper(seed: number): HopperState {
     nextId: 1,
     rng: seededRandom(seed),
   }
-  state.pads.push({ id: state.nextId++, kind: 'floor', x: 0, y: 0, w: FIELD_W, vx: 0, broken: false, variant: 0 })
+  state.pads.push({
+    id: state.nextId++,
+    kind: 'floor',
+    x: 0,
+    y: 0,
+    w: FIELD_W,
+    vx: 0,
+    broken: false,
+    variant: 0,
+  })
   layPads(state, FIELD_H + 6)
   return state
 }
@@ -279,7 +288,13 @@ export function overPad(x: number, pad: Pad): boolean {
  * Move the game on by `dt` seconds. Steps should be small (the game runs fixed 1/120 s steps).
  */
 export function stepHopper(state: HopperState, dt: number, input: HopperInput): StepEvents {
-  const events: StepEvents = { bounced: null, broke: false, hit: false, milestone: false, died: false }
+  const events: StepEvents = {
+    bounced: null,
+    broke: false,
+    hit: false,
+    milestone: false,
+    died: false,
+  }
   if (state.phase === 'dead') return events
   if (state.phase === 'ready') {
     if (!input.start) return events

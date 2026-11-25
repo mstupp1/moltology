@@ -15,12 +15,14 @@ import { usePlayerCharacter } from './usePlayerCharacter'
 
 const LazyRiptideGame = lazy(() => import('./RiptideGame'))
 const LazyCurrentRunnerGame = lazy(() => import('./CurrentRunnerGame'))
+const LazyVentHopperGame = lazy(() => import('./VentHopperGame'))
 
 /** Newest first: the top card is the newest game. */
-const GAME_ORDER: ArcadeGameId[] = ['current-runner', 'riptide']
+const GAME_ORDER: ArcadeGameId[] = ['vent-hopper', 'current-runner', 'riptide']
 const CARD_ART: Record<ArcadeGameId, string> = {
   riptide: 'images/arcade/v1/riptide-card.jpg',
   'current-runner': 'images/arcade/v1/current-runner-card.jpg',
+  'vent-hopper': 'images/arcade/v1/vent-hopper-card.jpg',
 }
 
 function GameCard({ id, isNew, userId, config }: { id: ArcadeGameId; isNew: boolean; userId: string | null; config: LobsterAvatarConfig | null | undefined }) {
@@ -137,7 +139,7 @@ export function ArcadeHome() {
           <p className="pt-1 text-xs text-ink-muted">More games are on the way.</p>
         </section>
         <div className="space-y-2">
-          <div className="flex gap-1" role="group" aria-label="Leaderboard game">
+          <div className="flex flex-wrap gap-1" role="group" aria-label="Leaderboard game">
             {GAME_ORDER.map((id) => (
               <button key={id} type="button" aria-pressed={boardGame === id} onClick={() => setBoardGame(id)} className={pillTabClass(boardGame === id)}>
                 {ARCADE_GAMES[id].title}
@@ -156,6 +158,15 @@ function GameLoading() {
     <div className="fixed inset-0 z-[100050] flex items-center justify-center bg-abyss">
       <HUDSpinner />
     </div>
+  )
+}
+
+/** Vent Hopper's own page: the game alone, full screen. Its leaderboard is on the arcade page. */
+export function VentHopperPage() {
+  return (
+    <Suspense fallback={<GameLoading />}>
+      <LazyVentHopperGame />
+    </Suspense>
   )
 }
 
