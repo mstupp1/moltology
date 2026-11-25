@@ -5,7 +5,7 @@
  * server/arcade.ts. Change reward numbers here; nothing else needs editing.
  */
 
-export const ARCADE_GAME_IDS = ['riptide', 'current-runner'] as const
+export const ARCADE_GAME_IDS = ['riptide', 'current-runner', 'vent-hopper'] as const
 export type ArcadeGameId = (typeof ARCADE_GAME_IDS)[number]
 
 export interface ArcadeGame {
@@ -54,6 +54,21 @@ export const ARCADE_GAMES: Record<ArcadeGameId, ArcadeGame> = {
     leadInSeconds: 0,
     maxScore: 99999,
     // About 15 seconds of running.
+    minRewardScore: 100,
+    unit: 'm',
+  },
+  'vent-hopper': {
+    id: 'vent-hopper',
+    title: 'Vent Hopper',
+    tagline: 'Bounce up the vent currents toward the light.',
+    howTo: 'You bounce on every pad you land on; just steer. Tilt your phone or hold either side of the screen, or use the arrow keys. Brittle coral breaks after one bounce, clams launch you high, and urchins knock you down.',
+    path: '/arcade/vent-hopper',
+    // A point is a metre climbed; the fastest climb is straight up off clam springs at 23.2 metres
+    // a second (vent-hopper-sim.ts), so a metre takes at least 0.043 s.
+    minSecondsPerPoint: 0.04,
+    leadInSeconds: 0,
+    maxScore: 99999,
+    // About 30 bounces.
     minRewardScore: 100,
     unit: 'm',
   },

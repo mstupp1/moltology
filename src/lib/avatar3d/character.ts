@@ -135,6 +135,18 @@ export interface Character3D {
    */
   tumble: () => void
   /**
+   * Bounced off something underfoot: a squash through the knees, then up into the air pose
+   * (feet tucked, claws thrown up). `strength` 1 is a normal bounce; 2 or more is a big launch
+   * with a wider, longer stretch. Works from any pose, airborne or not, so it can repeat; the
+   * caller moves (and spins) the character. `land()` or `setFall` take it out of the air pose.
+   */
+  bounce: (strength?: number) => void
+  /**
+   * Falling with nothing below: claws flailing overhead, legs kicking, eyes wide and mouth open.
+   * Eases in and out over whatever it holds. The caller moves the character.
+   */
+  setFall: (on: boolean) => void
+  /**
    * How loud the character is speaking right now, 0 (silent) to 1, for scripted animation, and
    * the cartoon mouth shape for the sound being made (mouth-shapes.ts). Without a shape the mouth
    * just opens with the level. The head nods a little on the louder syllables either way.
@@ -618,6 +630,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
     tumbleAt: null as number | null,
     tumbleQueued: false,
     dazed: false,
+    bounceAt: null as number | null,
+    bounceQueued: false,
+    bounceK: 1,
+    fall: false,
+    fallW: 0,
   }
   /** Each foot's stride this frame: how far ahead (+) or behind it reaches, and how high it lifts. */
   const strideAt = { L: new Vector3(), R: new Vector3() }
@@ -1056,6 +1073,11 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
         gait.tumbleQueued = false
         spring.kick(kickAt.set(0, 0.6, -0.8))
       }
+      if (gait.bounceQueued) {
+        gait.bounceAt = time
+        gait.bounceQueued = false
+        spring.kick(kickAt.set(0, -0.5 * Math.min(2, gait.bounceK), 0))
+      }
       const easeTo = (from: number, to: number, rate: number) => from + (to - from) * (1 - Math.exp(-dt * rate))
       gait.runW = easeTo(gait.runW, gait.run ? 1 : 0, 7)
       gait.duckW = easeTo(gait.duckW, gait.duck ? 1 : 0, 22)
@@ -1147,6 +1169,47 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
           dy -= 0.14 * arc(p) * (1 - 0.4 * p) * legLength
           overlay('chest', X, 0.12 * arc(p))
         }
+      }
+      if (gait.bounceAt !== null) {
+        // A bounce: squashed through the knees on contact, then stretched tall on the way up, claws
+        // flung higher and wider for a big launch.
+        const k = Math.min(2.5, gait.bounceK)
+        const p = (time - gait.bounceAt) / (0.26 + 0.06 * k)
+        if (p >= 1) gait.bounceAt = null
+        else {
+          const squash = arc(Math.min(1, p / 0.35))
+          const stretch = p > 0.25 ? arc((p - 0.25) / 0.75) : 0
+          dy += (-0.16 * squash + 0.05 * stretch) * Math.min(1.5, k) * legLength
+          overlay('chest', X, 0.14 * squash - 0.08 * stretch * k)
+          for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
+            aim(`arm${tag}`, aimAt.set(s * (0.6 + 0.15 * k), 0.8, 0.1), 0.5 * stretch * Math.min(1, 0.6 + 0.2 * k))
+            overlay(`antenna${tag}`, X, 0.4 * squash - 0.2 * stretch)
+          }
+          mouthOpen = Math.max(mouthOpen, (0.35 + 0.2 * k) * stretch)
+          bright = Math.max(bright, 0.4 * k * stretch)
+          fanSpread += 0.1 * k * stretch
+        }
+      }
+      gait.fallW += ((gait.fall ? 1 : 0) - gait.fallW) * (1 - Math.exp(-dt * 8))
+      if (gait.fallW > 0.001) {
+        // Falling: claws windmill overhead, legs kick, eyes wide, a round open mouth.
+        const w = gait.fallW
+        wide = Math.max(wide, 0.8 * w)
+        closed *= 1 - w
+        mouthOpen = Math.max(mouthOpen, 0.75 * w)
+        mouthRound = Math.max(mouthRound, w)
+        browUp += 0.02 * w
+        lift = Math.max(lift, 0.2 * legLength * w)
+        for (const [tag, s] of [['L', 1], ['R', -1]] as const) {
+          const flail = Math.sin(time * 13 + (s > 0 ? 0 : Math.PI))
+          aim(`arm${tag}`, aimAt.set(s * (0.7 + 0.2 * flail), 0.7 + 0.25 * flail, 0.15), 0.85 * w)
+          aim(`forearm${tag}`, aimAt.set(s * 0.3, 1, 0.2 * flail), 0.6 * w)
+          overlay(`thumb${tag}`, Zaxis, -s * 0.4 * w)
+          overlay(`antenna${tag}`, X, -0.5 * w + Math.sin(time * 17 + s) * 0.15 * w)
+        }
+        for (const leg of sideLegs) legPose(leg, 0.25 * Math.sin(time * 15 + leg.k * 1.3 + leg.s), 0.3 * w, 0.2 * w, 0.1 * w)
+        overlay('tail', X, -0.3 * w + Math.sin(time * 11) * 0.1 * w)
+        fanSpread += 0.2 * w
       }
       if (gait.tumbleAt !== null || gait.dazed) {
         // A crash: eyes wide and a gasp, claws flung up, legs splayed, antennae whipping; then
@@ -1501,9 +1564,22 @@ export function buildCharacter(look: Avatar3DLook): Character3D {
       gait.air = false
       gait.landQueued = true
     },
+    bounce(strength = 1) {
+      gait.air = true
+      gait.duck = false
+      gait.fall = false
+      gait.dazed = false
+      gait.bounceK = Math.max(0.5, strength)
+      gait.bounceQueued = true
+    },
+    setFall(on) {
+      gait.fall = on
+      if (on) gait.air = false
+    },
     tumble() {
       gait.run = false
       gait.air = false
+      gait.fall = false
       gait.duck = false
       gait.dazed = true
       gait.tumbleQueued = true
