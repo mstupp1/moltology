@@ -4,7 +4,7 @@
  * skirt that hangs below the torso. Fittings (lapels, buttons, cuffs, belts, laces) sit on that
  * surface in the trim colour, and never glow.
  */
-import { BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, TorusGeometry, Vector3 } from 'three'
+import { BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Matrix4, Quaternion, SphereGeometry, TorusGeometry, Vector3 } from 'three'
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import type { Loft } from './loft'
 import { Kit, SIDES, above, below, fromFront, onBody, seam, smooth, stud, tube, v, within } from './gear-kit'
@@ -30,7 +30,7 @@ export function garment(kit: Kit, wear: Wearable): void {
   const tailored = motif === 'coat' || motif === 'jacket' || motif === 'blazer'
   // A puffer stands well off the body in quilted channels; knit and canvas sit a little prouder too.
   const puffer = motif === 'puffer'
-  const bodyLift = puffer ? 0.05 : motif === 'sweater' || motif === 'divesuit' || motif === 'robe' ? 0.036 : LIFT
+  const bodyLift = puffer || motif === 'turkey' ? 0.05 : motif === 'sweater' || motif === 'divesuit' || motif === 'robe' ? 0.036 : LIFT
 
   // A lobster's swimmerets and both species' short walking legs would poke through the cloth.
   for (const { tag } of SIDES) {
@@ -99,12 +99,19 @@ export function garment(kit: Kit, wear: Wearable): void {
       }
       // Knit cuffs on a hoodie or sweater are thicker and in the body colour; a robe's sleeve
       // flares into a wide bell; a dive suit ends in a dark rubber seal.
-      const knit = motif === 'hoodie' || motif === 'sweater' || puffer
+      const knit = motif === 'hoodie' || motif === 'sweater' || puffer || motif === 'turkey'
       const bell = motif === 'robe'
-      const cuff = new TorusGeometry(wear.arm.radius * (bell ? 1.5 : 1.05) + sleeveLift, knit ? 0.024 : bell ? 0.02 : 0.014, 8, 28)
+      // A pilgrim's sleeves end in deep turned-back white cuffs.
+      const pilgrim = motif === 'pilgrim'
+      const cuff = new TorusGeometry(wear.arm.radius * (bell ? 1.5 : pilgrim ? 1.2 : 1.05) + sleeveLift, knit ? 0.024 : bell ? 0.02 : pilgrim ? 0.03 : 0.014, 8, 28)
       cuff.rotateX(Math.PI / 2)
       cuff.translate(0, -fore * 0.82, 0)
-      kit.add(`forearm${tag}`, motif === 'divesuit' ? 'dark' : (n >= 2 && tailored) || bell ? 'trim' : 'fabric', cuff)
+      kit.add(`forearm${tag}`, motif === 'divesuit' ? 'dark' : pilgrim ? 'soft' : (n >= 2 && tailored) || bell ? 'trim' : 'fabric', cuff)
+      if (pilgrim) {
+        const turn = new CylinderGeometry(wear.arm.radius * 1.2 + sleeveLift, wear.arm.radius * 1.05 + sleeveLift, fore * 0.16, 28, 1, true)
+        turn.translate(0, -fore * 0.74, 0)
+        kit.add(`forearm${tag}`, 'soft', turn)
+      }
       if (bell) {
         // The bell: a short flared cone from the forearm to the cuff.
         const r0 = wear.arm.radius + sleeveLift
@@ -130,6 +137,8 @@ export function garment(kit: Kit, wear: Wearable): void {
     return
   }
   if (motif === 'hoodie') return hoodie(kit, wear, hem, height, neck)
+  if (motif === 'pilgrim') return pilgrimDetails(kit, wear, hem, neck)
+  if (motif === 'turkey') return turkeyDetails(kit, wear, hem, height, neck)
   if (motif === 'shirt') return campShirt(kit, wear, hem, vBottom, opening)
   if (motif === 'puffer') return pufferDetails(kit, wear, hem, neck)
   if (motif === 'sweater') return sweaterDetails(kit, wear, hem, height, neck)
@@ -234,6 +243,97 @@ function collarLine(wear: Wearable, motif: string): Neckline {
     return pts
   }
   return { host, bone, y, ring }
+}
+
+/** A band of cloth lying on the shoulders just under the neckline, open a little at the front. */
+function flatCollar(kit: Kit, neck: Neckline, tone: 'soft' | 'seam' | 'fabric', depth: number, lift: number): void {
+  for (const slot of ['shell', 'belly'] as const) {
+    kit.puff(neck.bone, tone, (_p, w) => {
+      const phi = fromFront(neck.host, w)
+      const y = neck.y(phi)
+      return lift * Math.min(within(w.y, y - depth, y + 0.006, 0.01), above(phi, 0.08, 0.02))
+    }, slot)
+  }
+  const edge: Vector3[] = []
+  for (let i = 0; i <= 64; i++) {
+    const phi = 0.1 + (i / 64) * (Math.PI * 2 - 0.2)
+    const a = phi > Math.PI ? phi - Math.PI * 2 : phi
+    edge.push(onBody(neck.host, neck.y(Math.abs(a)) - depth + 0.004, a, lift - 0.002).at)
+  }
+  kit.addWorld(neck.bone, tone, tube(edge, 0.008, 128))
+}
+
+/**
+ * A pilgrim doublet: plain dark cloth, a wide white collar over the shoulders, white cuffs, a row
+ * of buttons down the front and a short skirt to the hip.
+ */
+function pilgrimDetails(kit: Kit, wear: Wearable, hem: number, neck: Neckline): void {
+  const { loft: host, bone, top } = wear.torso
+  const crab = wear.race === 'crab'
+  flatCollar(kit, neck, 'soft', crab ? 0.11 : 0.09, LIFT + 0.016)
+  const from = crab ? hem + (top - hem) * 0.9 : top - 0.1
+  for (let i = 0; i < 4; i++) {
+    const y = from - i * ((from - hem - 0.03) / 3)
+    const at = onBody(host, y, 0, LIFT + 0.004)
+    kit.addWorld(bone, 'trim', stud(at.at, at.normal, 0.014))
+  }
+  kit.addWorld(bone, 'seam', seam(host, [top - 0.02, 0], [hem + 0.01, 0], LIFT + 0.002, 0.005, 8))
+  skirt(kit, wear, hem, wear.leg.thigh * 0.3, 'seam')
+}
+
+/**
+ * A turkey suit: plump brown feathered cloth, rows of rust breast feathers, and a big fan of tail
+ * feathers standing up behind, each banded brown, rust and a pale tip.
+ */
+function turkeyDetails(kit: Kit, wear: Wearable, hem: number, height: number, neck: Neckline): void {
+  const { construction: n } = kit.visual
+  const crab = wear.race === 'crab'
+  // Breast feathers: overlapping scallops down the front under the neckline.
+  const chest = neck.host
+  const rows = crab ? 3 : 4
+  for (let r = 0; r < rows; r++) {
+    const y = neck.y(0) - 0.035 - r * 0.045
+    const across = r % 2 ? [-0.36, -0.12, 0.12, 0.36] : [-0.48, -0.24, 0, 0.24, 0.48]
+    for (const phi of across) {
+      const at = onBody(chest, y, phi, 0.05 + 0.006)
+      kit.addWorld(neck.bone, r % 2 ? 'seam' : 'fabric', stud(at.at.clone().add(v(0, -0.01, 0)), at.normal, 0.034, 0.03, 0.012))
+    }
+  }
+  // The fan rises from the back, centred behind the body and tipped back a little.
+  const yBase = crab ? neck.y(Math.PI) - 0.04 : hem + height * 0.45
+  const base = onBody(neck.host, yBase, Math.PI, 0.05)
+  const back = base.normal.clone().setY(0).normalize()
+  const side = new Vector3(0, 1, 0).cross(back).normalize()
+  const k = neck.host.key(neck.host.sAt(yBase))
+  const bodyR = Math.hypot(base.at.x - (k.x ?? 0), base.at.z - (k.z ?? 0))
+  const L = Math.max(0.6, bodyR * (crab ? 2.6 : 3.8)) * (0.85 + 0.05 * n)
+  const count = 11
+  for (let i = 0; i < count; i++) {
+    const a = -1.45 + (i / (count - 1)) * 2.9
+    const dir = side.clone().multiplyScalar(Math.sin(a)).add(new Vector3(0, Math.cos(a), 0)).addScaledVector(back, 0.35).normalize()
+    const face = back.clone().addScaledVector(dir, -back.dot(dir)).normalize()
+    const xAxis = dir.clone().cross(face).normalize()
+    const q = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(xAxis, dir, face))
+    const len = L * (1 - 0.12 * Math.abs(a) / 1.45)
+    const width = len * 0.17
+    // The longest layer (pale tip) in the middle, shorter rust and brown layers on both faces.
+    for (const [tone, f, dz] of [['soft', 1, 0], ['seam', 0.8, -0.006], ['fabric', 0.56, -0.012], ['seam', 0.8, 0.006], ['fabric', 0.56, 0.012]] as const) {
+      const feather = new SphereGeometry(1, 18, 10)
+      feather.scale(width * (0.75 + 0.25 * f), (len * f) / 2, 0.012)
+      feather.translate(0, (len * f) / 2, dz)
+      kit.addWorld(neck.bone, tone, placed(feather, base.at.clone().addScaledVector(back, 0.02 + (i % 2) * 0.008), q))
+    }
+    // A dark eye band across each tip.
+    const band = new SphereGeometry(1, 14, 8)
+    band.scale(width * 0.8, len * 0.05, 0.013)
+    band.scale(1, 1, 1.25)
+    band.translate(0, len * 0.86, 0)
+    kit.addWorld(neck.bone, 'dark', placed(band, base.at.clone().addScaledVector(back, 0.02 + (i % 2) * 0.008), q))
+  }
+  kit.addWorld(neck.bone, 'fabric', stud(base.at.clone().addScaledVector(back, 0.01), back, 0.08, 0.07, 0.05))
+  const band: Vector3[] = []
+  for (let i = 0; i <= 48; i++) band.push(onBody(wear.torso.loft, hem + 0.025, -Math.PI + (i / 48) * Math.PI * 2, 0.054).at)
+  kit.addWorld(wear.torso.bone, 'seam', tube(band, 0.02, 120))
 }
 
 /**

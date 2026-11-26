@@ -176,6 +176,21 @@ const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number) => voi
     }
     kit.add(bone, 'accent', at(new SphereGeometry(w * 0.07, 12, 10), 0, w * 0.88, 0))
   },
+  pie: (kit, bone, at, S) => {
+    const r = 0.2 * S
+    const h = 0.06 * S
+    // A pumpkin pie held flat on the palm: a crust with a fluted rim, orange filling and a swirl
+    // of whipped cream in the middle.
+    kit.add(bone, 'paint', at(new CylinderGeometry(r, r * 0.84, h, 36), 0, h * 0.5, 0))
+    kit.add(bone, 'soft', at(new CylinderGeometry(r * 0.88, r * 0.88, 0.006, 36), 0, h + 0.002, 0))
+    kit.add(bone, 'paint', at(new TorusGeometry(r * 0.93, 0.022 * S, 8, 40).rotateX(Math.PI / 2), 0, h, 0))
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2
+      kit.add(bone, 'paint', at(new SphereGeometry(0.026 * S, 8, 6), Math.cos(a) * r * 0.95, h + 0.008 * S, Math.sin(a) * r * 0.95))
+    }
+    kit.add(bone, 'seam', at(new SphereGeometry(0.05 * S, 14, 10).scale(1, 0.6, 1), 0, h + 0.02 * S, 0))
+    kit.add(bone, 'seam', at(new ConeGeometry(0.035 * S, 0.06 * S, 14), 0, h + 0.06 * S, 0))
+  },
 }
 
 export function heldProp(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {

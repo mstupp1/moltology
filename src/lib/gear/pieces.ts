@@ -706,6 +706,14 @@ const COLLECTION_PIECES: GearPiece[] = [
     { key: 'wrapped-gift', n: 124, name: 'Wrapped gift', flavorText: 'Green paper, gold ribbon. For someone who showed up all year.', slot: 'claws', rarity: 'uncommon', shape: 'held-prop', motif: 'none', prop: 'gift', colours: 'winter-gift', construction: 1 },
     { key: 'evergreen-cape', n: 125, name: 'Evergreen cape', flavorText: 'Deep green velvet edged in snow white, clasped with a berry.', slot: 'belt', rarity: 'legendary', shape: 'belt-plate', motif: 'cape', colours: 'winter-evergreen', construction: 3, surface: 'velvet', uniquePower: { name: 'First Snow', description: 'Everything goes quiet for a moment when you arrive.' } },
   ]),
+  ...collection('harvest-table', 'pincerTorque', [
+    { key: 'pilgrim-hat', n: 126, name: 'Pilgrim hat', flavorText: 'Tall black felt, a wide brim and a buckle you could see from the far end of the table.', slot: 'head', rarity: 'rare', shape: 'hat', motif: 'none', hat: 'pilgrim_hat', colours: 'harvest-pilgrim', construction: 2, surface: 'cloth' },
+    { key: 'pilgrim-buckle-belt', n: 127, name: 'Pilgrim buckle belt', flavorText: 'Broad brown leather and a square brass buckle. Loosen one notch after the second plate.', slot: 'belt', rarity: 'uncommon', shape: 'belt-plate', motif: 'buckle', colours: 'harvest-belt', construction: 1, surface: 'leather' },
+    { key: 'pilgrim-doublet', n: 128, name: 'Pilgrim doublet', flavorText: 'Black wool, a wide white collar and white cuffs, buttoned to the neck for grace.', slot: 'carapace', rarity: 'epic', shape: 'garment', motif: 'pilgrim', colours: 'harvest-pilgrim', construction: 3, surface: 'cloth', uniquePower: { name: 'Long Table', description: 'There is always room for one more chair.' } },
+    { key: 'turkey-suit', n: 129, name: 'Turkey suit', flavorText: 'Plump brown feathers and a full fan of tail. Nobody carves the crab.', slot: 'carapace', rarity: 'legendary', shape: 'garment', motif: 'turkey', colours: 'harvest-turkey', construction: 3, surface: 'fleece', uniquePower: { name: 'Full Fan', description: 'Spread the tail and the whole room says thanks at once.' } },
+    { key: 'turkey-hat', n: 130, name: 'Turkey hat', flavorText: 'A feathered cap with a turkey looking out over your eyes. It gobbles when nobody is listening.', slot: 'head', rarity: 'uncommon', shape: 'hat', motif: 'none', hat: 'turkey_hat', colours: 'harvest-turkey-hat', construction: 1, surface: 'fleece' },
+    { key: 'pumpkin-pie', n: 131, name: 'Pumpkin pie', flavorText: 'Fluted crust, spiced filling, whipped cream on top. Brought to share, mostly.', slot: 'claws', rarity: 'common', shape: 'held-prop', motif: 'none', prop: 'pie', colours: 'harvest-pie', construction: 0 },
+  ]),
 ]
 
 export const GEAR_PIECES: GearPiece[] = [...ORIGINAL_PIECES, ...COLLECTION_PIECES]

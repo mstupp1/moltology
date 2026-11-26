@@ -2,7 +2,7 @@
  * Gear. Every item is built for a socket of radius 1 and scaled to the socket it lands on, so
  * one hat fits any head shape or species. Items carry their own materials.
  */
-import { BufferAttribute, BufferGeometry, CatmullRomCurve3, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
+import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
 import type { AvatarAccessory } from '../avatar/traits'
 import type { Hat } from '../gear/types'
 import type { Rig, SocketInfo } from './rig'
@@ -51,6 +51,8 @@ function item(socket: string, build: (add: (geo: Mesh['geometry'], material: Mat
 const metal = (color: string, roughness = 0.24) => workedSurface(new MeshPhysicalMaterial({ color: new Color(color), metalness: 1, roughness, clearcoat: 0.3 }), 'metal')
 const gloss = (color: string) => new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 })
 const darker = (hex: string, by: number) => `#${new Color(hex).multiplyScalar(1 - by).getHexString()}`
+/** Felt and feathers: matte, with a faint sheen in its own colour so dark cloth stays dark. */
+const felt = (color: string) => workedSurface(new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.95, sheen: 0.5, sheenRoughness: 0.8, sheenColor: new Color(color).lerp(new Color('#ffffff'), 0.35) }), 'cloth')
 const cloth = (color: string) => workedSurface(new MeshPhysicalMaterial({ color: new Color(color), roughness: 0.9, sheen: 1, sheenRoughness: 0.8, sheenColor: new Color('#ffffff') }), 'cloth')
 
 /** The visor's lens: an ellipse round the head axis, in face-socket units. */
@@ -441,6 +443,101 @@ const HEAD_GEAR: Record<Hat, (socket?: SocketInfo, c?: GearColours, rig?: Rig) =
         leafA.rotateY(-b)
         leafA.translate(Math.cos(b) * 1.16, 0.12, Math.sin(b) * 1.16)
         add(leafA, vine)
+      }
+    }),
+  pilgrim_hat: (_s, c) =>
+    item('head', (add) => {
+      // A tall black felt capotain: a crown that tapers to a flat top, a wide flat brim, a band
+      // round the base of the crown and a big square buckle on the front.
+      const black = felt(c?.material ?? '#24211f')
+      black.side = 2
+      const crown = new CylinderGeometry(0.86, 1.04, 1.55, 48, 1, true)
+      crown.translate(0, 0.76, 0)
+      add(crown, black)
+      const lid = new CylinderGeometry(0.86, 0.86, 0.04, 48)
+      lid.translate(0, 1.52, 0)
+      add(lid, black)
+      const lidEdge = new TorusGeometry(0.86, 0.03, 8, 48)
+      lidEdge.rotateX(Math.PI / 2)
+      lidEdge.translate(0, 1.53, 0)
+      add(lidEdge, black)
+      for (const y of [0.03, -0.03]) {
+        const brim = new CylinderGeometry(1.02, 2.0, 0.0001, 64, 1, true)
+        brim.translate(0, y, 0)
+        add(brim, black)
+      }
+      const lip = new TorusGeometry(2.0, 0.04, 8, 72)
+      lip.rotateX(Math.PI / 2)
+      add(lip, black)
+      const bandMat = felt(c ? darker(c.material, 0.5) : '#0e0d0c')
+      bandMat.side = 2
+      const band = new CylinderGeometry(1.0, 1.05, 0.34, 48, 1, true)
+      band.translate(0, 0.22, 0)
+      add(band, bandMat)
+      const gold = metal(c?.trim ?? '#d8a640', 0.3)
+      const w = 0.46
+      const h = 0.4
+      const bar = 0.09
+      for (const [bw, bh, x, y] of [[w + bar, bar, 0, h / 2], [w + bar, bar, 0, -h / 2], [bar, h + bar, w / 2, 0], [bar, h + bar, -w / 2, 0]]) {
+        const part = new BoxGeometry(bw, bh, 0.05)
+        part.translate(x, 0.22 + y, 1.07)
+        add(part, gold)
+      }
+    }),
+  turkey_hat: (_s, c) =>
+    item('head', (add) => {
+      // A brown feathered cap with a turkey's head and neck rising off the front: an orange beak,
+      // a red wattle and snood, two round eyes. A fan of three feathers stands up behind.
+      const brown = felt(c?.material ?? '#6b4126')
+      const dome = new SphereGeometry(1.1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2)
+      dome.scale(1, 0.9, 1)
+      add(dome, brown)
+      const cuff = new TorusGeometry(1.08, 0.13, 12, 40)
+      cuff.rotateX(Math.PI / 2)
+      cuff.translate(0, 0.06, 0)
+      add(cuff, felt(c ? darker(c.material, 0.3) : '#4a2c18'))
+      const red = gloss(c?.accent ?? '#c8283a')
+      red.clearcoat = 0.3
+      red.roughness = 0.55
+      // The neck curves up and forward from the top of the cap.
+      const neck = new TubeGeometry(new CatmullRomCurve3([new Vector3(0, 0.6, 0.45), new Vector3(0, 1.0, 0.7), new Vector3(0, 1.3, 0.95)]), 24, 0.26, 16, false)
+      add(neck, brown)
+      const head = new SphereGeometry(0.42, 24, 18)
+      head.scale(0.92, 0.95, 1.05)
+      head.translate(0, 1.42, 1.05)
+      add(head, red)
+      const beak = new ConeGeometry(0.13, 0.36, 16)
+      beak.rotateX(Math.PI / 2)
+      beak.translate(0, 1.38, 1.6)
+      add(beak, gloss(c?.trim ?? '#f2a23a'))
+      const wattle = new SphereGeometry(0.13, 14, 10)
+      wattle.scale(0.8, 2.1, 0.8)
+      wattle.translate(0, 1.06, 1.36)
+      add(wattle, red)
+      const snood = new SphereGeometry(0.065, 10, 8)
+      snood.scale(1, 2.8, 1)
+      snood.rotateX(0.5)
+      snood.translate(0.06, 1.36, 1.52)
+      add(snood, red)
+      for (const s of [1, -1]) {
+        const white = new SphereGeometry(0.11, 14, 12)
+        white.translate(s * 0.2, 1.56, 1.38)
+        add(white, gloss('#f8f4ea'))
+        const pupil = new SphereGeometry(0.06, 12, 10)
+        pupil.translate(s * 0.21, 1.57, 1.47)
+        add(pupil, gloss('#141210'))
+      }
+      // Three tail feathers standing up at the back of the cap, banded like the suit's fan.
+      for (const [a, len] of [[-0.45, 0.95], [0, 1.1], [0.45, 0.95]]) {
+        for (const [tone, k, dz] of [[c?.accent ?? '#c8283a', 1, 0], [c?.trim ?? '#f2a23a', 0.78, 0.015], [c?.material ?? '#6b4126', 0.55, 0.03]] as const) {
+          const f = new SphereGeometry(1, 16, 10)
+          f.scale(0.2 * k + 0.04, (len * k) / 2, 0.035)
+          f.translate(0, (len * k) / 2, -dz)
+          f.rotateX(-0.35)
+          f.rotateZ(a)
+          f.translate(0, 0.55, -0.85)
+          add(f, felt(tone))
+        }
       }
     }),
   diving_helmet: (_s, c, rig) =>
