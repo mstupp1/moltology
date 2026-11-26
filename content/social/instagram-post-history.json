@@ -1162,6 +1162,50 @@
       "characters": [
         "crab_moss_tern"
       ]
+    },
+    {
+      "id": "carousel-1795701939158",
+      "type": "carousel",
+      "topic": "Trimming just-in-case items from a packing list",
+      "theme": "swipe-lab",
+      "mascot": "lobster_pointing",
+      "articleSlug": null,
+      "archivePath": "Social Archive/2026/11/carousel-944f4dd48b54a1e186ce1b9d",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795701940266_94ec898b25318b74_01.png",
+        "https://media.zernio.com/temp/1795701941494_551f3b9766736ca3_02.png",
+        "https://media.zernio.com/temp/1795701942940_ef7d0380c723860f_03.png",
+        "https://media.zernio.com/temp/1795701944619_d60d91848bd77626_04.png",
+        "https://media.zernio.com/temp/1795701945643_2d63092d2f4a4cea_05.png"
+      ],
+      "slideUrls": [
+        "https://media.zernio.com/temp/1795701940266_94ec898b25318b74_01.png",
+        "https://media.zernio.com/temp/1795701941494_551f3b9766736ca3_02.png",
+        "https://media.zernio.com/temp/1795701942940_ef7d0380c723860f_03.png",
+        "https://media.zernio.com/temp/1795701944619_d60d91848bd77626_04.png",
+        "https://media.zernio.com/temp/1795701945643_2d63092d2f4a4cea_05.png"
+      ],
+      "slideCount": 5,
+      "aspectRatio": "4:5",
+      "caption": "Your carry-on has a spare carry-on.\n\nThe hiking boots are dressed for a trail. The itinerary says hotel carpet. Before packing a just-in-case item, ask which day you’ll use it.\n\nSave this for your next trip.",
+      "hashtags": [],
+      "firstComment": "https://moltology.org/moltmax",
+      "status": "scheduled",
+      "scheduledFor": "2026-11-27T18:00:00.000Z",
+      "queueId": "6a84b76d2421e968ac81f5bc",
+      "zernioPostId": "6b083cba585d60f61819bda5",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "series": "Shell Check",
+      "episode": 1,
+      "format": "Roast ranking",
+      "cast": [
+        "None. The luggage is the subject."
+      ],
+      "stopper": "Your carry-on has a spare carry-on.",
+      "callback": "First episode",
+      "loudness": 4,
+      "createdAt": "2026-11-26T14:05:50.132Z"
     }
   ]
 }
