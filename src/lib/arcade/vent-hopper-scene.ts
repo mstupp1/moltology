@@ -39,7 +39,7 @@ import { withLoftDetail } from '../avatar3d/loft'
 import type { Avatar3DLook } from '../avatar3d/look'
 import { bakedLightTexture } from '../avatar3d/stage-light'
 import { FIELD_H, FIELD_W, HALF_W, HARDEST_AT, seededRandom, type HopperState, type Pad, type PadKind } from './vent-hopper-sim'
-import { ROCK_COLORS, bubbleTexture, lumpy, rayTexture, tint, urchinGeometry } from './scene-kit'
+import { ROCK_COLORS, bubbleTexture, createBestMarker, labelTexture, lumpy, rayTexture, tint, urchinGeometry } from './scene-kit'
 
 export interface HopperSceneOptions {
   quality?: 'high' | 'low'
@@ -54,7 +54,10 @@ export interface HopperScene {
   /** Draw the state as it is now. `dt` and `time` are seconds of real time, for idle motion. */
   draw: (state: HopperState, dt: number, time: number) => void
   /** Bounced off a pad of this kind. */
-  bounce: (kind: PadKind) => void
+  /** Bounced on a pad: which kind, and which pad (it squashes under the feet). */
+  bounce: (kind: PadKind, padId?: number | null) => void
+  /** The player's best height so far, in metres: a gold line crosses the shaft there. */
+  setBest: (best: number) => void
   /** Brittle coral broke underfoot. */
   crack: () => void
   /** Touched an urchin. */
@@ -148,29 +151,6 @@ function clamParts(variant: number) {
   // Hinged at the back edge.
   lid.translate(0, 0, 0.44)
   return { lower, lid }
-}
-
-function labelTexture(): {
-  texture: CanvasTexture
-  set: (text: string) => void
-} {
-  const canvas = document.createElement('canvas')
-  canvas.width = 256
-  canvas.height = 64
-  const ctx = canvas.getContext('2d')!
-  const texture = new CanvasTexture(canvas)
-  texture.colorSpace = SRGBColorSpace
-  return {
-    texture,
-    set(text) {
-      ctx.clearRect(0, 0, 256, 64)
-      ctx.font = '600 34px Inter, system-ui, sans-serif'
-      ctx.fillStyle = 'rgba(220,245,255,0.85)'
-      ctx.textBaseline = 'middle'
-      ctx.fillText(text, 8, 34)
-      texture.needsUpdate = true
-    },
-  }
 }
 
 export function createHopperScene(canvas: HTMLCanvasElement, options: HopperSceneOptions = {}): HopperScene {
@@ -278,10 +258,35 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
   }
   const floor = new Group()
   floor.add(new Mesh(floorGeo, sand))
-  // The bank under the sand's front edge, so a tall phone never sees past the floor.
-  const bank = new Mesh(new PlaneGeometry(FIELD_W + 1.6, 12), new MeshBasicMaterial({ color: '#08141c' }))
-  bank.position.set(0, -6, 0.6)
+  // The bank under the sand's front edge, so a tall phone never sees past the floor: lit sand
+  // sloping down into the dark, with a row of boulders along the lip.
+  const bankGeo = new PlaneGeometry(FIELD_W + 3, 12, 18, 16)
+  {
+    const pos = bankGeo.getAttribute('position')
+    const colors: number[] = []
+    const top = new Color('#3a3934')
+    const deep = new Color('#050c11')
+    const c = new Color()
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i)
+      pos.setZ(i, (rand() - 0.5) * 0.1)
+      c.copy(top).lerp(deep, Math.min(1, Math.pow((6 - y) / 4, 0.7)))
+      colors.push(c.r, c.g, c.b)
+    }
+    bankGeo.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3))
+    bankGeo.computeVertexNormals()
+  }
+  const bankMaterial = new MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true })
+  const bank = new Mesh(bankGeo, bankMaterial)
+  bank.position.set(0, -6, 0.55)
   floor.add(bank)
+  for (let i = 0; i < 9; i++) {
+    const g = tint(lumpy(0.35 + rand() * 0.3, rand, 0.3), ROCK_COLORS[i % 4].clone().multiplyScalar(0.7), rand, 0.14)
+    const boulder = new Mesh(g, rockMaterial)
+    boulder.position.set(-HALF_W - 0.3 + (i / 8) * (FIELD_W + 0.6) + (rand() - 0.5) * 0.4, -0.15 - rand() * 0.25, 0.75 + rand() * 0.2)
+    boulder.rotation.set(rand() * 3, rand() * 3, rand() * 3)
+    floor.add(boulder)
+  }
   scene.add(floor)
   const chimneys = new Group()
   for (const [x, h] of [
@@ -353,13 +358,13 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
   })
   scene.add(new Points(burstGeo, burstMaterial))
   let feet = new Vector3()
-  const burst = (count: number, spread: number) => {
+  const burst = (count: number, spread: number, at: { x: number; y: number } = feet) => {
     if (options.reducedMotion) return
     let made = 0
     for (let i = 0; i < BURST && made < count; i++) {
       if (burstLife[i] > 0) continue
       burstLife[i] = 0.4 + Math.random() * 0.3
-      burstPos.set([feet.x + (Math.random() - 0.5) * 0.5, feet.y - 0.05, 0.3], i * 3)
+      burstPos.set([at.x + (Math.random() - 0.5) * 0.5, at.y - 0.05, 0.3], i * 3)
       burstVel[i * 2] = (Math.random() - 0.5) * spread
       burstVel[i * 2 + 1] = -0.6 - Math.random() * 1.2
       made++
@@ -395,6 +400,14 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
     scene.add(group)
     return { group, label, value: -1 }
   })
+
+  // A gold line across the shaft at the player's best height.
+  const bestMarker = createBestMarker('line', FIELD_W)
+  bestMarker.group.visible = false
+  bestMarker.group.position.z = -0.7
+  scene.add(bestMarker.group)
+  let best = 0
+  let trailClock = 0
 
   // Painted art, swapped in as it arrives.
   const loaded: Texture[] = []
@@ -466,6 +479,8 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
     lid?: Mesh
     brokeAt?: number
     openAt?: number
+    /** When it was last bounced on (it squashes and springs back). */
+    squashAt?: number
   }
   const pads = new Map<number, PadNode>()
   const urchins = new Map<number, Mesh>()
@@ -483,6 +498,9 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
       const [a, b] = plateHalves(p.w, p.variant)
       node.geos.push(a, b)
       node.halves = [new Mesh(a, coralMaterial.clone()), new Mesh(b, coralMaterial.clone())]
+      // A visible crack down the middle, so brittle coral reads as breakable before it breaks.
+      node.halves[0].position.x = -0.05
+      node.halves[1].position.x = 0.05
       group.add(...node.halves)
     } else {
       const { lower, lid } = clamParts(p.variant)
@@ -584,7 +602,19 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
         }
         node.group.position.set(p.x, p.y, 0)
         if (p.kind === 'drift' && !options.reducedMotion) node.group.rotation.z = Math.sin(time * 2 + p.variant * 9) * 0.04
+        // Squashed under a bounce, springing back with a wobble.
+        if (node.squashAt !== undefined && !options.reducedMotion) {
+          const t = time - node.squashAt
+          const k = t > 0.6 ? 0 : Math.exp(-t * 9) * Math.cos(t * 30)
+          node.group.scale.set(1 + 0.14 * k, 1 - 0.3 * k, 1 + 0.08 * k)
+        }
+        // Drifting pads leave a trail of bubbles off their back edge.
+        if (p.kind === 'drift' && trailClock <= 0 && p.y > viewBottom && p.y < viewBottom + viewH) {
+          burst(1, 0.3, { x: p.x - Math.sign(p.vx) * p.w * 0.45, y: p.y - 0.15 })
+        }
         if (node.halves) {
+          // Brittle coral trembles now and then.
+          if (!p.broken && !options.reducedMotion) node.group.rotation.z = Math.sin(time * 40) * 0.025 * Math.max(0, Math.sin(time * 1.3 + p.variant * 11) - 0.85) * 6
           if (p.broken && node.brokeAt === undefined) node.brokeAt = time
           if (node.brokeAt !== undefined) {
             // The halves split, tip away from each other and sink as they fade.
@@ -605,6 +635,15 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
         }
       }
       for (const [id, node] of pads) if (!live.has(id)) freePad(id, node)
+      if (trailClock <= 0) trailClock = 0.22
+      trailClock -= dt
+
+      // The best line: shows while in view, flares as the climb passes it.
+      bestMarker.group.visible = best > 0 && best > viewBottom - 1 && best < viewBottom + viewH + 1
+      bestMarker.group.position.y = best
+      if (state.phase === 'ready') bestMarker.reset()
+      else if (best > 0 && state.best > best) bestMarker.pass()
+      bestMarker.update(dt, time)
 
       // Urchins turn slowly as they drift.
       const liveUrchins = new Set<number>()
@@ -700,7 +739,12 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
       camera.lookAt(cx, cy, 0)
       renderer.render(scene, camera)
     },
-    bounce(kind) {
+    setBest(next) {
+      best = next
+    },
+    bounce(kind, padId) {
+      const under = padId != null ? pads.get(padId) : undefined
+      if (under) under.squashAt = performance.now() / 1000
       if (kind === 'clam') {
         character?.bounce(2.4)
         if (!options.reducedMotion) spin = Math.PI * 2
@@ -709,14 +753,8 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
         character?.bounce(kind === 'floor' ? 1.2 : 1)
         burst(5, 1.2)
       }
-      // Open the clam that was bounced on (the one right under the feet).
-      if (kind === 'clam') {
-        for (const node of pads.values()) {
-          if (!node.lid) continue
-          const p = node.group.position
-          if (Math.abs(p.y - feet.y) < 0.05 && Math.abs(p.x - feet.x) < 1.2) node.openAt = performance.now() / 1000
-        }
-      }
+      // Open the clam that was bounced on.
+      if (kind === 'clam' && under?.lid) under.openAt = performance.now() / 1000
     },
     crack() {
       burst(8, 2)
@@ -748,6 +786,7 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
       character?.dispose()
       for (const [id, node] of pads) freePad(id, node)
       for (const m of markers) m.label.texture.dispose()
+      bestMarker.dispose()
       scene.traverse((node) => {
         const mesh = node as Mesh
         if (!(mesh.isMesh || (node as Points).isPoints)) return
@@ -758,7 +797,7 @@ export function createHopperScene(canvas: HTMLCanvasElement, options: HopperScen
       urchinGeo.dispose()
       pearlGeo.dispose()
       for (const g of wallGeos) g.dispose()
-      for (const m of [rockMaterial, spongeMaterial, driftMaterial, coralMaterial, shellMaterial, pearlMaterial, urchinMaterial, sand, bubbleMaterial, burstMaterial]) m.dispose()
+      for (const m of [rockMaterial, spongeMaterial, driftMaterial, coralMaterial, shellMaterial, pearlMaterial, urchinMaterial, sand, bankMaterial, bubbleMaterial, burstMaterial]) m.dispose()
       rayTex.dispose()
       bubbleTex.dispose()
       env.dispose()

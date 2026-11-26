@@ -39,7 +39,7 @@ import { buildCharacter, type Character3D } from '../avatar3d/character'
 import { withLoftDetail } from '../avatar3d/loft'
 import type { Avatar3DLook } from '../avatar3d/look'
 import { bakedLightTexture } from '../avatar3d/stage-light'
-import { CORAL_COLORS, ROCK_COLORS, bubbleTexture, lumpy, rayTexture, ridge, tint } from './scene-kit'
+import { CORAL_COLORS, ROCK_COLORS, bubbleTexture, createBestMarker, lumpy, rayTexture, ridge, tint } from './scene-kit'
 import {
   COLUMN_W,
   FIELD_H,
@@ -74,6 +74,8 @@ export interface RiptideScene {
   crash: () => void
   /** A gap cleared. */
   point: () => void
+  /** The player's best so far: a gold marker stands in the gap that would beat it. */
+  setBest: (best: number) => void
   resize: () => void
   dispose: () => void
 }
@@ -221,19 +223,51 @@ function buildHalf(column: Column, dir: 1 | -1, length: number, materials: Colum
   return meshes
 }
 
-function buildColumn(column: Column, materials: ColumnMaterials): Group {
+interface ColumnNode {
+  group: Group
+  upper: Group
+  lower: Group
+  glow: Mesh
+}
+
+function buildColumn(column: Column, materials: ColumnMaterials, glowMaterial: Material, glowGeo: BufferGeometry): ColumnNode {
   const group = new Group()
-  const top = column.gapY + column.gap / 2
-  const bottom = column.gapY - column.gap / 2
+  // Long enough to stay off the field at either end of a drifting gap's swing.
+  const top = column.baseY - column.drift + column.gap / 2
+  const bottom = column.baseY + column.drift - column.gap / 2
   // The upper half runs from the gap up past the surface, the lower one down into the sand.
   const upper = new Group()
   upper.add(...buildHalf(column, 1, FIELD_H + 2 - top, materials))
-  upper.position.y = top
   const lower = new Group()
   lower.add(...buildHalf(column, -1, bottom + 1, materials))
-  lower.position.y = bottom
-  group.add(upper, lower)
-  return group
+  // A soft glow in the opening, so the way through reads at a glance against dark rock.
+  const glow = new Mesh(glowGeo, glowMaterial)
+  glow.position.z = -0.4
+  glow.renderOrder = 1
+  group.add(upper, lower, glow)
+  return { group, upper, lower, glow }
+}
+
+/** Light in a gap: bright in the middle, fading smoothly to nothing on every side. */
+function gapGlowTexture(): CanvasTexture {
+  const canvas = document.createElement('canvas')
+  canvas.width = 32
+  canvas.height = 64
+  const ctx = canvas.getContext('2d')!
+  const image = ctx.createImageData(32, 64)
+  for (let y = 0; y < 64; y++) {
+    const v = Math.pow(Math.sin((Math.PI * (y + 0.5)) / 64), 0.8)
+    for (let x = 0; x < 32; x++) {
+      const u = 1 - Math.abs((x + 0.5) / 16 - 1)
+      const i = (y * 32 + x) * 4
+      image.data[i] = image.data[i + 1] = image.data[i + 2] = 255
+      image.data[i + 3] = Math.round(255 * u * u * v)
+    }
+  }
+  ctx.putImageData(image, 0, 0)
+  const texture = new CanvasTexture(canvas)
+  texture.colorSpace = SRGBColorSpace
+  return texture
 }
 
 function freeGroup(node: Object3D) {
@@ -294,7 +328,10 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
   // Sunlight from the surface, a little ahead of the swimmer, and a cool fill from the water.
   const sun = new DirectionalLight(0xe8fbff, 2.4)
   sun.position.set(-3, 14, 8)
-  scene.add(sun, new HemisphereLight(0x7fd6ff, 0x0b2233, 0.9))
+  // A cool light from behind and above picks out the rock edges against the dark water.
+  const rim = new DirectionalLight(0x9fe8ff, 1.4)
+  rim.position.set(4, 10, -6)
+  scene.add(sun, rim, new HemisphereLight(0x7fd6ff, 0x0b2233, 1.1))
 
   const materials: ColumnMaterials = {
     rock: new MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.95, metalness: 0 }),
@@ -405,7 +442,7 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
     materials.rock.map = t
     // The vertex colours are dark slate, made for an untextured rock; lift them so the painted
     // stone shows its own colour and they only vary it rock to rock.
-    materials.rock.color.setScalar(3.4)
+    materials.rock.color.setScalar(4.2)
     materials.rock.needsUpdate = true
   })
   load(options.art?.rust, (t) => {
@@ -442,7 +479,28 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
   swimmer.rotation.y = SWIM_YAW
   scene.add(swimmer)
 
-  const columns = new Map<number, Group>()
+  const columns = new Map<number, ColumnNode>()
+  const glowTex = gapGlowTexture()
+  const glowGeo = new PlaneGeometry(COLUMN_W * 1.6, 1)
+  const glowMaterial = new MeshBasicMaterial({ map: glowTex, color: '#7fe3ff', transparent: true, opacity: 0.22, blending: AdditiveBlending, depthWrite: false, fog: false })
+
+  // A gold marker in the gap that would beat the player's best.
+  const bestMarker = createBestMarker('post', 2.6, { tagBeside: true })
+  bestMarker.group.visible = false
+  scene.add(bestMarker.group)
+  let best = 0
+
+  // A ring of light washing back off the swimmer each time a gap is cleared.
+  const RINGS = 3
+  const ringGeo = new TorusGeometry(0.5, 0.045, 6, 28)
+  const rings = Array.from({ length: RINGS }, () => {
+    const mesh = new Mesh(ringGeo, new MeshBasicMaterial({ color: '#bff3ff', transparent: true, opacity: 0, blending: AdditiveBlending, depthWrite: false, fog: false }))
+    mesh.rotation.y = Math.PI / 2 - 0.35
+    mesh.visible = false
+    scene.add(mesh)
+    return { mesh, life: 0 }
+  })
+  let ringNext = 0
   let tilt = 0
   let shake = 0
   let lastPhase: RiptideState['phase'] = 'ready'
@@ -511,21 +569,45 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
     draw(state, dt, time) {
       // Columns: build new ones, move them, free the ones swept away.
       const live = new Set<number>()
+      let marked = false
       for (const column of state.columns) {
         live.add(column.id)
-        let group = columns.get(column.id)
-        if (!group) {
-          group = buildColumn(column, materials)
-          columns.set(column.id, group)
-          scene.add(group)
+        let node = columns.get(column.id)
+        if (!node) {
+          node = buildColumn(column, materials, glowMaterial, glowGeo)
+          columns.set(column.id, node)
+          scene.add(node.group)
         }
-        group.position.x = column.x
+        node.group.position.x = column.x
+        node.upper.position.y = column.gapY + column.gap / 2
+        node.lower.position.y = column.gapY - column.gap / 2
+        node.glow.position.y = column.gapY
+        node.glow.scale.y = column.gap
+        if (best > 0 && column.id === best + 1) {
+          marked = true
+          bestMarker.group.position.set(column.x, column.gapY - 1.3, -0.2)
+          if (column.passed) bestMarker.pass()
+        }
       }
-      for (const [id, group] of columns) {
+      for (const [id, node] of columns) {
         if (!live.has(id)) {
-          freeGroup(group)
+          // The glow's shape is shared by every column; only the rock is freed.
+          node.glow.removeFromParent()
+          freeGroup(node.group)
           columns.delete(id)
         }
+      }
+      if (state.phase === 'ready') bestMarker.reset()
+      bestMarker.group.visible = marked
+      bestMarker.update(dt, time)
+      for (const ring of rings) {
+        if (ring.life <= 0) continue
+        ring.life = Math.max(0, ring.life - dt)
+        const t = 1 - ring.life / 0.5
+        ring.mesh.scale.setScalar(0.8 + t * 1.6)
+        ring.mesh.position.x -= state.speed * dt * 0.5
+        ;(ring.mesh.material as MeshBasicMaterial).opacity = 0.7 * (1 - t)
+        ring.mesh.visible = ring.life > 0
       }
 
       // The current scrolls the seabed and kelp at full speed, the ridges slower.
@@ -619,15 +701,30 @@ export function createRiptideScene(canvas: HTMLCanvasElement, options: RiptideSc
       character?.react('poke')
     },
     point() {
-      // Nothing to show yet beyond the score itself.
+      if (options.reducedMotion) return
+      const ring = rings[ringNext]
+      ringNext = (ringNext + 1) % RINGS
+      ring.life = 0.5
+      ring.mesh.position.set(swimmer.position.x + 0.2, swimmer.position.y, 0.2)
+      ring.mesh.visible = true
+    },
+    setBest(next) {
+      best = next
     },
     resize,
     dispose() {
       disposed = true
       for (const t of loaded) t.dispose()
       canvas.removeEventListener('webglcontextlost', onLost)
-      for (const group of columns.values()) freeGroup(group)
+      for (const node of columns.values()) {
+        node.glow.removeFromParent()
+        freeGroup(node.group)
+      }
       columns.clear()
+      bestMarker.dispose()
+      glowGeo.dispose()
+      glowTex.dispose()
+      ringGeo.dispose()
       character?.dispose()
       scene.traverse((node) => {
         const mesh = node as Mesh

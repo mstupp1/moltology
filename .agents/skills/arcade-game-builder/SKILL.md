@@ -102,7 +102,20 @@ lobsters, and is driven by `update(dt, time, idle)`. Keep the game moving the ch
 - `<ArcadeFrame>` is the full-screen portal (z-[100050]) with best, live score, close X, ready
   text, pause and results card, plus sign-up for guests. Pass the game's canvas ref, pointer
   handlers and any extra layers (dimmed field edges).
-- `usePauseWhenHidden`, `keyBelongsToPage`, `RESULTS_DELAY_MS`.
+- `usePauseWhenHidden` (tab hidden, window blur, Escape/P), `keyBelongsToPage`, `RESULTS_DELAY_MS`.
+- Game feel every game gets (copy any of the three):
+  - Sounds from `src/lib/arcade/sound.ts` (`playArcadeSound`, made in code, no files) for each
+    action, point, milestone, crash and new best; `arcadeBuzz` for crashes and hits. The frame's
+    mute button covers both.
+  - On a crash: freeze the loop for `HIT_STOP_MS`, bump `crashPulse` (screen flash) and play the
+    crash sound.
+  - The player's best in the world: the scene takes `setBest(best)` and draws `createBestMarker`
+    from `scene-kit.ts`; the component bumps `bestPulse` ("New best" tag) the first time the score
+    passes it in a run.
+  - Pass `onPause` (pause button) and, if the player sits low on a phone, `resultsAt="high"` so the
+    results card does not cover the crash.
+  - On touch screens a second action needs its own place to press (Current Runner: hold the left
+    side to duck), not a gesture that starts with the first action.
 
 Add `src/routes/_hud/arcade.<id>.tsx` (copy riptide's), a `<Game>Page` in `ArcadePages.tsx`, the
 id in `GAME_ORDER` (newest first, it gets the "New game" eyebrow) and its card art key in

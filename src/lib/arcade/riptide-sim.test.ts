@@ -7,7 +7,10 @@ import {
   PLAYER_X,
   SPACING,
   SPEED_MAX,
+  DRIFT_FROM,
+  DRIFT_MAX,
   createRiptide,
+  driftFor,
   gapFor,
   hitsColumn,
   stepRiptide,
@@ -28,6 +31,35 @@ function autopilot(state: RiptideState, seconds: number) {
     if (kick) kicksIn = 0.18
     kicksIn -= DT
     stepRiptide(state, DT, kick)
+  }
+}
+
+/**
+ * A stronger player for proving runs can be won: every 6 steps it looks ~0.9 s ahead (kick or not,
+ * at each 6-step block) and only kicks when not kicking leads to a crash.
+ */
+const BLOCK = 6
+const LOOKAHEAD = 20
+function copy(state: RiptideState): RiptideState {
+  return { ...state, columns: state.columns.map((c) => ({ ...c })), rng: () => 0.5 }
+}
+function lives(state: RiptideState, depth: number): boolean {
+  if (state.phase === 'dead') return false
+  if (depth === 0) return true
+  for (const kick of [false, true]) {
+    const next = copy(state)
+    for (let i = 0; i < BLOCK && next.phase !== 'dead'; i++) stepRiptide(next, DT, kick && i === 0)
+    if (lives(next, depth - 1)) return true
+  }
+  return false
+}
+function searchAutopilot(state: RiptideState, seconds: number) {
+  if (state.phase === 'ready') stepRiptide(state, DT, true)
+  for (let b = 0; b < seconds / (DT * BLOCK) && (state.phase as string) !== 'dead'; b++) {
+    const coast = copy(state)
+    for (let i = 0; i < BLOCK; i++) stepRiptide(coast, DT, false)
+    const kick = !lives(coast, LOOKAHEAD - 1)
+    for (let i = 0; i < BLOCK && (state.phase as string) !== 'dead'; i++) stepRiptide(state, DT, kick && i === 0)
   }
 }
 
@@ -91,8 +123,26 @@ describe('riptide sim', () => {
     expect(state.score).toBeLessThanOrEqual(ceiling)
   })
 
+  it('drifts the gaps late in a run and keeps them reachable', () => {
+    expect(driftFor(DRIFT_FROM - 1)).toBe(0)
+    expect(driftFor(DRIFT_FROM + 5)).toBeGreaterThan(0)
+    expect(driftFor(10_000)).toBe(DRIFT_MAX)
+    for (const seed of [3, 17, 29, 41, 77, 123, 5, 6]) {
+      const state = createRiptide(seed)
+      state.score = DRIFT_FROM + 40
+      state.speed = SPEED_MAX
+      searchAutopilot(state, 60)
+      expect(state.columns.some((c) => c.drift > 0)).toBe(true)
+      expect(state.phase).toBe('playing')
+      for (const c of state.columns) {
+        expect(c.gapY - c.gap / 2).toBeGreaterThan(FLOOR_Y)
+        expect(c.gapY + c.gap / 2).toBeLessThan(CEIL_Y)
+      }
+    }
+  })
+
   it('detects touching either half of a column', () => {
-    const column: Column = { id: 1, x: PLAYER_X, gapY: 6, gap: 3, kind: 'rock', variant: 0, passed: false }
+    const column: Column = { id: 1, x: PLAYER_X, gapY: 6, baseY: 6, drift: 0, phase: 0, gap: 3, kind: 'rock', variant: 0, passed: false }
     expect(hitsColumn(column, 6)).toBe(false)
     expect(hitsColumn(column, 7.4)).toBe(true)
     expect(hitsColumn(column, 4.6)).toBe(true)

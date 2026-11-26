@@ -47,7 +47,7 @@ export const ARCADE_GAMES: Record<ArcadeGameId, ArcadeGame> = {
     id: 'current-runner',
     title: 'Current Runner',
     tagline: 'Run the seafloor as the current picks up speed.',
-    howTo: 'Tap, click or press space to jump urchins and coral; hold it to jump higher. Swipe down or press the down arrow to duck under jellyfish. The current keeps getting faster.',
+    howTo: 'Tap, click or press space to jump urchins and coral; hold it to jump higher. Hold the left side of the screen or press the down arrow to duck under jellyfish. The current keeps getting faster.',
     path: '/arcade/current-runner',
     // A point is a metre; the current tops out at 13 metres a second (current-runner-sim.ts).
     minSecondsPerPoint: 0.075,

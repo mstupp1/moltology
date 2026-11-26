@@ -5,7 +5,8 @@ import { mark3DUnavailable } from '@/lib/avatar3d-support'
 import { getAssetUrl } from '@/lib/assets'
 import { createRiptide, stepRiptide, type RiptideState } from '@/lib/arcade/riptide-sim'
 import type { RiptideScene } from '@/lib/arcade/riptide-scene'
-import { ArcadeFrame, RESULTS_DELAY_MS, keyBelongsToPage, randomSeed, useArcadeRuns, usePauseWhenHidden, type ArcadeScreen } from './ArcadeShell'
+import { arcadeBuzz, playArcadeSound } from '@/lib/arcade/sound'
+import { ArcadeFrame, HIT_STOP_MS, RESULTS_DELAY_MS, keyBelongsToPage, randomSeed, useArcadeRuns, usePauseWhenHidden, type ArcadeScreen } from './ArcadeShell'
 import { usePlayerCharacter } from './usePlayerCharacter'
 
 const STEP = 1 / 120
@@ -27,6 +28,10 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
   const overAtRef = useRef(0)
   const [screen, setScreenState] = useState<Screen>('loading')
   const [score, setScore] = useState(0)
+  const [crashPulse, setCrashPulse] = useState(0)
+  const [bestPulse, setBestPulse] = useState(0)
+  const bestRef = useRef(0)
+  const beatBestRef = useRef(false)
   const setScreen = useCallback((next: Screen) => {
     screenRef.current = next
     setScreenState(next)
@@ -43,6 +48,11 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
       if (stateRef.current.phase === 'ready') stateRef.current = createRiptide(seed)
     },
   })
+
+  useEffect(() => {
+    bestRef.current = best
+    sceneRef.current?.setBest(best)
+  }, [best])
 
   // The scene: built once 3D is known to work, rebuilt only if the page remounts.
   useEffect(() => {
@@ -69,17 +79,21 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
           },
         })
         sceneRef.current = scene
+        scene.setBest(bestRef.current)
         observer = new ResizeObserver(() => scene.resize())
         observer.observe(canvas)
         let last = performance.now()
         let carry = 0
+        let freezeUntil = 0
         const tick = (now: number) => {
           raf = requestAnimationFrame(tick)
           const dt = Math.min(0.1, (now - last) / 1000)
           last = now
           const state = stateRef.current
           const current = screenRef.current
-          if (current === 'paused' || current === 'loading') {
+          // Paused, loading, or the beat of stillness right after a crash.
+          if (current === 'paused' || current === 'loading' || now < freezeUntil) {
+            carry = 0
             scene.draw(state, 0, now / 1000)
             return
           }
@@ -89,15 +103,29 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
           while (carry >= STEP) {
             carry -= STEP
             const events = stepRiptide(state, STEP, kick)
-            if (events.kicked) scene.kick()
+            if (events.kicked) {
+              scene.kick()
+              playArcadeSound('kick')
+            }
             if (events.scored) {
               scene.point()
               setScore(state.score)
+              if (!beatBestRef.current && bestRef.current > 0 && state.score > bestRef.current) {
+                beatBestRef.current = true
+                setBestPulse((n) => n + 1)
+                playArcadeSound('best')
+              } else playArcadeSound(state.score % 10 === 0 ? 'milestone' : 'point')
             }
             if (events.died) {
               scene.crash()
+              playArcadeSound('crash')
+              arcadeBuzz([30, 40, 60])
+              setCrashPulse((n) => n + 1)
+              freezeUntil = now + HIT_STOP_MS
+              carry = 0
               overAtRef.current = performance.now()
               setScreen('over')
+              break
             }
             if (kick && state.phase === 'playing' && screenRef.current === 'ready') setScreen('playing')
             kick = false
@@ -151,6 +179,7 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
 
   const restart = useCallback(() => {
     stateRef.current = createRiptide(randomSeed())
+    beatBestRef.current = false
     setScore(0)
     setOutcome(null)
     requestTicket()
@@ -185,6 +214,12 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [press])
 
+  // Local dev only: the live state, for screenshot scripts to set up a scene.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    ;(window as unknown as { __arcadeState?: unknown }).__arcadeState = stateRef
+  }, [])
+
   // Leaving the tab pauses a run in progress.
   usePauseWhenHidden(screenRef, setScreen)
 
@@ -203,6 +238,9 @@ export function RiptideGame({ onFinished }: { onFinished?: () => void }) {
       readyAction="Tap to swim"
       readyHint="Space or click works too. Touch anything and the run ends."
       onPointerDown={press}
+      crashPulse={crashPulse}
+      bestPulse={bestPulse}
+      onPause={() => setScreen('paused')}
     >
       {/* On a wide screen the field is a 3:4 column in the middle (so no one sees further ahead);
           the reef either side of it is dimmed. */}
