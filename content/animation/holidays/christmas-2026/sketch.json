@@ -34,11 +34,11 @@
       }
     }
   ],
-  "hookHeadline": "Bo says he's Santa. Sort of.",
+  "hookHeadline": "Bo, who are you supposed to be?",
   "scenes": [
     {
       "speaker": "juno",
-      "line": "Bo, the kids keep asking who you're meant to be.",
+      "line": "Bo, who are you supposed to be?",
       "shot": "two",
       "pose": "point",
       "look": "right",
