@@ -39,7 +39,7 @@ import { withLoftDetail } from '../avatar3d/loft'
 import type { Avatar3DLook } from '../avatar3d/look'
 import { bakedLightTexture } from '../avatar3d/stage-light'
 import { FIELD_H, FIELD_W, PLAYER_X, SPEED_MAX, SPEED_START, seededRandom, type Obstacle, type RunnerState } from './current-runner-sim'
-import { CORAL_COLORS, ROCK_COLORS, bubbleTexture, lumpy, rayTexture, ridge, tint, urchinGeometry } from './scene-kit'
+import { CORAL_COLORS, ROCK_COLORS, bubbleTexture, createBestMarker, lumpy, rayTexture, ridge, tint, urchinGeometry } from './scene-kit'
 
 export interface RunnerSceneOptions {
   quality?: 'high' | 'low'
@@ -58,6 +58,8 @@ export interface RunnerScene {
   crash: () => void
   /** A new run: back on its feet, ready to go. */
   reset: () => void
+  /** The player's best so far, in metres: a gold post stands on the sand there. */
+  setBest: (best: number) => void
   resize: () => void
   dispose: () => void
 }
@@ -66,6 +68,8 @@ export interface RunnerScene {
 const RUNNER_HEIGHT = 1.55
 /** Turned most of the way toward where it runs, so the face still shows. */
 const RUN_YAW = 1.05
+/** On a screen narrower than the field, how much sand still shows behind the runner. */
+const BEHIND_ON_PHONE = 1.1
 /** The view's lowest point below the sand, when the screen is no taller than the field. */
 const VIEW_BELOW = 1.2
 /** How far back the sand reaches (its far edge), in field units. */
@@ -211,6 +215,7 @@ export function createRunnerScene(canvas: HTMLCanvasElement, options: RunnerScen
   const HALF_FOV = Math.tan((15 * Math.PI) / 180)
   let distance = FIELD_H / 2 / HALF_FOV
   let centerY = FIELD_H / 2 - VIEW_BELOW
+  let centerX = 0
 
   const sun = new DirectionalLight(0xe8fbff, 2.3)
   sun.position.set(-4, 12, 9)
@@ -337,6 +342,26 @@ export function createRunnerScene(canvas: HTMLCanvasElement, options: RunnerScen
     }
   }
 
+  // A gold post on the sand at the player's best distance.
+  const bestMarker = createBestMarker('post', 3.2)
+  bestMarker.group.visible = false
+  bestMarker.group.position.z = -0.6
+  scene.add(bestMarker.group)
+  let best = 0
+  let footfall = 0
+
+  // Streaks of current rushing past once the run gets fast.
+  const STREAKS = low ? 10 : 18
+  const streakGeo = new PlaneGeometry(1, 0.025)
+  const streakMaterial = new MeshBasicMaterial({ color: '#d9f6ff', transparent: true, opacity: 0, blending: AdditiveBlending, depthWrite: false, fog: false })
+  const streaks = Array.from({ length: STREAKS }, (_, i) => {
+    const mesh = new Mesh(streakGeo, streakMaterial)
+    mesh.position.set(-10 + (i / STREAKS) * 20 + Math.random() * 2, 0.4 + Math.random() * 4.6, -0.5 - Math.random() * 3)
+    mesh.scale.x = 0.8 + Math.random() * 1.6
+    scene.add(mesh)
+    return { mesh, rate: 1.4 + Math.random() * 0.8 }
+  })
+
   // Painted art, swapped in as it arrives.
   const loaded: Texture[] = []
   let backdrop: Mesh | null = null
@@ -437,9 +462,15 @@ export function createRunnerScene(canvas: HTMLCanvasElement, options: RunnerScen
     camera.updateProjectionMatrix()
     // The whole field always shows, so no one sees further ahead. On a tall screen the camera backs
     // off until the width fits and keeps the sand in the lower third, showing more water above.
-    const viewH = Math.max(FIELD_H, FIELD_W / camera.aspect)
+    // A tall phone is short of width, so it gives up a little of the sand behind the runner (never
+    // any of the way ahead) for a bigger runner, and keeps the sand low with water and art above.
+    const narrow = camera.aspect < FIELD_W / FIELD_H
+    const left = narrow ? PLAYER_X - BEHIND_ON_PHONE : -FIELD_W / 2
+    const viewW = FIELD_W / 2 - left
+    centerX = narrow ? (FIELD_W / 2 + left) / 2 : 0
+    const viewH = Math.max(FIELD_H, viewW / camera.aspect)
     distance = viewH / 2 / HALF_FOV
-    centerY = Math.max(FIELD_H / 2 - VIEW_BELOW, viewH * 0.17)
+    centerY = Math.max(FIELD_H / 2 - VIEW_BELOW, viewH * (narrow ? 0.26 : 0.17))
     if (scene.fog instanceof Fog) {
       scene.fog.near = distance + 4
       scene.fog.far = distance + 34
@@ -552,6 +583,36 @@ export function createRunnerScene(canvas: HTMLCanvasElement, options: RunnerScen
       }
       ;(puffGeo.getAttribute('position') as BufferAttribute).needsUpdate = true
 
+      // The best post rides the sand; it flares as the runner passes it.
+      const toBest = best - state.distance
+      bestMarker.group.visible = best > 0 && toBest > -FIELD_W && toBest < FIELD_W
+      bestMarker.group.position.x = PLAYER_X + toBest
+      if (state.phase === 'ready') bestMarker.reset()
+      else if (best > 0 && toBest <= 0) bestMarker.pass()
+      bestMarker.update(dt, time)
+
+      // Fast current: streaks rush past, brighter the faster it goes.
+      const rush = playing && !options.reducedMotion ? Math.max(0, (state.speed - 8) / (SPEED_MAX - 8)) : 0
+      streakMaterial.opacity += (rush * 0.25 - streakMaterial.opacity) * Math.min(1, dt * 3)
+      for (const st of streaks) {
+        st.mesh.visible = streakMaterial.opacity > 0.01
+        if (!st.mesh.visible) continue
+        st.mesh.position.x -= state.speed * st.rate * dt
+        if (st.mesh.position.x < -11) {
+          st.mesh.position.x = 11 + Math.random() * 3
+          st.mesh.position.y = 0.4 + Math.random() * 4.6
+        }
+      }
+
+      // Sand kicks up from the runner's feet as it runs, more often the faster it goes.
+      if (playing && state.grounded && !state.ducking) {
+        footfall -= dt * (state.speed / SPEED_START)
+        if (footfall <= 0) {
+          footfall = 0.16
+          kickSand(1, 0.5 + state.speed * 0.04)
+        }
+      }
+
       // The runner: waits at the ready, runs faster as the current picks up, ducks, leaps.
       if (character) {
         if (playing && !running) {
@@ -578,8 +639,8 @@ export function createRunnerScene(canvas: HTMLCanvasElement, options: RunnerScen
       if (shake > 0 && !options.reducedMotion) {
         shake = Math.max(0, shake - dt)
         const s = shake * 0.3
-        camera.position.set(Math.sin(time * 70) * s, centerY + Math.cos(time * 63) * s, distance)
-      } else camera.position.set(0, centerY, distance)
+        camera.position.set(centerX + Math.sin(time * 70) * s, centerY + Math.cos(time * 63) * s, distance)
+      } else camera.position.set(centerX, centerY, distance)
       camera.lookAt(camera.position.x, centerY, 0)
       renderer.render(scene, camera)
     },
@@ -596,6 +657,9 @@ export function createRunnerScene(canvas: HTMLCanvasElement, options: RunnerScen
       running = false
       shake = 0.3
       kickSand(10, 1.5)
+    },
+    setBest(next) {
+      best = next
     },
     reset() {
       running = false
@@ -624,6 +688,9 @@ export function createRunnerScene(canvas: HTMLCanvasElement, options: RunnerScen
           for (const m of Array.isArray(material) ? material : [material]) m?.dispose()
         }
       })
+      bestMarker.dispose()
+      streakGeo.dispose()
+      streakMaterial.dispose()
       urchinGeo.dispose()
       shadowGeo.dispose()
       shadowTex.dispose()

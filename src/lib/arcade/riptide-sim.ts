@@ -39,14 +39,29 @@ export const GAP_MIN = 2.9
 export const GAP_STEP = 0.02
 /** Largest jump in gap height from one pair to the next, so every gap can be reached. */
 export const GAP_SHIFT_MAX = 3.2
+/**
+ * Late in a run the gaps start to drift up and down, so long runs stay tense once the speed and gap
+ * have bottomed out. From DRIFT_FROM points the swing grows to DRIFT_MAX (up and down from the
+ * middle). The jump between neighbours shrinks by the same amount, so the furthest any gap can be
+ * from the last never exceeds GAP_SHIFT_MAX.
+ */
+export const DRIFT_FROM = 40
+export const DRIFT_STEP = 0.03
+export const DRIFT_MAX = 0.9
+/** Radians a second: a full swing every ~4.5 s, about 1.3 units a second at the widest. */
+export const DRIFT_RATE = 1.4
 
 export type ColumnKind = 'rock' | 'reef' | 'pipe'
 
 export interface Column {
   id: number
   x: number
-  /** Middle of the gap. */
+  /** Middle of the gap now (moves on a drifting column). */
   gapY: number
+  /** Middle of its swing, how far it swings each way, and where in the swing it started. */
+  baseY: number
+  drift: number
+  phase: number
   gap: number
   kind: ColumnKind
   /** A per-column number for the renderer's shapes and colours. */
@@ -71,6 +86,7 @@ export interface RiptideState {
   nextAt: number
   nextId: number
   lastGapY: number
+  lastDrift: number
   rng: () => number
 }
 
@@ -105,6 +121,7 @@ export function createRiptide(seed: number): RiptideState {
     nextAt: 0,
     nextId: 1,
     lastGapY: START_Y,
+    lastDrift: 0,
     rng: seededRandom(seed),
   }
 }
@@ -113,22 +130,37 @@ export function gapFor(score: number): number {
   return Math.max(GAP_MIN, GAP_START - score * GAP_STEP)
 }
 
+export function driftFor(score: number): number {
+  return score < DRIFT_FROM ? 0 : Math.min(DRIFT_MAX, (score - DRIFT_FROM + 1) * DRIFT_STEP)
+}
+
 export function speedFor(score: number): number {
   return Math.min(SPEED_MAX, SPEED_START + score * SPEED_STEP)
 }
 
 function spawn(state: RiptideState, x: number): Column {
   const gap = gapFor(state.score)
-  const low = FLOOR_Y + gap / 2 + 1
-  const high = CEIL_Y - gap / 2 - 0.8
-  const from = Math.max(low, state.lastGapY - GAP_SHIFT_MAX)
-  const to = Math.min(high, state.lastGapY + GAP_SHIFT_MAX)
-  const gapY = from + state.rng() * Math.max(0, to - from)
+  const drift = driftFor(state.score)
+  const low = FLOOR_Y + gap / 2 + 1 + drift
+  const high = CEIL_Y - gap / 2 - 0.8 - drift
+  const shift = GAP_SHIFT_MAX - drift - state.lastDrift
+  const from = Math.max(low, state.lastGapY - shift)
+  const to = Math.min(high, state.lastGapY + shift)
+  const baseY = from + state.rng() * Math.max(0, to - from)
   const roll = state.rng()
   const kind: ColumnKind = roll < 0.45 ? 'rock' : roll < 0.75 ? 'reef' : 'pipe'
-  const column: Column = { id: state.nextId++, x, gapY, gap, kind, variant: state.rng(), passed: false }
-  state.lastGapY = gapY
+  const variant = state.rng()
+  const phase = drift > 0 ? state.rng() * Math.PI * 2 : 0
+  const column: Column = { id: state.nextId++, x, gapY: baseY, baseY, drift, phase, gap, kind, variant, passed: false }
+  column.gapY = gapAt(column, state.time)
+  state.lastGapY = baseY
+  state.lastDrift = drift
   return column
+}
+
+/** Where a column's gap is at this point in the run. */
+export function gapAt(column: Column, time: number): number {
+  return column.drift ? column.baseY + column.drift * Math.sin(time * DRIFT_RATE + column.phase) : column.baseY
 }
 
 /** Whether a circle at (PLAYER_X, y) touches either half of a column. */
@@ -182,6 +214,7 @@ export function stepRiptide(state: RiptideState, dt: number, kick: boolean): Ste
   state.distance += move
   for (const column of state.columns) {
     column.x -= move
+    if (column.drift) column.gapY = gapAt(column, state.time)
     if (!column.passed && column.x + COLUMN_HIT_W / 2 < PLAYER_X - PLAYER_R) {
       column.passed = true
       state.score += 1

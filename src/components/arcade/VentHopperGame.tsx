@@ -5,6 +5,7 @@ import { mark3DUnavailable } from '@/lib/avatar3d-support'
 import { getAssetUrl } from '@/lib/assets'
 import { createHopper, stepHopper, type HopperState } from '@/lib/arcade/vent-hopper-sim'
 import type { HopperScene } from '@/lib/arcade/vent-hopper-scene'
+import { arcadeBuzz, playArcadeSound } from '@/lib/arcade/sound'
 import { ArcadeFrame, RESULTS_DELAY_MS, keyBelongsToPage, randomSeed, useArcadeRuns, usePauseWhenHidden, type ArcadeScreen } from './ArcadeShell'
 import { usePlayerCharacter } from './usePlayerCharacter'
 
@@ -12,6 +13,8 @@ const STEP = 1 / 120
 /** Degrees of tilt for full steer, and the dead zone around level. */
 const TILT_FULL = 18
 const TILT_DEAD = 2
+/** The way the phone is held when a run starts counts as level, up to this many degrees. */
+const TILT_ZERO_MAX = 12
 
 const LEFT_KEYS = new Set(['ArrowLeft', 'a', 'A'])
 const RIGHT_KEYS = new Set(['ArrowRight', 'd', 'D'])
@@ -44,13 +47,17 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
   const stateRef = useRef<HopperState>(createHopper(randomSeed()))
   const input = useRef({ start: false, left: false, right: false })
   const pointers = useRef(new Map<number, -1 | 1>())
-  const tilt = useRef({ on: false, value: 0, asked: false })
+  const tilt = useRef({ on: false, raw: 0, zero: 0, asked: false })
   const screenRef = useRef<ArcadeScreen>('loading')
   const overAtRef = useRef(0)
   const [screen, setScreenState] = useState<ArcadeScreen>('loading')
   const [score, setScore] = useState(0)
   const [flash, setFlash] = useState(0)
   const [touch, setTouch] = useState(false)
+  const [crashPulse, setCrashPulse] = useState(0)
+  const [bestPulse, setBestPulse] = useState(0)
+  const bestRef = useRef(0)
+  const beatBestRef = useRef(false)
   const setScreen = useCallback((next: ArcadeScreen) => {
     screenRef.current = next
     setScreenState(next)
@@ -83,8 +90,16 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
     if (side) return side
     const i = input.current
     if (i.left !== i.right) return i.left ? -1 : 1
-    return tilt.current.on ? tilt.current.value : 0
+    if (!tilt.current.on) return 0
+    const t = tilt.current.raw - tilt.current.zero
+    const live = Math.abs(t) < TILT_DEAD ? 0 : (t - Math.sign(t) * TILT_DEAD) / (TILT_FULL - TILT_DEAD)
+    return Math.max(-1, Math.min(1, live))
   }, [])
+
+  useEffect(() => {
+    bestRef.current = best
+    sceneRef.current?.setBest(best)
+  }, [best])
 
   // The scene and the game loop.
   useEffect(() => {
@@ -111,6 +126,7 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
           },
         })
         sceneRef.current = scene
+        scene.setBest(bestRef.current)
         observer = new ResizeObserver(() => scene.resize())
         observer.observe(canvas)
         let last = performance.now()
@@ -132,12 +148,31 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
           while (carry >= STEP) {
             carry -= STEP
             const events = stepHopper(state, STEP, { start, steer: steer() })
-            if (events.bounced) scene.bounce(events.bounced)
-            if (events.broke) scene.crack()
-            if (events.hit) scene.hit()
+            if (events.bounced) {
+              scene.bounce(events.bounced, state.lastPad)
+              playArcadeSound(events.bounced === 'clam' ? 'spring' : 'bounce')
+              if (events.bounced === 'clam') arcadeBuzz(15)
+            }
+            if (events.broke) {
+              scene.crack()
+              playArcadeSound('crack')
+            }
+            if (events.hit) {
+              scene.hit()
+              playArcadeSound('hit')
+              arcadeBuzz(40)
+              setCrashPulse((n) => n + 1)
+            }
+            if (!beatBestRef.current && bestRef.current > 0 && state.score > bestRef.current) {
+              beatBestRef.current = true
+              setBestPulse((n) => n + 1)
+              playArcadeSound('best')
+            } else if (events.milestone) playArcadeSound('milestone')
             if (events.milestone) setFlash((n) => n + 1)
             if (events.died) {
               scene.fall()
+              playArcadeSound('fall')
+              arcadeBuzz([20, 30, 50])
               overAtRef.current = performance.now()
               setScreen('over')
             }
@@ -200,8 +235,7 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
       const t = sideTilt(event)
       if (t === null) return
       tilt.current.on = true
-      const live = Math.abs(t) < TILT_DEAD ? 0 : (t - Math.sign(t) * TILT_DEAD) / (TILT_FULL - TILT_DEAD)
-      tilt.current.value = Math.max(-1, Math.min(1, live))
+      tilt.current.raw = t
     }
     window.addEventListener('deviceorientation', onOrient)
     return () => window.removeEventListener('deviceorientation', onOrient)
@@ -216,6 +250,7 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
 
   const restart = useCallback(() => {
     stateRef.current = createHopper(randomSeed())
+    beatBestRef.current = false
     sceneRef.current?.reset()
     setScore(0)
     setOutcome(null)
@@ -235,7 +270,11 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
       if (performance.now() - overAtRef.current > RESULTS_DELAY_MS * 1.5) restart()
       return
     }
-    if (current === 'ready') input.current.start = true
+    if (current === 'ready') {
+      input.current.start = true
+      // However the phone is held now counts as level for this run.
+      tilt.current.zero = Math.max(-TILT_ZERO_MAX, Math.min(TILT_ZERO_MAX, tilt.current.raw))
+    }
   }, [restart, setScreen])
 
   // Keys: left/right or A/D steer; space, Enter or up start.
@@ -320,6 +359,9 @@ export function VentHopperGame({ onFinished }: { onFinished?: () => void }) {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       scorePulse={flash}
+      crashPulse={crashPulse}
+      bestPulse={bestPulse}
+      onPause={() => setScreen('paused')}
     >
       {/* On a screen wider than 9:16 the field is a column in the middle; what lies either side is dimmed. */}
       <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-[max(0px,calc((100vw-100dvh*0.5625)/2))] bg-gradient-to-r from-abyss/85 to-abyss/55" />
