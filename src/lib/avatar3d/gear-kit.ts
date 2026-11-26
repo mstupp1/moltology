@@ -29,6 +29,8 @@ const FABRIC_FINISH: Partial<Record<GearSurface, { roughness: number; sheen: num
 }
 
 export type Tone = 'plate' | 'trim' | 'accent' | 'cloth' | 'fabric' | 'dark' | 'paint' | 'tape' | 'seam' | 'soft' | 'glass'
+/** A fixed colour for `Kit.addFixed`, as a hex string. */
+export type Fixed = `#${string}`
 export type Amount = (local: Vector3, rest: Vector3, normal: Vector3) => number
 
 export const v = (x: number, y: number, z: number) => new Vector3(x, y, z)
@@ -56,7 +58,7 @@ function strip(geo: BufferGeometry): BufferGeometry {
 
 /** Collects one item's parts by bone and material, then turns them into meshes. */
 export class Kit {
-  private readonly parts = new Map<string, { bone: string; tone: Tone; geos: BufferGeometry[] }>()
+  private readonly parts = new Map<string, { bone: string; tone: Tone | Fixed; geos: BufferGeometry[] }>()
   private readonly undo: (() => void)[] = []
   private readonly bending: { tone: Tone; geo: BufferGeometry; weigh: Weigh }[] = []
 
@@ -71,6 +73,23 @@ export class Kit {
     const entry = this.parts.get(id) ?? { bone, tone, geos: [] }
     entry.geos.push(strip(geo))
     this.parts.set(id, entry)
+  }
+
+  /**
+   * Geometry in a fixed colour, outside the piece's palette: matte painted card or wax. Only for
+   * details whose colour is the point whatever the palette (a kinara's red, black and green
+   * candles, the black bands in kente).
+   */
+  addFixed(bone: string, colour: Fixed, geo: BufferGeometry): void {
+    const id = `${bone}|${colour}`
+    const entry = this.parts.get(id) ?? { bone, tone: colour, geos: [] }
+    entry.geos.push(strip(geo))
+    this.parts.set(id, entry)
+  }
+
+  /** `addFixed` in character space. */
+  addFixedWorld(bone: string, colour: Fixed, geo: BufferGeometry): void {
+    this.addFixed(bone, colour, this.rig.localize(bone, geo))
   }
 
   /**
@@ -222,11 +241,19 @@ export class Kit {
       glass: new MeshPhysicalMaterial({ color: new Color(v.accent), emissive: new Color(v.accent), emissiveIntensity: 0.35, roughness: 0.08, clearcoat: 1, transparent: true, opacity: 0.42, side: 2, depthWrite: false }),
       dark: workedSurface(new MeshPhysicalMaterial({ color: new Color(tone(v.material, -0.62)), metalness: 0.15, roughness: 0.6 }), 'leather'),
     }
+    // Fixed colours: matte paint or wax, one material per colour.
+    const fixed = new Map<string, Material>()
+    const materialFor = (t: Tone | Fixed): Material => {
+      if (!t.startsWith('#')) return materials[t as Tone]
+      let m = fixed.get(t)
+      if (!m) fixed.set(t, (m = new MeshPhysicalMaterial({ color: new Color(t), roughness: 0.6, clearcoat: 0.2, clearcoatRoughness: 0.5 })))
+      return m
+    }
     const meshes: Mesh[] = []
     for (const { bone, tone: t, geos } of this.parts.values()) {
       const geo = geos.length === 1 ? geos[0] : mergeGeometries(geos, false)
       if (!geo) continue
-      const mesh = new Mesh(geo, materials[t])
+      const mesh = new Mesh(geo, materialFor(t))
       mesh.name = `gear:${v.key}:${bone}:${t}`
       mesh.castShadow = t !== 'glass'
       mesh.receiveShadow = t !== 'accent' && t !== 'glass'
@@ -274,6 +301,7 @@ export class Kit {
           mesh.geometry.dispose()
         }
         for (const m of Object.values(materials)) m.dispose()
+        for (const m of fixed.values()) m.dispose()
         for (const fn of this.undo) fn()
       },
     }

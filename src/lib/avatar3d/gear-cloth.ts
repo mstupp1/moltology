@@ -26,11 +26,11 @@ const LIFT = 0.03
 export function garment(kit: Kit, wear: Wearable): void {
   const { loft: host, bone, top, bottom, belt } = wear.torso
   const { motif, construction: n } = kit.visual
-  const sleeves = motif !== 'tank'
+  const sleeves = motif !== 'tank' && motif !== 'snowman'
   const tailored = motif === 'coat' || motif === 'jacket' || motif === 'blazer'
   // A puffer stands well off the body in quilted channels; knit and canvas sit a little prouder too.
   const puffer = motif === 'puffer'
-  const bodyLift = puffer || motif === 'turkey' ? 0.05 : motif === 'sweater' || motif === 'divesuit' || motif === 'robe' ? 0.036 : LIFT
+  const bodyLift = puffer || motif === 'turkey' || motif === 'snowman' ? 0.05 : motif === 'sweater' || motif === 'divesuit' || motif === 'robe' || motif === 'santa' ? 0.036 : LIFT
 
   // A lobster's swimmerets and both species' short walking legs would poke through the cloth.
   for (const { tag } of SIDES) {
@@ -43,7 +43,9 @@ export function garment(kit: Kit, wear: Wearable): void {
   const hem = Math.min(bottom, belt) - 0.04
   const height = top - hem
   // Quilted channels: the fill bulges between stitch lines every 7.5 cm.
-  const quilt = puffer ? (y: number) => 0.55 + 0.45 * Math.pow(Math.abs(Math.sin(((y - hem) * Math.PI) / 0.075)), 0.6) : () => 1
+  // A snowman: two snowballs, the cloth pinched in between them (the head is the third).
+  const snowball = (y: number) => snowLift((y - hem) / height) / 0.05
+  const quilt = motif === 'snowman' ? snowball : puffer ? (y: number) => 0.55 + 0.45 * Math.pow(Math.abs(Math.sin(((y - hem) * Math.PI) / 0.075)), 0.6) : () => 1
   // Coats and jackets with lapels hang open at the chest: a V from the collar down to where the
   // lapels meet, with a shirt showing underneath. A wrap crosses over higher and narrower.
   const lapelled = tailored && n >= 2
@@ -145,6 +147,9 @@ export function garment(kit: Kit, wear: Wearable): void {
   if (motif === 'robe') return robe(kit, wear, hem, vBottom, opening, neck)
   if (motif === 'divesuit') return diveSuit(kit, wear, hem, neck)
   if (motif === 'wrap') return wrap(kit, wear, hem, vBottom, opening)
+  if (motif === 'santa') return santaDetails(kit, wear, hem, neck)
+  if (motif === 'snowman') return snowmanDetails(kit, wear, hem, height)
+  if (motif === 'elf') return elfDetails(kit, wear, hem, neck)
 
   if (lapelled) {
     // Lapels: folded back either side of the opening, widening toward the collar. A blazer's are
@@ -408,7 +413,7 @@ function wrap(kit: Kit, wear: Wearable, hem: number, vBottom: number, opening: (
  * outside of the walking legs, wherever the species and build put them, with a little room to
  * spare. It rides the torso bone, open a little at the front so the legs show as it walks.
  */
-function skirt(kit: Kit, wear: Wearable, hem: number, drop: number, edges: 'trim' | 'seam' = 'trim'): void {
+function skirt(kit: Kit, wear: Wearable, hem: number, drop: number, edges: 'trim' | 'seam' | 'soft' = 'trim', edgeR = 0.008): void {
   const { bone } = wear.torso
   // On a crab the coat hangs from the underside of the shell, which it already covers, so it
   // drops cleanly round the wide stance instead of starting from the narrow body below.
@@ -516,7 +521,7 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number, edges: 'trim
     const i = (rows * (cols + 1) + c) * 3
     edge.push(v(verts[i], verts[i + 1], verts[i + 2]))
   }
-  kit.addBending(edges, tube(edge, 0.008, 96), weigh)
+  kit.addBending(edges, tube(edge, edgeR, 96), weigh)
   // A finished edge down each front.
   for (const c of [0, cols]) {
     const front: Vector3[] = []
@@ -524,7 +529,7 @@ function skirt(kit: Kit, wear: Wearable, hem: number, drop: number, edges: 'trim
       const i = (r * (cols + 1) + c) * 3
       front.push(v(verts[i], verts[i + 1], verts[i + 2]))
     }
-    kit.addBending(edges, tube(front, 0.006, 48), weigh)
+    kit.addBending(edges, tube(front, edgeR * 0.75, 48), weigh)
   }
 }
 
@@ -1047,6 +1052,131 @@ export function cape(kit: Kit, wear: Wearable): void {
         pts.push(onBody(neck.host, neck.y(Math.abs(a)) + 0.03 + i * 0.04, a, OVER + 0.03 + i * 0.012).at)
       }
       kit.addWorld(neck.bone, i === 2 ? 'trim' : 'fabric', tube(pts, 0.025, 48))
+    }
+  }
+}
+
+/** How far a snowman's snow stands off the body, `t` from hem (0) to neck (1): two round balls. */
+const snowLift = (t: number) => 0.02 + 0.075 * Math.pow(Math.abs(Math.sin(t * Math.PI * 2)), 0.6)
+
+/** Fur trim: a fat soft roll in the accent colour (white plush on a Santa suit). */
+const FUR = 0.034
+
+/**
+ * A Santa suit: plush red with thick white fur at the collar, down the front, round the cuffs
+ * and along the hem of a short skirt. The wide black belt is its own piece.
+ */
+function santaDetails(kit: Kit, wear: Wearable, hem: number, neck: Neckline): void {
+  const { loft: host, bone, top } = wear.torso
+  const { fore } = wear.arm
+  kit.addWorld(neck.bone, 'soft', tube(neck.ring(0.036 + FUR * 0.7), FUR * 1.2, 160))
+  if (wear.race === 'crab') kit.addWorld(neck.bone, 'soft', seam(neck.host, [neck.y(0) - 0.02, 0], [neck.y(0) - 0.3, 0], 0.036 + FUR * 0.5, FUR * 0.8, 10))
+  kit.addWorld(bone, 'soft', seam(host, [wear.race === 'crab' ? top : top - 0.03, 0], [hem + 0.02, 0], 0.036 + FUR * 0.5, FUR * 0.8, 10))
+  for (const { tag } of SIDES) {
+    const cuff = new TorusGeometry(wear.arm.radius * 1.05 + LIFT * 0.8 + FUR * 0.6, FUR, 10, 28)
+    cuff.rotateX(Math.PI / 2)
+    cuff.translate(0, -fore * 0.8, 0)
+    kit.add(`forearm${tag}`, 'soft', cuff)
+  }
+  skirt(kit, wear, hem, wear.leg.thigh * 0.5, 'soft', FUR)
+}
+
+/**
+ * A snowman: two packed snowballs (the head makes the third), three coal buttons down the front
+ * and a rolled lip of snow at the hem. No sleeves: the arms are the twigs.
+ */
+function snowmanDetails(kit: Kit, wear: Wearable, hem: number, height: number): void {
+  const { loft: host, bone } = wear.torso
+  for (const t of [0.78, 0.6, 0.25]) {
+    const at = onBody(host, hem + height * t, 0, snowLift(t) + 0.006)
+    kit.addWorld(bone, 'seam', stud(at.at, at.normal, 0.026, 0.024, 0.016))
+  }
+  kit.addWorld(bone, 'fabric', tube(ringAt(wear, hem + 0.02, 0.045), 0.03, 120))
+}
+
+/**
+ * An elf tunic: green, a collar cut into points in the trim colour, gold buttons, a black belt
+ * with a gold buckle, and a short skirt edged in the trim colour.
+ */
+function elfDetails(kit: Kit, wear: Wearable, hem: number, neck: Neckline): void {
+  const { loft: host, bone, top, belt } = wear.torso
+  const crab = wear.race === 'crab'
+  // The collar: a band under the neckline that hangs down in eight points.
+  const points = 8
+  const depth = (phi: number) => {
+    const k = ((phi / (Math.PI * 2)) * points + 0.5) % 1
+    return (crab ? 0.04 : 0.03) + (crab ? 0.09 : 0.08) * (1 - Math.abs(k * 2 - 1))
+  }
+  for (const slot of ['shell', 'belly'] as const) {
+    kit.puff(neck.bone, 'seam', (_p, w) => {
+      const phi = fromFront(neck.host, w)
+      const y = neck.y(phi)
+      return (LIFT + 0.014) * within(w.y, y - depth(phi), y + 0.006, 0.008)
+    }, slot)
+  }
+  // Gold buttons above the belt.
+  const from = crab ? top - 0.02 : top - 0.12
+  for (let i = 0; i < 3; i++) {
+    const y = from - i * ((from - belt - 0.05) / 2)
+    const at = onBody(host, y, 0, LIFT + 0.004)
+    kit.addWorld(bone, 'soft', stud(at.at, at.normal, 0.014))
+  }
+  // A black belt and a square gold buckle.
+  kit.addFixedWorld(bone, '#19171c', tube(ringAt(wear, belt, LIFT + 0.01), 0.026, 120))
+  const buckle = onBody(host, belt, 0, LIFT + 0.03)
+  const q = lookQuaternion(buckle.normal)
+  for (const [bw, bh, x, y] of [[0.09, 0.016, 0, 0.037], [0.09, 0.016, 0, -0.037], [0.016, 0.09, 0.037, 0], [0.016, 0.09, -0.037, 0]]) {
+    kit.addWorld(bone, 'soft', placed(new BoxGeometry(bw, bh, 0.014), buckle.at.clone().add(v(x, y, 0).applyQuaternion(q)), q))
+  }
+  skirt(kit, wear, hem, wear.leg.thigh * 0.35, 'seam', 0.014)
+}
+
+/** Kente blocks down a stole, in order: gold, green, gold, red, black, then round again. */
+const KENTE: ('fabric' | 'seam' | 'soft' | '#16130f')[] = ['fabric', 'seam', 'fabric', 'soft', '#16130f', 'fabric', 'seam', 'soft']
+
+/**
+ * A kente stole: a woven band round the back of the neck and two long ends hanging straight down
+ * the front, either side of the middle, in blocks of gold (main), green (trim), red (accent) and
+ * black, each block crossed by a narrow stripe. Construction 2 and up adds a fringe at both ends.
+ */
+export function stole(kit: Kit, wear: Wearable): void {
+  const neck = collarLine(wear, 'stole')
+  const { construction: n } = kit.visual
+  const lift = OVER + 0.015
+  const tone = (t: (typeof KENTE)[number], b: string, geo: BufferGeometry) => (t.startsWith('#') ? kit.addFixedWorld(b, t as `#${string}`, geo) : kit.addWorld(b, t as 'fabric', geo))
+  const band: Vector3[] = []
+  for (let i = 0; i <= 40; i++) {
+    const phi = 0.32 + (i / 40) * (Math.PI * 2 - 0.64)
+    const a = phi > Math.PI ? phi - Math.PI * 2 : phi
+    band.push(onBody(neck.host, neck.y(Math.abs(a)) + 0.005, a, lift).at)
+  }
+  kit.addWorld(neck.bone, 'fabric', tube(band, 0.03, 120))
+  const { loft: host, bone } = wear.torso
+  const fromY = wear.race === 'crab' ? wear.torso.top : wear.torso.top - 0.03
+  const len = Math.max(0.32, Math.min(0.5, fromY - wear.torso.bottom + 0.04))
+  const steps = 12
+  for (const s of [1, -1]) {
+    const phi = s * 0.3
+    for (let i = 0; i < steps; i++) {
+      const t0 = i / steps
+      const t1 = (i + 1) / steps
+      const a = onBody(host, fromY - len * t0, phi, lift + 0.02 + t0 * 0.015)
+      const b = onBody(host, fromY - len * t1, phi, lift + 0.02 + t1 * 0.015)
+      const q = lookQuaternion(a.normal)
+      const mid = a.at.clone().lerp(b.at, 0.5)
+      const block = KENTE[i % KENTE.length]
+      tone(block, bone, placed(new BoxGeometry(0.1, a.at.distanceTo(b.at) + 0.003, 0.018), mid, q))
+      // A narrow stripe across the block in a contrasting colour.
+      const stripe = block === 'fabric' ? '#16130f' : 'fabric'
+      tone(stripe, bone, placed(new BoxGeometry(0.104, 0.008, 0.02), mid, q))
+    }
+    if (n >= 2) {
+      const end = onBody(host, fromY - len, phi, lift + 0.04)
+      const q = lookQuaternion(end.normal)
+      for (let k = 0; k < 6; k++) {
+        const x = -0.042 + (k / 5) * 0.084
+        kit.addWorld(bone, 'fabric', placed(new CylinderGeometry(0.005, 0.004, 0.04, 6), end.at.clone().add(v(x, -0.024, 0).applyQuaternion(q)), q))
+      }
     }
   }
 }

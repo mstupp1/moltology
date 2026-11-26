@@ -40,6 +40,10 @@ export const GEAR_COLLECTIONS: GearCollection[] = [
   { id: 'polar-shelf', name: 'Polar Shelf', blurb: 'Cable knit, a striped scarf, fleece-cuffed boots and a mug of cocoa.', discountPercent: 20 },
   { id: 'bioluminescent', name: 'Bioluminescent', blurb: 'Armour with seams that glow like deep water, and a jellyfish lantern.', discountPercent: 20 },
   { id: 'winter-molt', name: 'Winter Molt', blurb: 'A snowflake sweater, an evergreen cape, holly stripes and a gift to hand over.', discountPercent: 20, releasesOn: '2026-12-01' },
+  { id: 'santas-workshop', name: "Santa's Workshop", blurb: 'A Santa suit, hat, belt and boots, and an elf tunic and hat for the helpers.', discountPercent: 20, releasesOn: '2026-12-01' },
+  { id: 'snow-day', name: 'Snow Day', blurb: 'Dress as a snowman: two snowballs, coal buttons, a top hat with holly and red mittens.', discountPercent: 20, releasesOn: '2026-12-01' },
+  { id: 'hanukkah-lights', name: 'Hanukkah Lights', blurb: 'A menorah hat with all nine candles lit, a dreidel and a blue and white sweater.', discountPercent: 20, releasesOn: '2026-12-01' },
+  { id: 'kwanzaa', name: 'Kwanzaa', blurb: 'A woven kente stole and a kinara with its seven candles.', discountPercent: 20, releasesOn: '2026-12-01' },
   { id: 'harvest-table', name: 'Harvest Table', blurb: 'A pilgrim hat and doublet, a buckle belt, a full turkey suit and a pumpkin pie to share.', discountPercent: 20 },
   { id: 'royal-reef', name: 'Royal Reef', blurb: 'A coral cape, a pearl crown and a sceptre for holding court.', discountPercent: 20 },
 ]
