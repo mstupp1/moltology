@@ -410,6 +410,8 @@ export interface CreateReelOptions {
   platform?: 'all' | 'instagram' | 'youtube'
   customVideo?: string
   publishNow?: boolean
+  /** Publish at this fixed time (ISO 8601) instead of the next queue slot. */
+  scheduledFor?: string
   scheduleBestTime?: boolean
   dryRun?: boolean
   useVeo?: boolean
@@ -1079,6 +1081,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       firstComment: scriptData.firstComment, queueId: targetQueueId, profileId: DEFAULT_PROFILE_ID,
       instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID, youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
       isAiGenerated: true, validateMediaWindow: true, publishNow: !!options.publishNow, platform: platformTarget,
+      ...(options.scheduledFor ? { scheduledFor: options.scheduledFor } : {}),
     }
     const archived = await publishArchivedSocial({
       kind: 'reel', files: [masterReelPath], metadata: { script: scriptData, durationSeconds, publication },
@@ -1192,6 +1195,8 @@ Options:
   --color-grade <preset>    Cinematic color grading: auto | benthic-cyan | thermal-melt | photonics-matrix | calcified-armor | none
   --publish-now             Publish directly to Instagram immediately (skip draft)
   --schedule-best-time      Schedule for optimal audience engagement time via Zernio
+  --scheduled-for <iso>     Publish at a fixed time (e.g. 2026-12-25T10:00:00-05:00) instead of the next
+                            queue slot; must be within 7 days (Zernio upload lifetime)
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
   --dry-run                 Local test without archiving to Drive or uploading to Zernio
   --recycle-clips           Assemble reel from pre-existing stored video clips without generating new Veo footage
@@ -1231,6 +1236,7 @@ Examples:
   let colorGrading: any
   let publishNow = false
   let scheduleBestTime = false
+  let scheduledFor: string | undefined
   let useVeo = true
   let dryRun = false
   let recycleClips = false
@@ -1274,6 +1280,7 @@ Examples:
     else if ((args[i] === '--color-grade' || args[i] === '--visual-preset') && args[i + 1]) colorGrading = args[++i]
     else if (args[i] === '--publish-now') publishNow = true
     else if (args[i] === '--schedule-best-time') scheduleBestTime = true
+    else if (args[i] === '--scheduled-for' && args[i + 1]) scheduledFor = args[++i]
     else if (args[i] === '--no-veo') useVeo = false
     else if (args[i] === '--dry-run') dryRun = true
     else if (args[i] === '--recycle-clips') recycleClips = true
@@ -1348,6 +1355,7 @@ Examples:
       holidayOrEvent,
       colorGrading,
       publishNow,
+      scheduledFor,
       scheduleBestTime,
       useVeo,
       dryRun,
