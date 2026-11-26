@@ -2,7 +2,7 @@
  * Held props: one object in the pinch of one claw, the other claw left bare. Placed like the
  * hammer: from the claw socket, in front of the palm, so it moves with every pose.
  */
-import { BoxGeometry, BufferGeometry, CapsuleGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, OctahedronGeometry, SphereGeometry, TorusGeometry } from 'three'
+import { BoxGeometry, BufferGeometry, CapsuleGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, OctahedronGeometry, Quaternion, SphereGeometry, TorusGeometry, type Vector3 } from 'three'
 import type { Prop } from '../gear/types'
 import { Kit, v } from './gear-kit'
 import { alongY, placed } from './parts'
@@ -10,7 +10,10 @@ import type { Wearable } from './rig'
 
 type Place = (geo: BufferGeometry, x: number, y: number, z: number) => BufferGeometry
 
-const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number) => void> = {
+/** Turns a prop's +Y to face a direction given in character space (at rest), in the prop's own frame. */
+type Facing = (dir: Vector3) => Quaternion
+
+const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number, facing: Facing) => void> = {
   dreidel: (kit, bone, at, S) => {
     const w = 0.2 * S
     // A four-sided top held by its stem: a square body, a point below, an inset panel on each face.
@@ -205,10 +208,14 @@ const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number) => voi
     }
     kit.add(bone, 'accent', at(new SphereGeometry(w * 0.07, 12, 10), 0, w * 0.88, 0))
   },
-  pie: (kit, bone, at, S) => {
-    const r = 0.2 * S
-    const h = 0.06 * S
-    // A pumpkin pie held flat on the palm: a crust with a fluted rim, orange filling and a swirl
+  pie: (kit, bone, place, S, facing) => {
+    // Held up to show it off: the top faces forward and a little up whatever angle the claw grips
+    // at, and it is big enough to read as a pie from across the room.
+    const turn = facing(v(0, 0.45, 1))
+    const at: Place = (geo, x, y, z) => place(geo.translate(x, y, z).applyQuaternion(turn), 0, 0.12 * S, 0)
+    const r = 0.3 * S
+    const h = 0.08 * S
+    // A pumpkin pie: a crust with a fluted rim, orange filling and a swirl
     // of whipped cream in the middle.
     kit.add(bone, 'paint', at(new CylinderGeometry(r, r * 0.84, h, 36), 0, h * 0.5, 0))
     kit.add(bone, 'soft', at(new CylinderGeometry(r * 0.88, r * 0.88, 0.006, 36), 0, h + 0.002, 0))
@@ -232,5 +239,8 @@ export function heldProp(kit: Kit, wear: Wearable, tag: 'L' | 'R'): void {
   // Clear of the palm's front face, as the hammer is.
   const grip = socket.node.position.clone().add(v(0, 0, 0.24 * style.bulk * S * style.depth + 0.05))
   const at: Place = (geo, x, y, z) => placed(geo, grip.clone().add(v(x, y, z).applyQuaternion(q)), q)
-  BUILDS[prop](kit, bone, at, S)
+  const rest = kit.rig.restWorldOf(bone).quaternion
+  const toFrame = rest.clone().multiply(q).invert()
+  const facing: Facing = (dir) => new Quaternion().setFromUnitVectors(v(0, 1, 0), dir.clone().normalize().applyQuaternion(toFrame))
+  BUILDS[prop](kit, bone, at, S, facing)
 }
