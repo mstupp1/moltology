@@ -18,6 +18,7 @@ A lesson is one JSON file. `npm run anim:create` checks it before rendering and 
 | `codex` | `{ id, title, url }` when teaching a passage |
 | `hookHeadline` | Scene 1's whole line, under 14 words |
 | `backdrop` | Optional 9:16 image, relative to the lesson file; overrides the set's painted plate |
+| `floor` | Optional square floor tile, relative to the lesson file; replaces the set's floor so the ground matches a custom backdrop (snow under a winter plate) |
 | `scenes` | Six to ten scenes (below) |
 | `caption`, `hashtags`, `firstComment`, `youtubeTitle`, `youtubeDescription`, `youtubeTags`, `ctaGoal` | Platform copy, same rules as reels |
 | `outro` | Optional finished outro image; without it the host waves under "Read the full passage at moltology.org" |

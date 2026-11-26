@@ -8,6 +8,7 @@
   "loudness": 4,
   "set": "open-water",
   "backdrop": "./winter-plate.png",
+  "floor": "./snow-floor.png",
   "outro": "none",
   "turnGap": 0.14,
   "tail": 1.4,

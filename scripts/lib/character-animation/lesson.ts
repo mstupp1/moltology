@@ -128,6 +128,8 @@ export interface Lesson {
   hookHeadline: string
   /** Default backdrop image (1080x1920 or larger), relative to the lesson file. */
   backdrop?: string
+  /** A floor texture tile that replaces the set's floor (e.g. snow under a winter backdrop), relative to the lesson file. */
+  floor?: string
   scenes: LessonScene[]
   caption: string
   hashtags: string[]
