@@ -15,7 +15,7 @@ import type { Print } from '../gear/types'
 
 const LIFT = 0.03
 /** How far a crab's neckline stays below its mouth line. */
-const MOUTH_CLEAR = 0.17
+const MOUTH_CLEAR = 0.08
 
 /**
  * A garment's cut comes from its motif: `tank` (no sleeves), `jacket` (sleeves, to the hip),
