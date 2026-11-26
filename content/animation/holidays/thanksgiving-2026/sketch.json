@@ -19,42 +19,54 @@
       "id": "juno",
       "at": "left",
       "equipment": {
-        "head": { "visualKey": "pilgrim-hat", "rarity": "rare" },
-        "carapace": { "visualKey": "pilgrim-doublet", "rarity": "epic" },
-        "belt": { "visualKey": "pilgrim-buckle-belt", "rarity": "uncommon" }
+        "head": {
+          "visualKey": "pilgrim-hat",
+          "rarity": "rare"
+        },
+        "carapace": {
+          "visualKey": "pilgrim-doublet",
+          "rarity": "epic"
+        },
+        "belt": {
+          "visualKey": "pilgrim-buckle-belt",
+          "rarity": "uncommon"
+        }
       }
     },
     {
       "id": "bo",
-      "at": "center",
-      "equipment": {
-        "head": { "visualKey": "turkey-hat", "rarity": "uncommon" },
-        "carapace": { "visualKey": "turkey-suit", "rarity": "legendary" },
-        "claws-1": { "visualKey": "pumpkin-pie", "rarity": "common" }
-      }
-    },
-    {
-      "id": "vera",
       "at": "right",
       "equipment": {
-        "head": { "visualKey": "pilgrim-hat", "rarity": "rare" },
-        "belt": { "visualKey": "pilgrim-buckle-belt", "rarity": "uncommon" }
+        "head": {
+          "visualKey": "turkey-hat",
+          "rarity": "uncommon"
+        },
+        "carapace": {
+          "visualKey": "turkey-suit",
+          "rarity": "legendary"
+        },
+        "claws-1": {
+          "visualKey": "pumpkin-pie",
+          "rarity": "common"
+        }
       }
     }
   ],
   "hookHeadline": "Bo came dressed as the turkey so nobody would eat him.",
   "scenes": [
     {
-      "speaker": "vera",
+      "speaker": "juno",
       "line": "Bo came dressed as the turkey so nobody would eat him.",
       "shot": "two",
       "pose": "point",
-      "look": "left",
+      "look": "right",
       "act": {
-        "bo": { "pose": "strut", "look": "camera" },
-        "juno": { "pose": "rest", "look": "right" }
+        "bo": {
+          "pose": "strut",
+          "look": "camera"
+        }
       },
-      "description": "Three-shot on a warm autumn sea floor: Vera in a pilgrim hat points at Bo, who struts in a full turkey suit and turkey hat holding a pumpkin pie; Juno in pilgrim black looks over."
+      "description": "Two-shot on a warm autumn sea floor: Juno in pilgrim black points at Bo, who struts in a full turkey suit and turkey hat holding a pumpkin pie."
     },
     {
       "speaker": "bo",
@@ -68,11 +80,16 @@
     {
       "speaker": "juno",
       "line": "Bo, you've been holding that pie for an hour.",
-      "shot": "medium",
+      "shot": "two",
       "move": "cut",
       "pose": "ready",
       "look": "right",
-      "description": "Medium on Juno in the pilgrim doublet, looking across at Bo."
+      "description": "Two-shot: Juno in the pilgrim doublet looks across at Bo, who holds the pumpkin pie up.",
+      "act": {
+        "bo": {
+          "pose": "rest"
+        }
+      }
     },
     {
       "speaker": "bo",
@@ -81,18 +98,24 @@
       "move": "cut",
       "pose": "rest",
       "look": "camera",
-      "react": [{ "kind": "snap", "word": 4, "side": -1 }],
+      "react": [
+        {
+          "kind": "snap",
+          "word": 4,
+          "side": -1
+        }
+      ],
       "description": "Extreme close-up on Bo, deadpan, snapping on 'shellfish'."
     },
     {
-      "speaker": "vera",
+      "speaker": "juno",
       "line": "Every single year.",
       "shot": "close",
       "move": "push-in",
       "pose": "rest",
       "look": "camera",
       "acting": "calm",
-      "description": "Slow push-in on Vera, unimpressed."
+      "description": "Slow push-in on Juno, unimpressed."
     },
     {
       "speaker": "juno",
@@ -102,19 +125,35 @@
       "pose": "wave",
       "look": "camera",
       "overlay": "./happy-thanksgiving.png",
-      "react": [{ "kind": "celebrate", "word": 1 }],
+      "react": [
+        {
+          "kind": "celebrate",
+          "word": 1
+        }
+      ],
       "act": {
-        "bo": { "pose": "wave", "look": "camera" },
-        "vera": { "pose": "wave", "look": "camera" }
+        "bo": {
+          "pose": "wave",
+          "look": "camera"
+        }
       },
-      "description": "All three wave at the camera under a warm 'Happy Thanksgiving' title, autumn leaves drifting down through the water."
+      "description": "Both wave at the camera under a warm 'Happy Thanksgiving' title, autumn leaves drifting down through the water."
     }
   ],
   "caption": "Bo has a plan every year. It is always the turkey suit.\n\nHappy Thanksgiving from all of us.\n\n#Thanksgiving #CrabLogic #Moltology",
-  "hashtags": ["#Thanksgiving", "#CrabLogic", "#Moltology"],
+  "hashtags": [
+    "#Thanksgiving",
+    "#CrabLogic",
+    "#Moltology"
+  ],
   "firstComment": "The Harvest Table gear is in the shop: https://moltology.org",
   "youtubeTitle": "The crab who came dressed as the turkey #shorts",
   "youtubeDescription": "Bo wore the turkey suit so nobody would eat him. Then he wouldn't share the pie. Happy Thanksgiving from the reef.\n\nhttps://moltology.org",
-  "youtubeTags": ["thanksgiving", "crab logic", "3d animation", "moltology"],
+  "youtubeTags": [
+    "thanksgiving",
+    "crab logic",
+    "3d animation",
+    "moltology"
+  ],
   "ctaGoal": "homepage"
 }
