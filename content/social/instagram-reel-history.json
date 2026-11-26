@@ -2614,6 +2614,52 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-11-21T14:11:27.392Z"
+    },
+    {
+      "id": "reel-1795722094118",
+      "topic": "Thanksgiving 2026 greeting: Bo wears the turkey suit so nobody eats him, won't share the pie because he's shellfish, then the cast waves Happy Thanksgiving. Shows the Harvest Table gear.",
+      "hookHeadline": "Bo came dressed as the turkey so nobody would eat him.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "juno, bo (animated 3D cast)",
+      "narrationScript": "Bo came dressed as the turkey so nobody would eat him. Nobody carves the guy in the costume. Basic strategy. Bo, you've been holding that pie for an hour. Can't share it. I'm shellfish. Every single year. Happy Thanksgiving from the whole reef!",
+      "series": "Holiday greetings",
+      "episode": 1,
+      "format": "animated-sketch",
+      "cast": [
+        "juno",
+        "bo"
+      ],
+      "loudness": 4,
+      "archivePath": "Social Archive/2026/11/reel-eef12caa7d744a4d854659df",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795722094518_60ffbeca74fbe7e8_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 16.8,
+      "status": "published",
+      "scheduledFor": "2026-11-26T19:41:36.542Z",
+      "queueId": "6b00c2052c18af30956c81c9",
+      "zernioInstagramPostId": "6b088b706f112065b4c7b182",
+      "zernioYouTubePostId": "6b088b706f112065b4c7b182",
+      "zernioPostId": "6b088b706f112065b4c7b182",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "The Harvest Table gear is in the shop: https://moltology.org",
+      "caption": "Bo has a plan every year. It is always the turkey suit.\n\nHappy Thanksgiving from all of us.\n\n#Thanksgiving #CrabLogic #Moltology",
+      "hashtags": [
+        "#Thanksgiving",
+        "#CrabLogic",
+        "#Moltology"
+      ],
+      "ctaGoal": "homepage",
+      "commentTriggerKeyword": "INITIATE",
+      "commentTriggerUrl": "https://moltology.org",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-26T19:41:39.754Z"
     }
   ]
 }
