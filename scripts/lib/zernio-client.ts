@@ -266,6 +266,16 @@ export async function assertUploadWindow(queueId: string, profileId: string, pub
   }
 }
 
+/** A fixed publish time must be in the future and inside Zernio's seven-day upload lifetime. */
+export function assertFixedTimeWindow(scheduledFor: string, now = Date.now()): void {
+  const at = Date.parse(scheduledFor)
+  if (!Number.isFinite(at)) throw new Error(`Not a valid time: ${scheduledFor}`)
+  if (at <= now + 5 * 60 * 1000) throw new Error(`${scheduledFor} is not far enough in the future.`)
+  if (at - now > 7 * 24 * 60 * 60 * 1000 - 60 * 60 * 1000) {
+    throw new Error(`Zernio uploads expire after seven days, so ${scheduledFor} is too far away; queue it within a week of publication.`)
+  }
+}
+
 // -----------------------------------------------------------------------------
 // High-Level Deterministic Queuing Workflows
 // -----------------------------------------------------------------------------
@@ -488,6 +498,11 @@ export interface QueueDualReelAndShortOptions {
   isAiGenerated?: boolean
   dryRun?: boolean
   publishNow?: boolean
+  /**
+   * Publish at a fixed time (ISO 8601, e.g. a holiday greeting) instead of the next queue slot.
+   * Zernio uploads expire after seven days, so queue it within a week of this time.
+   */
+  scheduledFor?: string
   platform?: 'all' | 'instagram' | 'youtube'
   /** Check the next slot against Zernio's seven-day temporary upload lifetime. */
   validateMediaWindow?: boolean
@@ -548,7 +563,8 @@ export async function queueDualReelAndShort(
   }
 
 
-  if (options.validateMediaWindow) await assertUploadWindow(queueId, profileId, !!options.publishNow)
+  if (options.scheduledFor) assertFixedTimeWindow(options.scheduledFor)
+  else if (options.validateMediaWindow) await assertUploadWindow(queueId, profileId, !!options.publishNow)
   // Build target platform configs
   const platforms: ZernioPlatformConfig[] = []
 
@@ -587,8 +603,7 @@ export async function queueDualReelAndShort(
 
   console.log(`   • Staging Broadcast to [${platforms.map(p => p.platform).join(', ')}]...`)
   const postPayload: ZernioCreatePostPayload = {
-    queuedFromProfile: profileId,
-    queueId,
+    ...(options.scheduledFor ? { scheduledFor: new Date(options.scheduledFor).toISOString() } : { queuedFromProfile: profileId, queueId }),
     content: options.instagramCaption,
     mediaItems: [{ type: 'video', url: videoUrl }],
     platforms,

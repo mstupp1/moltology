@@ -1,0 +1,111 @@
+{
+  "id": "holiday-christmas-2026",
+  "title": "Bo came as Sandy Claws",
+  "topic": "Christmas 2026 greeting: Bo dresses as Santa and calls himself Sandy Claws, plans to go down the chimney sideways, then wishes everyone a merry Christmas. Shows the Santa's Workshop gear.",
+  "series": "Holiday greetings",
+  "episode": 2,
+  "format": "sketch",
+  "loudness": 4,
+  "set": "open-water",
+  "backdrop": "./winter-plate.png",
+  "floor": "./snow-floor.png",
+  "outro": "none",
+  "turnGap": 0.14,
+  "tail": 1.4,
+  "bgVolume": 0,
+  "queueId": "6b00c2052c18af30956c81c9",
+  "host": "juno",
+  "cast": [
+    {
+      "id": "juno",
+      "at": "left",
+      "equipment": {
+        "head": { "visualKey": "elf-hat", "rarity": "common" },
+        "carapace": { "visualKey": "elf-tunic", "rarity": "epic" }
+      }
+    },
+    {
+      "id": "bo",
+      "at": "right",
+      "equipment": {
+        "head": { "visualKey": "santa-hat", "rarity": "uncommon" },
+        "carapace": { "visualKey": "santa-suit", "rarity": "legendary" },
+        "belt": { "visualKey": "santa-belt", "rarity": "rare" },
+        "legs": { "visualKey": "santa-boots", "rarity": "rare" }
+      }
+    }
+  ],
+  "hookHeadline": "Bo, who are you supposed to be?",
+  "scenes": [
+    {
+      "speaker": "juno",
+      "line": "Bo, who are you supposed to be?",
+      "shot": "two",
+      "pose": "point",
+      "look": "right",
+      "act": {
+        "bo": { "pose": "strut", "look": "camera" }
+      },
+      "description": "Two-shot on a snowy moonlit sea floor: Juno in an elf tunic and pointed elf hat points at Bo, who struts in a full Santa suit, hat, belt and boots."
+    },
+    {
+      "speaker": "bo",
+      "line": "Isn't it obvious? Sandy Claws.",
+      "shot": "close",
+      "move": "cut",
+      "pose": "flex",
+      "look": "camera",
+      "react": [{ "kind": "snap", "word": 4, "side": -1 }],
+      "description": "Close on Bo, proud, snapping a claw on 'Claws'."
+    },
+    {
+      "speaker": "juno",
+      "line": "You can't even fit down a chimney.",
+      "shot": "medium",
+      "move": "cut",
+      "pose": "ready",
+      "look": "right",
+      "description": "Medium on Juno, doubtful, looking across at Bo."
+    },
+    {
+      "speaker": "bo",
+      "line": "Don't need to. I go down sideways.",
+      "shot": "extreme",
+      "move": "cut",
+      "pose": "rest",
+      "look": "camera",
+      "description": "Extreme close-up on Bo, completely serious."
+    },
+    {
+      "speaker": "juno",
+      "line": "That is not how chimneys work.",
+      "shot": "close",
+      "move": "push-in",
+      "pose": "rest",
+      "look": "camera",
+      "acting": "calm",
+      "description": "Slow push-in on Juno, unimpressed, elf hat bell catching the light."
+    },
+    {
+      "speaker": "bo",
+      "line": "Merry Christmas from the whole reef!",
+      "shot": "two",
+      "move": "cut",
+      "pose": "wave",
+      "look": "camera",
+      "overlay": "./merry-christmas.png",
+      "react": [{ "kind": "celebrate", "word": 1 }],
+      "act": {
+        "juno": { "pose": "wave", "look": "camera" }
+      },
+      "description": "Both wave at the camera under a red and cream 'Merry Christmas' title, marine snow drifting down."
+    }
+  ],
+  "caption": "Bo has thought this through. Bo has not thought this through.\n\nMerry Christmas from all of us.\n\n#Christmas #CrabLogic #Moltology",
+  "hashtags": ["#Christmas", "#CrabLogic", "#Moltology"],
+  "firstComment": "The Santa's Workshop gear is in the shop: https://moltology.org",
+  "youtubeTitle": "The crab who came as Sandy Claws #shorts",
+  "youtubeDescription": "Bo dressed up as Santa. Sandy Claws, technically. He plans to go down the chimney sideways. Merry Christmas from the reef.\n\nhttps://moltology.org",
+  "youtubeTags": ["christmas", "crab logic", "3d animation", "moltology"],
+  "ctaGoal": "homepage"
+}

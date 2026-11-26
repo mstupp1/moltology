@@ -10,6 +10,7 @@ import {
   queueInstagramPost,
   queueInstagramCarousel,
   queueDualReelAndShort,
+  assertFixedTimeWindow,
 } from './zernio-client'
 
 describe('zernio-client', () => {
@@ -320,5 +321,17 @@ describe('zernio-client', () => {
     expect(postPayload.platforms).toHaveLength(1)
     expect(postPayload.platforms[0].platform).toBe('youtube')
     expect(postPayload.platforms[0].platformSpecificData.title).toBe('YouTube Short Title #Shorts')
+  })
+})
+
+describe('assertFixedTimeWindow', () => {
+  const now = Date.parse('2026-12-20T15:00:00Z')
+  it('accepts a time inside the seven-day upload lifetime', () => {
+    expect(() => assertFixedTimeWindow('2026-12-25T10:00:00-05:00', now)).not.toThrow()
+  })
+  it('rejects a time too far away, in the past, or unreadable', () => {
+    expect(() => assertFixedTimeWindow('2026-12-31T10:00:00-05:00', now)).toThrow(/seven days/)
+    expect(() => assertFixedTimeWindow('2026-12-19T10:00:00-05:00', now)).toThrow(/future/)
+    expect(() => assertFixedTimeWindow('Christmas', now)).toThrow(/valid/)
   })
 })

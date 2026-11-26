@@ -714,6 +714,28 @@ const COLLECTION_PIECES: GearPiece[] = [
     { key: 'turkey-hat', n: 130, name: 'Turkey hat', flavorText: 'A feathered cap with a turkey looking out over your eyes. It gobbles when nobody is listening.', slot: 'head', rarity: 'uncommon', shape: 'hat', motif: 'none', hat: 'turkey_hat', colours: 'harvest-turkey-hat', construction: 1, surface: 'fleece' },
     { key: 'pumpkin-pie', n: 131, name: 'Pumpkin pie', flavorText: 'Fluted crust, spiced filling, whipped cream on top. Brought to share, mostly.', slot: 'claws', rarity: 'common', shape: 'held-prop', motif: 'none', prop: 'pie', colours: 'harvest-pie', construction: 0 },
   ]),
+  ...collection('santas-workshop', 'pincerTorque', [
+    { key: 'santa-hat', n: 132, name: 'Santa hat', flavorText: 'Red plush, a white fur band and a pom that swings when you laugh.', slot: 'head', rarity: 'uncommon', shape: 'hat', motif: 'none', hat: 'santa_hat', colours: 'holiday-santa', construction: 1, surface: 'velvet' },
+    { key: 'santa-suit', n: 133, name: 'Santa suit', flavorText: 'Red velvet trimmed in thick white fur. Built for one very long night.', slot: 'carapace', rarity: 'legendary', shape: 'garment', motif: 'santa', colours: 'holiday-santa', construction: 3, surface: 'velvet', uniquePower: { name: 'One Night Only', description: 'Gets everywhere that matters before morning.' } },
+    { key: 'santa-belt', n: 134, name: 'Santa belt', flavorText: 'Wide black leather and a gold buckle the size of a cookie.', slot: 'belt', rarity: 'rare', shape: 'belt-plate', motif: 'buckle', colours: 'holiday-santa-belt', construction: 2, surface: 'leather' },
+    { key: 'santa-boots', n: 135, name: 'Santa boots', flavorText: 'Black boots with a fur cuff, polished for rooftops.', slot: 'legs', rarity: 'rare', shape: 'shoes', motif: 'boot', colours: 'holiday-santa-boots', construction: 1, surface: 'leather' },
+    { key: 'elf-hat', n: 136, name: 'Elf hat', flavorText: 'Tall green felt, a ring of red points and a bell that gives you away.', slot: 'head', rarity: 'common', shape: 'hat', motif: 'none', hat: 'elf_hat', colours: 'holiday-elf', construction: 0 },
+    { key: 'elf-tunic', n: 137, name: 'Elf tunic', flavorText: 'Workshop green with a pointed red collar and a belt for the tools.', slot: 'carapace', rarity: 'epic', shape: 'garment', motif: 'elf', colours: 'holiday-elf', construction: 2, surface: 'cloth', uniquePower: { name: 'Workshop Hours', description: 'Small jobs get done before anyone notices they needed doing.' } },
+  ]),
+  ...collection('snow-day', 'depthTolerance', [
+    { key: 'snowman-suit', n: 138, name: 'Snowman suit', flavorText: 'Two packed snowballs and three coal buttons. Your head is the third one.', slot: 'carapace', rarity: 'epic', shape: 'garment', motif: 'snowman', colours: 'holiday-snowman', construction: 2, surface: 'fleece', uniquePower: { name: 'Packed Snow', description: 'Stays cool when everything around it heats up.' } },
+    { key: 'snowman-top-hat', n: 139, name: 'Snowman top hat', flavorText: 'Black felt, a red band and a sprig of holly. Found in a box in the attic.', slot: 'head', rarity: 'rare', shape: 'hat', motif: 'none', hat: 'top_hat', colours: 'holiday-top-hat', construction: 2 },
+    { key: 'red-mittens', n: 140, name: 'Red mittens', flavorText: 'Thick red mittens, still damp from the last snowball.', slot: 'claws', rarity: 'common', shape: 'gauntlet', motif: 'mitten', colours: 'holiday-mittens', construction: 0, surface: 'fleece' },
+  ]),
+  ...collection('hanukkah-lights', 'neuralLatency', [
+    { key: 'menorah-hat', n: 141, name: 'Menorah hat', flavorText: 'Nine branches on soft blue felt, the helper candle set a little higher. All eight nights, lit.', slot: 'head', rarity: 'epic', shape: 'hat', motif: 'none', hat: 'menorah_hat', colours: 'holiday-menorah', construction: 3, uniquePower: { name: 'Eight Nights', description: 'A little more light every evening, until the whole window glows.' } },
+    { key: 'dreidel', n: 142, name: 'Dreidel', flavorText: 'Blue with silver edges. Spin it for the chocolate coins.', slot: 'claws', rarity: 'common', shape: 'held-prop', motif: 'none', prop: 'dreidel', colours: 'holiday-dreidel', construction: 0 },
+    { key: 'blue-white-sweater', n: 143, name: 'Blue and white sweater', flavorText: 'Blue and white stripes, for eight nights of latkes and lights.', slot: 'carapace', rarity: 'uncommon', shape: 'garment', motif: 'sweater', print: 'stripes', colours: 'holiday-hanukkah-sweater', construction: 1, surface: 'knit' },
+  ]),
+  ...collection('kwanzaa', 'ecdysisDiscipline', [
+    { key: 'kente-stole', n: 144, name: 'Kente stole', flavorText: 'Woven blocks of gold, green, red and black, worn over the shoulders to celebrate.', slot: 'belt', rarity: 'rare', shape: 'belt-plate', motif: 'stole', colours: 'holiday-kente', construction: 2, surface: 'cloth' },
+    { key: 'kinara', n: 145, name: 'Kinara', flavorText: 'Seven candles, three red, one black and three green, one lit for each day of Kwanzaa.', slot: 'claws', rarity: 'rare', shape: 'held-prop', motif: 'none', prop: 'kinara', colours: 'holiday-kinara', construction: 2 },
+  ]),
 ]
 
 export const GEAR_PIECES: GearPiece[] = [...ORIGINAL_PIECES, ...COLLECTION_PIECES]

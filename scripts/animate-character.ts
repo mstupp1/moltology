@@ -207,6 +207,8 @@ async function main() {
   const art = args.art ? await setArtFiles(lesson.set) : {}
   // A lesson's own backdrop replaces the set's painted plate in 3D too, or the plate card covers it.
   if (lesson.backdrop) art.plate = rel(lesson.backdrop)
+  // And its own floor tile replaces the set's, so the ground matches the painting.
+  if (lesson.floor) art.floor = rel(lesson.floor)
   if (Object.keys(art).length) console.log(`🎨 Set art: ${Object.keys(art).join(', ')}`)
   timeline.setArt = textureUrls(art)
   fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, talkBy: undefined, setArt: Object.keys(timeline.setArt), windows, hookEnd }, null, 2))

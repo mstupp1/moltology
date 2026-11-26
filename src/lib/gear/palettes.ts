@@ -110,6 +110,22 @@ export const GEAR_PALETTES: Readonly<Record<string, GearColours>> = {
   'harvest-turkey': { material: '#6b4126', trim: '#b5542a', accent: '#f0d9a0' },
   'harvest-turkey-hat': { material: '#6b4126', trim: '#f2a23a', accent: '#c8283a' },
   'harvest-pie': { material: '#d9a35e', trim: '#fbf3e4', accent: '#d0702c' },
+  // Santa's Workshop: Santa red, snow-white fur, black leather, elf green, gold.
+  'holiday-santa': { material: '#b8142a', trim: '#f7f3ec', accent: '#f7f3ec' },
+  'holiday-santa-belt': { material: '#18161a', trim: '#e2b54a', accent: '#e2b54a' },
+  'holiday-santa-boots': { material: '#1a1719', trim: '#121014', accent: '#f7f3ec' },
+  'holiday-elf': { material: '#2f7a3a', trim: '#c0182c', accent: '#e8c25a' },
+  // Snow Day: packed snow, coal, a red band and holly.
+  'holiday-snowman': { material: '#f3f5f8', trim: '#1d1c22', accent: '#e8742a' },
+  'holiday-top-hat': { material: '#1b1a20', trim: '#c0182c', accent: '#2f7a3a' },
+  'holiday-mittens': { material: '#b3142a', trim: '#6e0a18', accent: '#f7f3ec' },
+  // Hanukkah Lights: deep blue, silver, candle flame.
+  'holiday-menorah': { material: '#1f4c9e', trim: '#d9dde6', accent: '#ffc24a' },
+  'holiday-dreidel': { material: '#2a63c4', trim: '#d9dde6', accent: '#e8c25a' },
+  'holiday-hanukkah-sweater': { material: '#1f4c9e', trim: '#eef1f6', accent: '#eef1f6' },
+  // Kwanzaa: kente gold, green, red (black is fixed in the weave), a wooden kinara.
+  'holiday-kente': { material: '#d9a521', trim: '#1f7a3e', accent: '#b3202c' },
+  'holiday-kinara': { material: '#6b4226', trim: '#d6a84a', accent: '#ffc24a' },
   'royal-coral': { material: '#e0533f', trim: '#e6c15c', accent: '#f6ecd9' },
   'royal-navy': { material: '#1d2547', trim: '#e6c15c', accent: '#b9283f' },
   'royal-pearl': { material: '#f1ead9', trim: '#e6c15c', accent: '#ff8f7a' },

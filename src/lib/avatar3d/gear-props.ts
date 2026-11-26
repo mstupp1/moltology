@@ -14,6 +14,35 @@ type Place = (geo: BufferGeometry, x: number, y: number, z: number) => BufferGeo
 type Facing = (dir: Vector3) => Quaternion
 
 const BUILDS: Record<Prop, (kit: Kit, bone: string, at: Place, S: number, facing: Facing) => void> = {
+  dreidel: (kit, bone, at, S) => {
+    const w = 0.2 * S
+    // A four-sided top held by its stem: a square body, a point below, an inset panel on each face.
+    kit.add(bone, 'trim', at(new CylinderGeometry(w * 0.1, w * 0.12, w * 0.5, 12), 0, w * 1.35, 0))
+    kit.add(bone, 'paint', at(new BoxGeometry(w, w, w), 0, w * 0.6, 0))
+    kit.add(bone, 'paint', at(new ConeGeometry(w * 0.71, w * 0.62, 4).rotateY(Math.PI / 4).rotateX(Math.PI), 0, -w * 0.21, 0))
+    kit.add(bone, 'trim', at(new BoxGeometry(w * 1.02, w * 0.06, w * 1.02), 0, w * 1.09, 0))
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2
+      kit.add(bone, 'soft', at(new BoxGeometry(w * 0.56, w * 0.56, 0.006).rotateY(a), Math.sin(a) * w * 0.505, w * 0.6, Math.cos(a) * w * 0.505))
+    }
+  },
+  kinara: (kit, bone, at, S) => {
+    const w = 0.7 * S
+    // A wooden kinara held up level: seven candles, three red on the left, one black in the
+    // middle, three green on the right, the middle set highest, all lit.
+    kit.add(bone, 'paint', at(new BoxGeometry(w, w * 0.08, w * 0.12), 0, w * 0.1, 0))
+    kit.add(bone, 'paint', at(new BoxGeometry(w * 0.3, w * 0.14, w * 0.1), 0, w * 0.04, 0))
+    const colours = ['#b3202c', '#b3202c', '#b3202c', '#19171c', '#1f7a3e', '#1f7a3e', '#1f7a3e'] as const
+    colours.forEach((colour, i) => {
+      const x = (i - 3) * (w / 7.4)
+      const lift = (3 - Math.abs(i - 3)) * w * 0.035
+      kit.add(bone, 'paint', at(new CylinderGeometry(w * 0.03, w * 0.035, lift + w * 0.04, 10), x, w * 0.16 + (lift + w * 0.04) / 2, 0))
+      const cupY = w * 0.2 + lift
+      kit.add(bone, 'trim', at(new CylinderGeometry(w * 0.035, w * 0.028, w * 0.035, 12), x, cupY, 0))
+      kit.addFixed(bone, colour, at(new CylinderGeometry(w * 0.02, w * 0.02, w * 0.2, 10), x, cupY + w * 0.115, 0))
+      kit.add(bone, 'accent', at(new SphereGeometry(w * 0.022, 10, 8).scale(0.75, 1.6, 0.75), x, cupY + w * 0.25, 0))
+    })
+  },
   clipboard: (kit, bone, at, S) => {
     const w = 0.34 * S
     const h = 0.46 * S

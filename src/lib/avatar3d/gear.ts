@@ -2,7 +2,7 @@
  * Gear. Every item is built for a socket of radius 1 and scaled to the socket it lands on, so
  * one hat fits any head shape or species. Items carry their own materials.
  */
-import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Group, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
+import { BoxGeometry, BufferAttribute, BufferGeometry, CatmullRomCurve3, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Group, IcosahedronGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, TorusGeometry, TubeGeometry, Vector3, type Material } from 'three'
 import type { AvatarAccessory } from '../avatar/traits'
 import type { Hat } from '../gear/types'
 import type { Rig, SocketInfo } from './rig'
@@ -120,8 +120,151 @@ function visorFit(rig: Rig): VisorFit | null {
   return { y, h, cz, a, b: b + gap }
 }
 
+/**
+ * A soft cone for a pointed hat, slouching over: `bend` is how far the tip leans sideways (x),
+ * `droop` how far it falls back down, `back` how far it leans back (negative z). Returns the
+ * cone and where its tip ends up.
+ */
+function slouch(r: number, h: number, bend: number, droop: number, back: number): { geo: BufferGeometry; tip: Vector3 } {
+  const geo = new CylinderGeometry(0.04, r, h, 40, 28, true)
+  geo.translate(0, h / 2, 0)
+  const at = (t: number) => new Vector3(bend * t * t, h * t - droop * t * t * t, back * t * t)
+  const pos = geo.getAttribute('position')
+  for (let i = 0; i < pos.count; i++) {
+    const t = Math.max(0, Math.min(1, pos.getY(i) / h))
+    const centre = at(t)
+    pos.setXYZ(i, pos.getX(i) + centre.x, centre.y, pos.getZ(i) + centre.z)
+  }
+  geo.computeVertexNormals()
+  const tip = at(1)
+  return { geo, tip }
+}
+
 /** Every hat's build. A new hat goes here and in HATS (src/lib/gear/types.ts). */
 const HEAD_GEAR: Record<Hat, (socket?: SocketInfo, c?: GearColours, rig?: Rig) => SocketGear> = {
+  santa_hat: (_s, c) =>
+    item('head', (add) => {
+      // Plush red, slouching over to one side, a thick fur band and a pom at the tip.
+      const red = felt(c?.material ?? '#c0182c')
+      const fur = cloth(c?.trim ?? '#f7f3ec')
+      const { geo, tip } = slouch(1.05, 2.1, 1.15, 0.75, 0.15)
+      add(geo, red)
+      const band = new TorusGeometry(1.08, 0.22, 14, 48)
+      band.rotateX(Math.PI / 2)
+      band.scale(1, 0.85, 1)
+      band.translate(0, 0.06, 0)
+      add(band, fur)
+      const pom = new IcosahedronGeometry(0.27, 3)
+      pom.translate(tip.x, tip.y, tip.z)
+      add(pom, fur)
+    }),
+  elf_hat: (_s, c) =>
+    item('head', (add) => {
+      // A tall green point leaning back, a scalloped red band of points, a gold bell at the tip.
+      const green = felt(c?.material ?? '#2f7a3a')
+      const band = felt(c?.trim ?? '#c0182c')
+      band.side = 2
+      const { geo, tip } = slouch(1.02, 2.7, 0.45, 0.3, -0.75)
+      add(geo, green)
+      const ring = new CylinderGeometry(1.08, 1.1, 0.26, 40, 1, true)
+      ring.translate(0, 0.12, 0)
+      add(ring, band)
+      for (let i = 0; i < 10; i++) {
+        const a = (i / 10) * Math.PI * 2
+        const point = new ConeGeometry(0.2, 0.32, 3)
+        point.rotateX(Math.PI)
+        point.scale(1, 1, 0.3)
+        point.rotateY(Math.PI / 2 - a)
+        point.translate(Math.cos(a) * 1.11, -0.11, Math.sin(a) * 1.11)
+        add(point, band)
+      }
+      const bell = new SphereGeometry(0.15, 16, 12)
+      bell.translate(tip.x, tip.y - 0.08, tip.z)
+      add(bell, metal(c?.accent ?? '#e8c25a'))
+    }),
+  top_hat: (_s, c) =>
+    item('head', (add) => {
+      // A snowman's top hat: a tall crown, a stiff brim curled at the sides, a band and a sprig of holly.
+      const hatFelt = new MeshPhysicalMaterial({ color: new Color(c?.material ?? '#1b1a20'), roughness: 0.55, sheen: 0.6, sheenRoughness: 0.5, sheenColor: new Color('#5a5a66') })
+      const crown = new CylinderGeometry(0.86, 0.8, 1.15, 40)
+      crown.translate(0, 0.62, 0)
+      add(crown, hatFelt)
+      const brim = new CylinderGeometry(1.5, 1.5, 0.07, 48, 1)
+      const pos = brim.getAttribute('position')
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i)
+        pos.setY(i, pos.getY(i) + 0.16 * (x / 1.5) ** 2)
+      }
+      brim.scale(1, 1, 0.9)
+      brim.translate(0, 0.06, 0)
+      brim.computeVertexNormals()
+      add(brim, hatFelt)
+      const ribbon = felt(c?.trim ?? '#c0182c')
+      const band = new CylinderGeometry(0.825, 0.81, 0.2, 40, 1, true)
+      band.translate(0, 0.2, 0)
+      ribbon.side = 2
+      add(band, ribbon)
+      // Holly at the front right: two leaves and three berries.
+      const leafMat = felt(c?.accent ?? '#2f7a3a')
+      for (const s of [1, -1]) {
+        const leaf = new SphereGeometry(0.2, 12, 8)
+        leaf.scale(1, 0.42, 0.14)
+        leaf.rotateZ(s * 0.45)
+        leaf.rotateY(-0.5)
+        leaf.translate(0.48 + s * 0.15, 0.26 + 0.05, 0.62)
+        add(leaf, leafMat)
+      }
+      for (const [x, y] of [[0.44, 0.24], [0.52, 0.2], [0.48, 0.32]]) {
+        const berry = new SphereGeometry(0.06, 12, 10)
+        berry.translate(x, y, 0.72)
+        add(berry, gloss(c?.trim ?? '#c0182c'))
+      }
+    }),
+  menorah_hat: (_s, c) =>
+    item('head', (add) => {
+      // A soft felt cap with a menorah standing on top: a central stem, four curved arms each
+      // side, nine candles with the helper candle (shamash) set higher in the middle, all lit.
+      add(new SphereGeometry(1.1, 36, 14, 0, Math.PI * 2, 0, Math.PI / 2).scale(1, 0.78, 1), felt(c?.material ?? '#1f4c9e'))
+      const rim = new TorusGeometry(1.09, 0.08, 8, 48)
+      rim.rotateX(Math.PI / 2)
+      add(rim, felt(c ? darker(c.material, 0.25) : '#173a7a'))
+      const silver = metal(c?.trim ?? '#d9dde6', 0.2)
+      const foot = 0.8
+      const top = 1.75
+      const base = new CylinderGeometry(0.2, 0.32, 0.12, 24)
+      base.translate(0, foot, 0)
+      add(base, silver)
+      const stem = new CylinderGeometry(0.07, 0.09, top - foot, 14)
+      stem.translate(0, (top + foot) / 2, 0)
+      add(stem, silver)
+      const wax = new MeshPhysicalMaterial({ color: new Color('#f4f1e8'), roughness: 0.55, clearcoat: 0.2 })
+      const flame = new MeshPhysicalMaterial({ color: new Color(c?.accent ?? '#ffc24a'), emissive: new Color(c?.accent ?? '#ffb13b'), emissiveIntensity: 1.6, roughness: 0.4 })
+      const candle = (x: number, y: number) => {
+        const cup = new CylinderGeometry(0.1, 0.065, 0.09, 14)
+        cup.translate(x, y, 0)
+        add(cup, silver)
+        const body = new CylinderGeometry(0.055, 0.055, 0.34, 12)
+        body.translate(x, y + 0.21, 0)
+        add(body, wax)
+        const f = new SphereGeometry(0.065, 12, 10)
+        f.scale(0.75, 1.6, 0.75)
+        f.translate(x, y + 0.47, 0)
+        add(f, flame).castShadow = false
+      }
+      for (let k = 1; k <= 4; k++) {
+        const r = k * 0.26
+        const arm = new TorusGeometry(r, 0.05, 10, 36, Math.PI)
+        arm.rotateZ(Math.PI)
+        arm.translate(0, top, 0)
+        add(arm, silver)
+        for (const s of [1, -1]) candle(s * r, top + 0.04)
+      }
+      // The shamash, raised on its own taller cup.
+      const riser = new CylinderGeometry(0.07, 0.07, 0.22, 12)
+      riser.translate(0, top + 0.11, 0)
+      add(riser, silver)
+      candle(0, top + 0.26)
+    }),
   crown: (_s, c) =>
     item('head', (add) => {
       const gold = metal(c?.material ?? '#f5b93a')
