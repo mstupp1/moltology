@@ -205,6 +205,8 @@ async function main() {
   // The set's painted art kit (content/animation/sets/), if it has one: textures go to the 3D set,
   // the plate becomes the default backdrop.
   const art = args.art ? await setArtFiles(lesson.set) : {}
+  // A lesson's own backdrop replaces the set's painted plate in 3D too, or the plate card covers it.
+  if (lesson.backdrop) art.plate = rel(lesson.backdrop)
   if (Object.keys(art).length) console.log(`🎨 Set art: ${Object.keys(art).join(', ')}`)
   timeline.setArt = textureUrls(art)
   fs.writeFileSync(path.join(outDir, 'timeline.json'), JSON.stringify({ ...timeline, talk: undefined, talkBy: undefined, setArt: Object.keys(timeline.setArt), windows, hookEnd }, null, 2))
