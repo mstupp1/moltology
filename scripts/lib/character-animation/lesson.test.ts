@@ -17,6 +17,14 @@ describe('animated lessons', () => {
     expect(look.temperament).toBe('lively')
   })
 
+  it('dresses a cast member for one lesson over their own gear', () => {
+    const look = castLook('bo', undefined, { carapace: { visualKey: 'turkey-suit', rarity: 'legendary' }, head: { visualKey: 'turkey-hat', rarity: 'uncommon' } })
+    expect(look.equipment?.carapace?.visualKey).toBe('turkey-suit')
+    expect(look.equipment?.head?.visualKey).toBe('turkey-hat')
+    expect(castLook('bo').equipment?.head?.visualKey).toBe('creator-beanie')
+    expect(() => castLook('bo', undefined, { head: { visualKey: 'turkey-suit', rarity: 'legendary' } })).toThrow(/does not fit/)
+  })
+
   it('flags lessons that would make a bad short', () => {
     const bad = { ...example, hookHeadline: 'Something else entirely.', scenes: example.scenes.slice(0, 5) }
     const problems = lessonProblems(bad)

@@ -98,6 +98,8 @@ export interface LessonScene {
   act?: Record<string, CharacterDirection>
   /** What the scene shows, for the reel ledger and review (one sentence). */
   description: string
+  /** A full-frame 1080x1920 transparent PNG laid over this scene (a title card, a greeting), relative to the lesson file. */
+  overlay?: string
 }
 
 export interface Lesson {
@@ -113,7 +115,7 @@ export interface Lesson {
    * Everyone on stage, with their marks. Default: just the host, centre. The camera's framing is
    * built around the host's size.
    */
-  cast?: { id: string; at: Mark }[]
+  cast?: CastSpot[]
   /** Set dressing in front of the backdrop: codex-study, reef-office, open-water or podcast-studio. */
   set?: SetName
   /** A small tag on every scene, e.g. "Molt Pod · Ep. 3" (show-style series). */
@@ -148,6 +150,17 @@ export interface Lesson {
   queueId?: string
 }
 
+/**
+ * A character on stage. `equipment` dresses them for this lesson only (a holiday outfit, a
+ * costume), slot by slot over their usual gear, in the saved config's shape:
+ * `{ "head": { "visualKey": "pilgrim-hat", "rarity": "rare" } }`.
+ */
+export interface CastSpot {
+  id: string
+  at: Mark
+  equipment?: Record<string, { visualKey: string; rarity: string }>
+}
+
 export interface CastMember {
   name?: string
   role: string
@@ -176,17 +189,21 @@ export function loadCast(file = CAST_PATH): Record<string, CastMember> {
 }
 
 /** The 3D look for a cast member, resolved the way the site resolves a saved character. */
-export function castLook(id: string, cast = loadCast()): Avatar3DLook {
+export function castLook(id: string, cast = loadCast(), equipment?: CastSpot['equipment']): Avatar3DLook {
   const member = cast[id]
   if (!member) throw new Error(`No cast member "${id}" in content/characters/cast.json (have: ${Object.keys(cast).join(', ')})`)
   // Lessons start everyone at rest; poses come from the scene cues.
-  const config = parseLobsterAvatarConfig({ pose: 'rest', ...member.config })
+  const own = (member.config.equipment ?? {}) as Record<string, unknown>
+  const config = parseLobsterAvatarConfig({ pose: 'rest', ...member.config, ...(equipment ? { equipment: { ...own, ...equipment } } : {}) })
   if (!config) throw new Error(`Cast member "${id}" has an invalid character config`)
+  for (const [slot, piece] of Object.entries(equipment ?? {})) {
+    if (config.equipment?.[slot as keyof typeof config.equipment]?.visualKey !== piece.visualKey) throw new Error(`Cast member "${id}": "${piece.visualKey}" does not fit slot "${slot}" (or is not a gear key)`)
+  }
   return lookFromConfig(config)
 }
 
 /** Everyone on stage, with marks; a lesson without a cast list has only its host, centre. */
-export function castOf(lesson: Pick<Lesson, 'host' | 'cast'>): { id: string; at: Mark }[] {
+export function castOf(lesson: Pick<Lesson, 'host' | 'cast'>): CastSpot[] {
   if (!lesson.cast?.length) return [{ id: lesson.host, at: 'center' }]
   // The host comes first: the camera's framing is built around it.
   return [...lesson.cast].sort((a, b) => Number(b.id === lesson.host) - Number(a.id === lesson.host))

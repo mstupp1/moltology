@@ -11,7 +11,7 @@ A lesson is one JSON file. `npm run anim:create` checks it before rendering and 
 | `series`, `episode` | `Codex Lessons` and the next episode number |
 | `format` | `short` (the only format built so far) |
 | `host` | Cast key, first name or alias from `content/characters/cast.json` (`juno`); speaks any line without a `speaker` |
-| `cast` | Optional `[{ "id", "at" }]` for two or more characters; `at` is a mark: `left`, `center` or `right`. Must include the host |
+| `cast` | Optional `[{ "id", "at", "equipment" }]` for two or more characters; `at` is a mark: `left`, `center` or `right`. Must include the host. `equipment` dresses that character for this lesson only, slot by slot over their own gear, with gear keys from `src/lib/gear/pieces.ts`: `{ "head": { "visualKey": "pilgrim-hat", "rarity": "rare" }, "claws-1": { ... } }` (slots `head`, `carapace`, `belt`, `legs`, `antennae`, `claws-1`, `claws-2`) |
 | `acting` | Optional `auto` (default), `calm` or `none`: how much the cast acts on their own while talking and listening (see [Acting](#acting)) |
 | `set` | Optional 3D set: `codex-study`, `reef-office`, `open-water` or `podcast-studio` (pieces stay behind and beside the marks, except the podcast desk, which stands in front of the cast on purpose). Its art kit from `content/animation/sets/` is used automatically |
 | `tag` | Optional small label on every scene, top left, at most 32 characters: `"Molt Pod · Ep. 3"` for show-style series |
@@ -42,6 +42,7 @@ A lesson is one JSON file. `npm run anim:create` checks it before rendering and 
 | `turn` | Degrees | Turns the whole host; small values (10 to 25) add life to a static shot |
 | `spin` | Degrees per second | Slow turntable, for a "look at this" beat |
 | `backdrop` | Image path | Overrides the lesson backdrop for this scene |
+| `overlay` | Image path | A full-frame 1080x1920 transparent PNG over this scene, above the characters (a greeting title on a holiday sign-off). Keep it clear of faces and the subtitle band at y 1180 |
 
 Word indexes count words as the voice does: hyphenated words split ("check-in" is two words) and "moltology.org" is one.
 
