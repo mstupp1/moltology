@@ -791,7 +791,7 @@ export function buildLobster(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   rig.wear = {
     race: 'lobster',
     torso: { loft: abdomen, bone: 'pelvis', top: 1.16, bottom: 0.82, belt: 0.74 },
-    head: { loft: carapace, bone: 'chest', top, eyeY: 1.525, eyeRadius: 0.105 },
+    head: { loft: carapace, bone: 'chest', top, eyeY: 1.525, eyeRadius: 0.105, mouthY: fit.y(1.35) },
     arm,
     leg,
     antenna,
@@ -931,7 +931,7 @@ export function buildCrab(rig: Rig, look: Avatar3DLook): SpeciesBuild {
   rig.wear = {
     race: 'crab',
     torso: { loft: under, bone: 'pelvis', top: 1.0, bottom: 0.76, belt: 0.84 },
-    head: { loft: shell, bone: 'chest', top: shell.key(0).d, eyeY: 1.3, eyeRadius: 0.135 },
+    head: { loft: shell, bone: 'chest', top: shell.key(0).d, eyeY: 1.3, eyeRadius: 0.135, mouthY: fit.y(1.105) },
     arm,
     leg,
     antenna,

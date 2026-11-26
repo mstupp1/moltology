@@ -14,6 +14,8 @@ import { SWIMMERETS } from './species'
 import type { Print } from '../gear/types'
 
 const LIFT = 0.03
+/** How far a crab's neckline stays below its mouth line. */
+const MOUTH_CLEAR = 0.17
 
 /**
  * A garment's cut comes from its motif: `tank` (no sleeves), `jacket` (sleeves, to the hip),
@@ -59,9 +61,12 @@ export function garment(kit: Kit, wear: Wearable): void {
   // What shows in the V: a dark knit under a coat, a pressed shirt under a jacket, a soft layer under a wrap.
   const under = motif === 'coat' || motif === 'robe' ? 'dark' : 'soft'
   const print = kit.visual.print
+  const neck = collarLine(wear, motif)
+  // On a crab the belly plates reach up under the mouth: the cloth stops at the neckline.
+  const underNeck = wear.race === 'crab' ? (w: Vector3) => below(w.y, neck.y(fromFront(host, w)), 0.02) : () => 1
   for (const slot of ['shell', 'belly'] as const) {
     const lift = (slot === 'shell' ? bodyLift : bodyLift - 0.002)
-    kit.puff(bone, 'fabric', (_p, w) => lift * quilt(w.y) * above(w.y, hem, 0.025) * covered(w), slot)
+    kit.puff(bone, 'fabric', (_p, w) => lift * quilt(w.y) * above(w.y, hem, 0.025) * covered(w) * underNeck(w), slot)
     if (vee && motif !== 'shirt') kit.puff(bone, under, (_p, w) => LIFT * 0.55 * above(w.y, vBottom - 0.03, 0.02) * (1 - covered(w)), slot)
   }
   if (print) {
@@ -69,7 +74,6 @@ export function garment(kit: Kit, wear: Wearable): void {
     const keep = (y: number, phi: number) => y < top - 0.03 && above(Math.abs(phi), opening(y) + 0.05, 0.001) > 0
     printOn((tone, geo) => kit.addWorld(bone, tone, geo), print, bodyPlace(wear, bodyLift + 0.002, keep), -1.2, 1.2, hem + 0.035, top - 0.03)
   }
-  const neck = collarLine(wear, motif)
   if (wear.race === 'crab') {
     // A crab's shell is its body too: the cloth comes up round the lower shell to a collar under
     // the face, higher at the sides and back, so the shell sits in the garment like a head.
@@ -232,8 +236,10 @@ function collarLine(wear: Wearable, motif: string): Neckline {
   const bone = crab ? wear.head.bone : wear.torso.bone
   let y: (phi: number) => number
   if (crab) {
-    const { eyeY, eyeRadius } = wear.head
-    const front = eyeY - eyeRadius * (motif === 'tank' ? 2.6 : 2.25)
+    const { eyeY, eyeRadius, mouthY } = wear.head
+    // Under the face, and always well clear of the mouth: a round or small head puts the mouth
+    // lower, and cloth lifted off the underside of the dome reads higher than it sits.
+    const front = Math.min(eyeY - eyeRadius * (motif === 'tank' ? 2.6 : 2.25), mouthY - MOUTH_CLEAR)
     const back = front + (motif === 'tank' ? 0.1 : 0.2)
     y = (phi) => front + (back - front) * smooth(0.5, 2.3, phi)
   } else {
