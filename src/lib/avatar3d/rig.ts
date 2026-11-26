@@ -41,7 +41,7 @@ export interface Wearable {
   race: 'lobster' | 'crab'
   /** The body a chest plate and belt wrap: the band a plate covers and the belt line, as heights. */
   torso: { loft: Loft; bone: string; top: number; bottom: number; belt: number }
-  head: { loft: Loft; bone: string; top: number; eyeY: number; eyeRadius: number }
+  head: { loft: Loft; bone: string; top: number; eyeY: number; eyeRadius: number; /** Where the mouth line sits on this head shape, so cloth stops below it. */ mouthY: number }
   arm: { radius: number; upper: number; fore: number; clawSize: number; claw: ClawStyle }
   leg: { radius: number; thigh: number; shin: number; ankle: number; footLength: number }
   /** The left antenna's path in character space, and its thickness at the base. */
