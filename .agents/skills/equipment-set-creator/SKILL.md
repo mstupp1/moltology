@@ -49,11 +49,11 @@ Prices come from the rarity alone (`GEAR_PRICES` in `gear-variants.ts`). Do not 
 | `helmet` | head | A helmet over the crown of the head | same |
 | `antenna-fittings` | antennae | Sleeves, bands and tips riding the character's own antennae | same |
 | `hat` | head | One of the hat builds on the head socket (glasses, visors and mics too). Collection hats wear their palette; the original base hats keep their own colours | `src/lib/avatar3d/gear.ts` |
-| `garment` | carapace | Cloth on the body; motif `tank`, `jacket`, `blazer`, `coat`, `wrap`, `hoodie`, `shirt` (short-sleeved camp shirt), `puffer` (quilted), `sweater` (ribbed, cables from construction 2), `robe` (hood down, to the ankle) or `divesuit` (covers the legs, brass corselet) | `src/lib/avatar3d/gear-cloth.ts` |
+| `garment` | carapace | Cloth on the body; motif `tank`, `jacket`, `blazer`, `coat`, `wrap`, `hoodie`, `shirt` (short-sleeved camp shirt), `puffer` (quilted), `sweater` (ribbed, cables from construction 2), `robe` (hood down, to the ankle) `divesuit` (covers the legs, brass corselet), `pilgrim` (plain doublet, wide white collar and cuffs in the accent colour, short skirt) or `turkey` (plump body, breast scallops, a tail-feather fan behind banded material/trim/accent) | `src/lib/avatar3d/gear-cloth.ts` |
 | `shoes` | legs | `clog`, `hi-top`, `boot` (cuff at 1, straps at 2, toe cap at 3) or `sandal` | same |
 | `held-prop` | claws | One object in one claw; `prop` names it | `src/lib/avatar3d/gear-props.ts` |
 
-`belt-plate` also takes motif `cord` (twisted sash), `dress` (slim belt, frame buckle) or `lanyard` (strap round the neck, badge on the chest), `scarf` (wound twice, fringe from construction 2) or `cape` (from the shoulders to the ground, trim edge at 2, stand-up collar at 3).
+`belt-plate` also takes motif `cord` (twisted sash), `dress` (slim belt, frame buckle) or `lanyard` (strap round the neck, badge on the chest), `buckle` (broad pilgrim belt, big square frame buckle), `scarf` (wound twice, fringe from construction 2) or `cape` (from the shoulders to the ground, trim edge at 2, stand-up collar at 3).
 
 Garments and scarves take an optional `print`: `stripes`, `dots`, `plaid` (trim colour) or `flowers` (accent petals, trim centres), laid on the cloth as small flat marks so it stays crisp. A colourway of a piece (same shape, new palette or print) is its own piece with its own `n`. `antenna-fittings` takes motif `panels` (floating glass panels).
 

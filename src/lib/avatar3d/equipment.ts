@@ -104,6 +104,7 @@ function belt(kit: Kit, wear: Wearable): void {
   const { motif, construction: n } = kit.visual
   if (motif === 'cord') return cordSash(kit, wear)
   if (motif === 'dress') return dressBelt(kit, wear)
+  if (motif === 'buckle') return dressBelt(kit, wear, true)
   if (motif === 'lanyard') return lanyard(kit, wear)
   if (motif === 'scarf') return scarf(kit, wear)
   if (motif === 'cape') return cape(kit, wear)
@@ -160,10 +161,13 @@ function cordSash(kit: Kit, wear: Wearable): void {
   }
 }
 
-/** A slim leather dress belt with a plain rectangular frame buckle in front. */
-function dressBelt(kit: Kit, wear: Wearable): void {
+/**
+ * A slim leather dress belt with a plain rectangular frame buckle in front. `wide`: a broad
+ * pilgrim belt with a big square buckle.
+ */
+function dressBelt(kit: Kit, wear: Wearable, wide = false): void {
   const { loft: host, bone, belt: y } = wear.torso
-  const half = 0.024
+  const half = wide ? 0.045 : 0.024
   kit.puff(bone, 'plate', (_p, w) => OVER_CLOTH * within(w.y, y - half, y + half, 0.01))
   for (const edge of [half - 0.005, -half + 0.005]) {
     const pts: Vector3[] = []
@@ -172,14 +176,18 @@ function dressBelt(kit: Kit, wear: Wearable): void {
   }
   const front = onBody(host, y, 0, OVER_CLOTH + 0.006)
   const q = lookQuaternion(front.normal)
-  const w = 0.085
-  const h = 0.07
-  const bar = 0.011
+  const w = wide ? 0.13 : 0.085
+  const h = wide ? 0.12 : 0.07
+  const bar = wide ? 0.02 : 0.011
   for (const [bw, bh, x, by] of [[w, bar, 0, h / 2], [w, bar, 0, -h / 2], [bar, h, w / 2, 0], [bar, h, -w / 2, 0]]) {
     kit.addWorld(bone, 'trim', placed(new BoxGeometry(bw + bar, bh + (bw === bar ? bar : 0), 0.012), front.at.clone().add(v(x, by, 0).applyQuaternion(q)), q))
   }
   // The prong across the middle, and the strap end through a keeper loop to the left.
-  kit.addWorld(bone, 'trim', placed(new BoxGeometry(w * 0.7, 0.007, 0.01), front.at.clone().add(v(0, 0, 0.004).applyQuaternion(q)), q))
+  if (wide) {
+    // The strap shows through the frame, and the prong runs up the middle.
+    kit.addWorld(bone, 'plate', placed(new BoxGeometry(w, h, 0.008), front.at.clone().add(v(0, 0, -0.004).applyQuaternion(q)), q))
+    kit.addWorld(bone, 'trim', placed(new BoxGeometry(0.01, h * 0.9, 0.01), front.at.clone().add(v(0, 0, 0.004).applyQuaternion(q)), q))
+  } else kit.addWorld(bone, 'trim', placed(new BoxGeometry(w * 0.7, 0.007, 0.01), front.at.clone().add(v(0, 0, 0.004).applyQuaternion(q)), q))
   const keeper = onBody(host, y, 0.32, OVER_CLOTH + 0.004)
   const kq = lookQuaternion(keeper.normal)
   kit.addWorld(bone, 'plate', placed(new BoxGeometry(0.018, half * 2.4, 0.01), keeper.at, kq))

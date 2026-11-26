@@ -66,9 +66,14 @@ export type GearMotif =
   | 'sweater'
   | 'robe'
   | 'divesuit'
+  /** A pilgrim doublet with a wide white collar and cuffs; a turkey suit with a feather fan behind. */
+  | 'pilgrim'
+  | 'turkey'
   /** Neckwear on the belt slot, worn over any garment: a knit scarf, a cape from the shoulders. */
   | 'scarf'
   | 'cape'
+  /** A wide leather belt with a big square frame buckle (pilgrim style). */
+  | 'buckle'
   /** Shoe styles. */
   | 'clog'
   | 'hi-top'
@@ -78,11 +83,11 @@ export type GearMotif =
   | 'none'
 
 /** Hats with their own 3D build (src/lib/avatar3d/gear.ts). */
-export const HATS = ['hard_hat', 'crown', 'visor', 'headset', 'halo', 'bow', 'beanie', 'reading_glasses', 'sunglasses', 'sweatband', 'sun_hat', 'bucket_hat', 'headset_mic', 'tortoise_glasses', 'diving_helmet', 'cap', 'flower_crown'] as const
+export const HATS = ['hard_hat', 'crown', 'visor', 'headset', 'halo', 'bow', 'beanie', 'reading_glasses', 'sunglasses', 'sweatband', 'sun_hat', 'bucket_hat', 'headset_mic', 'tortoise_glasses', 'diving_helmet', 'cap', 'flower_crown', 'pilgrim_hat', 'turkey_hat'] as const
 export type Hat = (typeof HATS)[number]
 
 /** Things a claw can hold (src/lib/avatar3d/gear-props.ts). */
-export const PROPS = ['clipboard', 'can', 'controller', 'tea_cup', 'watering_can', 'book', 'phone', 'marshmallow_stick', 'lantern', 'staff', 'sceptre', 'mug', 'ice_lolly', 'gift'] as const
+export const PROPS = ['clipboard', 'can', 'controller', 'tea_cup', 'watering_can', 'book', 'phone', 'marshmallow_stick', 'lantern', 'staff', 'sceptre', 'mug', 'ice_lolly', 'gift', 'pie'] as const
 export type Prop = (typeof PROPS)[number]
 
 /**

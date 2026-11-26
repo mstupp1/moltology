@@ -104,6 +104,12 @@ export const GEAR_PALETTES: Readonly<Record<string, GearColours>> = {
   'winter-mug': { material: '#f6f2ea', trim: '#c8233b', accent: '#fffaf0' },
   'winter-gift': { material: '#1f5a3a', trim: '#e6c15c', accent: '#c8233b' },
   'winter-evergreen': { material: '#1d4a33', trim: '#f6f2ea', accent: '#a3192f' },
+  // Harvest Table (Thanksgiving): pilgrim black and brass, turkey browns, pumpkin pie.
+  'harvest-pilgrim': { material: '#25211e', trim: '#d8a640', accent: '#f4efe2' },
+  'harvest-belt': { material: '#4a2e1a', trim: '#d8a640', accent: '#d8a640' },
+  'harvest-turkey': { material: '#6b4126', trim: '#b5542a', accent: '#f0d9a0' },
+  'harvest-turkey-hat': { material: '#6b4126', trim: '#f2a23a', accent: '#c8283a' },
+  'harvest-pie': { material: '#d9a35e', trim: '#fbf3e4', accent: '#d0702c' },
   'royal-coral': { material: '#e0533f', trim: '#e6c15c', accent: '#f6ecd9' },
   'royal-navy': { material: '#1d2547', trim: '#e6c15c', accent: '#b9283f' },
   'royal-pearl': { material: '#f1ead9', trim: '#e6c15c', accent: '#ff8f7a' },

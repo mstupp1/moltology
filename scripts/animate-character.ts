@@ -183,7 +183,7 @@ async function main() {
   const ctaDurationSeconds = noOutro ? 0 : OUTRO_SECONDS
   const bgVolume = lesson.bgVolume ?? (isSketch ? 0 : undefined)
 
-  const looks = Object.fromEntries(castOf(lesson).map((c) => [c.id, castLook(c.id)]))
+  const looks = Object.fromEntries(castOf(lesson).map((c) => [c.id, castLook(c.id, undefined, c.equipment)]))
   const look = looks[lesson.host]
   const narratorVoice = args.voice || (process.env.FISH_VOICE_REFERENCE_ID ? '' : NARRATOR)
   const { audio, words, talkBy, mouthBy, emphasisBy, accentBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice, turnGap })
@@ -287,6 +287,7 @@ async function main() {
         overlays: [
           ...(tag ? [{ png: tag, from: 0, to: (last - first) / FPS + 1 }] : []),
           ...(i === 0 ? headlineOverlays(cards, words.slice(0, hookCount), hookEnd) : []),
+          ...(scene.overlay ? [{ png: rel(scene.overlay), from: 0, to: (last - first) / FPS + 1 }] : []),
         ],
       })
     )
