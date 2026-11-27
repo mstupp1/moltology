@@ -108,7 +108,10 @@ export interface Lesson {
   topic: string
   series: string
   episode: number
-  format: 'short' | 'sketch'
+  /** `clip`: a block of scenes for a long-form video (create-longform), no hook, outro or captions. */
+  format: 'short' | 'sketch' | 'clip'
+  /** Frame shape; long-form clips are 16:9. */
+  aspect?: '9:16' | '16:9'
   /** Cast id from content/characters/cast.json: the main character. */
   host: string
   /**
@@ -224,14 +227,35 @@ export function narrationOf(lesson: Pick<Lesson, 'scenes'>): string {
   return lesson.scenes.map((s) => s.line.trim()).join(' ')
 }
 
+/**
+ * A long-form clip is a run of scenes cut into a longer video by create-longform: it needs a cast
+ * and scenes the renderer can direct, but no hook, platform copy or word budget of a short.
+ */
+function clipProblems(lesson: Lesson): string[] {
+  const problems: string[] = []
+  if (!lesson.id?.trim() || !lesson.host?.trim()) problems.push('a clip needs an id and a host')
+  if (!Array.isArray(lesson.scenes) || lesson.scenes.length < 1 || lesson.scenes.length > 16) problems.push('a clip has one to sixteen scenes')
+  const ids = castOf(lesson).map((c) => c.id)
+  if (!ids.includes(lesson.host)) problems.push('cast must include the host')
+  if (lesson.set && !SET_NAMES.includes(lesson.set)) problems.push(`set "${lesson.set}" is not one of ${SET_NAMES.join(', ')}`)
+  lesson.scenes?.forEach((scene, i) => {
+    const at = `scene ${i + 1}`
+    if (!scene.line?.trim()) problems.push(`${at} has no line`)
+    if (!(scene.shot in SHOTS)) problems.push(`${at} shot "${scene.shot}" is not one of ${Object.keys(SHOTS).join(', ')}`)
+    if (scene.speaker && scene.speaker !== NARRATOR && !ids.includes(scene.speaker)) problems.push(`${at} speaker "${scene.speaker}" is not in the cast`)
+  })
+  return problems
+}
+
 /** Problems that would make a bad render or a bad short. Empty means it can be produced. */
 export function lessonProblems(lesson: Lesson): string[] {
   const problems: string[] = []
+  if (lesson.format === 'clip') return clipProblems(lesson)
   for (const key of ['id', 'title', 'topic', 'series', 'host', 'hookHeadline', 'caption', 'firstComment', 'youtubeTitle', 'youtubeDescription'] as const) {
     if (typeof lesson[key] !== 'string' || !lesson[key].trim()) problems.push(`needs ${key}`)
   }
   if (lesson.format !== 'short' && lesson.format !== 'sketch') {
-    problems.push('format must be "short" or "sketch" (long form is not built yet)')
+    problems.push('format must be "short", "sketch" or "clip"')
   }
   const isSketch = lesson.format === 'sketch'
   const minScenes = isSketch ? 4 : 6
@@ -388,7 +412,7 @@ export function buildTimeline(
   const duration = Math.max(lastWord + (options.tail ?? 0.8), longest / fps)
   const frames = Math.ceil(duration * fps)
   const windows = sceneWindows(lesson, words, duration)
-  const hookWords = wordsOf(lesson.hookHeadline).length
+  const hookWords = lesson.hookHeadline ? wordsOf(lesson.hookHeadline).length : 0
   const hookEnd = hookWords && words[hookWords - 1] ? words[hookWords - 1].endMs / 1000 : 0
   const cues: TimelineCue[] = []
   const solo = cast.length === 1

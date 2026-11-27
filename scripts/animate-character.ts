@@ -17,7 +17,7 @@ import { buildTimeline, castLook, castOf, lessonProblems, reelDraftFrom, softenC
 import { rehearse, type FrameClip } from '../src/lib/avatar3d/rehearse'
 import { voiceLesson } from './lib/character-animation/voices'
 import { renderFrames } from './lib/character-animation/render'
-import { defaultBackdrop, headlineOverlays, normaliseBackdrop, OUT_H, OUT_W, renderHeadlineCards, renderOutroText, renderSceneClip, renderTagCard } from './lib/character-animation/compose'
+import { defaultBackdrop, headlineOverlays, normaliseBackdrop, OUT_H, OUT_W, renderHeadlineCards, renderOutroText, renderSceneClip, renderTagCard, setFrameSize } from './lib/character-animation/compose'
 import { tokenizeScriptText } from './lib/tts-engine'
 import { setArtFiles, textureUrls } from './lib/character-animation/set-art'
 import { SHOTS } from '../src/lib/avatar3d/scripted'
@@ -33,6 +33,7 @@ interface Args {
   outDir?: string
   silent: boolean
   voice?: string
+  rate?: string
   scale: number
   framesOnly: boolean
   reuseFrames: boolean
@@ -52,6 +53,7 @@ function parseArgs(argv: string[]): Args {
     else if (a === '--out-dir') args.outDir = argv[++i]
     else if (a === '--silent') args.silent = true
     else if (a === '--voice') args.voice = argv[++i]
+    else if (a === '--rate') args.rate = argv[++i]
     else if (a === '--scale') args.scale = Number(argv[++i])
     else if (a === '--frames-only') args.framesOnly = true
     else if (a === '--reuse-frames') args.reuseFrames = true
@@ -66,6 +68,7 @@ function parseArgs(argv: string[]): Args {
 
   --silent          No voice: estimated word timings, silent audio (cloud tests, layout checks)
   --voice <name>    Narrator's Fish voice (default ${NARRATOR}, same as reels); characters use their cast voice
+  --rate <pct>      Voice pace for every take (default +12%; long-form uses +0%)
   --scale <0..1>    Render the 3D at a fraction of 1080x1920 (0.5 for quick tests)
   --max-seconds <n> Only render the first n seconds (motion tests)
   --frames-only     Stop after rendering frames
@@ -177,23 +180,26 @@ async function main() {
   const rel = (p: string) => path.resolve(path.dirname(lessonPath), p)
 
   const isSketch = lesson.format === 'sketch'
+  const isClip = lesson.format === 'clip'
+  const wide = lesson.aspect === '16:9'
+  if (wide) setFrameSize(1920, 1080)
   const turnGap = lesson.turnGap ?? (isSketch ? 0.14 : 0.35)
-  const tail = lesson.tail ?? (isSketch ? 0.3 : 0.8)
-  const noOutro = lesson.outro === 'none' || (isSketch && !lesson.outro)
+  const tail = lesson.tail ?? (isSketch ? 0.3 : isClip ? 0.4 : 0.8)
+  const noOutro = isClip || lesson.outro === 'none' || (isSketch && !lesson.outro)
   const ctaDurationSeconds = noOutro ? 0 : OUTRO_SECONDS
   const bgVolume = lesson.bgVolume ?? (isSketch ? 0 : undefined)
 
   const looks = Object.fromEntries(castOf(lesson).map((c) => [c.id, castLook(c.id, undefined, c.equipment)]))
   const look = looks[lesson.host]
   const narratorVoice = args.voice || (process.env.FISH_VOICE_REFERENCE_ID ? '' : NARRATOR)
-  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice, turnGap })
-  const width = even(1080 * args.scale)
-  const height = even(1920 * args.scale)
+  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice, turnGap, rate: args.rate })
+  const width = even((wide ? 1920 : 1080) * args.scale)
+  const height = even((wide ? 1080 : 1920) * args.scale)
   if (args.mouthCheck) {
     await mouthCheck(lesson, looks, { audio, words, talkBy, mouthBy, emphasisBy, accentBy }, { width, height, outDir, maxSeconds: args.maxSeconds, art: args.art })
     return
   }
-  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail, hookLift: 0.9, mouthBy, emphasisBy, accentBy })
+  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail, hookLift: isClip ? 0 : 0.9, mouthBy, emphasisBy, accentBy })
   if (args.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(args.maxSeconds * FPS))
   const gestures = timeline.cues.filter((c) => c.gesture)
   console.log(`🎭 Acting: ${gestures.length} gestures (${gestures.filter((c) => c.auto).length} automatic)`)
@@ -267,8 +273,8 @@ async function main() {
   // Scenes: backdrop, character, and the hook headline over the opening.
   console.log('🎞️  Building scene clips...')
   const defaultSet = await setBackdrop()
-  const hookCount = tokenizeScriptText(lesson.hookHeadline).length
-  const cards = renderHeadlineCards(lesson.hookHeadline, path.join(outDir, 'headline'))
+  const hookCount = lesson.hookHeadline ? tokenizeScriptText(lesson.hookHeadline).length : 0
+  const cards = lesson.hookHeadline ? renderHeadlineCards(lesson.hookHeadline, path.join(outDir, 'headline')) : []
   // Molt Pod and other show-style series carry a small tag on every scene.
   const tag = lesson.tag ? renderTagCard(lesson.tag, path.join(outDir, 'tag.png')) : null
   const clips: string[] = []
@@ -290,12 +296,26 @@ async function main() {
         outPath: path.join(outDir, `scene-${i + 1}.mp4`),
         overlays: [
           ...(tag ? [{ png: tag, from: 0, to: (last - first) / FPS + 1 }] : []),
-          ...(i === 0 ? headlineOverlays(cards, words.slice(0, hookCount), hookEnd) : []),
+          ...(i === 0 && cards.length ? headlineOverlays(cards, words.slice(0, hookCount), hookEnd) : []),
           ...(scene.overlay ? [{ png: rel(scene.overlay), from: 0, to: (last - first) / FPS + 1 }] : []),
         ],
       })
     )
     durations.push((last - first) / FPS)
+  }
+
+  // A long-form clip stops here: the scenes joined with the voice, and where each scene sits,
+  // for create-longform to place in the episode. Captions, music and the outro are its job.
+  if (isClip) {
+    const list = path.join(outDir, 'scenes.txt')
+    fs.writeFileSync(list, clips.map((c) => `file '${c}'`).join('\n'))
+    const clipPath = path.join(outDir, 'clip.mp4')
+    execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', list, '-i', audio, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', clipPath])
+    const sceneStarts: number[] = []
+    durations.reduce((t, d) => (sceneStarts.push(t), t + d), 0)
+    fs.writeFileSync(path.join(outDir, 'clip.json'), JSON.stringify({ clip: clipPath, audio, fps: FPS, scenes: sceneStarts.map((start, i) => ({ start, seconds: durations[i] })), words }, null, 2))
+    console.log(`✅ Clip: ${path.relative(process.cwd(), clipPath)} (${durations.reduce((a, b) => a + b, 0).toFixed(1)}s, ${clips.length} scenes)`)
+    return
   }
 
   const final = path.join(outDir, 'final.mp4')
