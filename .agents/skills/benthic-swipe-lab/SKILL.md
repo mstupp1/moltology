@@ -22,7 +22,7 @@ Complete the workflow through ingestion and Zernio queueing after inspecting the
 
 Read `STYLE_GUIDE.md`, `BRAND_BIBLE.md` and the [creative direction](../../../content/creative-direction.md) playbook before writing, then run `npm run social:continuity`. Use it to avoid repeating a recent format, topic, hook shape or overused character, and to find the next episode of the series you're making. Video adaptations read the same report.
 
-For content artwork that uses characters, follow [character casting](../../../content/character-casting.md) before choosing the cast or writing prompts. Match the cast to the written story first; use recent usage and randomization among equally strong matches, then preserve the reviewed identities within the piece. User-requested identities and controlled comparisons take precedence. Characters are the 3D content cast ([content/characters/README.md](../../../content/characters/README.md)): render them with `npm run cast:render` and use the renders as the casting guide describes, never the retired 2D cutouts.
+Use a recognizable canonical 3D Moltology crab or lobster on the cover and every finished frame, including type-led and costume decks. Character-free artwork requires an explicit user request. Follow [character casting](../../../content/character-casting.md) for story fit, rotation and identity. Use the [carousel artwork workflow](../instagram-carousel-creator/SKILL.md#artwork-and-polish-built-in-imagegen-by-default) to integrate the cast into the generated scenes.
 
 ## 1. Pitch three, build one
 
@@ -40,7 +40,7 @@ Score each concept from 1 to 5 on:
 | Keep | Is there something concrete to save, or an observation precise enough to send to a friend? |
 | Fresh | Is the format or angle different from the last five Swipe Lab and carousel posts? |
 
-Build the highest total. A concept scoring under 3 on Stop or Laugh gets rewritten before it can win. Record the scores and the winner in the draft.
+Before choosing, test whether each competitive pitch connects the everyday situation to an attention, habit or boundary the reader recognizes. Sketch the winning arc before art: the cover promises a reveal or useful payoff, the middle shows the habit escalating through distinct actions, and the last useful frame gives the reader a specific move they can try. Read through that arc and revise if the punchline was already visible on the cover, the tip could fit any topic, or a frame only repeats the premise. Build the highest-scoring pitch that passes this check. A concept scoring under 3 on Stop or Laugh gets rewritten before it can win. Record the scores and the winner in the draft.
 
 ### Costumes
 
@@ -88,7 +88,7 @@ Save `tmp/swipe-lab/<slug>/draft.json` with:
 - `series`, `episode`, `creativeBrief` (from the creative-direction playbook), `format`, `formatFamily`, `loudness`, `pitchScores` (all three concepts and the winner), `coverCandidates`, `title`, `topic`, `readerPayoff`, `saveOrShareTrigger`, `ctaGoal`.
 - `referenceIds` and `borrowedDevices` when an inspiration archive post shaped the deck.
 - `artDirection`: `treatment` (`type-led`, `scene-led` or `mixed`), plus the series look (light, grade, accent), the cover system, and the visual motif shared by the whole piece.
-- `slides`: ordered objects with `number`, `role` (cover, rehook, beat, payoff, save, closer), `headline`, `body`, `visualDirection` (including the shot from the playbook's shot list), `characterRole` (character, job and expression, or `none`), and `layoutPath` when rendered.
+- `slides`: ordered objects with `number`, `role` (cover, rehook, beat, payoff, save, closer), `headline`, `body`, `visualDirection` (including the shot from the playbook's shot list), `characterRole` (canonical cast key, action, pose, mood and still reference, or `none` when explicitly requested), and `layoutPath` when rendered.
 - `caption`, `hashtags` (at most three), `firstComment` (a direct destination link), and `sources` for real-world claims.
 - `mascot`, `aspectRatio`, and final artifact paths when available.
 
@@ -106,7 +106,7 @@ npm run composite:render -- --spec tmp/swipe-lab/<slug>/slide-01.json --out tmp/
 
 Use 3:4 portrait, 1080×1440, with 2x scaffolds by default; preserve the finished full frame. Use the Space Grotesk hierarchy, the brand colours plus the series accent, the series cover system and the Order emblem. One category pill at most. Each frame has one focal point. Follow the creative-direction type scale and set `minSize` on every auto-fit text layer; treat renderer type-size warnings as fixes to make, not notes.
 
-Use built-in ImageGen on every finished frame by default, either for its scene artwork or for a polish pass over a reviewed scaffold. The renderer adds exact copy and the official emblem afterward. A type-led format does not waive image production. Only skip ImageGen when the user explicitly requests a purely typographic or code-rendered treatment.
+Use built-in ImageGen on every finished frame by default, either for its scene artwork or for a polish pass over a reviewed scaffold. Use the renderer for final exact copy, structured information and the official emblem. Allow for them in the scaffold and image prompt. A type-led format does not waive image production. Only skip ImageGen when the user explicitly requests a purely typographic or code-rendered treatment.
 
 Pick the treatment from the format:
 
@@ -118,13 +118,15 @@ Pick the treatment from the format:
 
 Read the available imagegen `SKILL.md` before generating. Use the built-in tool by default and follow that skill's fallback rules if it is unavailable; Google Flow is an alternative only when the user selects it. Set one treatment for the piece (scene language, palette, lighting, materials, motif) and carry it through every prompt, using an inspected successful frame as a style reference where it helps. Favor a funny concrete visual (a lobster buried in sticky notes, a calendar covered in actual barnacles) over generic glow.
 
-Inspect local edit targets and identity references with `view_image` before using them. Label each input's role in the prompt: scaffold/edit target (with the 3D characters already in it, kept unchanged), character reference sheet (only when a character must be redrawn), or style reference. Keep reviewed text, hierarchy and factual diagrams intact during scaffold edits; for dense text, generate the artwork first and compose the exact text with the renderer afterward.
+Make a complete cover scaffold with the reviewed type, cast placement and room for the visual joke. Generate and inspect that finished cover at 390px wide before producing the rest. Use it as the deck's style reference. Plan distinct shots and blocking across the deck, with consistent lighting, materials and grade. Keep the text and main action close enough to read together at phone size.
+
+Inspect the local scaffold and still with `view_image`. Pass the scaffold as the layout reference and the posed canonical 3D still as the identity reference for each frame. Generate one full 3:4 scene at a time. Have ImageGen render the character into the scene with matching perspective, contact shadows, ambient light and prop interactions. When exact copy will be overlaid, keep its reserved area clear and omit generated lettering. Batch custom scaffold captures through `openCompositeSession()` when useful.
 
 ### Logo and characters
 
 Use the exact official logo assets, never an ImageGen approximation, invented wordmark, decorative shell substitute or altered emblem. Inspect `public/images/order_emblem.svg` (or its official raster twin) and the composite `brand` layer before production. Reserve clean branding space and composite the supplied asset afterward; scale and perspective may fit the surface, but preserve the geometry and approved colors. Check every final frame for invented or distorted marks.
 
-Characters are the 3D content cast ([content/characters/README.md](../../../content/characters/README.md)). For a series, start from its creative-direction cast and choose with the character-casting rules; don't default to the host. Give each appearance a job (reacting, demonstrating, placing a tile, sending a message) and record it in `characterRole`. A recurring reaction character across a meme deck is fine when it reacts to each frame; a character pasted on as a badge is not. Act the job out with the 3D render's pose and mood (`npm run cast:render -- --who <name> --pose <pose> --mood <mood>`), and follow [using the 3D characters in artwork](../../../content/character-casting.md#using-the-3d-characters-in-artwork): image models paint the world and keep the rendered character unchanged; they redraw a character only for a pose the rig can't make, with its reference sheet as the identity reference. No robot anatomy, no creator faces.
+Start from the series cast in creative direction. Keep a consistent lead and give it a job on each slide, such as judging the evidence, trying the habit or demonstrating the fix. Stage a legible action or expression, with the character large enough to recognize at phone size. Render the pose and mood with `npm run cast:render -- --who <name> --pose <pose> --mood <mood>`. Add the canonical reference sheet (`--shot sheet`) when the angle or pose needs it. Preserve the cast member's face, markings, colours, proportions and gear. Use the chosen canonical lead key as `mascot` in the draft and pass it explicitly on CLI commands that accept `--mascot`, including ingest and retries.
 
 ## 6. Boredom check before queueing
 
@@ -136,6 +138,7 @@ Lay the finished frames out in order (a contact sheet is enough) and answer hone
 - Is the save or share frame genuinely useful or precisely relatable?
 - Is it loud, a bit silly and engaging, or merely tidy?
 - With the text hidden, does each frame still show a specific situation, visual joke, purposeful reaction or distinctive composition? Generic glow, texture behind text and repeated panels do not pass this check.
+- Is the cast recognizable and actively doing something on every frame? Regenerate any frame with identity drift, a character lost at phone size, or lighting and contact that make it look pasted in.
 - Is the artwork carrying the premise at phone size, with enough space to see it? Do not bury a generated scene under the same scaffold panels.
 
 Then run the creative-direction phone proof: a contact sheet with every frame 390px wide, saved as `phone-proof.png`. Fix any "no" from either check with a targeted change (rewrite the line, cut words, enlarge the type, cut a frame, swap the reaction) before queueing. Then check spelling, margins, order, legibility, claims, character identity and logo integrity. Save each final ImageGen prompt and its input roles beside the draft. Copy selected built-in outputs from their returned save paths into `tmp/swipe-lab/<slug>/` and record the final artifact paths; don't leave deliverables only in the tool's default output directory. Generated media stays in workspace `tmp/` until publication; finished social media and reviewed metadata go to the Google Drive social archive through the social CLI, with publishing media uploaded directly to Zernio, never tracked `public/`. Website and character source assets remain on S3.
