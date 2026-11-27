@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Make time for emotional regulation in an ordinary day. Pause before a reply, name what happened and choose one next step in a quiet daily practice.',
   keywords: 'emotional regulation, pause before replying, naming feelings, daily routine, quiet practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer: 'Moltology is not therapy; speak with a qualified professional about ongoing distress.',
   shareImage: {
     src: '/images/benefits/emotional/share.jpg?v=2',
@@ -20,13 +20,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Release it, from the Nightly Molt Audit',
+    label: 'The Nightly Molt Audit',
     href: '/codex/scr-032#verse-5',
-    text: 'Each night, say or write the one thing you are carrying and let it go. The verse is plain about it: it does not have to be resolved, only released. A heavy day gets a small, finishable ending.',
+    text: 'Name one replay you’re ready to put down for the night.',
   },
   reveal: {
-    headline: 'The reply can wait while you choose your words.',
-    body: 'Give one difficult task a quiet place in your day.',
+    headline: 'The draft can wait.',
+    body: 'Give yourself a quiet minute before your next reply.',
     screenshot: 'forum',
   },
   related: ['resilience', 'communication', 'spirituality'],
@@ -65,9 +65,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       kicker: 'An unhurried daily practice',
-      headline: 'Emotional regulation starts with letting the reply wait.',
-      sub: 'The email is open. The answer is already getting longer. Put it aside for a moment. Moltology invites you to name what happened, give a difficult task some quiet and choose what to do next. Start where you are, with the day you have.',
-      cta: 'Take a moment for yourself',
+      headline: 'Emotional regulation before you hit send.',
+      sub: 'Let the draft sit. Come back when you know what you want to say.',
+      cta: 'Begin free',
       image: {
         src: '/images/benefits/emotional/hero.jpg?v=2',
         alt: 'A crab resting on a cushioned bench beside a courtyard pool in soft wellness retreat photography',
@@ -80,27 +80,13 @@ const page: BenefitPage = {
       source: { label: 'Even Pressure, from the Codex', href: '/codex/scr-011#verse-3' },
     },
     rhythm: {
-      title: 'A place to pause between the demands',
-      intro: 'Use the eight daily tasks as invitations to stop, choose and return. Put a little care around the awkward parts of the day: the tense meeting, the overdue answer, the conversation you keep replaying while making dinner.',
+      title: 'Leave a little space',
+      intro: 'Four quiet places to put a pause in the day.',
       items: [
         { time: 'As you wake', title: 'Sit in silence', body: 'Sit by the window before reading messages, with whatever mood you woke up in.' },
-        { time: 'At the morning table', title: 'Pick your one thing', body: 'Choose one useful job, even when another part of the day feels unsettled.' },
-        { time: 'When you open a book', title: 'Learn something hard', body: 'Read slowly through the part you do not understand before judging your attempt.' },
         { time: 'In a midday gap', title: 'Reset your focus', body: 'Close an unrelated conversation and choose the next action on the task at hand.' },
-        { time: 'With the door closed', title: 'Do deep work', body: 'Give a difficult job its own block, with the incoming messages left outside it.' },
-        { time: 'On the forum', title: 'Help a member', body: 'Read a request carefully and answer the question you have the patience to answer.' },
         { time: 'As work winds down', title: 'Let one thing go', body: 'Name a small frustration from today that you are ready to stop revisiting tonight.' },
         { time: 'Before the lights go out', title: 'Close the day', body: 'Check the actions you completed, then stop checking the list for the evening.' },
-      ],
-    },
-    itinerary: {
-      title: 'Before you send that message',
-      items: [
-        { day: 'Pause', title: 'Leave it in drafts', body: 'Take your hands off the keyboard. Check whether the answer actually needs to go now.' },
-        { day: 'Name', title: 'Say what happened', body: 'Write the event in a short sentence. Keep the imagined motives on a separate line.' },
-        { day: 'Ask', title: 'Find the request', body: 'Decide what you want to ask for: a correction, a date or a conversation.' },
-        { day: 'Choose', title: 'Use the right channel', body: 'Pick a message or a call. Give the other person time to answer.' },
-        { day: 'Return', title: 'Do the next ordinary thing', body: 'Go back to your chosen task while you wait. Leave the sent folder closed.' },
       ],
     },
     carry: {

@@ -12,7 +12,7 @@ import type { BenefitPage } from './types'
 
 export const BENEFITS_HUB_TITLE = 'Benefits of Moltology | Moltology'
 export const BENEFITS_HUB_DESCRIPTION =
-  'What a free daily practice can do for your drive, energy and peace of mind. Pick a benefit and see how Moltology gets you there.'
+  'Find a starting point for Moltology’s free daily practice. Explore focus, follow-through, community, and the habits that give each day some shape.'
 
 export function benefitCanonical(slug: string) {
   return `${SITE_ORIGIN}${benefitPath(slug)}`

@@ -13,8 +13,8 @@ export function BenefitFaq({ faqs, title, id = 'faq' }: { faqs: FaqItem[]; title
           {title}
         </h2>
         <div className="bf-list">
-          {faqs.map((faq, index) => (
-            <details key={faq.question} className="bf-item" open={index === 0}>
+          {faqs.map((faq) => (
+            <details key={faq.question} className="bf-item">
               <summary className="bf-q">
                 <span>{faq.question}</span>
                 <span className="bf-icon" aria-hidden="true" />

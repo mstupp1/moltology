@@ -246,36 +246,19 @@
   height: 16px;
 }
 
-[data-kit='clinic'] .ck-checks {
-  margin-top: 22px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 20px;
-}
-
-[data-kit='clinic'] .ck-checks li {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--ck-ink);
-}
-
-[data-kit='clinic'] .ck-checks svg {
-  width: 18px;
-  height: 18px;
-  padding: 3px;
-  border-radius: 999px;
-  background: var(--ck-ink);
-  color: var(--ck-paper);
-}
-
 [data-kit='clinic'] .ck-actions {
   margin-top: 30px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+[data-kit='clinic'] .ck-fine {
+  max-width: 44ch;
+  margin-top: 16px;
+  color: var(--ck-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
 @media (min-width: 560px) {
@@ -352,101 +335,7 @@
   background: var(--ck-blush);
 }
 
-[data-kit='clinic'] .ck-plan-card {
-  position: absolute;
-  left: -12px;
-  bottom: 28px;
-  width: 210px;
-  padding: 16px;
-  border-radius: 20px;
-  background: var(--ck-paper);
-  box-shadow: 0 18px 40px -18px rgba(28, 38, 38, 0.35);
-  color: var(--ck-ink);
-}
-
-@media (min-width: 900px) {
-  [data-kit='clinic'] .ck-plan-card {
-    left: -48px;
-  }
-}
-
-[data-kit='clinic'] .ck-plan-card-label {
-  font-size: 0.75rem;
-  color: var(--ck-muted);
-}
-
-[data-kit='clinic'] .ck-plan-card-title {
-  font-family: var(--ck-serif);
-  font-size: 1.35rem;
-  margin-top: 2px;
-}
-
-[data-kit='clinic'] .ck-plan-card ul {
-  margin-top: 10px;
-  display: grid;
-  gap: 8px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-}
-
-[data-kit='clinic'] .ck-plan-card li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-[data-kit='clinic'] .ck-plan-card svg {
-  width: 16px;
-  height: 16px;
-  color: var(--ck-sage-ink);
-}
-
-[data-kit='clinic'] .ck-plan-card .is-next {
-  color: var(--ck-muted);
-}
-
-[data-kit='clinic'] .ck-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  border: 1.5px dashed #b9b0a4;
-}
-
 /* Trust row ------------------------------------------------------------- */
-
-[data-kit='clinic'] .ck-trust {
-  background: var(--ck-ink);
-  color: var(--ck-ground);
-}
-
-[data-kit='clinic'] .ck-trust-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 20px;
-  padding-top: 18px;
-  padding-bottom: 18px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-@media (min-width: 900px) {
-  [data-kit='clinic'] .ck-trust-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-[data-kit='clinic'] .ck-trust-row li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-[data-kit='clinic'] .ck-trust-row svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  color: var(--ck-blush);
-}
 
 /* Sections -------------------------------------------------------------- */
 
@@ -462,55 +351,6 @@
 
 [data-kit='clinic'] .ck-tint {
   background: var(--ck-paper);
-}
-
-[data-kit='clinic'] .ck-signs {
-  display: grid;
-  gap: 28px;
-}
-
-@media (min-width: 900px) {
-  [data-kit='clinic'] .ck-signs {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 64px;
-    align-items: start;
-  }
-}
-
-[data-kit='clinic'] .ck-signs-list {
-  display: grid;
-  gap: 10px;
-  padding: 20px;
-  border-radius: 28px;
-  background: var(--ck-blush);
-}
-
-[data-kit='clinic'] .ck-signs-list li {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--ck-ink);
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-[data-kit='clinic'] .ck-box {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  border-radius: 7px;
-  background: var(--ck-ink);
-  color: var(--ck-paper);
-  display: grid;
-  place-items: center;
-}
-
-[data-kit='clinic'] .ck-box svg {
-  width: 14px;
-  height: 14px;
 }
 
 [data-kit='clinic'] .ck-steps {
@@ -580,20 +420,6 @@
   font-weight: 600;
 }
 
-[data-kit='clinic'] .ck-price {
-  margin-top: auto;
-  padding-top: 20px;
-  font-size: 0.875rem;
-  color: var(--ck-muted);
-}
-
-[data-kit='clinic'] .ck-price strong {
-  font-family: var(--ck-serif);
-  font-weight: 400;
-  font-size: 2rem;
-  color: var(--ck-ink);
-}
-
 [data-kit='clinic'] .ck-link {
   margin-top: 14px;
   display: inline-flex;
@@ -614,50 +440,6 @@
 [data-kit='clinic'] .ck-link svg {
   width: 16px;
   height: 16px;
-}
-
-[data-kit='clinic'] .ck-table-wrap {
-  margin: 36px auto 0;
-  max-width: 820px;
-  overflow-x: auto;
-}
-
-[data-kit='clinic'] .ck-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 0.9375rem;
-}
-
-[data-kit='clinic'] .ck-table th,
-[data-kit='clinic'] .ck-table td {
-  padding: 16px 14px;
-  text-align: left;
-  border-bottom: 1px solid var(--ck-line);
-}
-
-[data-kit='clinic'] .ck-table thead th {
-  font-weight: 600;
-  color: var(--ck-ink);
-}
-
-[data-kit='clinic'] .ck-table tbody th {
-  font-weight: 500;
-  color: var(--ck-muted);
-}
-
-[data-kit='clinic'] .ck-table .is-us {
-  background: var(--ck-sage);
-  color: var(--ck-ink);
-  font-weight: 600;
-}
-
-[data-kit='clinic'] .ck-table thead .is-us {
-  border-radius: 16px 16px 0 0;
-}
-
-[data-kit='clinic'] .ck-table tbody tr:last-child .is-us {
-  border-radius: 0 0 16px 16px;
 }
 
 /* FAQ ------------------------------------------------------------------- */
@@ -829,21 +611,6 @@
   border: 1px solid var(--ck-line);
 }
 
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-lab-readout {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 14px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: var(--ck-paper);
-  border: 1px solid var(--ck-line);
-  font-family: var(--ck-mono);
-  font-size: 0.75rem;
-  color: var(--ck-ink);
-}
-
 @media (min-width: 900px) {
   [data-kit='clinic'][data-variant='botanical-lab'] .ck-hero {
     padding: 0;
@@ -872,56 +639,6 @@
     border: 0;
     border-left: 1px solid var(--ck-line);
   }
-
-  [data-kit='clinic'][data-variant='botanical-lab'] .ck-lab-readout {
-    position: absolute;
-    left: 24px;
-    right: 24px;
-    bottom: 24px;
-    margin-top: 0;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(8px);
-  }
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-trust {
-  background: var(--ck-blush);
-  color: var(--ck-ink);
-  border-top: 1px solid var(--ck-line);
-  border-bottom: 1px solid var(--ck-line);
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-trust-row svg {
-  color: var(--ck-sage-ink);
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-signs-list {
-  padding: 6px 22px;
-  border-radius: 14px;
-  border: 1px solid var(--ck-line);
-  background: var(--ck-paper);
-  gap: 0;
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-signs-list li {
-  padding: 16px 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-signs-list li + li {
-  border-top: 1px solid var(--ck-line);
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-box {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: var(--ck-sage);
-  color: var(--ck-sage-ink);
-  font-family: var(--ck-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
 }
 
 [data-kit='clinic'][data-variant='botanical-lab'] .ck-steps {
@@ -975,16 +692,6 @@
   gap: 12px 20px;
 }
 
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-price {
-  margin-top: 0;
-  padding-top: 0;
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-price strong {
-  font-weight: 600;
-  font-size: 1.5rem;
-}
-
 [data-kit='clinic'][data-variant='botanical-lab'] .ck-link {
   margin-top: 0;
 }
@@ -1011,32 +718,6 @@
     gap: 6px;
     text-align: right;
   }
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-table-wrap {
-  border: 1px solid var(--ck-line);
-  border-radius: 14px;
-  background: var(--ck-paper);
-  overflow-x: auto;
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-table {
-  border-collapse: collapse;
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-table thead th {
-  background: var(--ck-blush);
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-table .is-us {
-  background: #edf5f1;
-  border-left: 3px solid var(--ck-sage-ink);
-  border-radius: 0;
-}
-
-[data-kit='clinic'][data-variant='botanical-lab'] .ck-table thead .is-us {
-  background: var(--ck-sage);
-  border-radius: 0;
 }
 
 [data-kit='clinic'][data-variant='botanical-lab'] .bf-item {
@@ -1143,20 +824,6 @@
   border: 1px solid var(--ck-line);
 }
 
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-lab-readout {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 12px;
-  padding: 12px 16px;
-  border-radius: 6px;
-  background: var(--ck-ink);
-  color: #edf3f8;
-  font-family: var(--ck-mono);
-  font-size: 0.75rem;
-}
-
 @media (min-width: 900px) {
   [data-kit='clinic'][data-variant='graphite-protocol'] .ck-hero {
     padding: 0;
@@ -1186,38 +853,6 @@
     border: 0;
     border-right: 1px solid var(--ck-line);
   }
-
-  [data-kit='clinic'][data-variant='graphite-protocol'] .ck-lab-readout {
-    position: absolute;
-    left: 24px;
-    right: 24px;
-    bottom: 24px;
-    margin-top: 0;
-    background: var(--ck-ink);
-  }
-}
-
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-trust {
-  background: var(--ck-ink);
-  color: #e6eef5;
-}
-
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-trust-row svg {
-  color: #7ee3d9;
-}
-
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-signs-list li {
-  border-radius: 8px;
-  background: var(--ck-paper);
-  border: 1px solid var(--ck-line);
-}
-
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-box {
-  border-radius: 4px;
-  background: var(--ck-ink);
-  color: #ffffff;
-  font-family: var(--ck-mono);
-  font-size: 0.75rem;
 }
 
 [data-kit='clinic'][data-variant='graphite-protocol'] .ck-tint {
@@ -1274,25 +909,8 @@
   border-top: 1px solid var(--ck-line);
 }
 
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-price {
-  margin-top: 0;
-  padding-top: 0;
-}
-
 [data-kit='clinic'][data-variant='graphite-protocol'] .ck-link {
   margin-top: 0;
-}
-
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-table-wrap {
-  border: 1px solid var(--ck-line);
-  border-radius: 8px;
-  background: var(--ck-paper);
-  overflow-x: auto;
-}
-
-[data-kit='clinic'][data-variant='graphite-protocol'] .ck-table .is-us {
-  background: #e2eff0;
-  border-radius: 0;
 }
 
 [data-kit='clinic'][data-variant='graphite-protocol'] .bf-item,
@@ -1391,60 +1009,6 @@
   outline-offset: 10px;
 }
 
-[data-kit='clinic'][data-variant='cognitive-studio'] .ck-lab-readout {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 18px;
-  padding: 12px 4px 0;
-  border-radius: 0;
-  border-top: 1px solid var(--ck-line);
-  background: transparent;
-  color: var(--ck-ink);
-  font-family: var(--ck-mono);
-  font-size: 0.74rem;
-}
-
-[data-kit='clinic'][data-variant='cognitive-studio'] .ck-trust {
-  background: var(--ck-blush);
-  color: var(--ck-ink);
-  border-top: 1px dashed var(--ck-line);
-  border-bottom: 1px dashed var(--ck-line);
-}
-
-[data-kit='clinic'][data-variant='cognitive-studio'] .ck-trust-row svg {
-  color: var(--ck-sage-ink);
-}
-
-@media (min-width: 900px) {
-  [data-kit='clinic'][data-variant='cognitive-studio'] .ck-signs {
-    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
-    align-items: start;
-  }
-
-  [data-kit='clinic'][data-variant='cognitive-studio'] .ck-signs-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-}
-
-[data-kit='clinic'][data-variant='cognitive-studio'] .ck-signs-list li {
-  border-radius: 14px;
-  background: var(--ck-paper);
-  border: 1px solid var(--ck-line);
-}
-
-[data-kit='clinic'][data-variant='cognitive-studio'] .ck-box {
-  border-radius: 999px;
-  background: var(--ck-sage);
-  color: var(--ck-sage-ink);
-  font-family: var(--ck-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
-}
-
 [data-kit='clinic'][data-variant='cognitive-studio'] .ck-step {
   border-radius: 16px;
   border: 1px solid var(--ck-line);
@@ -1482,14 +1046,9 @@
   flex-wrap: wrap;
 }
 
-[data-kit='clinic'][data-variant='cognitive-studio'] .ck-price,
 [data-kit='clinic'][data-variant='cognitive-studio'] .ck-link {
   margin-top: 0;
   padding-top: 0;
-}
-
-[data-kit='clinic'][data-variant='cognitive-studio'] .ck-table .is-us {
-  background: var(--ck-blush);
 }
 
 /* Variant: clinical-editorial (intelligence) ---------------------------- */
@@ -1561,21 +1120,6 @@
   border: 1px solid var(--ck-line);
 }
 
-[data-kit='clinic'][data-variant='clinical-editorial'] .ck-lab-readout {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding: 12px 16px;
-  border-radius: 4px;
-  background: var(--ck-blush);
-  border: 1px solid var(--ck-line);
-  font-family: var(--ck-serif);
-  font-size: 1.05rem;
-  color: var(--ck-ink);
-}
-
 @media (min-width: 900px) {
   [data-kit='clinic'][data-variant='clinical-editorial'] .ck-hero {
     padding: 0;
@@ -1605,35 +1149,6 @@
     border: 0;
     object-position: center 35%;
   }
-
-  [data-kit='clinic'][data-variant='clinical-editorial'] .ck-lab-readout {
-    margin-top: 0;
-    border-radius: 0;
-    border: 0;
-    border-top: 1px solid var(--ck-line);
-    padding: 14px 24px;
-  }
-}
-
-[data-kit='clinic'][data-variant='clinical-editorial'] .ck-signs-list {
-  gap: 0;
-  border-top: 1px solid var(--ck-line);
-}
-
-[data-kit='clinic'][data-variant='clinical-editorial'] .ck-signs-list li {
-  border-radius: 0;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--ck-line);
-  padding: 16px 0;
-}
-
-[data-kit='clinic'][data-variant='clinical-editorial'] .ck-box {
-  border-radius: 999px;
-  background: var(--ck-crimson);
-  color: #ffffff;
-  font-family: var(--ck-serif);
-  font-size: 0.95rem;
 }
 
 [data-kit='clinic'][data-variant='clinical-editorial'] .ck-steps {
@@ -1684,12 +1199,7 @@
   flex-wrap: wrap;
 }
 
-[data-kit='clinic'][data-variant='clinical-editorial'] .ck-price,
 [data-kit='clinic'][data-variant='clinical-editorial'] .ck-link {
   margin-top: 0;
   padding-top: 0;
-}
-
-[data-kit='clinic'][data-variant='clinical-editorial'] .ck-table .is-us {
-  background: #f5e6e8;
 }

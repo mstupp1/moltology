@@ -5,8 +5,6 @@ import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
-import '@/styles/editorial-fonts.css'
-import './retreat.css'
 
 const RETREAT_SUBS: Record<string, string> = {
   'moss-monastery': 'Monastic daily',
@@ -31,7 +29,7 @@ function RetreatLockup({ variant }: { variant?: string }) {
 /** Retreat: mindfulness and wellness retreats. Linen and sage, slow pacing, a script lockup. */
 export default function RetreatKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'retreat') return null
-  const { hero, intention, rhythm, itinerary, carry } = page.content
+  const { hero, intention, rhythm, carry } = page.content
 
   return (
     <div className="rt">
@@ -39,7 +37,6 @@ export default function RetreatKit({ page, onJoin, children }: BenefitKitProps) 
         lockup={<RetreatLockup variant={page.variant} />}
         links={[
           { label: 'The practice', href: '#practice' },
-          { label: 'Your first week', href: '#week' },
           { label: 'Questions', href: '#faq' },
         ]}
         cta="Begin"
@@ -66,7 +63,7 @@ export default function RetreatKit({ page, onJoin, children }: BenefitKitProps) 
                 {hero.cta}
               </button>
               <Link to={BENEFIT_LINKS.quiz} className="rt-btn-quiet">
-                Or take the three minute quiz
+                Take the habit quiz
               </Link>
             </div>
           </div>
@@ -85,7 +82,6 @@ export default function RetreatKit({ page, onJoin, children }: BenefitKitProps) 
         <section className="rt-section" id="practice" aria-labelledby="rt-practice">
           <div className="rt-wrap rt-practice">
             <div className="rt-practice-head">
-              <p className="rt-kicker rt-kicker-dark">The practice</p>
               <h2 id="rt-practice" className="rt-h2">
                 {rhythm.title}
               </h2>
@@ -99,24 +95,6 @@ export default function RetreatKit({ page, onJoin, children }: BenefitKitProps) 
                     <h3 className="rt-h3">{item.title}</h3>
                     <p className="rt-body">{item.body}</p>
                   </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section className="rt-section rt-sand" id="week" aria-labelledby="rt-week">
-          <div className="rt-wrap">
-            <p className="rt-kicker rt-kicker-dark rt-center">Itinerary</p>
-            <h2 id="rt-week" className="rt-h2 rt-center">
-              {itinerary.title}
-            </h2>
-            <ol className="rt-days">
-              {itinerary.items.map((item) => (
-                <li key={item.day} className="rt-day">
-                  <span className="rt-day-n">{item.day}</span>
-                  <h3 className="rt-h3">{item.title}</h3>
-                  <p className="rt-body">{item.body}</p>
                 </li>
               ))}
             </ol>
@@ -144,7 +122,7 @@ export default function RetreatKit({ page, onJoin, children }: BenefitKitProps) 
                 ))}
               </ul>
               <button type="button" className="rt-btn rt-btn-dark" onClick={onJoin}>
-                Reserve your place, free
+                Join free
               </button>
             </div>
           </div>

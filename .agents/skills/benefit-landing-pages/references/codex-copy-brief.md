@@ -22,7 +22,8 @@ For each page in your list, create src/lib/benefits/pages/<slug>.ts:
 - reveal.headline: a fresh line, not "X was a costume/metaphor", not "... is real", not "... is an app". reveal.body: one short line specific to the page. Keep the reveal.screenshot field shape the kit page uses.
 - related: 2 or 3 other slugs from src/lib/benefits/summaries.ts (prefer pages on nearby topics).
 - disclaimer: required for health or money angles (given below); a plain one-sentence line.
-- At least 450 words of page copy (content + FAQs + hook + reveal).
+- At least 250 words of page copy (content + FAQs + hook + reveal). Keep the hero pitch to 25 words
+  or fewer. Give the remaining space to concrete examples and useful FAQ answers.
 
 Copy rules that reviewers keep catching:
 - Describe what the practice asks, never what it delivers. No "you will feel/see/get...", no "most members", no timelines, no "proven/guaranteed/clinically/safest". No medical, financial or nutritional claims.

@@ -7,12 +7,12 @@ const page: BenefitPage = {
   query: 'low libido and low drive',
   title: 'Libido and low drive: a daily plan | Moltology',
   description:
-    'Low drive often follows bad days, not bad genes. Take a free three minute assessment and get eight small daily tasks that bring your focus and energy back.',
-  keywords: 'low libido, low drive, how to get your drive back, low motivation, daily routine, focus plan',
+    'Low libido and low drive can raise different questions. Moltology offers a free daily habit practice for the ordinary parts of your day.',
+  keywords: 'low libido, low drive, daily routine, habit practice, quiet morning',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer:
-    'Moltology is a free practice and community, not a medical service. If a change in libido is sudden or worrying, talk to a doctor.',
+    'Moltology offers a habit practice. If you’re worried about a change in libido, talk to a healthcare professional.',
   shareImage: {
     src: '/images/benefits/libido/share.jpg',
     alt: 'A crab in a clinic coat beside the words "Get your drive back"',
@@ -20,55 +20,29 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The Grip, from the Codex',
+    label: 'The Grip',
     href: '/codex/scr-030#verse-3',
-    text: 'The plan follows the Daily Shedding Routine. Its first-hour step, The Grip, asks you to name the one thing that matters today and start on it before anything else gets a say.',
+    text: 'Choose one thing that matters today and give it the first hour.',
   },
   reveal: {
-    headline: 'Your plan lives in a real app.',
-    body: 'The assessment is the Moltmax quiz, and the plan is the eight daily tasks.',
+    headline: 'Give the day a quiet start.',
+    body: 'Begin with one small task on the daily checklist.',
     screenshot: 'dashboard',
   },
   related: ['energy-drinks', 'spirituality'],
   faqs: [
-    {
-      question: 'Can Moltology increase my libido?',
-      answer:
-        'Not directly. It works on the everyday things that often flatten drive, like short sleep, constant phone use and days with no clear goal. If a drop in libido is sudden or worrying, see a doctor.',
-    },
-    {
-      question: 'Is this a medical service?',
-      answer: 'No. There are no doctors, prescriptions or supplements. Moltology is a free daily practice and community.',
-    },
-    {
-      question: 'What is the assessment?',
-      answer:
-        'The Moltmax quiz: 15 questions that score your boundaries, follow-through, focus, adaptability and calm under pressure. It takes about three minutes and needs no account.',
-    },
-    {
-      question: 'What does the daily plan involve?',
-      answer:
-        'Eight short tasks from early morning to evening, such as sitting quietly before you open your phone, one block of deep work and letting one thing go at night. Most take a few minutes.',
-    },
-    {
-      question: 'What causes low libido?',
-      answer:
-        'Many things, including stress, short sleep, relationship strain, hormones, medicines and other health conditions. If it changed suddenly or worries you, talk to a doctor first. Moltology only works on the everyday habits part.',
-    },
-    {
-      question: 'Can sleep and stress affect sex drive?',
-      answer:
-        'Both are commonly linked to lower desire. Getting to bed on time and having fewer frantic days are reasonable places to start, alongside any medical advice.',
-    },
-
+    { question: 'What does low libido mean?', answer: 'Low libido means having less interest in sex. Desire can vary over time and from person to person.' },
+    { question: 'What can contribute to low libido?', answer: 'Stress, relationship difficulties, medications and hormonal changes are among the possible factors.' },
+    { question: 'When should I talk to a healthcare professional about my sex drive?', answer: 'Bring it up if the change worries you or you suspect it may be related to a medication.' },
+    { question: 'What does the Moltmax quiz cover?', answer: 'Fifteen questions about everyday habits, including focus, follow-through, adaptability and boundaries.' },
+    { question: 'What’s on the daily checklist?', answer: 'A quiet opening, a priority, a hard lesson, a midday reset, deep work, helping someone, letting one thing go, and closing the day.' },
   ],
   content: {
     hero: {
-      eyebrow: 'Online assessment · free',
-      headline: 'Low libido? Start with the ordinary things.',
-      sub: 'Short nights, endless feeds and days with no point to them can flatten drive. Moltology gives you a three minute assessment and a daily plan for that part.',
-      checks: ['Free, no card', 'About three minutes', 'Plan ready the same day'],
-      cta: 'Get your free plan',
+      eyebrow: 'Habit check-in',
+      headline: 'Low libido on a low-drive day?',
+      sub: 'Build a little structure into a low-drive day, from a quiet start to a deliberate stop.',
+      cta: 'Start free',
       image: {
         src: '/images/benefits/libido/hero.jpg',
         alt: 'A calm crab in a pale clinic coat holding a clipboard, soft daylight',
@@ -76,38 +50,17 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    trust: ['Free to join', 'No pills or prescriptions', '8 small daily tasks', 'Nothing to cancel'],
-    signs: {
-      title: 'Sound familiar?',
-      intro: 'These are the common signs. None of them need a prescription.',
-      items: [
-        'You reach for your phone before you are fully awake',
-        'Evenings vanish into a feed you will not remember',
-        'Nothing on today’s list feels like yours',
-        'You are tired, but not from doing anything',
-        'Plans keep sliding to next week',
-      ],
-    },
     steps: {
-      title: 'How it works',
+      title: 'Give the day a shape',
       items: [
-        {
-          title: 'Take the assessment',
-          body: 'Fifteen questions score you on boundaries, follow-through, focus, adaptability and calm under pressure.',
-        },
-        {
-          title: 'Get your daily plan',
-          body: 'Eight small tasks spread through the day, from a quiet start before your phone to closing the day on purpose.',
-        },
-        {
-          title: 'Check in, not out',
-          body: 'Tick tasks off, keep your streak and ask the Oracle, our AI guide, when a day goes sideways.',
-        },
+        { title: 'Look at your habits', body: 'Take the Moltmax quiz for a snapshot of your everyday routine.' },
+        { title: 'Pick one place to start', body: 'Open the checklist and choose a task that fits today.' },
+        { title: 'Log the day', body: 'Check off what you did. Come back tomorrow.' },
       ],
     },
     plans: {
-      title: 'Choose your plan',
-      intro: 'Every plan is free. Start with the one that sounds most like your week.',
+      title: 'Three readings to start with',
+      intro: 'Pick the one that fits your day.',
       items: [
         {
           name: 'The morning reset',
@@ -127,17 +80,6 @@ const page: BenefitPage = {
           body: 'Let one thing go, close the day and stop. It is done either way.',
           href: '/codex/scr-032',
         },
-      ],
-    },
-    compare: {
-      title: 'Moltology vs. another night of scrolling',
-      us: 'Moltology',
-      them: 'Scrolling',
-      rows: [
-        { label: 'Cost', us: 'Free', them: 'Free, plus your evening' },
-        { label: 'Time', us: 'A few minutes per task', them: 'Hours, somehow' },
-        { label: 'Side effects', us: 'A clearer head', them: 'Next-day fog' },
-        { label: 'You end up with', us: 'One thing done', them: 'A sore thumb' },
       ],
     },
   },

@@ -368,35 +368,6 @@
 
 /* Promise --------------------------------------------------------------- */
 
-[data-kit='seminar'] .sm-promise {
-  padding: 64px 0;
-  background: var(--sm-gold);
-}
-
-[data-kit='seminar'] .sm-promise-list {
-  margin-top: 28px;
-  display: grid;
-  gap: 12px 32px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-
-[data-kit='seminar'] .sm-promise-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 1.0625rem;
-  font-weight: 500;
-  line-height: 1.45;
-  color: var(--sm-ink);
-}
-
-[data-kit='seminar'] .sm-promise-list svg {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
 /* Chapters -------------------------------------------------------------- */
 
 [data-kit='seminar'] .sm-section {
@@ -475,52 +446,6 @@
 }
 
 /* Agenda ---------------------------------------------------------------- */
-
-[data-kit='seminar'] .sm-agenda-grid {
-  display: grid;
-  gap: 40px;
-  align-items: center;
-}
-
-[data-kit='seminar'] .sm-ticket {
-  position: relative;
-  padding: 12px 28px;
-  border-radius: 14px;
-  background: var(--sm-cream);
-  border: 2px solid var(--sm-ink);
-  box-shadow: 8px 8px 0 var(--sm-gold);
-}
-
-[data-kit='seminar'] .sm-ticket-row {
-  display: grid;
-  grid-template-columns: 110px minmax(0, 1fr);
-  gap: 16px;
-  padding: 14px 0;
-}
-
-[data-kit='seminar'] .sm-ticket-row + .sm-ticket-row {
-  border-top: 1px dashed var(--sm-ink);
-}
-
-[data-kit='seminar'] .sm-ticket-time {
-  font-family: var(--sm-display);
-  font-size: 0.875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--sm-label);
-}
-
-[data-kit='seminar'] .sm-ticket-title {
-  font-weight: 500;
-  color: var(--sm-ink);
-}
-
-@media (min-width: 900px) {
-  [data-kit='seminar'] .sm-agenda-grid {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 80px;
-  }
-}
 
 /* FAQ ------------------------------------------------------------------- */
 
@@ -750,22 +675,6 @@
   line-height: 1;
 }
 
-[data-kit='seminar'][data-variant='publisher'] .sm-promise {
-  background: var(--sm-forest);
-}
-
-[data-kit='seminar'][data-variant='publisher'] .sm-promise .sm-h2 {
-  color: var(--sm-ivory);
-}
-
-[data-kit='seminar'][data-variant='publisher'] .sm-promise-list li {
-  color: #e6efe9;
-}
-
-[data-kit='seminar'][data-variant='publisher'] .sm-promise-list svg {
-  color: var(--sm-foil);
-}
-
 [data-kit='seminar'][data-variant='publisher'] #chapters .sm-wrap-narrow {
   max-width: 1080px;
 }
@@ -814,36 +723,6 @@
 
 [data-kit='seminar'][data-variant='publisher'] .sm-source {
   color: var(--sm-terracotta);
-}
-
-@media (min-width: 900px) {
-  [data-kit='seminar'][data-variant='publisher'] .sm-agenda-grid {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  }
-
-  [data-kit='seminar'][data-variant='publisher'] .sm-ticket {
-    order: -1;
-  }
-}
-
-[data-kit='seminar'][data-variant='publisher'] .sm-ticket {
-  border-radius: 6px;
-  background: #ffffff;
-  border: 1px solid var(--sm-rule);
-  border-left: 6px solid var(--sm-forest);
-  box-shadow: 0 18px 38px -26px rgba(19, 42, 31, 0.35);
-}
-
-[data-kit='seminar'][data-variant='publisher'] .sm-ticket-row + .sm-ticket-row {
-  border-top: 1px solid var(--sm-rule);
-}
-
-[data-kit='seminar'][data-variant='publisher'] .sm-ticket-time {
-  color: var(--sm-terracotta);
-}
-
-[data-kit='seminar'][data-variant='publisher'] .sm-ticket-title {
-  color: var(--sm-forest-deep);
 }
 
 [data-kit='seminar'][data-variant='publisher'] .bf {
@@ -943,11 +822,6 @@
   background: var(--sm-gold);
   color: var(--sm-ink);
   box-shadow: 0 5px 0 #a35e06;
-}
-
-[data-kit='seminar'][data-variant='keynote-stage'] .sm-promise {
-  background: var(--sm-cream);
-  border-bottom: 1px solid var(--sm-line);
 }
 
 [data-kit='seminar'][data-variant='keynote-stage'] #chapters .sm-wrap-narrow {
@@ -1122,22 +996,6 @@
   }
 }
 
-[data-kit='seminar'][data-variant='cobalt-summit'] .sm-promise {
-  background: var(--sm-ink);
-}
-
-[data-kit='seminar'][data-variant='cobalt-summit'] .sm-promise .sm-h2 {
-  color: #ffffff;
-}
-
-[data-kit='seminar'][data-variant='cobalt-summit'] .sm-promise-list li {
-  color: #e4ebf9;
-}
-
-[data-kit='seminar'][data-variant='cobalt-summit'] .sm-promise-list svg {
-  color: #93c5fd;
-}
-
 [data-kit='seminar'][data-variant='cobalt-summit'] #chapters .sm-wrap-narrow {
   max-width: 1080px;
 }
@@ -1175,12 +1033,6 @@
 
 [data-kit='seminar'][data-variant='cobalt-summit'] .sm-source {
   color: var(--sm-navy);
-}
-
-[data-kit='seminar'][data-variant='cobalt-summit'] .sm-ticket {
-  background: #ffffff;
-  border: 1px solid var(--sm-line);
-  box-shadow: 8px 8px 0 var(--sm-navy);
 }
 
 [data-kit='seminar'][data-variant='cobalt-summit'] .bf-q {
@@ -1308,31 +1160,8 @@
   text-transform: none;
 }
 
-[data-kit='seminar'][data-variant='olive-monograph'] .sm-promise {
-  background: var(--sm-navy);
-}
-
-[data-kit='seminar'][data-variant='olive-monograph'] .sm-promise .sm-h2 {
-  color: #ffffff;
-}
-
-[data-kit='seminar'][data-variant='olive-monograph'] .sm-promise-list li {
-  color: #ebefe4;
-}
-
-[data-kit='seminar'][data-variant='olive-monograph'] .sm-promise-list svg {
-  color: #e0c888;
-}
-
 [data-kit='seminar'][data-variant='olive-monograph'] .sm-source {
   color: #e8cf8e;
-}
-
-[data-kit='seminar'][data-variant='olive-monograph'] .sm-ticket {
-  background: #ffffff;
-  border: 1px solid var(--sm-line);
-  box-shadow: none;
-  border-left: 6px solid var(--sm-navy);
 }
 
 [data-kit='seminar'][data-variant='olive-monograph'] .bf-q {
@@ -1415,11 +1244,6 @@
   text-transform: none;
 }
 
-[data-kit='seminar'][data-variant='midnight-folio'] .sm-promise {
-  background: var(--sm-cream);
-  border-bottom: 1px solid var(--sm-line);
-}
-
 [data-kit='seminar'][data-variant='midnight-folio'] #chapters .sm-wrap-narrow {
   max-width: 1080px;
 }
@@ -1443,12 +1267,6 @@
 
 [data-kit='seminar'][data-variant='midnight-folio'] .sm-toc-item .sm-body {
   margin-top: 8px;
-}
-
-[data-kit='seminar'][data-variant='midnight-folio'] .sm-ticket {
-  background: #ffffff;
-  border: 1px solid var(--sm-line);
-  box-shadow: 8px 8px 0 var(--sm-navy);
 }
 
 /* Variant: plum-journal (truth) ----------------------------------------- */
@@ -1587,41 +1405,12 @@
   }
 }
 
-[data-kit='seminar'][data-variant='plum-journal'] .sm-promise {
-  background: var(--sm-navy);
-}
-
-[data-kit='seminar'][data-variant='plum-journal'] .sm-promise .sm-h2 {
-  color: #ffffff;
-}
-
-[data-kit='seminar'][data-variant='plum-journal'] .sm-promise-list li {
-  color: #f4e8ef;
-}
-
-[data-kit='seminar'][data-variant='plum-journal'] .sm-promise-list svg {
-  color: #f4bfd9;
-}
-
 [data-kit='seminar'][data-variant='plum-journal'] .sm-passage {
   background: var(--sm-ink);
 }
 
 [data-kit='seminar'][data-variant='plum-journal'] .sm-source {
   color: #f6c4dd;
-}
-
-@media (min-width: 900px) {
-  [data-kit='seminar'][data-variant='plum-journal'] .sm-ticket {
-    order: -1;
-  }
-}
-
-[data-kit='seminar'][data-variant='plum-journal'] .sm-ticket {
-  background: #ffffff;
-  border: 1px solid var(--sm-line);
-  box-shadow: none;
-  border-left: 6px solid var(--sm-navy);
 }
 
 [data-kit='seminar'][data-variant='plum-journal'] .bf-q {

@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Internet culture starts with what you share. Bring your odd question, favorite reference, or desk disaster to General Discussion on Moltology.',
   keywords: 'internet culture, online forums, community etiquette, internet slang, shared jokes, General Discussion',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/culture/share.jpg?v=2',
     alt: 'A purple lobster and a crimson lobster sharing a tablet on a violet sofa in a colorful social app campaign photograph',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The General Discussion board',
+    label: 'General Discussion',
     href: '/forum/general-discussion',
-    text: 'Read a thread on General Discussion, then add a question or a reply of your own. Explain the reference if your post needs one, and give the next person something to answer.',
+    text: 'Post what caught your attention and tell people why.',
   },
   reveal: {
-    headline: 'Your next post belongs somewhere.',
-    body: 'Bring the question you keep typing into the wrong group chat.',
+    headline: 'Post the thing worth keeping.',
+    body: 'Give your next good find a thread of its own.',
     screenshot: 'forum',
   },
   related: ['community', 'social', 'gaming'],
@@ -63,10 +63,9 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      headline: 'Internet culture worth opening a tab for.',
-      sub: 'Bring the oddly specific question. Stay for the reply with three paragraphs about desk lamps. Moltology has a forum for talking, a daily practice to do, and a character you can put in a hat.',
-      cta: 'Join in for free',
-      chips: ['Open conversation', 'Room for odd questions', 'Pick your character', 'Join at no charge'],
+      headline: 'Internet culture worth a tab.',
+      sub: 'Bring the strange link, the good question, or the thing you made.',
+      cta: 'Join the forum free',
       image: {
         src: '/images/benefits/culture/hero.jpg?v=2',
         alt: 'An orchid-purple lobster showing a tablet to a crimson lobster on a lavender sofa, with glossy social app campaign lighting',
@@ -79,18 +78,9 @@ const page: BenefitPage = {
       { name: 'Vera Drift', handle: '@vera-drift', text: 'Then I withdraw my theory about the lamp having personal objections to my desk.', tag: 'Sample · Update', cast: 'lobster_vera_drift' },
       { name: 'Otto Basalt', handle: '@otto-basalt', text: 'Lamp on. Desk clear. Returning to the task I bought the lamp for.', tag: 'Sample · Back to it', cast: 'crab_otto_basalt' },
     ],
-    features: {
-      title: 'Bring your particular kind of interesting',
-      items: [
-        { title: 'Give it a thread', body: 'Write a title that names the subject. Put your question in the post, with enough context for someone who missed the original conversation.' },
-        { title: 'Wear the unusual hat', body: 'Your character appears beside your forum posts. Choose its look in the cosmetics shop, then let your reply do the talking.' },
-        { title: 'Get curious about the reading', body: 'The Codex is there to read and discuss. Bring a passage to the forum and say what you think it asks you to do.' },
-        { title: 'Explain the reference', body: 'A shared joke deserves a short explanation when someone asks. Add the context, credit the source, and let new people join in.' },
-      ],
-    },
     rooms: {
-      title: 'Every conversation needs a home',
-      intro: 'Use the board that fits your subject. Keep an introduction simple, give a technical question its details, and leave room for someone to disagree with you.',
+      title: 'Give the good stuff a thread',
+      intro: 'Pick a board where someone else can add to it.',
       items: [
         { name: 'General Discussion for the open thread', body: 'Introduce yourself, ask a casual question, or share the thought that needs more room than a caption.' },
         { name: 'Rules & Directives for the basics', body: 'Check announcements and community guidelines. Read these before deciding what belongs in a new post.' },

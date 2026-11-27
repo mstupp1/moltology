@@ -10,7 +10,7 @@ const page: BenefitPage = {
     'Gamify your life without another grind. Moltology gives you eight daily quests, XP, a weekly leaderboard and a character whose stats grow with you. Free.',
   keywords: 'gamify your life, gamification, life rpg, habit game, daily quests, xp for real life',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/gaming/share.jpg?v=2',
     alt: 'An armored orange lobster hero on a reef ledge under a neon night sky',
@@ -20,11 +20,11 @@ const page: BenefitPage = {
   hook: {
     label: 'Your character',
     href: '/character',
-    text: 'Every member has a 3D crab or lobster with five stats and gear from the shop. It sits on your profile and next to your forum posts.',
+    text: 'Build your look and see the five stats on your character sheet.',
   },
   reveal: {
     headline: 'Press start on day one.',
-    body: 'Quests reset every day and the board resets every Monday.',
+    body: 'Clear a quest and watch it count on your dashboard.',
     screenshot: 'dashboard',
   },
   related: ['strength', 'automation', 'community'],
@@ -58,13 +58,12 @@ const page: BenefitPage = {
       answer:
         'A way of treating real habits like a role-playing game: quests for daily actions, experience points for doing them and a character that reflects your progress. Moltology takes its quests from a daily practice.',
     },
-
   ],
   content: {
     hero: {
-      tag: 'Season 1 · Now live',
-      headline: 'Gamify your life. The quests are real.',
-      sub: 'Eight daily quests. XP that tracks what you actually did. A character that levels with you and a weekly board to climb. Free to play, no loot boxes.',
+      tag: 'Quest accepted',
+      headline: 'Gamify your life.',
+      sub: 'Eight daily quests, a weekly leaderboard, and a character that grows with your practice.',
       cta: 'Play free',
       image: {
         src: '/images/benefits/gaming/hero.jpg?v=2',
@@ -73,20 +72,9 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: {
-      title: 'Choose your build',
-      intro: 'Five stats, trained by real habits. Gear from the shop raises them on your character too.',
-      items: [
-        { code: 'SHL', label: 'Shell', body: 'Hold your boundaries and take a hit without cracking.', value: 72 },
-        { code: 'TRQ', label: 'Torque', body: 'Commit to one thing and grip it until it is done.', value: 64 },
-        { code: 'SYN', label: 'Synapse', body: 'How fast a signal turns into action.', value: 81 },
-        { code: 'ECD', label: 'Ecdysis', body: 'Shed an old habit cleanly and grow the next shell.', value: 55 },
-        { code: 'DEP', label: 'Depth', body: 'Stay steady under pressure, below the noise.', value: 68 },
-      ],
-    },
     quests: {
       title: 'Daily quests',
-      intro: 'They reset every day. Clear them all for a full board.',
+      intro: 'The board resets daily. Bring your own unfinished business.',
       items: [
         { title: 'Silent start', body: 'Sit in quiet before the first screen.', reward: '+XP' },
         { title: 'Pick your one thing', body: 'Name the main objective for today.', reward: '+XP' },
@@ -112,17 +100,6 @@ const page: BenefitPage = {
         width: 1280,
         height: 960,
       },
-    },
-    patch: {
-      title: 'Patch notes',
-      version: 'v1.0, launch',
-      items: [
-        'Added real life as a playable map',
-        'Doomscrolling now drains focus faster',
-        'Sleep restores more than expected',
-        'Helping other players grants XP',
-        'Removed microtransactions from progress',
-      ],
     },
   },
 }

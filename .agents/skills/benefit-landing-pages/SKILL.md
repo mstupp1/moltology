@@ -117,7 +117,7 @@ Design calls stay with Claude; filling pages inside a finished kit can go to Cod
   or financial claims. Nothing sexually explicit.
 - Imitate an industry, never one real brand: no look-alike logos, names or slogans.
 - Only real features: 8 daily tasks (titles in `src/lib/alignment-tasks.ts`), the 15-question Moltmax
-  quiz (`/moltmax`), the Oracle AI guide (free daily limit, optional Oracle MAX at `/max`), the
+  quiz (`/moltmax`), the Oracle AI guide (limited free chat, optional Oracle MAX at `/max`), the
   Codex, Academy, forum, the 3D character. Demo = `/dashboard` as a guest. Sign-up = the auth modal.
 - 5 to 8 FAQs written as real questions people search about this angle; they feed the FAQPage
   JSON-LD. **No cost, sign-up, demo or "can I try it" questions**: the reveal answers those once for
@@ -146,8 +146,8 @@ Design calls stay with Claude; filling pages inside a finished kit can go to Cod
 - US spelling (practice, favor, apologize).
 - Hook text states the passage's rule in its own words ("Torque belongs on your work, never on
   winning an argument"), never "This verse asks you to…".
-- In a batch, give every hero headline and CTA its own shape: "X. Start with Y." on three pages
-  reads as a template. Sample stats on sibling pages use different numbers.
+- Give each hero headline its own shape. Keep the supporting pitch to 25 words or fewer and use
+  plain, consistent CTA labels for the same destination.
 - Plan cards (platform kit) are short product nouns ("Higher Oracle limits", "Everything in Free"),
   never reassurances ("Continued access to…", "stays included").
 
@@ -158,7 +158,7 @@ Design calls stay with Claude; filling pages inside a finished kit can go to Cod
 | 8 daily tasks, fixed for everyone | `src/lib/alignment-tasks.ts`, `src/lib/alignment-actions.ts` |
 | 5 stats: Shell, Torque, Synapse, Ecdysis, Depth (SHL TRQ SYN ECD DEP) | `src/lib/vectors.ts` |
 | Weekly XP leaderboard, resets Monday 00:00 UTC, at `/forum/leaderboard` | `src/lib/leaderboard.ts` |
-| Oracle: free daily limit, guests 5 a day; MAX at `/max` = higher limits + stronger model | `ORACLE_GUEST_LIMITS`, `/max` |
+| Oracle: guests have a daily limit, members have rolling limits; MAX at `/max` = higher limits + stronger model | `ORACLE_GUEST_LIMITS`, `src/lib/ai/usage-limits.ts`, `/max` |
 | 12 Oracle skills: 4 free, the rest cost Gems | `content/oracle-skills/*.md` (`price`) |
 | Paid things: Oracle MAX, Molt Credits, the merch store. Never say "the only paid option" | `BRAND_BIBLE.md` economy |
 | Gear changes the character's look and stats, never XP, stage or rank | `src/lib/vectors.ts`, market |
@@ -199,7 +199,7 @@ image `src` (and in `benefitHeroSrc` for heroes) to get a fresh URL.
 
 - `npm run benefits:check`: slugs, title 60 max, description 110 to 160, the query in the title or
   headline and half its words in the H1, no cost/demo FAQs, no FAQ opening shared by 3+ pages, no
-  invented outcomes, unique hooks, no repeated reveal shape, 5 to 12 FAQs, 2+ related pages, 450+ words of copy, no sentence shared across pages,
+  invented outcomes, unique hooks, no repeated reveal shape, 5 to 12 FAQs, 2+ related pages, 250+ words of page copy with at most 25 words below the hero headline, no sentence shared across pages,
   disclaimers, banned phrases, and that every image exists in the bucket (`--no-images` offline).
   Its rules also run in `scripts/lib/benefit-pages-check.test.ts`.
 - `npm run benefits:shots -- --base http://localhost:5173 [--only slug,slug]` with the dev server

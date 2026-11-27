@@ -4,6 +4,8 @@
  * Scoped to [data-kit="retreat"]; colours and fonts here stay in this file.
  */
 
+@import '../../../../styles/editorial-fonts.css';
+
 [data-kit='retreat'] {
   --rt-linen: #f7f2ea;
   --rt-sand: #ece3d4;
@@ -189,20 +191,11 @@
   color: rgba(255, 250, 242, 0.88);
 }
 
-[data-kit='retreat'] .rt-kicker-dark {
-  color: var(--rt-sage);
-  margin-bottom: 14px;
-}
-
 [data-kit='retreat'] .rt-body {
   margin-top: 8px;
   font-size: 1rem;
   line-height: 1.7;
   text-wrap: pretty;
-}
-
-[data-kit='retreat'] .rt-center {
-  text-align: center;
 }
 
 /* Hero ------------------------------------------------------------------ */
@@ -375,11 +368,6 @@
   }
 }
 
-[data-kit='retreat'] .rt-sand {
-  background: var(--rt-sand);
-  border-top: 0;
-}
-
 [data-kit='retreat'] .rt-practice {
   display: grid;
   gap: 40px;
@@ -424,44 +412,6 @@
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--rt-sage);
-}
-
-[data-kit='retreat'] .rt-days {
-  margin-top: 48px;
-  display: grid;
-  gap: 14px;
-}
-
-@media (min-width: 720px) {
-  [data-kit='retreat'] .rt-days {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1080px) {
-  [data-kit='retreat'] .rt-days {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-[data-kit='retreat'] .rt-day {
-  padding: 28px 22px;
-  border-radius: 200px 200px 6px 6px;
-  background: var(--rt-linen);
-  text-align: center;
-}
-
-[data-kit='retreat'] .rt-day-n {
-  display: block;
-  margin: 12px 0 14px;
-  font-family: var(--rt-script);
-  font-size: 1.9rem;
-  line-height: 1;
-  color: var(--rt-clay);
-}
-
-[data-kit='retreat'] .rt-day .rt-body {
-  font-size: 0.9375rem;
 }
 
 [data-kit='retreat'] .rt-carry {
@@ -782,18 +732,6 @@
   color: var(--rt-brass);
 }
 
-[data-kit='retreat'][data-variant='moss-monastery'] .rt-day {
-  border-radius: 6px;
-  border-top: 3px solid var(--rt-sage);
-  text-align: left;
-}
-
-[data-kit='retreat'][data-variant='moss-monastery'] .rt-day-n {
-  font-family: var(--rt-serif);
-  font-style: italic;
-  font-size: 1.45rem;
-}
-
 [data-kit='retreat'][data-variant='moss-monastery'] .rt-btn-dark {
   background: var(--rt-moss);
   color: #f2f1eb;
@@ -916,20 +854,6 @@
   height: 2px;
 }
 
-[data-kit='retreat'][data-variant='coastal-air'] .rt-day {
-  border-radius: 0;
-  border: 0;
-  border-top: 2px solid var(--rt-sage);
-  background: transparent;
-  padding: 20px 8px 16px;
-  text-align: left;
-}
-
-[data-kit='retreat'][data-variant='coastal-air'] .rt-day-n {
-  font-family: var(--rt-serif);
-  font-size: 1.55rem;
-}
-
 [data-kit='retreat'][data-variant='coastal-air'] .bf-item {
   border-bottom-color: var(--rt-line);
 }
@@ -997,12 +921,6 @@
 
 [data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-rhythm li:first-child {
   border-top: 2px solid var(--rt-clay);
-}
-
-[data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-day {
-  border-radius: 0;
-  border-top: 4px solid var(--rt-clay);
-  background: #ffffff;
 }
 
 [data-kit='retreat'][data-variant='terracotta-courtyard'] .rt-carry-img {
@@ -1112,21 +1030,6 @@
 
 [data-kit='retreat'][data-variant='amber-hearth'] .rt-intention {
   background: var(--rt-sand);
-}
-
-[data-kit='retreat'][data-variant='amber-hearth'] .rt-day {
-  border-radius: 0;
-  border: 0;
-  border-top: 2px solid var(--rt-clay);
-  background: transparent;
-  padding: 20px 8px 16px;
-  text-align: left;
-}
-
-[data-kit='retreat'][data-variant='amber-hearth'] .rt-day-n {
-  font-family: var(--rt-serif);
-  font-style: italic;
-  font-size: 1.45rem;
 }
 
 [data-kit='retreat'][data-variant='amber-hearth'] .rt-carry-list li {

@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Make room for inner beauty in your daily routine. Meet your Moltology character, then practice listening, keeping promises and helping someone.',
   keywords: 'inner beauty, everyday kindness, listening habits, personal character, beauty routine',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/beauty/share.jpg?v=2',
     alt: 'A glossy crab beside an ivory pedestal in a softly lit luxury beauty photograph',
@@ -21,11 +21,11 @@ const page: BenefitPage = {
   hook: {
     label: 'Your character in 3D',
     href: '/character/3d',
-    text: 'Meet your character in the 3D view. Take a look at the details, then put the same care into a small act off screen. Read the message from your friend all the way through before you reply.',
+    text: 'Give your character a look that feels like yours.',
   },
   reveal: {
-    headline: 'Leave a little care in the details.',
-    body: 'Start with Help a member, the task that faces outward.',
+    headline: 'Start with the everyday pieces.',
+    body: 'Choose one small act of care and put it on today’s list.',
     screenshot: 'dashboard',
   },
   related: ['fashion', 'empathy', 'charisma'],
@@ -64,9 +64,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       season: 'The beauty issue · Daily care',
-      headline: 'Make inner beauty part of the routine.',
-      sub: 'Keep the serum. Add a little care for the person on the other side of your phone. The routine: sit quietly, keep a commitment, help someone. Your character takes the model booking. You take the daily practice.',
-      cta: 'Begin your routine, free',
+      headline: 'Inner beauty, in daily wear.',
+      sub: 'A quiet start, a promise kept, a little care for the person across from you.',
+      cta: 'Join free',
       image: {
         src: '/images/benefits/beauty/hero.jpg?v=2',
         alt: 'A pearl-colored crab against cream studio paper, photographed with soft beauty-editorial lighting',
@@ -74,22 +74,13 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    manifesto: [
-      'Remember the thing they told you on Tuesday.',
-      'Ask about it when you next speak, and put the phone down for the answer.',
-      'Give that detail a place in your daily care.',
-    ],
     lookbook: {
-      title: 'The everyday essentials',
-      intro: 'The eight daily tasks cover the day from a quiet morning to an evening check-in. Read each instruction, do the task and tick it off. Here is the collection, with a little extra attention to how you treat people.',
+      title: 'The everyday collection',
+      intro: 'Four small acts of care from the daily checklist.',
       items: [
         { name: 'Sit in silence', note: 'Before the inbox, sit quietly and look back at yesterday. Recall the conversation you rushed through. Leave the next message unopened for now.' },
         { name: 'Pick your one thing', note: 'Write down what matters today and begin. Include the promise you keep moving to another list if that is the thing that needs doing.' },
-        { name: 'Learn something hard', note: 'Read past the easy explanation. Take a difficult question seriously, including one from someone whose experience differs from yours.' },
-        { name: 'Reset your focus', note: 'Clear a distraction at noon. Put away the shopping tab and choose the next useful action on the desk in front of you.' },
-        { name: 'Do deep work', note: 'Give a piece of work your full attention. Finish reading the brief before asking the sender to explain it again.' },
         { name: 'Help a member', note: 'Answer a forum question or welcome someone new. Use their name if they have shared it, and reply to what they actually asked.' },
-        { name: 'Let one thing go', note: 'Name something from today you are ready to drop. The replay of a slightly awkward goodbye is allowed on that list.' },
         { name: 'Close the day', note: 'Check your tasks, put the unfinished work down and stop. Leave the evening some room beyond the checklist.' },
       ],
     },
@@ -102,18 +93,6 @@ const page: BenefitPage = {
         width: 1024,
         height: 1280,
       },
-    },
-    care: {
-      title: 'For everyday care',
-      rows: [
-        { label: 'Essential', value: 'Listen to the whole story' },
-        { label: 'Application', value: 'In the next conversation' },
-        { label: 'Detail', value: 'Remember their question' },
-        { label: 'Model', value: 'Your character, in 3D' },
-        { label: 'Routine', value: 'Eight daily tasks' },
-        { label: 'Membership', value: 'Free to join' },
-      ],
-      footnote: 'Keep the routine close to real life. Read the note on the fridge. Return the call you said you would make. A thoughtful act can be small enough to do between putting the kettle on and making the tea.',
     },
   },
 }

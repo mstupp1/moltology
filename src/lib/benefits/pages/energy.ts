@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Looking up how to have more energy? Put the midnight inbox down. Close the day, shut the laptop and leave room for sleep.',
   keywords: 'how to have more energy, evening routine, bedtime habits, work shutdown, sleep routine',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/energy/share.jpg?v=2',
     alt: 'A glossy lobster beside a bedside light on a bold blue energy drink campaign set',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Carapace Close in the Codex',
+    label: 'Carapace Close',
     href: '/codex/scr-030#verse-9',
-    text: 'Carapace Close is the passage behind Close the day. Its instruction is short: log the day, then stop, whether or not it went well. Read it before you open that work document again.',
+    text: 'Close your work on purpose and leave tomorrow’s first move written down.',
   },
   reveal: {
-    headline: 'Bedtime has right of way.',
-    body: 'Check off Close the day, then leave the laptop shut.',
+    headline: 'Call it a day.',
+    body: 'Put an end to the workday, even if the draft stays open.',
     screenshot: 'dashboard',
   },
   related: ['energy-drinks', 'focus', 'freedom'],
@@ -65,9 +65,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       sticker: 'Midnight is off the clock',
-      headline: 'More energy starts with a closing time.',
-      sub: 'The inbox has no bedtime. You do. Tick off what you did, close the day and stop. The unfinished draft keeps until morning, and sleep gets its slot back.',
-      cta: 'Start my routine free',
+      headline: 'More energy. Earlier closing time.',
+      sub: 'Give the last email a curfew. Moltology puts a closing task on your daily list.',
+      cta: 'Get started free',
       image: {
         src: '/images/benefits/energy/hero.jpg?v=2',
         alt: 'A shiny lobster switching off a desk lamp against cobalt blue in punchy beverage advertising light',
@@ -77,7 +77,7 @@ const page: BenefitPage = {
     },
     marquee: ['Zero caffeine added', 'Evenings included', 'Leave the inbox closed', 'Join for free', 'Laptop lid down'],
     flavors: {
-      title: 'Meet the late shift lineup',
+      title: 'The after-hours range',
       items: [
         { name: 'Sign-off Lime', note: 'Write the next step for your unfinished job, then save and close it.', tone: 'lime' },
         { name: 'After Hours Berry', note: 'Tell the group chat you are heading off. Put the phone out of reach.', tone: 'berry' },
@@ -87,29 +87,16 @@ const page: BenefitPage = {
     },
     label: {
       title: 'Evening facts',
-      serving: 'Suggested use: when work is done',
+      serving: 'Best served after work',
       rows: [
-        { label: 'Caffeine supplied', value: '0 mg' },
-        { label: 'Sugar supplied', value: '0 g' },
         { label: 'Final task', value: 'Close the day' },
         { label: 'Saved draft', value: 'Keep for work hours' },
         { label: 'Phone', value: 'Set aside' },
-        { label: 'Perfect day required', value: 'Never' },
       ],
-      footnote: 'Check the day once. The checklist can stay closed while you read a book, wash up or get ready for bed.',
-    },
-    crash: {
-      title: 'Give the last email a curfew',
-      without: ['One more inbox refresh', 'A laptop on the pillow', 'An unfinished task on repeat', 'Work squeezed in before sleep'],
-      with: ['Close the mail window', 'Leave the laptop at the desk', 'Write down the next step', 'Stop at your chosen time'],
+      footnote: 'Review the day once. Leave the checklist closed.',
     },
     story: {
-      title: 'The inbox can sleep outside',
-      body: [
-        'That email marked unread can stay marked unread. Unless you are on call, choose when work ends and keep the laptop out of bed. There is always another message. It does not need a place beside your pillow.',
-        'Close the day comes at the end of the daily routine. Review what you did, tick those actions and stop checking. A rough afternoon still gets a closing time. Put the unfinished proposal in its folder, with a note about where to pick it up.',
-        'Keep the rest simple. Wash the mug, put the phone down, read a few pages. Skip the elaborate evening system with its own spreadsheet. The last task asks you to finish the day, including the part where you keep planning it.',
-      ],
+      caption: 'The inbox can sleep outside.',
       image: {
         src: '/images/benefits/energy/story.jpg?v=2',
         alt: 'A crab placing a closed laptop on a shelf under sharp blue and orange snack campaign lighting',

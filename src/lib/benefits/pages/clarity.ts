@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'On brain fog days, start with less to open. Moltology offers a quiet morning practice: sit before your inbox, look back at yesterday and write one next step.',
   keywords: 'brain fog, quiet morning, mental clarity, morning routine, sit in silence',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer:
     'Brain fog can have medical causes; see a doctor about persistent or worrying symptoms, and seek urgent help for sudden confusion.',
   shareImage: {
@@ -21,13 +21,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Sit in silence: the morning Codex reading',
+    label: 'Sit in silence',
     href: '/codex/scr-030#verse-2',
-    text: 'Sit in silence comes from a Codex verse that starts the day before any feed, inbox or message: cold water, still air and one honest look at yesterday. Keep the phone face down and go back over the day you had, including the part that did not go to plan.',
+    text: 'Take ten quiet minutes before the first message of the day.',
   },
   reveal: {
-    headline: 'Start the day before opening it.',
-    body: 'Make Sit in silence your first check-in with the daily practice.',
+    headline: 'Leave the inbox unopened.',
+    body: 'Try the morning’s quiet first task.',
     screenshot: 'dashboard',
   },
   related: ['focus', 'spirituality', 'emotional'],
@@ -65,11 +65,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      eyebrow: 'Morning routine · no equipment',
-      headline: 'A quiet start on brain fog days.',
-      sub: 'The kettle is on. Your inbox can wait. Moltology starts the morning with a simple request: sit quietly, look back at yesterday and leave the feeds unopened for now.',
-      checks: ['Begin at home', 'A short reading to follow', 'Keep your own notes'],
-      cta: 'Begin your morning practice',
+      eyebrow: 'Morning check-in',
+      headline: 'Brain fog? Keep the morning simple.',
+      sub: 'Give the first few minutes to quiet. Leave the inbox until afterward.',
+      cta: 'Start free',
       image: {
         src: '/images/benefits/clarity/hero.jpg?v=2',
         alt: 'A crab seated by a frosted window with a notebook nearby, photographed in muted clinic campaign light',
@@ -77,20 +76,8 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    trust: ['Instructions included', 'No special technique', 'Fits your waking day', 'No appointment to book'],
-    signs: {
-      title: 'Before the morning gets busy',
-      intro: 'There is plenty waiting for your attention. Choose where to put the phone while you take a quiet pause.',
-      items: [
-        'The group chat has been awake longer than you have',
-        'Yesterday’s unfinished list is beside the kettle',
-        'A headline takes you into the feed before breakfast',
-        'You check the calendar while brushing your teeth',
-        'A small promise from yesterday still needs a note',
-      ],
-    },
     steps: {
-      title: 'The morning check-in',
+      title: 'A simple morning check-in',
       items: [
         { title: 'Leave messages for later', body: 'Put the phone somewhere you do not have to keep deciding about it. Sit comfortably before opening the first feed or email.' },
         { title: 'Look back at yesterday', body: 'Read your notes if you have them. Recall what you did, what you left unfinished and anything you want to handle differently.' },
@@ -98,23 +85,12 @@ const page: BenefitPage = {
       ],
     },
     plans: {
-      title: 'A place to pause in your day',
-      intro: 'The morning reading is one part of a daily routine. There are also instructions for a midday reset and an evening finish.',
+      title: 'Readings for a quieter day',
+      intro: 'A short reading for morning, midday, or evening.',
       items: [
         { name: 'Before the first scroll', tag: 'Morning', body: 'Follow Sit in silence before the messages begin. Look at yesterday’s notes instead of starting with whatever arrived overnight.', href: '/codex/scr-030#verse-2' },
         { name: 'When the tabs pile up', tag: 'Midday', body: 'Use Reset your focus to clear one thing pulling at you. Close the spare tab or handle the small request you keep reopening.', href: '/codex/scr-030#verse-5' },
         { name: 'When the day is done', tag: 'Evening', body: 'Close the day: tick off what you did and stop. The unfinished list keeps until the next time you sit down.', href: '/codex/scr-030#verse-9' },
-      ],
-    },
-    compare: {
-      title: 'What comes before your inbox?',
-      us: 'A quiet check-in',
-      them: 'The morning scroll',
-      rows: [
-        { label: 'First thing opened', us: 'Yesterday’s notes', them: 'Overnight notifications' },
-        { label: 'What to read', us: 'One morning instruction', them: 'Whatever the feed serves' },
-        { label: 'What to write', us: 'A loose end to handle', them: 'A reply to the latest post' },
-        { label: 'Where to stop', us: 'Finish the pause', them: 'Keep refreshing' },
       ],
     },
   },

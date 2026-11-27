@@ -7,10 +7,10 @@ const page: BenefitPage = {
   query: 'investing in yourself',
   title: 'Investing in yourself, one small deposit a day | Moltology',
   description:
-    'Small daily habits compound like regular deposits. Moltology is a free daily practice: eight small deposits of focus, learning and rest that add up over months.',
+    'Investing in yourself can begin with a block of focus or one hard lesson. Use Moltology’s free daily practice to keep a record of the work.',
   keywords: 'investing in yourself, self investment, compound habits, personal growth, daily routine, self improvement',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer: 'Moltology is not financial advice and does not hold, manage or invest money.',
   shareImage: {
     src: '/images/benefits/investing/share.jpg?v=2',
@@ -21,11 +21,11 @@ const page: BenefitPage = {
   hook: {
     label: 'The weekly XP leaderboard',
     href: '/forum/leaderboard',
-    text: 'Every task you finish adds XP to your week, and the leaderboard shows who has been showing up this week. It is the closest thing Moltology has to a portfolio.',
+    text: 'Completed tasks add XP to your weekly total.',
   },
   reveal: {
-    headline: 'Your first deposit takes five minutes.',
-    body: 'Start with a silent start tomorrow and watch the activity log fill.',
+    headline: 'Make a deposit of attention.',
+    body: 'Start with a block of work or one hard lesson.',
     screenshot: 'dashboard',
   },
   related: ['automation', 'strength', 'energy-drinks'],
@@ -47,7 +47,7 @@ const page: BenefitPage = {
     },
     {
       question: 'What happens if I miss a day?',
-      answer: 'Your streak resets, nothing else. Pick it back up the next morning. One missed day costs far less than quitting.',
+      answer: 'Pick up with one manageable task on your next practice day. The activity log keeps a record of work you’ve already done.',
     },
     {
       question: 'What are good ways to invest in yourself?',
@@ -59,57 +59,36 @@ const page: BenefitPage = {
       answer:
         'Small, regular inputs build on the ones before them. Fifteen minutes of reading a day comes to about ninety hours a year, and each hour makes the next one easier to use.',
     },
-
   ],
   content: {
     hero: {
       eyebrow: 'Self investment, made simple',
-      headline: 'Investing in yourself, with daily deposits.',
-      sub: 'No minimums, no fees, no market hours. Moltology turns eight small actions a day into a habit that compounds quietly for years.',
-      cta: 'Open a free account',
+      headline: 'Investing in yourself, one hour at a time.',
+      sub: 'Put a little attention into something that matters. Log the work you actually did.',
+      cta: 'Start a free account',
       image: {
         src: '/images/benefits/investing/hero.jpg?v=2',
         alt: 'A purple lobster patiently watering a small potted tree whose leaves are tiny coins',
         width: 1280,
         height: 960,
       },
-      card: {
-        label: 'Your practice',
-        value: 'Day 42',
-        change: '+8 tasks today',
-        points: [12, 14, 13, 17, 16, 20, 22, 21, 25, 28, 27, 31, 34, 33, 38, 41],
-      },
-    },
-    compound: {
-      title: 'Small deposits, real compounding',
-      intro: 'A habit works like interest. Each day adds a little, and the gains build on the gains before them.',
-      rows: [
-        { label: 'One quiet morning', value: '5 min', note: 'Starts the day before your feed does.' },
-        { label: 'One focused block', value: '25 to 90 min', note: 'The work that actually moves things.' },
-        { label: 'One hard lesson', value: '15 min', note: 'Learning that stacks into a skill.' },
-        { label: 'One closed day', value: '5 min', note: 'Review, tidy and sleep on time.' },
-      ],
     },
     features: {
-      title: 'Built like a good account',
+      title: 'Your attention account',
       items: [
-        { title: 'Automatic deposits', body: 'The same eight tasks every day, so you never have to decide what self-improvement means this morning.' },
-        { title: 'A clear statement', body: 'A streak, weekly XP and an activity log show exactly what you put in and when.' },
-        { title: 'An advisor on call', body: 'The Oracle, our AI guide, helps you plan a day, untangle a problem or restart after a bad week.' },
-        { title: 'No lock-in', body: 'Free to join and free to leave. Your account keeps your history if you come back.' },
+        { title: 'Scheduled deposits', body: 'The daily checklist gives focused work and learning a place.' },
+        { title: 'Activity statement', body: 'See the tasks and XP you’ve logged.' },
+        { title: 'A guide on call', body: 'Bring the Oracle a hard chapter or a draft you keep reopening.' },
+        { title: 'Weekly standings', body: 'See how your practice adds up on the XP leaderboard.' },
       ],
     },
     statement: {
-      title: 'A sample day on your statement',
-      intro: 'What a normal Tuesday looks like in the activity log.',
+      title: 'Your attention statement',
+      intro: 'A few sample entries from an ordinary Tuesday.',
       rows: [
-        { when: '7:02', label: 'Silent start', amount: '+1 task' },
         { when: '7:10', label: 'Picked one thing: finish the proposal', amount: '+1 task' },
         { when: '8:30', label: 'Learned something hard: one Academy lesson', amount: '+1 task' },
         { when: '9:00', label: 'Deep work, 75 minutes', amount: '+1 task' },
-        { when: '12:30', label: 'Reset your focus', amount: '+1 task' },
-        { when: '18:15', label: 'Answered a question on the forum', amount: '+1 task' },
-        { when: '21:40', label: 'Let one thing go', amount: '+1 task' },
         { when: '22:00', label: 'Closed the day', amount: '+1 task' },
       ],
     },

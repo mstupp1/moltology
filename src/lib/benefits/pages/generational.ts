@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Start breaking generational curses with the everyday habits you learned. Pick what to keep, question an old pattern and practice a different response.',
   keywords: 'breaking generational curses, inherited habits, family patterns, daily choices, personal boundaries',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer: 'Moltology offers daily practice, not therapy or financial advice.',
   shareImage: {
     src: '/images/benefits/generational/share.jpg?v=2',
@@ -20,13 +20,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'What the Ledger Records, from the Codex',
+    label: 'What the Ledger Records',
     href: '/codex/scr-041#verse-6',
-    text: 'What the Ledger Records names what you let go, the rhythm of your practice and the help you offer. Read it, then put an ordinary action on the record: the request you answered honestly or the distraction you closed. Write about your part in the day.',
+    text: 'Write down the thing you set aside, the work you did, or the help you offered.',
   },
   reveal: {
-    headline: 'Keep the Sunday recipe. Change the automatic yes.',
-    body: 'Choose one familiar response to practice differently today.',
+    headline: 'Make an entry of your own.',
+    body: 'Try a different answer to one familiar request.',
     screenshot: 'dashboard',
   },
   related: ['emotional', 'commitment', 'financial'],
@@ -65,34 +65,18 @@ const page: BenefitPage = {
   content: {
     hero: {
       eyebrow: 'Your legacy · Your daily choices',
-      headline: 'Breaking generational curses? Start with the habits you learned.',
-      sub: 'The instant yes. The laptop at dinner. The feeling that a break needs an explanation. Pick one familiar habit and choose how to answer it today. Bring the parts of your upbringing you love along with you.',
-      cta: 'Begin your free practice',
+      headline: 'Breaking generational curses starts with the defaults.',
+      sub: 'Keep the Sunday recipe. Rethink the automatic yes.',
+      cta: 'Start a free account',
       image: {
         src: '/images/benefits/generational/hero.jpg?v=2',
         alt: 'A blue crab at a green writing desk with stacked notebooks in a softly lit private banking editorial portrait',
         width: 1280,
         height: 960,
       },
-      card: {
-        label: 'Example daily entries',
-        value: '8 actions logged',
-        change: 'Sample only · Full list below',
-        points: [0, 0, 1, 1, 2, 2, 3, 4, 4, 4, 5, 5, 6, 6, 7, 8],
-      },
-    },
-    compound: {
-      title: 'Choose what you carry forward',
-      intro: 'Start with the things that happen on an ordinary day. An old habit needs a name before you can choose what to do with it.',
-      rows: [
-        { label: 'Keep a good tradition', value: 'Keep', note: 'Name the meal, call or act of care you want to continue.' },
-        { label: 'Spot an automatic answer', value: 'Notice', note: 'Catch the yes that arrives before you have read the request.' },
-        { label: 'Say what you can do', value: 'Speak', note: 'Offer a clear answer, including the time you actually have.' },
-        { label: 'Write down your part', value: 'Review', note: 'Record your own choice, with other people’s private details left out.' },
-      ],
     },
     features: {
-      title: 'Make room for a different response',
+      title: 'Change one entry',
       items: [
         { title: 'A quiet opening', body: 'Sit in silence before the messages arrive. Look back at yesterday and name the moment you want to handle differently when it comes up again.' },
         { title: 'A priority of your own', body: 'Pick your one thing before filling every gap with someone else’s requests. Check your responsibilities, then name the work you intend to start.' },
@@ -101,17 +85,13 @@ const page: BenefitPage = {
       ],
     },
     statement: {
-      title: 'An ordinary day, entered in full',
-      intro: 'The eight daily tasks ask for small actions across your day. This sample statement includes the whole checklist, from sitting quietly to stopping for the evening. Use your own circumstances for each entry.',
+      title: 'A day of your own',
+      intro: 'A few lines to record choices you made for yourself.',
       rows: [
         { when: 'Before the group chat', label: 'Sit in silence', amount: '+1 entry' },
         { when: 'Check your calendar', label: 'Pick your one thing', amount: '+1 entry' },
-        { when: 'Ask a new question', label: 'Learn something hard', amount: '+1 entry' },
-        { when: 'Put the phone down', label: 'Reset your focus', amount: '+1 entry' },
-        { when: 'Give the work time', label: 'Do deep work', amount: '+1 entry' },
         { when: 'Offer a welcome', label: 'Help a member', amount: '+1 entry' },
         { when: 'Name today’s habit', label: 'Let one thing go', amount: '+1 entry' },
-        { when: 'Put the notebook away', label: 'Close the day', amount: '+1 entry' },
       ],
     },
   },

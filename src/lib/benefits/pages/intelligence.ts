@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Asking how to get smarter? Choose something you cannot explain yet. Moltology gives you a daily task for it: learn one hard thing, then check your answer.',
   keywords: 'how to get smarter, learning habits, active recall, study routine, learn something hard',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/intelligence/share.jpg?v=2',
     alt: 'A lobster leaning over a diagram at a cream desk, photographed as a clean learning clinic campaign',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Learn something hard, from the daily Codex routine',
+    label: 'Learn something hard',
     href: '/codex/scr-030#verse-4',
-    text: 'Learn something hard comes from a Codex verse asking you to study a difficult thing on purpose instead of skimming a feed. Bring a question you cannot answer yet. Open the source, work through the confusing part and check your own explanation against it.',
+    text: 'Choose something difficult enough to make you reach for a pencil.',
   },
   reveal: {
-    headline: 'The difficult chapter has a place here.',
-    body: 'Use Learn something hard for the question you keep skipping.',
+    headline: 'Put a question in the margin.',
+    body: 'Give one hard lesson a slot on today’s task list.',
     screenshot: 'dashboard',
   },
   related: ['focus', 'technique', 'self-help-books'],
@@ -63,11 +63,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      eyebrow: 'Learning plan · no entry requirements',
-      headline: 'How to get smarter: open the hard chapter.',
-      sub: 'Your bookmarks have had enough time to prepare. Pick something you want to understand and do the difficult part. Moltology puts one hard lesson in your day, every day.',
-      checks: ['Bring your own subject', 'Start at your level', 'Check off the work'],
-      cta: 'Start your learning routine',
+      eyebrow: 'Daily study',
+      headline: 'Get smarter. Open the hard chapter.',
+      sub: 'Pick a question you can’t answer yet. Stay with the page until you can explain it.',
+      cta: 'Start free',
       image: {
         src: '/images/benefits/intelligence/hero-alt.jpg',
         alt: 'Maris Slate, a cobalt-blue crab with tide markings, leaning over an open notebook at a warm timber desk beside a sunlit window and library shelves',
@@ -75,20 +74,8 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    trust: ['No course prerequisite', 'Daily learning task', 'Choose what to study', 'Ask in the forum'],
-    signs: {
-      title: 'You know where you stopped reading',
-      intro: 'Start with the bit you skipped. The next lesson can be a paragraph, a diagram or a problem that needs another attempt.',
-      items: [
-        'The article is saved, but the question is still unanswered',
-        'You recognize the term until someone asks you to explain it',
-        'The worked example looks easy with the answer beside it',
-        'You skip the diagram and hope the next page explains it',
-        'A new reading list takes the place of opening the old one',
-      ],
-    },
     steps: {
-      title: 'From saved link to study session',
+      title: 'A short study protocol',
       items: [
         { title: 'Find the hard part', body: 'Choose the term, step or example you cannot explain. Write it as a question before searching for another lesson.' },
         { title: 'Try an answer', body: 'Read carefully, then close the source. Solve the problem or explain the idea on paper, including the parts you are unsure about.' },
@@ -96,23 +83,12 @@ const page: BenefitPage = {
       ],
     },
     plans: {
-      title: 'Make room for the hard lesson',
-      intro: 'Choose a reading for the part of studying you keep putting off. Bring your own book, course or practice problem.',
+      title: 'The study shelf',
+      intro: 'Bring your own book, course, or problem.',
       items: [
         { name: 'Open the difficult bit', tag: 'For familiar feeds', body: 'The verse behind Learn something hard is blunt: learn one difficult thing on purpose. Pick the explanation you keep scrolling past and follow it with a pencil.', href: '/codex/scr-030#verse-4' },
         { name: 'Choose one question', tag: 'For long reading lists', body: 'Read the instruction behind Pick your one thing. Choose which question matters today before browsing another shelf of possible subjects.', href: '/codex/scr-030#verse-3' },
         { name: 'Stay with the problem', tag: 'For busy desks', body: 'Use the work protocol to arrange an uninterrupted session. Keep your reference material close and unrelated messages for afterward.', href: '/codex/scr-031' },
-      ],
-    },
-    compare: {
-      title: 'More than a full bookmarks folder',
-      us: 'Working through it',
-      them: 'Saving it for later',
-      rows: [
-        { label: 'The question', us: 'Write what you do not understand', them: 'Collect interesting titles' },
-        { label: 'The example', us: 'Try it with the answer covered', them: 'Nod along to the solution' },
-        { label: 'The explanation', us: 'Put it in your own words', them: 'Copy the highlighted paragraph' },
-        { label: 'The follow-up', us: 'Check the step you missed', them: 'Find another reading list' },
       ],
     },
   },

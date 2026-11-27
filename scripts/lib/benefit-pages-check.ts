@@ -74,8 +74,10 @@ export const LIMITS = {
   faqMin: 5,
   faqMax: 12,
   relatedMin: 2,
+  /** One short pitch under the headline. */
+  heroSubMax: 25,
   /** Words of copy unique to the page (content, FAQ, hook, reveal). */
-  wordsMin: 450,
+  wordsMin: 250,
   /** A sentence this long that appears on two pages is duplicate copy. */
   sharedSentenceWords: 7,
 }
@@ -141,7 +143,6 @@ export function checkBenefitPages(
 
   const sentenceOwners = new Map<string, string>()
   const hookOwners = new Map<string, string>()
-  const ctaOwners = new Map<string, string>()
   const faqShapes = new Map<string, Set<string>>()
   const revealShapes = new Map<number, string[]>()
 
@@ -156,7 +157,11 @@ export function checkBenefitPages(
     }
 
     const queryWords = words(page.query).filter((word) => word.length > 3)
-    const headline = 'hero' in page.content ? page.content.hero.headline : ''
+    const { headline, sub } = page.content.hero
+    const subWordCount = words(sub).length
+    if (subWordCount > LIMITS.heroSubMax) {
+      add(slug, 'hero-length', `Hero copy is ${subWordCount} words (max ${LIMITS.heroSubMax})`)
+    }
     const findable = `${page.title} ${page.description} ${headline}`.toLowerCase()
     const missing = queryWords.filter((word) => !findable.includes(word))
     if (queryWords.length && missing.length === queryWords.length) {
@@ -206,12 +211,6 @@ export function checkBenefitPages(
 
     if (/^(this|the)\s+(codex\s+)?(verse|passage|scripture|reading)\b[^.]*\basks\b/i.test(page.hook.text)) {
       add(slug, 'hook-voice', 'Hook text opens with "This verse asks you to…"; state the passage\'s rule in its own words')
-    }
-    const cta = 'hero' in page.content && 'cta' in page.content.hero ? String(page.content.hero.cta) : ''
-    if (cta) {
-      const ctaOwner = ctaOwners.get(cta)
-      if (ctaOwner) add(slug, 'cta-repeat', `Hero CTA "${cta}" is already used by ${ctaOwner}`, 'warning')
-      else ctaOwners.set(cta, slug)
     }
     if (!page.hook.href.startsWith('/')) add(slug, 'hook', 'The Moltology hook must link to a page on the site')
     if (SENSITIVE_TOPICS.has(slug) && !page.disclaimer) add(slug, 'disclaimer', 'Health and money topics need a disclaimer line')

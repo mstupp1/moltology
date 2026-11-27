@@ -1,12 +1,11 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
-import { CheckCircle2, Ticket } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
-import './seminar.css'
 
 const SEMINAR_LABELS: Record<string, string> = {
   publisher: 'Press',
@@ -46,10 +45,10 @@ function SeminarLockup({ variant }: { variant?: string }) {
   )
 }
 
-/** Seminar: self-help books and live events. Navy and gold, tall capitals, a book cover, an agenda. */
+/** Seminar: self-help books and live events, with a cover and a short table of contents. */
 export default function SeminarKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'seminar') return null
-  const { hero, promise, chapters, passage, agenda } = page.content
+  const { hero, chapters, passage } = page.content
   const isVariant = Boolean(page.variant)
 
   return (
@@ -57,11 +56,10 @@ export default function SeminarKit({ page, onJoin, children }: BenefitKitProps) 
       <BenefitHeader
         lockup={<SeminarLockup variant={page.variant} />}
         links={[
-          { label: 'The book', href: '#chapters' },
-          { label: 'Agenda', href: '#agenda' },
+          { label: 'Chapters', href: '#chapters' },
           { label: 'FAQ', href: '#faq' },
         ]}
-        cta="Get your seat"
+        cta="Join free"
         onJoin={onJoin}
       />
 
@@ -74,11 +72,11 @@ export default function SeminarKit({ page, onJoin, children }: BenefitKitProps) 
               <p className="sm-lede">{hero.sub}</p>
               <div className="sm-actions">
                 <button type="button" className="sm-btn" onClick={onJoin}>
-                  <Ticket aria-hidden="true" />
+                  <BookOpen aria-hidden="true" />
                   {hero.cta}
                 </button>
                 <Link to={BENEFIT_LINKS.quiz} className="sm-link">
-                  Take the free 3 minute assessment
+                  Take the habit quiz
                 </Link>
               </div>
             </div>
@@ -98,22 +96,6 @@ export default function SeminarKit({ page, onJoin, children }: BenefitKitProps) 
                 <BrandIcon tone="inherit" className="sm-book-icon" />
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="sm-promise" aria-labelledby="sm-promise">
-          <div className="sm-wrap">
-            <h2 id="sm-promise" className="sm-h2">
-              {promise.title}
-            </h2>
-            <ul className="sm-promise-list">
-              {promise.items.map((item) => (
-                <li key={item}>
-                  <CheckCircle2 aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
           </div>
         </section>
 
@@ -145,30 +127,7 @@ export default function SeminarKit({ page, onJoin, children }: BenefitKitProps) 
           </figure>
         </section>
 
-        <section className="sm-section" id="agenda" aria-labelledby="sm-agenda">
-          <div className="sm-wrap sm-agenda-grid">
-            <div>
-              <h2 id="sm-agenda" className="sm-h2">
-                {agenda.title}
-              </h2>
-              <p className="sm-body">{agenda.intro}</p>
-              <button type="button" className="sm-btn" onClick={onJoin}>
-                <Ticket aria-hidden="true" />
-                Reserve my free seat
-              </button>
-            </div>
-            <ol className="sm-ticket">
-              {agenda.items.map((item) => (
-                <li key={item.time} className="sm-ticket-row">
-                  <span className="sm-ticket-time">{item.time}</span>
-                  <span className="sm-ticket-title">{item.title}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <BenefitFaq faqs={page.faqs} title="Before you take your seat" />
+        <BenefitFaq faqs={page.faqs} title="Questions from the reader" />
         {children}
       </main>
     </div>

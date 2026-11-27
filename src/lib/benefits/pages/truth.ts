@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Practice how to be honest with yourself through the Nightly Molt Audit. Name what happened, choose one thing to release, and close the day with Moltology.',
   keywords: 'how to be honest with yourself, nightly review, Nightly Molt Audit, self honesty',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/truth/share.jpg?v=2',
     alt: 'A pale blue crab writing a single line in a notebook at a seminar desk, intimate evening event photography',
@@ -21,11 +21,11 @@ const page: BenefitPage = {
   hook: {
     label: 'The Nightly Molt Audit',
     href: '/codex/scr-032',
-    text: 'Each night, name three candidates: a thought that circled, an hour you cannot account for, and a distraction that produced nothing. Release exactly one, write it plainly, and close the day.',
+    text: 'Notice a looping thought, a lost hour, or a useless distraction. Set one aside.',
   },
   reveal: {
-    headline: 'One honest line is enough for tonight.',
-    body: 'Let one thing go asks for a named item, not a verdict on yourself.',
+    headline: 'One honest line is plenty.',
+    body: 'Give yesterday a sentence you’d recognize as true.',
     screenshot: 'forum',
   },
   related: ['commitment', 'answers', 'self-help-books'],
@@ -63,10 +63,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      kicker: 'The evening session · bring a notebook',
-      headline: 'Be honest with yourself about where the evening went.',
-      sub: 'You opened the phone to check one thing. The kettle boiled twice. Write down what happened without the courtroom speech. The nightly practice wants a short, plain account and one thing to let go.',
-      cta: 'Begin an honest practice',
+      kicker: 'An evening journal',
+      headline: 'Be honest with yourself about the evening.',
+      sub: 'Write down where the time went and what you’re ready to put down.',
+      cta: 'Start the practice free',
       image: {
         src: '/images/benefits/truth/hero.jpg?v=2',
         alt: 'A pale blue crab at a wooden seminar desk with an open notebook and warm reading lamp, navy curtains and evening book-event lighting',
@@ -75,44 +75,18 @@ const page: BenefitPage = {
       },
       book: { title: 'Tell yourself', subtitle: 'A plain account. One thing to put down.', author: 'Moltology · the evening reading' },
     },
-    promise: {
-      title: 'Leave the grand confession out of it',
-      items: [
-        'Use the name of the thing you actually did',
-        'Separate what happened from what you guessed',
-        'Give unfinished work an honest mark',
-        'Keep any repair you owe on its own list',
-        'Choose one item to release and end the review',
-      ],
-    },
     chapters: {
-      title: 'An account you can write in plain ink',
+      title: 'The evening audit',
       items: [
         { title: 'The event', body: 'Write what happened before explaining it. The draft stayed closed, the call went unanswered, or the evening went into a feed.' },
-        { title: 'The missing detail', body: 'Name the part you keep leaving out of the story. Include what you chose as well as what interrupted you.' },
-        { title: 'The guess', body: 'Mark what you are assuming about someone else’s thoughts. Keep a guess from becoming a fact just because you have repeated it.' },
         { title: 'The thought that circled', body: 'Name a thought you kept returning to today. You do not need to settle its entire history in tonight’s notebook.' },
         { title: 'The hour unaccounted for', body: 'Look at where the time went. Write the activity plainly instead of turning the blank space into a label for yourself.' },
-        { title: 'The distraction', body: 'Name the tab, thread, or notification that kept calling you back. Choose whether this is the item to put down tonight.' },
         { title: 'The thing to release', body: 'Pick exactly one of the candidates. Say it or write it, and let the review stop growing around it.' },
-        { title: 'The closed notebook', body: 'Record the release and mark the day honestly. Close the page even if a few boxes remain unchecked.' },
       ],
     },
     passage: {
       quote: 'It does not have to be resolved.',
       source: { label: 'The Nightly Molt Audit, verse 5', href: '/codex/scr-032#verse-5' },
-    },
-    agenda: {
-      title: 'Before the last screen goes dark',
-      intro: 'Follow the audit’s small sequence. Keep a separate note for anything that needs an apology or practical repair; the review does not do that work for you.',
-      items: [
-        { time: 'Take a seat', title: 'Put the notebook where you can write in it' },
-        { time: 'First candidate', title: 'Name the thought you kept circling' },
-        { time: 'Second candidate', title: 'Account for the hour that went elsewhere' },
-        { time: 'Third candidate', title: 'Write down the distraction that produced nothing' },
-        { time: 'One choice', title: 'Let one thing go from the three you named' },
-        { time: 'Notebook closed', title: 'Record it and stop reviewing the evening' },
-      ],
     },
   },
 }

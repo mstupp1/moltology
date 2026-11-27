@@ -6,7 +6,6 @@ import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
-import './arcade.css'
 
 /** The game studio lockup: the name in pixel type with a split colour shadow. */
 function ArcadeLockup({ variant }: { variant?: string }) {
@@ -31,14 +30,13 @@ function ArcadeLockup({ variant }: { variant?: string }) {
 /** Arcade: video game launches. Night purple, neon cyan and magenta, pixel labels, HUD frames. */
 export default function ArcadeKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'arcade') return null
-  const { hero, stats, quests, modes, patch } = page.content
+  const { hero, quests, modes } = page.content
 
   return (
     <div className="ar">
       <BenefitHeader
         lockup={<ArcadeLockup variant={page.variant} />}
         links={[
-          { label: 'Build', href: '#build' },
           { label: 'Quests', href: '#quests' },
           { label: 'Modes', href: '#modes' },
         ]}
@@ -68,39 +66,9 @@ export default function ArcadeKit({ page, onJoin, children }: BenefitKitProps) {
               </button>
               <Link to={BENEFIT_LINKS.demo} className="ar-btn-alt">
                 <Gamepad2 aria-hidden="true" />
-                Play the demo
+                Try the demo
               </Link>
             </div>
-            <Link to={BENEFIT_LINKS.quiz} className="ar-quiz">
-              Not sure of your class? Take the 3 minute quiz
-            </Link>
-          </div>
-        </section>
-
-        <section className="ar-section" id="build" aria-labelledby="ar-build">
-          <div className="ar-wrap ar-split">
-            <div>
-              <p className="ar-pixel ar-label">Character</p>
-              <h2 id="ar-build" className="ar-h2">
-                {stats.title}
-              </h2>
-              <p className="ar-body">{stats.intro}</p>
-            </div>
-            <ul className="ar-panel ar-stats">
-              {stats.items.map((stat) => (
-                <li key={stat.code} className="ar-stat">
-                  <div className="ar-stat-head">
-                    <span className="ar-pixel ar-stat-code">{stat.code}</span>
-                    <span className="ar-stat-name">{stat.label}</span>
-                    <span className="ar-pixel ar-stat-value">{stat.value}</span>
-                  </div>
-                  <span className="ar-bar" aria-hidden="true">
-                    <span style={{ width: `${stat.value}%` }} />
-                  </span>
-                  <p className="ar-stat-body">{stat.body}</p>
-                </li>
-              ))}
-            </ul>
           </div>
         </section>
 
@@ -150,26 +118,6 @@ export default function ArcadeKit({ page, onJoin, children }: BenefitKitProps) {
                 ))}
               </ul>
             </div>
-          </div>
-        </section>
-
-        <section className="ar-section ar-dark" aria-labelledby="ar-patch">
-          <div className="ar-wrap ar-split">
-            <div>
-              <h2 id="ar-patch" className="ar-h2">
-                {patch.title}
-              </h2>
-              <p className="ar-pixel ar-label ar-version">{patch.version}</p>
-              <button type="button" className="ar-btn" onClick={onJoin}>
-                <Play aria-hidden="true" />
-                Start day one
-              </button>
-            </div>
-            <ul className="ar-panel ar-patch">
-              {patch.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
           </div>
         </section>
 

@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Make room for mental resilience in the training plan. Read about the soft-shell window, work through eight daily tasks, and close the day with Moltology.',
   keywords: 'mental resilience, setbacks, recovery, boundaries, daily habits',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer: 'Moltology is a habit practice and community, not therapy or crisis care.',
   shareImage: {
     src: '/images/benefits/resilience/share.jpg?v=2',
@@ -20,13 +20,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The soft-shell window, Codex verse 5',
+    label: 'The soft-shell window',
     href: '/codex/scr-010#verse-5',
-    text: 'The Codex makes room for the exposed stretch after you leave an old habit behind. Read the soft-shell window passage. Name the thing you have dropped and leave its old place empty for now. You do not have to fill it before bedtime.',
+    text: 'Give an old habit’s empty slot a little time before filling it.',
   },
   reveal: {
-    headline: 'Keep a place for the quieter session.',
-    body: 'Close today without adding a punishment set for tomorrow.',
+    headline: 'Keep an easier session on the card.',
+    body: 'Choose one useful rep for the day you actually have.',
     screenshot: 'dashboard',
   },
   related: ['strength', 'emotional', 'empathy'],
@@ -65,9 +65,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Recovery is in the program',
-      headline: 'Mental resilience. Recover, repeat.',
-      sub: 'Some days call for a lighter brief. Pick the work that fits today, ask for help, and stop when the day is done. Moltology’s eight daily tasks include quiet, a reset and an ending.',
-      cta: 'Join at your own pace',
+      headline: 'Mental resilience. Recovery is in the program.',
+      sub: 'Pick a session that fits today. Leave room to come back tomorrow.',
+      cta: 'Start training free',
       image: {
         src: '/images/benefits/resilience/hero.jpg?v=2',
         alt: 'A lobster resting by an empty locker under soft edge lighting in a wide performance apparel campaign shot',
@@ -75,23 +75,13 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: [
-      { value: '8', label: 'Tasks in the routine' },
-      { value: '1', label: 'Day to review' },
-      { value: '0', label: 'Equipment required' },
-      { value: '$0', label: 'Joining cost' },
-    ],
     program: {
-      title: 'Train with room to recover',
-      intro: 'Use the eight daily tasks as written. A rough day does not call for a secret ninth task or a tougher version of tomorrow. Work with the responsibilities you actually have.',
+      title: 'Train for the day you have',
+      intro: 'Four reps for a day that needs a lighter load.',
       items: [
         { set: 'Easy start', title: 'Sit in silence', body: 'Take a quiet seat before the messages arrive. Look at yesterday without writing a speech about what went wrong.' },
-        { set: 'Today’s load', title: 'Pick your one thing', body: 'Choose the task that matters under today’s circumstances. Start with the reply you owe, not a complete life overhaul.' },
-        { set: 'Practice set', title: 'Learn something hard', body: 'Try something you do not understand yet. Leave room to be a beginner and ask the question you were about to skip.' },
         { set: 'Rest interval', title: 'Reset your focus', body: 'Clear one distraction and choose what to do next. If the day has changed, check the plan before carrying on.' },
-        { set: 'Working load', title: 'Do deep work', body: 'Give one piece of work a session of its own. Put the other requests aside while you work on that piece.' },
         { set: 'Stay alongside', title: 'Help a member', body: 'Read someone’s forum post before offering a fix. Ask what kind of help they want and answer the question they brought.' },
-        { set: 'Leave behind', title: 'Let one thing go', body: 'Name what you are done carrying from today. Leave the space it occupied open instead of immediately taking something else on.' },
         { set: 'Recovery', title: 'Close the day', body: 'Check what you completed and stop for the evening. The unfinished line can wait for the next decision about it.' },
       ],
     },
@@ -106,7 +96,6 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    creed: 'There is room on the bench for a quiet day.',
   },
 }
 
