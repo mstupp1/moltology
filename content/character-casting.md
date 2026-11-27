@@ -26,7 +26,7 @@ On social CLIs that support `--mascot`, pass the chosen canonical key explicitly
 
 ## Using the 3D characters in artwork
 
-The cast exists as real 3D characters, so the character in a finished piece is the 3D render itself, not an image model's redrawing of it. "3D for the character, AI for the world":
+For [editorial carousels](../.agents/skills/instagram-carousel-creator/SKILL.md#artwork-and-polish-built-in-imagegen-by-default) and [Benthic Swipe Lab](../.agents/skills/benthic-swipe-lab/SKILL.md#imagegen), use the posed 3D render as the identity reference and have ImageGen integrate the character into each scene. The steps below describe the direct-render workflow for other formats.
 
 1. **Render the character.** `npm run cast:render -- --who <name> --pose <pose> --mood <mood>` writes a transparent full-figure still under `tmp/cast/<key>/`. Poses: cheer, wave, rest, flex, think, point, shrug, victory, ready, strut. Moods: happy, calm, focused, smug, worried, sad, shocked, angry, wink. Avoid `think` for a speaking or reacting character: the claw covers the mouth.
 2. **Paint the world without the character.** Image generation (Codex on Luna) makes the background plate, scene or prop art with an empty space where the character will stand. Say the light direction and mood so the plate matches the render.
