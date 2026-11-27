@@ -5,7 +5,6 @@ import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
-import './atelier.css'
 
 const ATELIER_PLATES: Record<string, [string, string]> = {
   noir: ['Plate 01', 'Signed edition'],
@@ -49,7 +48,7 @@ function AtelierLockup({ variant }: { variant?: string }) {
 /** Atelier: fashion houses and lookbooks. Greige and black, Didone italics, a show program of looks. */
 export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'atelier') return null
-  const { hero, manifesto, lookbook, campaign, care } = page.content
+  const { hero, lookbook, campaign } = page.content
   const isVariant = Boolean(page.variant)
   const plate = page.variant ? ATELIER_PLATES[page.variant] : undefined
 
@@ -59,7 +58,6 @@ export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) 
         lockup={<AtelierLockup variant={page.variant} />}
         links={[
           { label: 'The looks', href: '#looks' },
-          { label: 'Care', href: '#care' },
           { label: 'FAQ', href: '#faq' },
         ]}
         cta="Join"
@@ -78,7 +76,7 @@ export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) 
                   {hero.cta}
                 </button>
                 <Link to={BENEFIT_LINKS.quiz} className="at-link">
-                  Or find your fit with the quiz
+                  Take the habit quiz
                 </Link>
               </div>
             </div>
@@ -105,16 +103,6 @@ export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) 
                 )}
               </figcaption>
             </figure>
-          </div>
-        </section>
-
-        <section className="at-manifesto" aria-label="Manifesto">
-          <div className="at-wrap-narrow">
-            {manifesto.map((line) => (
-              <p key={line} className="at-manifesto-line">
-                {line}
-              </p>
-            ))}
           </div>
         </section>
 
@@ -164,29 +152,6 @@ export default function AtelierKit({ page, onJoin, children }: BenefitKitProps) 
             <blockquote className="at-quote">{campaign.quote}</blockquote>
             <figcaption className="at-caption">{campaign.credit}</figcaption>
           </figure>
-        </section>
-
-        <section className="at-section" id="care" aria-labelledby="at-care">
-          <div className="at-wrap at-care-grid">
-            <div>
-              <h2 id="at-care" className="at-h2">
-                {care.title}
-              </h2>
-              <p className="at-body">{care.footnote}</p>
-              <button type="button" className="at-btn" onClick={onJoin}>
-                Wear it daily, free
-              </button>
-            </div>
-            <dl className="at-label">
-              <BrandIcon aria-hidden="true" tone="inherit" className="at-label-icon" />
-              {care.rows.map((row) => (
-                <div key={row.label} className="at-label-row">
-                  <dt>{row.label}</dt>
-                  <dd>{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
         </section>
 
         <BenefitFaq faqs={page.faqs} title="Client services" />

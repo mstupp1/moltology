@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'How to get a grip on your life starts on the training card: choose one task, start it, and review the work with the eight daily tasks in Moltology.',
   keywords: 'how to get a grip on your life, priorities, follow-through, choosing one task',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/grip/share.jpg?v=2',
     alt: 'A lobster holding a clipboard against dark gym lockers in a high contrast sportswear photograph',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Pincer Torque, The Sacred Metrics verse 3',
+    label: 'Pincer Torque',
     href: '/codex/scr-040#verse-3',
-    text: 'Pincer Torque is about holding a chosen project until it is finished. Read the passage, then put Pick your one thing to work: choose the task, say what done means, and begin. The character sheet calls this stat Torque.',
+    text: 'Choose what done means and hold on until you get there.',
   },
   reveal: {
-    headline: 'One priority. Put your name to it.',
-    body: 'Make today’s choice in Pick your one thing.',
+    headline: 'Put one thing on the card.',
+    body: 'Name today’s priority before the rest of the list gets a vote.',
     screenshot: 'dashboard',
   },
   related: ['commitment', 'focus', 'strength'],
@@ -64,9 +64,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Single-task training',
-      headline: 'Get a grip on your life.',
-      sub: 'Twelve tabs. Three urgent lists. Start with one thing you can actually finish. Choose it, work on it, log the day. A new planner is optional.',
-      cta: 'Make your first commitment',
+      headline: 'Get a grip on your life. Pick one thing.',
+      sub: 'Choose a job you can finish and give it the first slot on the card.',
+      cta: 'Start training free',
       image: {
         src: '/images/benefits/grip/hero-alt.jpg',
         alt: 'Maris Slate, a cobalt-blue crab with chalked claws, hanging from a steel pull-up bar on the right side of a dark concrete gym',
@@ -74,23 +74,13 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: [
-      { value: '1', label: 'Priority to pick' },
-      { value: '8', label: 'Tasks on the card' },
-      { value: '0', label: 'Special equipment' },
-      { value: '$0', label: 'Entry fee' },
-    ],
     program: {
-      title: 'Load one objective',
-      intro: 'The eight daily tasks put a choice at the start and a review at the end. Work through the whole card. Your top priority still leaves room for a break and another person.',
+      title: 'One objective on the card',
+      intro: 'Pick the work that gets the first rep.',
       items: [
-        { set: 'Settle', title: 'Sit in silence', body: 'Keep the inbox shut while you sit. Look at yesterday before today starts volunteering you for everything.' },
         { set: 'Main set', title: 'Pick your one thing', body: 'Name the task you intend to finish. Write the first action and do it before shopping for a different priority.' },
-        { set: 'Skill work', title: 'Learn something hard', body: 'Study something that takes effort. Try the difficult example yourself instead of saving another explanation for later.' },
         { set: 'Regrip', title: 'Reset your focus', body: 'Clear the distraction that took over the screen. Read your chosen task again and pick the next useful move.' },
         { set: 'Working set', title: 'Do deep work', body: 'Give the chosen work its own session. Park unrelated requests on the list instead of switching jobs mid-sentence.' },
-        { set: 'Spotter', title: 'Help a member', body: 'Take a forum question seriously. Answer the part you know or welcome someone who is finding their way around.' },
-        { set: 'Release', title: 'Let one thing go', body: 'Drop one demand from the day that you are finished carrying. Leave the abandoned project out of tonight’s mental rehearsal.' },
         { set: 'Logbook', title: 'Close the day', body: 'Mark the work you completed. Be straight about what is still open, then finish for the evening.' },
       ],
     },
@@ -105,7 +95,6 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    creed: 'Pick the work before picking another notebook.',
   },
 }
 

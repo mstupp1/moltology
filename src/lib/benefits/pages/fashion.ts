@@ -10,7 +10,7 @@ const page: BenefitPage = {
     'Personal style starts before the closet. Moltology is a free daily practice that builds the posture, focus and calm that make any outfit look like yours.',
   keywords: 'personal style, how to find your personal style, confidence, self presentation, style tips, daily routine',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/fashion/share.jpg?v=2',
     alt: 'A lobster in a tailored charcoal coat posing in a pale studio',
@@ -20,11 +20,11 @@ const page: BenefitPage = {
   hook: {
     label: 'The character shop',
     href: '/character/shop',
-    text: 'Every member has a 3D character with a wardrobe of shells, claws and gear. It is the one place on Moltology where you dress up.',
+    text: 'Try pieces on your character and find a cut that suits you.',
   },
   reveal: {
-    headline: 'The confidence comes from the practice.',
-    body: 'Your character has a wardrobe too, in the shop.',
+    headline: 'Make it yours.',
+    body: 'Pick a look and give it one good habit to wear.',
     screenshot: 'dashboard',
   },
   related: ['charisma', 'spirituality', 'strength'],
@@ -58,14 +58,13 @@ const page: BenefitPage = {
       answer:
         'Posture, pace and eye contact change how any outfit reads. Those come from habits more than purchases, which is the part a daily practice works on.',
     },
-
   ],
   content: {
     hero: {
       season: 'Collection 01 · The daily edit',
       headline: 'Personal style, cut from the inside.',
-      sub: 'The best dressed person in the room is rarely the one in the newest coat. It is the one who looks settled in their own skin. Moltology is a free daily practice for exactly that.',
-      cta: 'Join the collection, free',
+      sub: 'Dress your character. Practice carrying yourself with a little more care.',
+      cta: 'Join free',
       image: {
         src: '/images/benefits/fashion/hero.jpg?v=2',
         alt: 'A crimson lobster in an oversized charcoal coat and black turtleneck, posing in a pale grey studio',
@@ -73,23 +72,14 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    manifesto: [
-      'Clothes are the last layer.',
-      'Under them is posture, under that is attention, and under that is how you spent this morning.',
-      'We design that part.',
-    ],
     lookbook: {
-      title: 'The eight looks',
-      intro: 'One collection, worn every day. Each look is a small task you tick off in the app, and together they shape the person wearing the clothes.',
+      title: 'The daily collection',
+      intro: 'Four looks from the daily practice, cut for repeat wear.',
       items: [
         { name: 'Silence, tailored', note: 'A few quiet minutes before the phone comes out. The base layer for everything after.' },
         { name: 'The one thing', note: 'Choose the single task that would make today count, and write it down.' },
-        { name: 'Hard study', note: 'Learn something that resists you. Range shows in conversation.' },
-        { name: 'Midday reset', note: 'A real break: step away, breathe, come back with a clear head.' },
         { name: 'Deep work', note: 'One focused block with the noise switched off. The look of someone who finishes things.' },
         { name: 'Generosity', note: 'Help another member on the forum. Nothing reads as confident like kindness.' },
-        { name: 'Let it go', note: 'Drop one grudge, worry or habit that no longer fits.' },
-        { name: 'Close the day', note: 'Review, tidy, rest. Tomorrow starts here.' },
       ],
     },
     campaign: {
@@ -101,18 +91,6 @@ const page: BenefitPage = {
         width: 1024,
         height: 1280,
       },
-    },
-    care: {
-      title: 'Care label',
-      rows: [
-        { label: 'Composition', value: '100% habit' },
-        { label: 'Fit', value: 'Grows with the wearer' },
-        { label: 'Wear', value: 'Daily, eight small tasks' },
-        { label: 'Wash', value: 'Do not dry clean. Reset at noon.' },
-        { label: 'Price', value: 'Free' },
-        { label: 'Made in', value: 'Your own mornings' },
-      ],
-      footnote: 'Sizing is personal. Results depend on sleep, effort and showing up most days.',
     },
   },
 }

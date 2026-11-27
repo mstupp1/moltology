@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Looking for the best self help books? Open the Codex, pick one passage, and put down the highlighter. Then do what it says, with a daily practice to hold it.',
   keywords: 'best self help books, self improvement reading, Codex, daily reading practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/self-help-books/share.jpg?v=2',
     alt: 'A rust-red lobster beside a clothbound book on a navy seminar lectern, warm publisher portrait lighting',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The Codex, Moltology’s book of readings',
+    label: 'The Codex',
     href: '/codex',
-    text: 'Read a passage in the Codex, then do the thing it asks. Start with the Daily Shedding Routine for the daily tasks, or the Nightly Molt Audit for something to put down before bed.',
+    text: 'Read the Daily Shedding Routine and take one task into your day.',
   },
   reveal: {
-    headline: 'Put a bookmark in it. Use what you read.',
-    body: 'Take one instruction from the Codex into your next ordinary day.',
+    headline: 'Put the bookmark to work.',
+    body: 'Pick a reading and follow it with one ordinary action.',
     screenshot: 'forum',
   },
   related: ['commitment', 'truth', 'answers'],
@@ -63,10 +63,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      kicker: 'The reading room · open to everyone',
-      headline: 'The best self help books deserve more than a highlighter.',
-      sub: 'You have marked the paragraph. Now close the book and use it. Moltology pairs the Codex with a daily practice: choose the work, give it your attention, and call it a day when the day is done.',
-      cta: 'Begin your practice free',
+      kicker: 'The reading room',
+      headline: 'Give your best self-help books a field test.',
+      sub: 'Pick one passage and try it before you reach for the highlighter again.',
+      cta: 'Start the practice free',
       image: {
         src: '/images/benefits/self-help-books/hero.jpg?v=2',
         alt: 'A rust-red lobster at a gold-trimmed lectern holding an open book, navy backdrop and book-launch spotlight',
@@ -75,44 +75,18 @@ const page: BenefitPage = {
       },
       book: { title: 'The Codex', subtitle: 'Read a little. Put it to work.', author: 'Readings from Moltology' },
     },
-    promise: {
-      title: 'Bring a pencil. Leave room for the work.',
-      items: [
-        'Choose a question before you open the contents',
-        'Read the whole passage around the line you underline',
-        'Write one instruction on paper beside your desk',
-        'Try the exercise before collecting another recommendation',
-        'Return with a note about what you actually did',
-      ],
-    },
     chapters: {
-      title: 'From the reading chair to the rest of your day',
+      title: 'From the page to the day',
       items: [
         { title: 'Before the first page', body: 'Leave the feed closed while you sit quietly. Give the question you brought a little room before taking in more words.' },
         { title: 'An instruction worth trying', body: 'Choose one action from your reading. Put it beside the task you have already decided matters today.' },
         { title: 'The difficult paragraph', body: 'Stay with a passage you do not understand. Look up the unfamiliar word and explain the idea in your own notebook.' },
-        { title: 'Pause the collection', body: 'Close the recommendation tab at midday. Clear one distraction from the place where you intend to work.' },
         { title: 'Off the page', body: 'Open the actual assignment. Put your attention on that work instead of another article about how to begin it.' },
-        { title: 'A useful reply', body: 'Answer a member’s question with something you know. Say when you do not know, and leave the lecture unwritten.' },
-        { title: 'The margin note', body: 'Name one thing to release from today. Leave the grand rewrite of your entire personality out of the exercise.' },
-        { title: 'Book closed', body: 'Mark the tasks you completed and stop. An unfinished chapter can keep its bookmark until you choose to return.' },
       ],
     },
     passage: {
       quote: 'This is a log entry, not a courtroom.',
       source: { label: 'The Nightly Molt Audit, verse 3', href: '/codex/scr-032#verse-3' },
-    },
-    agenda: {
-      title: 'Your reading-day workshop',
-      intro: 'Use these moments alongside the daily tasks. No reading quota, speed-reading challenge, or pile of required purchases.',
-      items: [
-        { time: 'Before reading', title: 'Write the question at the top of the page' },
-        { time: 'At the contents', title: 'Choose the passage that speaks to that question' },
-        { time: 'Pencil out', title: 'Underline an instruction you can attempt' },
-        { time: 'Book down', title: 'Give the exercise a place in your day' },
-        { time: 'After doing', title: 'Note what happened, including what you skipped' },
-        { time: 'Reading finished', title: 'Keep one bookmark and close the extra tabs' },
-      ],
     },
   },
 }

@@ -6,7 +6,6 @@ import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
-import './locker.css'
 
 /** The sportswear lockup: slanted condensed capitals with the emblem riding a speed bar. */
 function LockerLockup({ variant }: { variant?: string }) {
@@ -42,7 +41,7 @@ function LockerLockup({ variant }: { variant?: string }) {
 /** Locker room: sportswear and training brands. Black, volt, condensed italic capitals, grit. */
 export default function LockerKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'locker') return null
-  const { hero, stats, program, gear, creed } = page.content
+  const { hero, program, gear } = page.content
   const isVariant = Boolean(page.variant)
 
   return (
@@ -79,20 +78,11 @@ export default function LockerKit({ page, onJoin, children }: BenefitKitProps) {
                 <ArrowRight aria-hidden="true" />
               </button>
               <Link to={BENEFIT_LINKS.quiz} className="lk-btn-line">
-                Test yourself: 3 minute quiz
+                Take the habit quiz
               </Link>
             </div>
           </div>
         </section>
-
-        <ul className="lk-stats" aria-label="The program in numbers">
-          {stats.map((stat) => (
-            <li key={stat.label} className="lk-stat">
-              <span className="lk-stat-value">{stat.value}</span>
-              <span className="lk-stat-label">{stat.label}</span>
-            </li>
-          ))}
-        </ul>
 
         <section className="lk-section" id="program" aria-labelledby="lk-program">
           <div className="lk-wrap">
@@ -144,10 +134,6 @@ export default function LockerKit({ page, onJoin, children }: BenefitKitProps) {
               </button>
             </div>
           </div>
-        </section>
-
-        <section className="lk-creed" aria-label="Creed">
-          <p className="lk-wrap lk-creed-text">{creed}</p>
         </section>
 
         <BenefitFaq faqs={page.faqs} title="Questions from the bench" />

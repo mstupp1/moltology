@@ -35,13 +35,6 @@
   padding: 0 20px;
 }
 
-[data-kit='atelier'] .at-wrap-narrow {
-  width: 100%;
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
 /* Header ---------------------------------------------------------------- */
 
 [data-kit='atelier'] .bh {
@@ -291,27 +284,6 @@
 
 /* Manifesto ------------------------------------------------------------- */
 
-[data-kit='atelier'] .at-manifesto {
-  padding: 88px 0;
-  background: var(--at-ink);
-  color: var(--at-paper);
-  text-align: center;
-}
-
-[data-kit='atelier'] .at-manifesto-line {
-  font-family: var(--at-serif);
-  font-size: clamp(1.6rem, 3.2vw, 2.6rem);
-  line-height: 1.25;
-}
-
-[data-kit='atelier'] .at-manifesto-line + .at-manifesto-line {
-  margin-top: 18px;
-}
-
-[data-kit='atelier'] .at-manifesto-line:last-child {
-  font-style: italic;
-}
-
 /* Lookbook -------------------------------------------------------------- */
 
 [data-kit='atelier'] .at-section {
@@ -406,60 +378,6 @@
 }
 
 /* Care label ------------------------------------------------------------ */
-
-[data-kit='atelier'] .at-care-grid {
-  display: grid;
-  gap: 48px;
-  align-items: center;
-}
-
-[data-kit='atelier'] .at-label {
-  position: relative;
-  width: 100%;
-  max-width: 420px;
-  justify-self: center;
-  padding: 40px 32px 32px;
-  background: #fbfaf7;
-  border: 1px solid var(--at-line);
-  box-shadow: 0 30px 60px -40px rgba(17, 17, 17, 0.35);
-  font-size: 0.8125rem;
-  letter-spacing: 0.06em;
-}
-
-[data-kit='atelier'] .at-label-icon {
-  display: block;
-  width: 22px;
-  height: 22px;
-  margin: 0 auto 20px;
-  color: var(--at-ink);
-}
-
-[data-kit='atelier'] .at-label-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 10px 0;
-  border-top: 1px dashed var(--at-line);
-}
-
-[data-kit='atelier'] .at-label-row dt {
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.6875rem;
-  color: var(--at-muted);
-}
-
-[data-kit='atelier'] .at-label-row dd {
-  text-align: right;
-  color: var(--at-ink);
-}
-
-@media (min-width: 900px) {
-  [data-kit='atelier'] .at-care-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 96px;
-  }
-}
 
 /* FAQ ------------------------------------------------------------------- */
 
@@ -630,11 +548,6 @@
   }
 }
 
-[data-kit='atelier'][data-variant='noir'] .at-manifesto {
-  background: #f2ece1;
-  color: #141210;
-}
-
 [data-kit='atelier'][data-variant='noir'] .at-looks {
   grid-template-columns: minmax(0, 1fr);
   gap: 0 56px;
@@ -722,16 +635,6 @@
   }
 }
 
-[data-kit='atelier'][data-variant='noir'] .at-label {
-  background: var(--at-greige);
-  border: 1px solid var(--at-line);
-  box-shadow: none;
-}
-
-[data-kit='atelier'][data-variant='noir'] .at-label-row dt {
-  color: var(--at-bronze);
-}
-
 [data-kit='atelier'][data-variant='noir'] .bf {
   background: var(--at-greige);
 }
@@ -795,11 +698,6 @@
   margin-top: 18px;
 }
 
-[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-manifesto {
-  background: var(--at-lacquer);
-  color: #fbf7f6;
-}
-
 [data-kit='atelier'][data-variant='porcelain-lacquer'] .at-looks {
   grid-template-columns: minmax(0, 1fr);
   gap: 0 52px;
@@ -832,10 +730,6 @@
 
 [data-kit='atelier'][data-variant='porcelain-lacquer'] .at-look-copy .at-h3 {
   margin-top: 0;
-}
-
-[data-kit='atelier'][data-variant='porcelain-lacquer'] .at-label-row dt {
-  color: var(--at-lacquer);
 }
 
 /* Variant: milan-terracotta (sexy) -------------------------------------- */
@@ -923,7 +817,7 @@
 
 @media (min-width: 900px) {
   [data-kit='atelier'][data-variant='milan-terracotta'] .at-looks {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1034,11 +928,6 @@
     border-top: 1px solid var(--at-line);
     border-left: 1px solid var(--at-line);
   }
-}
-
-[data-kit='atelier'][data-variant='architectural-stone'] .at-manifesto {
-  background: var(--at-ink);
-  color: var(--at-paper);
 }
 
 [data-kit='atelier'][data-variant='architectural-stone'] .at-looks {

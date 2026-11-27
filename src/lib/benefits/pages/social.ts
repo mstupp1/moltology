@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Wondering how to make friends as an adult? Start a conversation, ask a follow-up, and add someone on Moltology. A shared practice gives you a place to begin.',
   keywords: 'how to make friends as an adult, adult friendships, meet people online, conversation starters, friend requests',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/social/share.jpg?v=2',
     alt: 'A teal lobster and a yellow crab chatting across a café table in a bright, candid social app photograph',
@@ -21,11 +21,11 @@ const page: BenefitPage = {
   hook: {
     label: 'Friends on your profile',
     href: '/profile?tab=friends',
-    text: 'Open the Friends tab on your profile to find members and send a friend request. Start with someone you have talked with. Let them decide whether to accept.',
+    text: 'Send a friend request after you’ve enjoyed talking with someone.',
   },
   reveal: {
-    headline: 'Put a name to the next hello.',
-    body: 'Reply to someone, then ask about the thing they mentioned.',
+    headline: 'Give the next hello a name.',
+    body: 'Find a conversation, say something, and come back for the reply.',
     screenshot: 'forum',
   },
   related: ['community', 'communication', 'empathy'],
@@ -63,10 +63,9 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      headline: 'Make friends as an adult. Start with hello.',
-      sub: 'The group chat has discussed meeting up since February. Take a smaller first step here: ask a question, write a reply, and send a friend request after a good conversation.',
-      cta: 'Join the conversation free',
-      chips: ['Your friends tab', 'Shared interests', 'A place to say hi', '$0 to join'],
+      headline: 'Make friends as an adult. Say hello twice.',
+      sub: 'Start with a shared interest. Come back for the next conversation.',
+      cta: 'Join the forum free',
       image: {
         src: '/images/benefits/social/hero.jpg?v=2',
         alt: 'A small teal lobster greeting a yellow crab at an outdoor café, photographed with warm daylight and bright social app colors',
@@ -79,18 +78,9 @@ const page: BenefitPage = {
       { name: 'Bo Pebble', handle: '@bo-pebble', text: 'I tried soup. Apparently you have to stay in the kitchen for the soup part.', tag: 'Sample · Reply', cast: 'crab_bo_pebble' },
       { name: 'Moss Tern', handle: '@moss-tern', text: 'What kind of soup? I have a very forgiving recipe if you want it.', tag: 'Sample · Follow-up', cast: 'crab_moss_tern' },
     ],
-    features: {
-      title: 'A little less “we should hang out”',
-      items: [
-        { title: 'Say something small', body: 'Your introduction can be a book, a hobby, or the recipe you keep burning. Give someone an easy question to ask back.' },
-        { title: 'Keep the conversation going', body: 'Use the Friends tab to find a member you have met on the forum. Send a request when you both want to stay in touch.' },
-        { title: 'Make yourself useful', body: 'Help a member is the daily task for answering a question or welcoming someone new. Read what they need before jumping in with advice.' },
-        { title: 'Choose your look', body: 'Style your character for your profile and forum posts. A new hat is a perfectly reasonable conversation starter.' },
-      ],
-    },
     rooms: {
-      title: 'Find something to talk about',
-      intro: 'Start with a subject you care about. Read the thread, pick one detail, and ask about it. You can leave your entire life story for another time.',
+      title: 'Start with a shared interest',
+      intro: 'Find a subject worth coming back to.',
       items: [
         { name: 'Introductions in General Discussion', body: 'Mention what brought you here and one thing you enjoy away from a screen.' },
         { name: 'Questions in Sacred Doctrine & AI', body: 'Ask about a Codex reading you found puzzling. You can join the discussion while you are still learning.' },

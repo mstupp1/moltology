@@ -78,16 +78,11 @@ export interface ClinicContent {
     eyebrow: string
     headline: string
     sub: string
-    checks: string[]
     cta: string
     image: BenefitImage
   }
-  /** Small honest facts under the hero ("Free to join", "3 minute assessment"). */
-  trust: string[]
-  signs: { title: string; intro: string; items: string[] }
   steps: { title: string; items: { title: string; body: string }[] }
   plans: { title: string; intro: string; items: { name: string; tag: string; body: string; href: string }[] }
-  compare: { title: string; us: string; them: string; rows: { label: string; us: string; them: string }[] }
 }
 
 // ---------------------------------------------------------------------------
@@ -105,8 +100,7 @@ export interface CanContent {
   marquee: string[]
   flavors: { title: string; items: { name: string; note: string; tone: 'lime' | 'berry' | 'citrus' | 'ice' }[] }
   label: { title: string; serving: string; rows: { label: string; value: string }[]; footnote: string }
-  crash: { title: string; without: string[]; with: string[] }
-  story: { title: string; body: string[]; image: BenefitImage }
+  story: { caption: string; image: BenefitImage }
 }
 
 // ---------------------------------------------------------------------------
@@ -123,7 +117,6 @@ export interface RetreatContent {
   }
   intention: { quote: string; source: BenefitLink }
   rhythm: { title: string; intro: string; items: { time: string; title: string; body: string }[] }
-  itinerary: { title: string; items: { day: string; title: string; body: string }[] }
   carry: { title: string; items: string[]; image: BenefitImage }
 }
 
@@ -133,11 +126,9 @@ export interface RetreatContent {
 
 export interface AtelierContent {
   hero: { season: string; headline: string; sub: string; cta: string; image: BenefitImage }
-  manifesto: string[]
-  /** The eight daily tasks as numbered looks. */
+  /** Selected daily tasks as numbered looks. */
   lookbook: { title: string; intro: string; items: { name: string; note: string }[] }
   campaign: { quote: string; credit: string; image: BenefitImage }
-  care: { title: string; rows: { label: string; value: string }[]; footnote: string }
 }
 
 // ---------------------------------------------------------------------------
@@ -151,10 +142,7 @@ export interface LedgerContent {
     sub: string
     cta: string
     image: BenefitImage
-    /** The app card over the hero image: a practice "balance" and its chart. */
-    card: { label: string; value: string; change: string; points: number[] }
   }
-  compound: { title: string; intro: string; rows: { label: string; value: string; note: string }[] }
   features: { title: string; items: { title: string; body: string }[] }
   statement: { title: string; intro: string; rows: { when: string; label: string; amount: string }[] }
 }
@@ -165,10 +153,8 @@ export interface LedgerContent {
 
 export interface LockerContent {
   hero: { tag: string; headline: string; sub: string; cta: string; image: BenefitImage }
-  stats: { value: string; label: string }[]
   program: { title: string; intro: string; items: { set: string; title: string; body: string }[] }
   gear: { title: string; intro: string; items: string[]; image: BenefitImage }
-  creed: string
 }
 
 // ---------------------------------------------------------------------------
@@ -176,10 +162,9 @@ export interface LockerContent {
 // ---------------------------------------------------------------------------
 
 export interface PlatformContent {
-  hero: { badge: string; headline: string; sub: string; cta: string; prompt: string; image: BenefitImage }
+  hero: { badge: string; headline: string; sub: string; cta: string; image: BenefitImage }
   features: { title: string; intro: string; items: { title: string; body: string }[] }
   workflow: { title: string; intro: string; steps: { when: string; then: string }[] }
-  config: { title: string; body: string; filename: string; lines: string[] }
   plans: { title: string; items: { name: string; price: string; body: string; items: string[]; href?: string }[] }
 }
 
@@ -189,10 +174,8 @@ export interface PlatformContent {
 
 export interface ArcadeContent {
   hero: { tag: string; headline: string; sub: string; cta: string; image: BenefitImage }
-  stats: { title: string; intro: string; items: { code: string; label: string; body: string; value: number }[] }
   quests: { title: string; intro: string; items: { title: string; body: string; reward: string }[] }
   modes: { title: string; items: { name: string; body: string }[]; image: BenefitImage }
-  patch: { title: string; version: string; items: string[] }
 }
 
 // ---------------------------------------------------------------------------
@@ -208,10 +191,8 @@ export interface SeminarContent {
     image: BenefitImage
     book: { title: string; subtitle: string; author: string }
   }
-  promise: { title: string; items: string[] }
   chapters: { title: string; items: { title: string; body: string }[] }
   passage: { quote: string; source: BenefitLink }
-  agenda: { title: string; intro: string; items: { time: string; title: string }[] }
 }
 
 // ---------------------------------------------------------------------------
@@ -219,10 +200,9 @@ export interface SeminarContent {
 // ---------------------------------------------------------------------------
 
 export interface NetworkContent {
-  hero: { headline: string; sub: string; cta: string; chips: string[]; image: BenefitImage }
+  hero: { headline: string; sub: string; cta: string; image: BenefitImage }
   /** Sample posts in the hero phone, by the cast characters. */
   feed: { name: string; handle: string; text: string; tag: string; /** Key in content/characters/cast.json. */ cast: string }[]
-  features: { title: string; items: { title: string; body: string }[] }
   rooms: { title: string; intro: string; items: { name: string; body: string }[] }
   norms: { title: string; items: string[] }
 }

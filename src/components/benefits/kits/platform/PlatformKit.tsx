@@ -1,12 +1,11 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, ArrowUp, Check, Sparkles } from 'lucide-react'
+import { ArrowRight, Check, Sparkles } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
 import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
-import './platform.css'
 
 const PLATFORM_PILLS: Record<string, string> = {
   'split-prism': 'stack',
@@ -39,10 +38,10 @@ function PlatformLockup({ variant }: { variant?: string }) {
   )
 }
 
-/** Platform: AI software launches. Near black, a violet glow, a prompt box, mono details, pricing. */
+/** Platform: AI software launch styling with workflows and plan details. */
 export default function PlatformKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'platform') return null
-  const { hero, features, workflow, config, plans } = page.content
+  const { hero, features, workflow, plans } = page.content
   const isVariant = Boolean(page.variant)
 
   return (
@@ -72,20 +71,19 @@ export default function PlatformKit({ page, onJoin, children }: BenefitKitProps)
                 <h1 className="pf-h1">{hero.headline}</h1>
                 <p className="pf-lede">{hero.sub}</p>
                 <div className="pf-actions">
-                  <button type="button" className="pf-btn" onClick={onJoin}>
-                    {hero.cta}
-                  </button>
+                  {page.slug === 'ai-swarms' ? (
+                    <Link to="/oracle" className="pf-btn">
+                      {hero.cta}
+                    </Link>
+                  ) : (
+                    <button type="button" className="pf-btn" onClick={onJoin}>
+                      {hero.cta}
+                    </button>
+                  )}
                   <Link to={BENEFIT_LINKS.demo} className="pf-btn-ghost">
                     Open the demo
                   </Link>
                 </div>
-                <Link to="/oracle" className="pf-prompt">
-                  <span className="sr-only">Ask the Oracle, for example: </span>
-                  <span className="pf-prompt-text">{hero.prompt}</span>
-                  <span className="pf-prompt-send" aria-hidden="true">
-                    <ArrowUp />
-                  </span>
-                </Link>
               </div>
               <div className="pf-frame">
                 <img
@@ -116,13 +114,6 @@ export default function PlatformKit({ page, onJoin, children }: BenefitKitProps)
                     Open the demo
                   </Link>
                 </div>
-                <Link to="/oracle" className="pf-prompt">
-                  <span className="sr-only">Ask the Oracle, for example: </span>
-                  <span className="pf-prompt-text">{hero.prompt}</span>
-                  <span className="pf-prompt-send" aria-hidden="true">
-                    <ArrowUp />
-                  </span>
-                </Link>
               </div>
               <div className="pf-wrap">
                 <div className="pf-frame">
@@ -178,46 +169,6 @@ export default function PlatformKit({ page, onJoin, children }: BenefitKitProps)
                 </li>
               ))}
             </ol>
-          </div>
-        </section>
-
-        <section className="pf-section" aria-labelledby="pf-config">
-          <div className="pf-wrap pf-split">
-            <div>
-              <h2 id="pf-config" className="pf-h2">
-                {config.title}
-              </h2>
-              <p className="pf-body pf-intro">{config.body}</p>
-              <p className="pf-body pf-intro">
-                <a href={page.hook.href} className="pf-text-link">
-                  {page.hook.label}
-                </a>
-                : {page.hook.text}
-              </p>
-            </div>
-            <figure className="pf-code">
-              <figcaption className="pf-code-bar">
-                <span className="pf-dots" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </span>
-                <span className="pf-mono">{config.filename}</span>
-              </figcaption>
-              <pre className="pf-pre">
-                <code>
-                  {config.lines.map((codeLine, index) => (
-                    <span key={`${index}-${codeLine}`} className="pf-code-line">
-                      <span className="pf-code-n" aria-hidden="true">
-                        {index + 1}
-                      </span>
-                      {codeLine}
-                      {'\n'}
-                    </span>
-                  ))}
-                </code>
-              </pre>
-            </figure>
           </div>
         </section>
 

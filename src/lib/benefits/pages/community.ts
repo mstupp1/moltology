@@ -7,10 +7,10 @@ const page: BenefitPage = {
   query: 'online community for self improvement',
   title: 'A friendly online community for self improvement | Moltology',
   description:
-    'Find your people without the feed. Moltology is a free online community for self improvement, built around one shared daily practice and a forum that helps.',
+    'Find an online community for self improvement with topic boards, shared daily tasks, and a place to ask questions or compare notes.',
   keywords: 'online community for self improvement, self improvement community, accountability group, find your people, forum',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/community/share.jpg?v=2',
     alt: 'A group of cartoon crabs laughing together around a beach bonfire at golden hour',
@@ -18,13 +18,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The forum group photo',
+    label: 'The Moltology forum',
     href: '/forum',
-    text: 'The top of the forum shows a group photo of active members as their 3D characters, retaken at most once a day as people join.',
+    text: 'Find a board that interests you and add one useful reply.',
   },
   reveal: {
-    headline: 'Come say hello on the forum.',
-    body: 'Introduce yourself in General Discussion. Helping newcomers is part of everyone\'s day.',
+    headline: 'Pull up a chair.',
+    body: 'Read a thread and leave one reply worth getting.',
     screenshot: 'forum',
   },
   related: ['charisma', 'gaming', 'spirituality'],
@@ -32,7 +32,7 @@ const page: BenefitPage = {
     {
       question: 'Is Moltology a social network?',
       answer:
-        'Not in the usual sense. There is no endless feed and no follower count to chase. It is a forum and a profile built around a shared daily practice, so most conversations are about doing the work.',
+        'Moltology has a forum and member profiles. Pick a topic board and join a conversation about the daily practice or something you’re curious about.',
     },
     {
       question: 'What makes it a self improvement community?',
@@ -58,14 +58,12 @@ const page: BenefitPage = {
       answer:
         'Turn up in the same place often, help with small things and reply to people by name. Helping another member is one of the daily tasks here, so those small exchanges happen without forcing them.',
     },
-
   ],
   content: {
     hero: {
-      headline: 'An online community for self improvement that feels like friends.',
-      sub: 'No feed to scroll and no follower counts. Moltology is a free community where everyone does the same small daily practice, and helping each other is part of it.',
-      cta: 'Join free',
-      chips: ['Daily practice', 'Kind replies', 'No follower counts', 'Free'],
+      headline: 'A self-improvement community for showing up.',
+      sub: 'Bring a good question, a small win, or the habit you’re working on.',
+      cta: 'Join the forum free',
       image: {
         src: '/images/benefits/community/hero.jpg?v=2',
         alt: 'Cartoon crabs laughing around a beach bonfire at golden hour, one showing the others a phone',
@@ -78,18 +76,9 @@ const page: BenefitPage = {
       { name: 'Kit', handle: '@kit', text: 'First week here. What do you all pick as your one thing when everything feels urgent?', tag: 'Question', cast: 'lobster_kit_shallows' },
       { name: 'Moss', handle: '@moss', text: 'Pick the thing you would be proudest of by tonight. The urgent things tend to shout for themselves.', tag: 'Help a member', cast: 'crab_moss_tern' },
     ],
-    features: {
-      title: 'Built for showing up, not scrolling',
-      items: [
-        { title: 'A shared practice', body: 'Everyone has the same eight tasks, so there is always something to talk about.' },
-        { title: 'Help counts', body: 'Answering another member is one of the daily tasks, so questions get replies.' },
-        { title: 'Your character', body: 'A 3D crab or lobster you dress up stands in for your face across the site.' },
-        { title: 'Weekly board', body: 'A friendly XP leaderboard that resets each Monday, so anyone can place.' },
-      ],
-    },
     rooms: {
-      title: 'Where people hang out',
-      intro: 'A few of the boards on the forum.',
+      title: 'Find your corner',
+      intro: 'Ask a question, share what worked, or welcome someone new.',
       items: [
         { name: 'General Discussion', body: 'Introductions, daily wins and the rest.' },
         { name: 'Moltmaxxing & Biometrics', body: 'Sleep, training, focus and the numbers behind them.' },

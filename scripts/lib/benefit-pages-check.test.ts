@@ -53,4 +53,17 @@ describe('benefit pages', () => {
     expect(rules).toContain(`${first.slug}:faq-standalone`)
     expect(rules).toContain(`${first.slug}:spelling`)
   })
+
+  it('flags marketing copy that is too long for the hero', () => {
+    const [first, ...rest] = pages
+    const wordy = {
+      ...first,
+      content: {
+        ...first.content,
+        hero: { ...first.content.hero, sub: 'word '.repeat(26).trim() },
+      },
+    } as BenefitPage
+    const rules = checkBenefitPages(BENEFIT_PAGES, [wordy, ...rest]).map((issue) => issue.rule)
+    expect(rules).toContain('hero-length')
+  })
 })

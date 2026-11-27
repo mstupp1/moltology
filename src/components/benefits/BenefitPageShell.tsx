@@ -5,9 +5,8 @@ import { AuthModal } from '@/components/AuthModal'
 import type { BenefitPage } from '@/lib/benefits/types'
 import { MoltReveal } from './MoltReveal'
 import type { BenefitKitProps } from './kit-props'
-import './benefits.css'
 
-// Each costume is its own chunk with its own CSS and fonts, so a page only loads the one it wears.
+// The route head loads the active kit stylesheet before its component hydrates.
 const KITS = {
   clinic: lazy(() => import('./kits/clinic/ClinicKit')),
   can: lazy(() => import('./kits/can/CanKit')),

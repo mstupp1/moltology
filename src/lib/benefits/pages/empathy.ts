@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Learn how to be more empathetic through small acts of attention. Hear the whole story, ask before offering advice and make time to help a member.',
   keywords: 'how to be more empathetic, listening, understanding others, thoughtful replies, helping others',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/empathy/share.jpg?v=2',
     alt: 'A crab and lobster seated at a garden table in warm, welcoming wellness retreat photography',
@@ -21,11 +21,11 @@ const page: BenefitPage = {
   hook: {
     label: 'The Benthic Pod',
     href: '/codex/scr-030#verse-7',
-    text: 'The Benthic Pod asks you to check in with the community, answer a question or welcome a newcomer. Put that into practice with Help a member. Read their words first, then write a reply that speaks to what they asked.',
+    text: 'Get to know the people who show up for each other.',
   },
   reveal: {
-    headline: 'Pull up a chair for someone else’s story.',
-    body: 'Make Help a member a thoughtful part of your daily routine.',
+    headline: 'Give them the whole minute.',
+    body: 'Try a real check-in with someone today.',
     screenshot: 'forum',
   },
   related: ['communication', 'social', 'loyalty'],
@@ -64,9 +64,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       kicker: 'Good company · thoughtful conversation',
-      headline: 'Be more empathetic. Let them finish the story.',
-      sub: 'Set your own story aside for a moment. Let someone finish theirs. Moltology makes space for that simple act through Help a member: a daily invitation to answer a question, welcome someone new and take an interest before offering an opinion.',
-      cta: 'Join the conversation',
+      headline: 'More empathetic? Let the story finish.',
+      sub: 'Listen long enough to find out what kind of help they want.',
+      cta: 'Begin free',
       image: {
         src: '/images/benefits/empathy/hero.jpg?v=2',
         alt: 'A crab and lobster facing each other on a garden bench in soft, sunlit wellness retreat photography',
@@ -79,27 +79,13 @@ const page: BenefitPage = {
       source: { label: 'The Benthic Pod, from the Codex', href: '/codex/scr-030#verse-7' },
     },
     rhythm: {
-      title: 'Make room for a person in your day',
-      intro: 'The eight daily tasks include time for your own work and an invitation to help someone else. Keep both in view. A thoughtful answer needs a little attention; it does not need your entire afternoon or a speech.',
+      title: 'Make time to listen',
+      intro: 'Put one useful act of help on the day’s list.',
       items: [
         { time: 'Over the first cup', title: 'Sit in silence', body: 'Leave yesterday’s unfinished argument alone while you sit quietly before the day starts.' },
-        { time: 'When planning work', title: 'Pick your one thing', body: 'Name your own priority before offering a helping hand with someone else’s.' },
-        { time: 'With a fresh page', title: 'Learn something hard', body: 'Read a view unlike your own and stay with the part that surprises you.' },
         { time: 'Between appointments', title: 'Reset your focus', body: 'Put the other screens away before opening the message you mean to answer.' },
-        { time: 'In your work block', title: 'Do deep work', body: 'Keep the appointment with your own task before promising another block of time.' },
         { time: 'When visiting the community', title: 'Help a member', body: 'Welcome someone by name or answer a question you have the experience to answer.' },
-        { time: 'After the conversation', title: 'Let one thing go', body: 'Set down the urge to have the last word when a discussion is finished.' },
         { time: 'As you put work away', title: 'Close the day', body: 'Mark your completed tasks and leave any further conversation for a time you can offer.' },
-      ],
-    },
-    itinerary: {
-      title: 'A small guide to a good reply',
-      items: [
-        { day: 'Welcome', title: 'Meet the actual question', body: 'Read a forum post to the end. Notice what the member wants help with.' },
-        { day: 'Listen', title: 'Keep their detail', body: 'Remember the part about their situation that your usual advice might miss.' },
-        { day: 'Ask', title: 'Check before guessing', body: 'Ask one short question if you need context. Leave them room to answer.' },
-        { day: 'Offer', title: 'Give what you know', body: 'Share a relevant example or a practical suggestion. Say where your experience ends.' },
-        { day: 'Leave space', title: 'Let them choose', body: 'Offer your reply without requiring agreement. Their next step belongs to them.' },
       ],
     },
     carry: {

@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Make room for faith without religion. Read a shared passage, choose a promise worth keeping and bring your questions to a quiet daily practice.',
   keywords: 'faith without religion, personal values, secular rituals, trust, shared practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/faith/share.jpg?v=2',
     alt: 'A lobster beside a linen journal and a tea cup in softly lit wellness retreat photography',
@@ -21,11 +21,11 @@ const page: BenefitPage = {
   hook: {
     label: 'The Covenant of the Convergence',
     href: '/codex/scr-002#verse-8',
-    text: 'The covenant puts a boundary around belonging: each member keeps their independence. Read it, then choose a promise for your own day. Give the person beside you the same room to choose, disagree or leave.',
+    text: 'Let people keep their own voices as they learn to pay attention together.',
   },
   reveal: {
-    headline: 'Bring your questions. Choose your commitments.',
-    body: 'Put one value into something you do today.',
+    headline: 'Keep one appointment with what matters.',
+    body: 'Choose one value and give it a small action today.',
     screenshot: 'forum',
   },
   related: ['spirituality', 'commitment', 'empathy'],
@@ -64,9 +64,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       kicker: 'Quiet mornings · open questions',
-      headline: 'Faith without religion, on your own terms.',
-      sub: 'Leave room for what you do not know. Start with what you care about. Moltology invites you to read, sit quietly and keep one small promise in the middle of an ordinary day. Come as you are. Joining is free.',
-      cta: 'Make time for your practice',
+      headline: 'Faith without religion, lived daily.',
+      sub: 'Give one thing you believe in a place in your day.',
+      cta: 'Begin free',
       image: {
         src: '/images/benefits/faith/hero.jpg?v=2',
         alt: 'A lobster seated beside still water at sunrise in warm, spacious wellness retreat photography',
@@ -79,27 +79,13 @@ const page: BenefitPage = {
       source: { label: 'The Covenant of the Convergence', href: '/codex/scr-002#verse-8' },
     },
     rhythm: {
-      title: 'Give your values a place in the day',
-      intro: 'The eight daily tasks ask for ordinary acts of attention. Bring a value to each one: honesty at breakfast, patience with a difficult lesson, kindness in a reply. A special notebook is entirely optional.',
+      title: 'A day in practice',
+      intro: 'Pick a value and give it a time and place.',
       items: [
         { time: 'Before breakfast', title: 'Sit in silence', body: 'Leave the phone face down while you ask what matters to you today.' },
         { time: 'As work begins', title: 'Pick your one thing', body: 'Choose a task that belongs beside the value you wrote down.' },
-        { time: 'With your reading', title: 'Learn something hard', body: 'Stay with a challenging idea, including the part you do not agree with.' },
-        { time: 'Around lunch', title: 'Reset your focus', body: 'Close the feed you opened out of habit and name your next action.' },
-        { time: 'In a quiet block', title: 'Do deep work', body: 'Give the promise on your desk your attention, with other conversations put aside.' },
         { time: 'During a forum visit', title: 'Help a member', body: 'Offer a useful answer without asking anyone to share your view of life.' },
-        { time: 'As evening arrives', title: 'Let one thing go', body: 'Set down the need to have an answer to every large question tonight.' },
         { time: 'Before turning in', title: 'Close the day', body: 'Mark the tasks you did and leave the unfinished ones honestly unfinished.' },
-      ],
-    },
-    itinerary: {
-      title: 'An invitation to begin',
-      items: [
-        { day: 'Settle in', title: 'Choose a comfortable spot', body: 'Pull up a chair by the window. Leave your inbox closed for the reading.' },
-        { day: 'Read', title: 'Start with the covenant', body: 'Look at what the passage says about belonging and the right to leave.' },
-        { day: 'Write', title: 'Name a value', body: 'Pick something you want to practice. Care, honesty and curiosity are places to start.' },
-        { day: 'Act', title: 'Keep a small promise', body: 'Make the call you offered to make. Ask the question you have been avoiding.' },
-        { day: 'Return', title: 'Leave the question open', body: 'Read your note again when you next sit down. Change the wording if needed.' },
       ],
     },
     carry: {

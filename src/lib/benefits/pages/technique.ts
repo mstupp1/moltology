@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Run the pomodoro technique with one target and a timer. Moltology pairs a pre-round setup with Focus rounds, an Oracle skill for 25-minute work sessions.',
   keywords: 'pomodoro technique, focus rounds, work intervals, pomodoro breaks, single task work',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/technique/share.jpg?v=2',
     alt: 'A purple lobster beside a round timer in a dark training room, cinematic esports key art',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Seal before the descent, from the Codex',
+    label: 'Seal before the descent',
     href: '/codex/scr-031#verse-3',
-    text: 'Seal the room before you start, not halfway through the round. Put the phone away and shut the spare tabs while you are still setting up, then press start.',
+    text: 'Close spare tabs and put the phone away before the timer starts.',
   },
   reveal: {
-    headline: 'Ready up. The draft is waiting.',
-    body: 'Name the next paragraph before starting your first focus round.',
+    headline: 'The draft is waiting.',
+    body: 'Members can use the Oracle’s free Focus rounds skill for a target and a check-in.',
     screenshot: 'dashboard',
   },
   related: ['focus', 'gamification', 'gaming'],
@@ -58,15 +58,15 @@ const page: BenefitPage = {
     {
       question: 'Does the Oracle run a Pomodoro timer for me?',
       answer:
-        'No, you run your own timer and return to the Oracle, our AI guide, when it rings. Focus rounds is a free skill that asks for your target, counts the rounds and prompts breaks. Oracle chat has a daily limit, with optional Oracle MAX for higher limits.',
+        'Run your own timer and return when it rings. The free Focus rounds skill for members helps you choose a target, track rounds, and take breaks.',
     },
   ],
   content: {
     hero: {
       tag: 'Focus rounds · Ready check',
-      headline: 'Run the pomodoro technique one round at a time.',
-      sub: 'The report has enough tabs already. Pick one part, put the phone away and start a 25-minute timer. Ask the Oracle for Focus rounds when you want a target and a check-in between rounds.',
-      cta: 'Join for focus rounds',
+      headline: 'Pomodoro technique. Ready for round one?',
+      sub: 'Pick a task, put the phone away, and start a 25-minute timer.',
+      cta: 'Join for Focus rounds',
       image: {
         src: '/images/benefits/technique/hero.jpg?v=2',
         alt: 'A purple lobster at a training console with a round desk timer on the right, dark violet game launch key art',
@@ -74,29 +74,14 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: {
-      title: 'Check your pre-round setup',
-      intro: 'Sample build. Run these five checks before the clock starts.',
-      items: [
-        { code: 'SHL', label: 'Shell', body: 'Decide which notifications can wait until the break.', value: 58 },
-        { code: 'TRQ', label: 'Torque', body: 'Choose one part of the report to work on this round.', value: 77 },
-        { code: 'SYN', label: 'Synapse', body: 'Write the first step beside the timer and begin there.', value: 69 },
-        { code: 'ECD', label: 'Ecdysis', body: 'Change the setup that interrupted your previous attempt.', value: 61 },
-        { code: 'DEP', label: 'Depth', body: 'Keep the selected document open until the work interval ends.', value: 84 },
-      ],
-    },
     quests: {
-      title: 'Rounds fit inside the daily practice',
-      intro: 'The eight daily tasks cover the whole day. Timed rounds belong in Do deep work; keep the rest of the board in view too.',
+      title: 'Choose a quest for the timer',
+      intro: 'Use an interval where a job can hold your full attention.',
       items: [
-        { title: 'Sit in silence', body: 'Sit quietly before opening the messages waiting for you.', reward: 'Daily XP' },
         { title: 'Pick your one thing', body: 'Choose the main job before dividing it into work intervals.', reward: 'Daily XP' },
         { title: 'Learn something hard', body: 'Try the difficult exercise with your notes closed first.', reward: 'Daily XP' },
         { title: 'Reset your focus', body: 'Clear the distraction left over from your morning session.', reward: 'Daily XP' },
         { title: 'Do deep work', body: 'Set one target, start your timer and return after the round.', reward: 'Daily XP' },
-        { title: 'Help a member', body: 'Read a forum question and offer a useful answer.', reward: 'Daily XP' },
-        { title: 'Let one thing go', body: 'Name one frustration from the session and let it go.', reward: 'Daily XP' },
-        { title: 'Close the day', body: 'Review what you did and put the work away.', reward: 'Daily XP' },
       ],
     },
     modes: {
@@ -113,17 +98,6 @@ const page: BenefitPage = {
         width: 1280,
         height: 960,
       },
-    },
-    patch: {
-      title: 'Session settings',
-      version: 'Focus rounds · Default loadout',
-      items: [
-        'Work interval: 25 minutes on the chosen target.',
-        'Short break: five minutes away from the screen.',
-        'Long break: 15 to 30 minutes after four rounds.',
-        'Round report: tell the Oracle what you worked on.',
-        'Before starting: clear distractions and keep urgent contacts reachable.',
-      ],
     },
   },
 }

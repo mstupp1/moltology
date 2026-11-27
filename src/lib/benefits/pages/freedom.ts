@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Wondering how to feel free? Start with one small thing to let go: a stale plan, a noisy feed or an automatic yes. Make space for a daily practice.',
   keywords: 'how to feel free, letting go, personal boundaries, fewer commitments, daily practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/freedom/share.jpg?v=2',
     alt: 'A crab resting beside an open linen tote on a quiet beach in airy retreat photography',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'What is shed does not come back, and this is the mercy',
+    label: 'The Law of Ecdysis',
     href: '/codex/scr-010#verse-4',
-    text: 'This Codex verse is about not gluing dead plate back on: the outgrown habit, the draining obligation, the project that died months ago. Start small: remove a stale reminder or decline an optional invitation you keep dreading. Use Let one thing go to name what you are setting down.',
+    text: 'Give a habit you’ve outgrown permission to stay gone.',
   },
   reveal: {
-    headline: 'That old reminder can stop following you.',
-    body: 'Start with Let one thing go and choose what to put down.',
+    headline: 'Leave one thing here.',
+    body: 'Tonight’s practice has a place to name what you’re putting down.',
     screenshot: 'forum',
   },
   related: ['spirituality', 'resilience', 'emotional'],
@@ -64,9 +64,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       kicker: 'Travel light · stay close to home',
-      headline: 'Leave one thing behind. Make room to feel free.',
-      sub: 'The unread newsletter. The hobby you keep apologizing to. The invitation that became a standing appointment. Pick one small thing you no longer want to carry. Name it tonight and let it go. Moltology builds a quiet daily routine around that one choice.',
-      cta: 'Start with one less thing',
+      headline: 'Feel free to take one thing off the list.',
+      sub: 'Start with the stale reminder, the standing invitation, or the project you’ve already left behind.',
+      cta: 'Begin free',
       image: {
         src: '/images/benefits/freedom/hero.jpg?v=2',
         alt: 'A lobster walking along an open stretch of pale sand in spacious wellness travel photography',
@@ -79,27 +79,13 @@ const page: BenefitPage = {
       source: { label: 'The Law of Ecdysis, verse 4', href: '/codex/scr-010#verse-4' },
     },
     rhythm: {
-      title: 'A lighter packing list for the day',
-      intro: 'Keep the eight daily tasks close. They ask you to choose what gets your attention, do the work you picked and stop at the end. Leave some space between appointments; you need somewhere to eat lunch.',
+      title: 'A lighter day',
+      intro: 'Four places to make room in an ordinary day.',
       items: [
-        { time: 'First light', title: 'Sit in silence', body: 'Take a seat before checking what the rest of the world wants from you.' },
         { time: 'At your desk', title: 'Pick your one thing', body: 'Choose the task you mean to do before adding anything else to the list.' },
-        { time: 'In your reading time', title: 'Learn something hard', body: 'Open the lesson you chose, with the recommended videos left for another visit.' },
         { time: 'At lunchtime', title: 'Reset your focus', body: 'Remove a distraction you can control, such as a tab you keep reopening.' },
-        { time: 'For the main task', title: 'Do deep work', body: 'Put the phone away and work on the single job in front of you.' },
-        { time: 'When you check in', title: 'Help a member', body: 'Offer help you have time to give, then return to your own responsibilities.' },
         { time: 'Before dusk', title: 'Let one thing go', body: 'Name an optional demand you are dropping and take the step to drop it.' },
         { time: 'At the end', title: 'Close the day', body: 'Tick what you completed and put the list away, including its empty boxes.' },
-      ],
-    },
-    itinerary: {
-      title: 'Leave something at the door',
-      items: [
-        { day: 'Unpack', title: 'Find the small weight', body: 'Look for the recurring reminder you dismiss every time it appears.' },
-        { day: 'Choose', title: 'Check whose choice it is', body: 'Pick something optional that belongs to you. Keep promises to other people in view.' },
-        { day: 'Release', title: 'Finish the small goodbye', body: 'Unsubscribe, delete the stale reminder or send a polite decline.' },
-        { day: 'Rest', title: 'Leave the gap alone', body: 'Keep that newly empty calendar space empty for now. Resist assigning it another job.' },
-        { day: 'Close', title: 'Name what you put down', body: 'Use the evening task to mark the choice, then leave the list for tonight.' },
       ],
     },
     carry: {

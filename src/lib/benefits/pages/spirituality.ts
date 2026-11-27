@@ -10,7 +10,7 @@ const page: BenefitPage = {
     'A daily spiritual practice without the retreat price: a quiet morning, one honest look at yesterday and a clear close to each day. Free to join, ready today.',
   keywords: 'daily spiritual practice, spiritual routine, morning silence, evening reflection, mindfulness practice, spirituality without religion',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/spirituality/share.jpg',
     alt: 'A crab sitting still on warm sand at dawn',
@@ -20,11 +20,11 @@ const page: BenefitPage = {
   hook: {
     label: 'The Daily Shedding Routine',
     href: '/codex/scr-030',
-    text: 'The practice comes from one reading in the Codex. It argues that two moments carry the day: the first hour, which decides what the day is for, and the last minutes, which decide what you carry into tomorrow.',
+    text: 'Choose what gets your first hour and what stays behind at night.',
   },
   reveal: {
-    headline: 'The retreat fits inside an ordinary day.',
-    body: 'Begin with a few quiet minutes tomorrow morning and build from there.',
+    headline: 'Come back to quiet.',
+    body: 'Make a small appointment with yourself every morning.',
     screenshot: 'forum',
   },
   related: ['libido', 'energy-drinks'],
@@ -59,14 +59,13 @@ const page: BenefitPage = {
       answer:
         'No. The Codex is a set of readings with its own story and language, and you can take it as metaphor. The practice is the same whatever you believe.',
     },
-
   ],
   content: {
     hero: {
       kicker: 'A retreat you never travel to',
       headline: 'A daily spiritual practice, at home.',
-      sub: 'Moltology is a free daily practice: a quiet start, one honest look back and a clear end to each day. No flights, no fees, no week away.',
-      cta: 'Begin your practice',
+      sub: 'Begin in quiet. Give the day one purpose. End it on purpose, too.',
+      cta: 'Begin free',
       image: {
         src: '/images/benefits/spirituality/hero.jpg',
         alt: 'A small crab resting on pale sand by still water at dawn',
@@ -79,27 +78,13 @@ const page: BenefitPage = {
       source: { label: 'The Daily Shedding Routine', href: '/codex/scr-030' },
     },
     rhythm: {
-      title: 'The shape of a day',
-      intro: 'Eight small practices from first light to evening. Keep only the first and the last and the day still counts.',
+      title: 'A day at the retreat',
+      intro: 'A little quiet, useful work, and somewhere to leave the day.',
       items: [
         { time: 'Early morning', title: 'Sit in silence', body: 'Before any feed or inbox, sit quietly and look honestly at yesterday.' },
         { time: 'Morning', title: 'Pick your one thing', body: 'Name what matters most today and begin it.' },
-        { time: 'Late morning', title: 'Learn something hard', body: 'Read a passage or a lesson that asks something of you.' },
-        { time: 'Noon', title: 'Reset your focus', body: 'Clear one distraction and choose the next useful act.' },
         { time: 'Afternoon', title: 'Do deep work', body: 'One unhurried block of real attention on the thing you chose.' },
-        { time: 'Late afternoon', title: 'Help someone', body: 'Answer one member or welcome a newcomer.' },
-        { time: 'Early evening', title: 'Let one thing go', body: 'Name one thing from today and set it down.' },
         { time: 'Evening', title: 'Close the day', body: 'Check off the day and stop. It is done either way.' },
-      ],
-    },
-    itinerary: {
-      title: 'Your first week',
-      items: [
-        { day: 'Day 1', title: 'Arrive', body: 'Take the three minute assessment and see where you stand on focus, calm and follow-through.' },
-        { day: 'Day 2', title: 'Quiet mornings', body: 'Start the day without your phone, even for five minutes.' },
-        { day: 'Days 3 to 5', title: 'Find the rhythm', body: 'Add one practice at a time until the day has a shape.' },
-        { day: 'Day 6', title: 'Join the circle', body: 'Read the forum and say hello. Others are keeping the same rhythm.' },
-        { day: 'Day 7', title: 'Look back', body: 'Read your week in your activity log and keep what worked.' },
       ],
     },
     carry: {

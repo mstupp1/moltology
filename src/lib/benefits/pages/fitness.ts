@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Mental fitness, on the daily training card. Read the five character stats, work through eight tasks, and log what you did with Moltology.',
   keywords: 'mental fitness, character stats, daily training, focus practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer: 'Moltology is a daily practice, not mental health treatment or a test of intelligence.',
   shareImage: {
     src: '/images/benefits/fitness/share.jpg?v=2',
@@ -20,13 +20,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The Sacred Metrics in the Codex',
+    label: 'The Sacred Metrics',
     href: '/codex/scr-040',
-    text: 'Read The Sacred Metrics on boundaries, follow-through and focus. Then check the five stats on your character sheet: Shell, Torque, Synapse, Ecdysis and Depth. Take the Moltmax quiz for your base scores and use the daily tasks as your training card.',
+    text: 'Read what the five character stats represent and pick a task to practice.',
   },
   reveal: {
-    headline: 'Bring the logbook back to the work.',
-    body: 'Read your character sheet, then choose today’s task.',
+    headline: 'Get your reps in.',
+    body: 'Pick one daily task and log the work.',
     screenshot: 'dashboard',
   },
   related: ['strength', 'grip', 'gaming'],
@@ -66,8 +66,8 @@ const page: BenefitPage = {
     hero: {
       tag: 'Training log included',
       headline: 'Mental fitness. Daily reps.',
-      sub: 'Read the stats. Pick the work. Log the session. Moltology puts eight daily tasks beside a character sheet with five stats. Bring the same attention to the task as you bring to the numbers.',
-      cta: 'Join and open your task card',
+      sub: 'Log your reps on the daily checklist. Check your five character stats.',
+      cta: 'Start training free',
       image: {
         src: '/images/benefits/fitness/hero.jpg?v=2',
         alt: 'A lobster with a plain stat card by a locker under hard directional sportswear campaign lighting',
@@ -75,23 +75,13 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: [
-      { value: '5', label: 'Stats on your sheet' },
-      { value: '8', label: 'Daily training tasks' },
-      { value: '15', label: 'Questions in the quiz' },
-      { value: '$0', label: 'To start' },
-    ],
     program: {
-      title: 'Full session. No skipped lines.',
-      intro: 'Everyone gets the same eight daily tasks. Read the whole card before loading your day with extra goals. There is quiet at the start, work in the middle, and a place to stop.',
+      title: 'The training card',
+      intro: 'Four reps from the daily program. Do the work before logging it.',
       items: [
         { set: 'Warm-up', title: 'Sit in silence', body: 'Sit before opening a feed. Look back at yesterday while the morning is still yours to start.' },
-        { set: 'Target', title: 'Pick your one thing', body: 'Choose today’s most important task and begin it. Put an action on the card, not an ambition for the whole year.' },
         { set: 'Skill set', title: 'Learn something hard', body: 'Work through material you cannot skim. Try the exercise in the book before checking how someone else did it.' },
-        { set: 'Interval', title: 'Reset your focus', body: 'Remove one distraction from the session. Decide what needs your attention next before returning to the screen.' },
         { set: 'Main block', title: 'Do deep work', body: 'Keep one piece of work open. Set the other demands aside and work through the difficult bit you came here for.' },
-        { set: 'Team session', title: 'Help a member', body: 'Answer someone’s forum question or welcome a newcomer. Give them the useful explanation you would have wanted when starting.' },
-        { set: 'Deload', title: 'Let one thing go', body: 'Name something you are setting down from today. Stop carrying the argument after you have left the conversation.' },
         { set: 'Record', title: 'Close the day', body: 'Check the tasks you finished and stop. Write the day as it happened instead of adding imaginary extra credit.' },
       ],
     },
@@ -106,7 +96,6 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    creed: 'Read the numbers. Do the session.',
   },
 }
 

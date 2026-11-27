@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Learn how to communicate better with plain requests, patient listening, and room for a reply. Read the Codex and take the practice into your next conversation.',
   keywords: 'how to communicate better, listening, clear requests, communication practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/communication/share.jpg?v=2',
     alt: 'Two coral crabs at a seminar table with one microphone between them, polished event photography',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The pincers grip work, never people',
+    label: 'The Soft-Shell Covenant',
     href: '/codex/scr-013#verse-5',
-    text: 'Torque belongs on your own work, never on winning an argument. Take that rule into your next conversation: make the request plainly and let the other person choose their reply.',
+    text: 'Put your effort into the work. Give the people doing it room to speak.',
   },
   reveal: {
-    headline: 'Leave a little room for their reply.',
-    body: 'Practice a clear request when you answer someone on the forum.',
+    headline: 'Take it into the next conversation.',
+    body: 'Practice one useful reply today.',
     screenshot: 'forum',
   },
   related: ['charisma', 'loyalty', 'community'],
@@ -63,10 +63,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      kicker: 'A practical workshop in saying what you mean',
-      headline: 'Communicate better. Give the other person a turn.',
-      sub: 'Put the phone down. Ask the question you came to ask. Listen to the answer before preparing your closing argument. Practice it in the group chat too, especially when it gets interesting.',
-      cta: 'Join the practice free',
+      kicker: 'A short course in listening',
+      headline: 'Communicate better. Leave room for an answer.',
+      sub: 'Ask one clear question. Let the other person finish before you reply.',
+      cta: 'Start the practice free',
       image: {
         src: '/images/benefits/communication/hero.jpg?v=2',
         alt: 'A coral crab holding a handheld microphone low while another crab speaks, navy seminar stage and warm spotlights',
@@ -75,44 +75,18 @@ const page: BenefitPage = {
       },
       book: { title: 'Say it plainly', subtitle: 'Ask clearly. Listen all the way through.', author: 'A Moltology practice' },
     },
-    promise: {
-      title: 'Your side of the conversation',
-      items: [
-        'Ask whether this is a good time to talk',
-        'Name what happened before guessing why it happened',
-        'Make one request that someone can answer',
-        'Let a pause stay a pause',
-        'Accept a reply that differs from your rehearsal',
-      ],
-    },
     chapters: {
-      title: 'The conversation, from first word to last',
+      title: 'The conversation, in four pages',
       items: [
         { title: 'Put the screen away', body: 'Set your phone down before someone starts talking. If you need to check something, say so instead of splitting your attention silently.' },
         { title: 'Find the actual question', body: 'Write the thing you need to ask in one sentence. Read it back and remove the opening speech.' },
-        { title: 'Listen past your example', body: 'Keep your similar story for later. Ask a question about the detail the other person just gave you.' },
         { title: 'Check the meaning', body: 'Repeat the point in your own words and ask if it is right. Let the speaker correct your version.' },
         { title: 'Ask for something', body: 'Say who needs to do what. Replace the vague complaint about nobody helping with a request about the next task.' },
-        { title: 'Keep pressure on the work', body: 'Stay with the shared problem. Skip the attempt to corner someone into agreement or win the room.' },
-        { title: 'Repair the interruption', body: 'If you cut in, stop. Invite the person to finish and leave the explanation of your excellent intentions for another occasion.' },
-        { title: 'Know when to pause', body: 'Ask to continue later when you cannot listen properly. Agree when to return, then come back at that time.' },
       ],
     },
     passage: {
       quote: 'Aim a strong grip at a person and the tool has malfunctioned.',
       source: { label: 'The Soft-Shell Covenant, verse 5', href: '/codex/scr-013#verse-5' },
-    },
-    agenda: {
-      title: 'Take it into the next conversation',
-      intro: 'Use an ordinary exchange for practice. The request about tomorrow’s meeting counts; you do not need a grand speech.',
-      items: [
-        { time: 'Before you speak', title: 'Choose the single thing you need to ask' },
-        { time: 'Opening words', title: 'Check whether they have time to listen' },
-        { time: 'Their turn', title: 'Keep your next sentence to yourself' },
-        { time: 'A question', title: 'Ask about the point you did not understand' },
-        { time: 'Your request', title: 'State the action and leave room for a no' },
-        { time: 'After the exchange', title: 'Let one thing go instead of replaying every word' },
-      ],
     },
   },
 }

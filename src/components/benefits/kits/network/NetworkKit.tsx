@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
-import { Hash, Heart, MessageCircle, Sparkles } from 'lucide-react'
+import { Hash, Sparkles } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
 import { CAST, castStillFilename } from '@/lib/cast'
 import { MASCOT_S3_PREFIX } from '@/lib/mascots'
@@ -8,7 +8,6 @@ import { BrandIcon } from '@/components/ui/BrandMark'
 import { BenefitHeader } from '../../BenefitHeader'
 import { BenefitFaq } from '../../BenefitFaq'
 import { BENEFIT_LINKS, type BenefitKitProps } from '../../kit-props'
-import './network.css'
 
 /** The social app lockup: the emblem on a gradient app tile and a rounded lowercase name. */
 function NetworkLockup({ variant }: { variant?: string }) {
@@ -31,14 +30,13 @@ function castStill(key: string) {
 /** Network: social apps. White and violet, a sunset gradient, rounded type, a phone with a feed. */
 export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) {
   if (page.kit !== 'network') return null
-  const { hero, feed, features, rooms, norms } = page.content
+  const { hero, feed, rooms, norms } = page.content
 
   return (
     <div className="nw">
       <BenefitHeader
         lockup={<NetworkLockup variant={page.variant} />}
         links={[
-          { label: 'Features', href: '#features' },
           { label: 'Boards', href: '#boards' },
           { label: 'FAQ', href: '#faq' },
         ]}
@@ -52,19 +50,12 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
             <div className="nw-hero-copy">
               <h1 className="nw-h1">{hero.headline}</h1>
               <p className="nw-lede">{hero.sub}</p>
-              <ul className="nw-chips" aria-label="At a glance">
-                {hero.chips.map((chip) => (
-                  <li key={chip} className="nw-chip">
-                    {chip}
-                  </li>
-                ))}
-              </ul>
               <div className="nw-actions">
                 <button type="button" className="nw-btn" onClick={onJoin}>
                   {hero.cta}
                 </button>
                 <Link to={BENEFIT_LINKS.quiz} className="nw-btn-soft">
-                  Take the 3 minute quiz
+                  Take the habit quiz
                 </Link>
               </div>
             </div>
@@ -85,7 +76,7 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
                     className="nw-photo-img"
                   />
                 </figure>
-                <p className="nw-sample">Sample posts from the cast</p>
+                <p className="nw-sample">Sample forum thread</p>
                 <ul className="nw-feed">
                   {feed.map((post) => (
                     <li key={post.handle} className="nw-post">
@@ -96,10 +87,6 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
                           <span className="nw-post-tag">{post.tag}</span>
                         </p>
                         <p className="nw-post-text">{post.text}</p>
-                        <p className="nw-post-actions" aria-hidden="true">
-                          <Heart />
-                          <MessageCircle />
-                        </p>
                       </div>
                     </li>
                   ))}
@@ -110,22 +97,6 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
           </div>
         </section>
 
-        <section className="nw-section" id="features" aria-labelledby="nw-features">
-          <div className="nw-wrap">
-            <h2 id="nw-features" className="nw-h2 nw-center">
-              {features.title}
-            </h2>
-            <ul className="nw-cards">
-              {features.items.map((item, index) => (
-                <li key={item.title} className={`nw-card is-${index % 4}`}>
-                  <h3 className="nw-h3">{item.title}</h3>
-                  <p className="nw-body">{item.body}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
         <section className="nw-section nw-tint" id="boards" aria-labelledby="nw-boards">
           <div className="nw-wrap nw-split">
             <div>
@@ -133,12 +104,7 @@ export default function NetworkKit({ page, onJoin, children }: BenefitKitProps) 
                 {rooms.title}
               </h2>
               <p className="nw-body">{rooms.intro}</p>
-              <p className="nw-body">
-                <a href={page.hook.href} className="nw-text-link">
-                  {page.hook.label}
-                </a>
-                : {page.hook.text}
-              </p>
+              <Link to="/forum" className="nw-text-link">Browse the forum</Link>
             </div>
             <ul className="nw-rooms">
               {rooms.items.map((room) => (
