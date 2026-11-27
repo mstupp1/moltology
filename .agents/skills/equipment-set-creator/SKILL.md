@@ -68,7 +68,7 @@ Builders get three colours as tones: `plate` (material), `trim` (metal), `accent
 3. **Rarity spread.** Commons and uncommons for small pieces, one rare-or-better signature piece. Collections use `ladder: false`.
 4. **Define the pieces** at the end of `pieces.ts`, and the collection (if any) in `collections.ts` with its benefit `kit`. A collection with a kit shows on that kit's benefit pages (Wear the look), gets a buyable bundle at its `discountPercent`, and takes a turn as the shop's collection of the week.
 5. **Build** any new shapes or hats.
-6. **Review** with the board (below) on lobster and crab, front and back. Check: no clipping through the shell or eyes in every build (`classic`, `slim`, `chunky`, `barrel`, `tapered`), claws open and closed, all ten poses for anything on the arms.
+6. **Review** with the board (below) on lobster and crab, front and back, then run the **face check** (`--faces`, below) for every garment, belt-slot piece (stoles, scarves, capes) and hat. Check: no clipping through the shell or eyes in every build (`classic`, `slim`, `chunky`, `barrel`, `tapered`), claws open and closed, all ten poses for anything on the arms.
 7. **Ship.** Merge the PR. There is no catalog migration: each server instance upserts missing or changed pieces into `equipment_catalog` the first time a member buys, adds or equips something (`ensureGearCatalog`). Server reads (shop, Customize, profiles) come straight from code. Run `npm run gear:sync` to sync the dev database by hand. Never delete or renumber a shipped piece; set `retired: true` to take it out of the shop (owners keep it).
 8. **Bump `STILL_VERSION`** in `src/lib/avatar-still.ts` only if existing pieces' looks changed, so cached stills redraw.
 
@@ -81,10 +81,25 @@ npm run gear:board                                             # every base piec
 npm run gear:board -- --out tmp/gear-board/after --compare tmp/gear-board/before
 ```
 
+### Face check (required for anything near the neck or head)
+
+```bash
+npm run gear:board -- --collection <id> --faces --size 400
+```
+
+Renders every outfit close and straight on, on both species in all six head shapes (each with a different build) and the tongue out, the lowest mouth. The plain board uses one bean-headed classic crab, which hides the problem: on a round, tall or chunky crab the mouth sits lower on the shell, and cloth, collars and trims that clear it on the mannequin cover it. Look at every crab tile: **the whole mouth and tongue must show.** If anything sits over the mouth, fix it before the PR, never by asking the user to accept it.
+
+Rules that keep the face clear on a crab (its shell is its head and its chest):
+
+- Body cloth stops at `collarLine()` (it already keeps `MOUTH_CLEAR` below `wear.head.mouthY`). Build collars and necklines from that `Neckline`, never from a fixed height or `torso.top`.
+- A thick trim (fur roll, puffer collar, stole band) has its own height: drop it below the line by about its width (`neck.ring(lift, drop)`) so its top, not its centre, sits at the neckline. Anything lifted far off the shell stands out in front of the mouth in a front view.
+- Things that hang down the front (plackets, stole ends, ties) start below the neckline on a crab (`neck.y(0) - drop`), not at `torso.top`.
+- Hats sit above the eyes; check brims and bands do not drop over the eyes on a tall or round head.
+
 Pieces are packed into outfits (one per slot) and worn by a plain lobster and crab. The sheet lands at `<out>/board.png`. `--compare` reports any still that changed against an earlier run: use it before and after touching a shared builder, so existing gear stays as it was.
 
 ## Checks
 
 - `npm run test:file -- src/lib/gear scripts/lib/gear-sql.test.ts` checks unique keys, ids and numbers, shapes in the right slot, palettes and collections that exist, a 3D look for every catalog row, that pieces old migrations shipped keep their id and slug, and that no new piece reuses an old slug.
 - `npm run typecheck`.
-- The board, looked at by Claude, before any PR.
+- The board and the face check board, looked at by Claude, before any PR. Content that dresses a cast member (animated lessons, reels) also renders that character in the outfit close up before the video render: cast members have their own head shapes and builds.

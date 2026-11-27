@@ -10,6 +10,7 @@
  *   npm run gear:board -- --pieces cream-trench --pose strut   # any character pose
  *   npm run gear:board -- --out tmp/gear-board/before
  *   npm run gear:board -- --out tmp/gear-board/after --compare tmp/gear-board/before
+ *   npm run gear:board -- --collection snow-day --faces   # face check: every head shape and build
  *
  * Pieces are packed into outfits, one piece per slot, so each still shows up to seven pieces.
  * Linux draws with software WebGL, about 20 seconds a still.
@@ -26,10 +27,31 @@ import { parseLobsterAvatarConfig, LOBSTER_AVATAR_STYLE } from '../src/lib/lobst
 import { lookFromConfig } from '../src/lib/avatar3d/look'
 import { SHOTS, type AnimationTimeline } from '../src/lib/avatar3d/scripted'
 import { renderStills, type StillJob } from './lib/character-animation/render'
+import { AVATAR_BUILDS, AVATAR_HEAD_SHAPES, type AvatarBuild, type AvatarHeadShape } from '../src/lib/avatar/traits'
 
 const VIEWS = { front: 0.5, back: Math.PI - 0.5, side: 1.5, face: 0 } as const
 type View = keyof typeof VIEWS
 const SPECIES = ['lobster', 'crab'] as const
+type Species = (typeof SPECIES)[number]
+
+/** One character the outfits are tried on. */
+interface Body {
+  species: Species
+  headShape: AvatarHeadShape
+  build: AvatarBuild
+  mouth: string
+}
+
+const MANNEQUINS: Body[] = SPECIES.map((species) => ({ species, headShape: 'bean', build: 'classic', mouth: 'smile' }))
+
+/**
+ * The face check: the head shape and build move the mouth and the neckline, so a garment that
+ * clears the mouth on the plain mannequin can still cover it on a round-headed chunky crab. Every
+ * head shape on both species, with the tongue out (the lowest mouth), across the builds.
+ */
+const FACE_CHECK: Body[] = SPECIES.flatMap((species) =>
+  AVATAR_HEAD_SHAPES.map((headShape, i) => ({ species, headShape, build: AVATAR_BUILDS[i % AVATAR_BUILDS.length], mouth: 'tongue' })),
+)
 
 interface Args {
   pieces?: string[]
@@ -42,10 +64,11 @@ interface Args {
   force: boolean
   shot: 'wide' | 'close' | 'medium'
   pose: string
+  faces: boolean
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { views: ['front'], out: 'tmp/gear-board/latest', size: 640, force: false, shot: 'wide', pose: 'rest' }
+  const args: Args = { views: ['front'], out: 'tmp/gear-board/latest', size: 640, force: false, shot: 'wide', pose: 'rest', faces: false }
   const list = (v: string) => v.split(',').map((s) => s.trim()).filter(Boolean)
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -59,7 +82,13 @@ function parseArgs(argv: string[]): Args {
     else if (a === '--force') args.force = true
     else if (a === '--shot') args.shot = argv[++i] as Args['shot']
     else if (a === '--pose') args.pose = argv[++i]
+    else if (a === '--faces') args.faces = true
     else throw new Error(`Unknown option ${a}`)
+  }
+  if (args.faces) {
+    // Close and straight on, where a covered mouth shows.
+    args.shot = 'close'
+    if (!argv.includes('--views')) args.views = ['face']
   }
   for (const v of args.views) if (!(v in VIEWS)) throw new Error(`Unknown view "${v}" (${Object.keys(VIEWS).join(', ')})`)
   return args
@@ -116,20 +145,20 @@ function packOutfits(pieces: Piece[]): Partial<Record<EquipSlotId, Piece>>[] {
   return outfits
 }
 
-function timeline(species: (typeof SPECIES)[number], outfit: Partial<Record<EquipSlotId, Piece>>, yaw: number, size: number, shot: Args['shot'], pose: string): AnimationTimeline {
+function timeline(body: Body, outfit: Partial<Record<EquipSlotId, Piece>>, yaw: number, size: number, shot: Args['shot'], pose: string): AnimationTimeline {
   const equipment = Object.fromEntries(Object.entries(outfit).map(([slot, p]) => [slot, { visualKey: p!.key, rarity: 'common' }]))
   const config = parseLobsterAvatarConfig({
     style: LOBSTER_AVATAR_STYLE,
-    seed: `gear-board-${species}`,
-    race: species,
-    shellColor: species === 'lobster' ? 'coral' : 'lagoon',
+    seed: `gear-board-${body.species}`,
+    race: body.species,
+    shellColor: body.species === 'lobster' ? 'coral' : 'lagoon',
     shellFinish: 'satin',
     marking: 'none',
     pose,
-    headShape: 'bean',
-    build: 'classic',
+    headShape: body.headShape,
+    build: body.build,
     eyelidStyle: 'relaxed',
-    mouth: 'smile',
+    mouth: body.mouth,
     antennae: 'whip',
     equipment,
   })
@@ -171,14 +200,16 @@ async function main() {
   const outfits = packOutfits(pieces)
   const dir = path.resolve(args.out)
   const jobs: StillJob[] = []
+  const bodies = args.faces ? FACE_CHECK : MANNEQUINS
   const grid: { label: string; files: string[] }[] = []
   outfits.forEach((outfit, i) => {
     const files: string[] = []
-    for (const species of SPECIES) {
+    for (const body of bodies) {
       for (const view of args.views) {
-        const out = path.join(dir, `outfit-${String(i + 1).padStart(2, '0')}-${species}-${view}.png`)
+        const who = args.faces ? `${body.species}-${body.headShape}-${body.build}` : body.species
+        const out = path.join(dir, `outfit-${String(i + 1).padStart(2, '0')}-${who}-${view}.png`)
         files.push(out)
-        if (args.force || !fs.existsSync(out)) jobs.push({ timeline: timeline(species, outfit, VIEWS[view], args.size, args.shot, args.pose), out, shadows: false })
+        if (args.force || !fs.existsSync(out)) jobs.push({ timeline: timeline(body, outfit, VIEWS[view], args.size, args.shot, args.pose), out, shadows: false })
       }
     }
     grid.push({ label: Object.values(outfit).map((p) => p!.name).join(' · '), files })
@@ -190,7 +221,7 @@ async function main() {
   const tile = Math.round(args.size * 0.5)
   const pad = 16
   const labelH = 40
-  const cols = SPECIES.length * args.views.length
+  const cols = bodies.length * args.views.length
   const W = pad + cols * (tile + pad)
   const H = pad + grid.length * (tile + labelH + pad)
   const c = createCanvas(W, H)
