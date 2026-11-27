@@ -207,7 +207,8 @@ export const StageLadder: React.FC = () => {
 /** The same day lived two ways, one row per pair, landing in turn across the beat. */
 export const MeltVsMolt: React.FC = () => {
   const beat = useBeat()
-  const start = cueAt(beat, 'same', 0.35)
+  // Rows fill the whole beat: the comparison is the picture for all of it, not just "the same day".
+  const start = Math.round(beat.duration * 0.12)
   const gap = Math.max(10, Math.round((beat.duration - start) / 5))
   return (
     <AbsoluteFill>
