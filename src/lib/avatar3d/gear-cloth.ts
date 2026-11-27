@@ -226,8 +226,8 @@ interface Neckline {
   bone: string
   /** Height of the neckline at an angle from the front. */
   y: (phi: number) => number
-  /** The closed neckline, lifted off the cloth. */
-  ring: (lift: number) => Vector3[]
+  /** The closed neckline, lifted off the cloth and `drop` below it (a thick trim sits lower so its top stays at the line). */
+  ring: (lift: number, drop?: number) => Vector3[]
 }
 
 function collarLine(wear: Wearable, motif: string): Neckline {
@@ -245,11 +245,11 @@ function collarLine(wear: Wearable, motif: string): Neckline {
   } else {
     y = () => wear.torso.top - 0.015
   }
-  const ring = (lift: number) => {
+  const ring = (lift: number, drop = 0) => {
     const pts: Vector3[] = []
     for (let i = 0; i <= 64; i++) {
       const phi = -Math.PI + (i / 64) * Math.PI * 2
-      pts.push(onBody(host, y(Math.abs(phi)), phi, lift).at)
+      pts.push(onBody(host, y(Math.abs(phi)) - drop, phi, lift).at)
     }
     return pts
   }
@@ -1075,9 +1075,13 @@ const FUR = 0.034
 function santaDetails(kit: Kit, wear: Wearable, hem: number, neck: Neckline): void {
   const { loft: host, bone, top } = wear.torso
   const { fore } = wear.arm
-  kit.addWorld(neck.bone, 'soft', tube(neck.ring(0.036 + FUR * 0.7), FUR * 1.2, 160))
-  if (wear.race === 'crab') kit.addWorld(neck.bone, 'soft', seam(neck.host, [neck.y(0) - 0.02, 0], [neck.y(0) - 0.3, 0], 0.036 + FUR * 0.5, FUR * 0.8, 10))
-  kit.addWorld(bone, 'soft', seam(host, [wear.race === 'crab' ? top : top - 0.03, 0], [hem + 0.02, 0], 0.036 + FUR * 0.5, FUR * 0.8, 10))
+  const crab = wear.race === 'crab'
+  // On a crab the collar wraps the underside of the face: a fat roll there stands out in front of
+  // the mouth, so it sits a roll's width below the neckline and closer in.
+  const drop = crab ? FUR * 2.2 : 0
+  kit.addWorld(neck.bone, 'soft', tube(neck.ring(0.036 + FUR * 0.7, drop), FUR * 1.2, 160))
+  if (crab) kit.addWorld(neck.bone, 'soft', seam(neck.host, [neck.y(0) - drop - 0.03, 0], [neck.y(0) - 0.3, 0], 0.036 + FUR * 0.5, FUR * 0.8, 10))
+  kit.addWorld(bone, 'soft', seam(host, [crab ? Math.min(top, neck.y(0) - drop - 0.03) : top - 0.03, 0], [hem + 0.02, 0], 0.036 + FUR * 0.5, FUR * 0.8, 10))
   for (const { tag } of SIDES) {
     const cuff = new TorusGeometry(wear.arm.radius * 1.05 + LIFT * 0.8 + FUR * 0.6, FUR, 10, 28)
     cuff.rotateX(Math.PI / 2)
@@ -1147,6 +1151,7 @@ const KENTE: ('fabric' | 'seam' | 'soft' | '#16130f')[] = ['fabric', 'seam', 'fa
  */
 export function stole(kit: Kit, wear: Wearable): void {
   const neck = collarLine(wear, 'stole')
+  const crab = wear.race === 'crab'
   const { construction: n } = kit.visual
   const lift = OVER + 0.015
   const tone = (t: (typeof KENTE)[number], b: string, geo: BufferGeometry) => (t.startsWith('#') ? kit.addFixedWorld(b, t as `#${string}`, geo) : kit.addWorld(b, t as 'fabric', geo))
@@ -1154,11 +1159,13 @@ export function stole(kit: Kit, wear: Wearable): void {
   for (let i = 0; i <= 40; i++) {
     const phi = 0.32 + (i / 40) * (Math.PI * 2 - 0.64)
     const a = phi > Math.PI ? phi - Math.PI * 2 : phi
-    band.push(onBody(neck.host, neck.y(Math.abs(a)) + 0.005, a, lift).at)
+    // On a crab the band lies on the underside of the face, so it drops below the neckline to
+    // keep the mouth clear; the hanging ends start below it.
+    band.push(onBody(neck.host, neck.y(Math.abs(a)) + (crab ? -0.05 : 0.005), a, lift).at)
   }
   kit.addWorld(neck.bone, 'fabric', tube(band, 0.03, 120))
   const { loft: host, bone } = wear.torso
-  const fromY = wear.race === 'crab' ? wear.torso.top : wear.torso.top - 0.03
+  const fromY = crab ? Math.min(wear.torso.top, neck.y(0.3)) - 0.09 : wear.torso.top - 0.03
   const len = Math.max(0.32, Math.min(0.5, fromY - wear.torso.bottom + 0.04))
   const steps = 12
   for (const s of [1, -1]) {
