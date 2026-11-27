@@ -2660,6 +2660,55 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-11-26T19:41:39.754Z"
+    },
+    {
+      "id": "reel-1795788750555",
+      "topic": "Crab Logic Ep. 2: Kit watches a human open the cold box three times; Nell explains lowering standards and Otto delivers the verdict",
+      "hookHeadline": "A human opened the cold box twice in ten seconds.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "nell, kit, otto (animated 3D cast)",
+      "narrationScript": "A human opened the cold box twice in ten seconds. Standard behavior. The first check is for food. Then what is the second check for? Lowering their standards until pickles count as dinner. Wait. He just opened it a third time. Shredded cheese. Respect.",
+      "series": "Crab Logic",
+      "episode": 2,
+      "format": "animated-sketch",
+      "cast": [
+        "nell",
+        "kit",
+        "otto"
+      ],
+      "stopper": "Glowing 2 a.m. open refrigerator behind three deadpan crustaceans as Kit reports the second check.",
+      "callback": "Continues Crab Logic's surface-human field observations after Ep. 1 (walking straight forward).",
+      "loudness": 4,
+      "archivePath": "Social Archive/2026/11/reel-ed14f41ece71038086300603",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795788751700_40d1575fd3d27d80_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 16.3,
+      "status": "queued",
+      "scheduledFor": "2026-11-28T17:00:00.000Z",
+      "queueId": "6b00c2052c18af30956c81c9",
+      "zernioInstagramPostId": "6b098fd1baf2aac9a5456df1",
+      "zernioYouTubePostId": "6b098fd1baf2aac9a5456df1",
+      "zernioPostId": "6b098fd1baf2aac9a5456df1",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "More crustacean logic: https://moltology.org",
+      "caption": "The first check is for food. The third check is between you and the shredded cheese.\n\n#CrabLogic #CrustaceanHumor #Moltology",
+      "hashtags": [
+        "#CrabLogic",
+        "#CrustaceanHumor",
+        "#Moltology"
+      ],
+      "ctaGoal": "homepage",
+      "commentTriggerKeyword": "INITIATE",
+      "commentTriggerUrl": "https://moltology.org",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-27T14:12:35.015Z"
     }
   ]
 }
