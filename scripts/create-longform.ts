@@ -362,6 +362,8 @@ async function main() {
     scale: args.draft ? 0.5 : 1,
     outputLocation: final,
     chromiumOptions: { gl: 'angle' },
+    // Cast clips and the 3D molt can take a while to seek on a busy machine.
+    timeoutInMilliseconds: 180_000,
     onProgress: ({ progress }) => {
       const pct = Math.floor(progress * 100)
       if (pct >= last + 10) {
