@@ -1,0 +1,553 @@
+{
+  "id": "moltmaxxing",
+  "title": "Moltmaxxing",
+  "format": "long-form",
+  "loudness": 2,
+  "narrator": "oracle",
+  "cast": [
+    "kit",
+    "juno",
+    "sol",
+    "moss"
+  ],
+  "sources": [
+    {
+      "id": "attention-residue",
+      "label": "Leroy, Organizational Behavior and Human Decision Processes (2009)",
+      "url": "https://ideas.repec.org/a/eee/jobhdp/v109y2009i2p168-181.html",
+      "supports": "When people switch from one task to another, part of their attention stays on the first task (attention residue), and performance on the next task suffers."
+    }
+  ],
+  "chapters": [
+    {
+      "title": "Cold open",
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Somewhere right now, someone is filming their face go from zero to one hundred percent melted.",
+          "visual": {
+            "kind": "scene",
+            "art": "melt-meter",
+            "type": {
+              "style": "meter",
+              "from": 0,
+              "to": 100,
+              "label": "melted"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "It's called meltmaxxing. It's funny because it's familiar: soft, scattered, pulled in every direction by lunchtime.",
+          "visual": {
+            "kind": "scene",
+            "art": "scattered-desk",
+            "type": {
+              "style": "kicker",
+              "text": "Meltmaxxing"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "This video is about the opposite. It's called moltmaxxing, and by the end you'll know its four moves and how to start tonight.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf1",
+            "type": {
+              "style": "title",
+              "eyebrow": "Molt Academy",
+              "text": "Moltmaxxing"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Harder to knock over",
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Moltmaxxing is the daily practice of becoming harder to knock over.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf2-bg",
+            "type": {
+              "style": "statement",
+              "text": "Harder to knock over"
+            }
+          }
+        },
+        {
+          "speaker": "kit",
+          "line": "So it's looksmaxxing, but for crabs?",
+          "visual": {
+            "kind": "character",
+            "set": "reef-office",
+            "cast": [
+              "kit",
+              "juno"
+            ],
+            "shot": "two",
+            "pose": "shrug"
+          }
+        },
+        {
+          "speaker": "juno",
+          "line": "Looksmaxxing is how you look. This is how you hold up: your focus, your boundaries, and whether you finish things.",
+          "visual": {
+            "kind": "character",
+            "set": "reef-office",
+            "cast": [
+              "kit",
+              "juno"
+            ],
+            "shot": "medium",
+            "focus": "juno",
+            "look": "other"
+          }
+        },
+        {
+          "speaker": "kit",
+          "line": "Only one of them comes with a shell.",
+          "visual": {
+            "kind": "character",
+            "set": "reef-office",
+            "cast": [
+              "kit",
+              "juno"
+            ],
+            "shot": "close",
+            "focus": "kit",
+            "look": "camera"
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "It isn't about looking tougher. It's the opposite of a melted day: one tab, one task, and checking your messages when you choose to.",
+          "visual": {
+            "kind": "scene",
+            "art": "melt-vs-molt",
+            "type": {
+              "style": "split",
+              "left": "Forty-seven tabs",
+              "right": "One tab, one task"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "It comes from molting: a crab can only grow by climbing out of the shell it has outgrown. The practice is four moves.",
+          "visual": {
+            "kind": "scene",
+            "art": "four-moves",
+            "type": {
+              "style": "list",
+              "items": [
+                "Shed",
+                "Harden",
+                "Grip",
+                "Go deep"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Shed and harden",
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "One. Shed. Pick one thing that keeps you small, like the late night scroll, or the yes you didn't mean, and drop it.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf1",
+            "type": {
+              "style": "chapter-move",
+              "number": 1,
+              "text": "Shed",
+              "sub": "Let one habit go"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Just one. A crab doesn't shed its whole life at once. It sheds the shell that stopped fitting.",
+          "visual": {
+            "kind": "scene",
+            "art": "shed-phone",
+            "type": {
+              "style": "kicker",
+              "text": "Just one"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Try this: write down the one habit you'd drop if nobody was watching. That's usually the one.",
+          "visual": {
+            "kind": "scene",
+            "art": "notebook-phone",
+            "type": {
+              "style": "kicker",
+              "text": "Write it down"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Two. Harden. Criticism, drama and other people's urgency land on the shell, not on you. You decide what gets through.",
+          "visual": {
+            "kind": "scene",
+            "art": "harden",
+            "type": {
+              "style": "chapter-move",
+              "number": 2,
+              "text": "Harden",
+              "sub": "Boundaries that hold"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "A boundary can be one sentence. I'll look at this tomorrow at ten. Then close the tab.",
+          "visual": {
+            "kind": "scene",
+            "art": "harden",
+            "type": {
+              "style": "quote",
+              "text": "I'll look at this tomorrow at ten."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Grip and go deep",
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Three. Grip. Choose one task, start it, stay with it, and close it.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf2",
+            "type": {
+              "style": "chapter-move",
+              "number": 3,
+              "text": "Grip",
+              "sub": "Finish what you start"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "There's research behind this. When you switch from one task to another, part of your attention stays behind on the first one. It's called attention residue.",
+          "visual": {
+            "kind": "scene",
+            "art": "residue",
+            "type": {
+              "style": "kicker",
+              "text": "Attention residue",
+              "source": "attention-residue"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Twelve half-done things weigh more than one done thing.",
+          "visual": {
+            "kind": "scene",
+            "art": "residue",
+            "type": {
+              "style": "statement",
+              "text": "12 half-done > 1 done"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Grip also means deciding when something is finished. Done and sent beats perfect and still open.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf2",
+            "type": {
+              "style": "split",
+              "left": "Perfect and still open",
+              "right": "Done and sent"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Four. Go deep. Turn off the pings and stay with one thought long enough to reach the quiet part.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf3",
+            "type": {
+              "style": "chapter-move",
+              "number": 4,
+              "text": "Go deep",
+              "sub": "Focus that goes down"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Start with twenty-five minutes. The phone in another room, one tab, one task. When the urge to check something arrives, notice it, and keep going. It passes.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf3",
+            "type": {
+              "style": "timer",
+              "minutes": 25
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Your starting reading",
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "To see where you start, there's a free audit: a short quiz about how your focus holds up under noise.",
+          "visual": {
+            "kind": "screen",
+            "capture": "moltmax-audit"
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "It gives you one of four readings. Surface Moltlet. Soft-Shell Diver. Armored Vanguard. Abyssal Steward.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf3",
+            "type": {
+              "style": "depth-readings",
+              "items": [
+                "Surface Moltlet",
+                "Soft-Shell Diver",
+                "Armored Vanguard",
+                "Abyssal Steward"
+              ]
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Each reading comes with one next step. A Surface Moltlet starts with one small, gentle shed. An Abyssal Steward passes one steady habit to someone newer.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf3",
+            "type": {
+              "style": "depth-readings",
+              "items": [
+                "Surface Moltlet",
+                "Soft-Shell Diver",
+                "Armored Vanguard",
+                "Abyssal Steward"
+              ],
+              "focus": [
+                0,
+                3
+              ]
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "It's a starting point, not a grade. Everyone begins soft.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf3",
+            "type": {
+              "style": "statement",
+              "text": "A starting point, not a grade"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Two things a day",
+      "beats": [
+        {
+          "speaker": "sol",
+          "line": "Great. Tomorrow I'm doing all eight Liturgies. Before breakfast.",
+          "visual": {
+            "kind": "character",
+            "set": "open-water",
+            "cast": [
+              "sol",
+              "moss"
+            ],
+            "shot": "two",
+            "pose": "flex"
+          }
+        },
+        {
+          "speaker": "moss",
+          "line": "Do two. Name the one thing each morning. Then run the Nightly Molt Audit before bed.",
+          "visual": {
+            "kind": "character",
+            "set": "open-water",
+            "cast": [
+              "sol",
+              "moss"
+            ],
+            "shot": "medium",
+            "focus": "moss",
+            "look": "other",
+            "acting": "calm"
+          }
+        },
+        {
+          "speaker": "sol",
+          "line": "Just two?",
+          "visual": {
+            "kind": "character",
+            "set": "open-water",
+            "cast": [
+              "sol",
+              "moss"
+            ],
+            "shot": "close",
+            "focus": "sol"
+          }
+        },
+        {
+          "speaker": "moss",
+          "line": "Then do them again the next day. That's the whole trick.",
+          "visual": {
+            "kind": "character",
+            "set": "open-water",
+            "cast": [
+              "sol",
+              "moss"
+            ],
+            "shot": "two",
+            "look": "camera",
+            "acting": "calm"
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "If you join, the app tracks all eight Liturgies for you, from a quiet start before the phone to the audit at night. But two is enough to begin.",
+          "visual": {
+            "kind": "screen",
+            "capture": "liturgies"
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "You don't need any equipment. A notebook helps, and so does a phone you're willing to leave face down.",
+          "visual": {
+            "kind": "scene",
+            "art": "notebook-phone",
+            "type": {
+              "style": "kicker",
+              "text": "No equipment"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Start tonight",
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Take the free audit at moltology.org, then pick your one thing for tomorrow.",
+          "visual": {
+            "kind": "scene",
+            "art": "sf1",
+            "type": {
+              "style": "title",
+              "eyebrow": "Start tonight",
+              "text": "moltology.org"
+            }
+          }
+        },
+        {
+          "speaker": "narrator",
+          "line": "Shed one thing. The shell will follow.",
+          "visual": {
+            "kind": "motion",
+            "component": "EndCard",
+            "props": {
+              "url": "moltology.org"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "art": {
+    "sf1": {
+      "layers": [
+        {
+          "src": "art/sf1-bg.png",
+          "depth": 0
+        },
+        {
+          "src": "art/sf1-shell-cut.png",
+          "depth": 0.62,
+          "x": 0.73,
+          "y": 0.62,
+          "width": 0.34,
+          "float": 6,
+          "turn": 8,
+          "glow": "rgba(255,170,110,0.55)"
+        }
+      ],
+      "camera": "push",
+      "focus": 0.62,
+      "shade": 0.7,
+      "light": "rgba(255,190,140,0.22)"
+    },
+    "sf2": {
+      "layers": [
+        {
+          "src": "art/sf2-bg.png",
+          "depth": 0
+        },
+        {
+          "src": "art/sf2-claw-cut.png",
+          "depth": 0.7,
+          "x": 0.72,
+          "y": 0.54,
+          "width": 0.32,
+          "float": 8,
+          "turn": 10,
+          "glow": "rgba(255,230,160,0.6)"
+        }
+      ],
+      "camera": "drift-left",
+      "focus": 0.7,
+      "shade": 0.65
+    },
+    "sf2-bg": {
+      "layers": [
+        {
+          "src": "art/sf2-bg.png",
+          "depth": 0.2
+        }
+      ],
+      "camera": "push",
+      "focus": 0.2,
+      "shade": 0.5
+    },
+    "sf3": {
+      "layers": [
+        {
+          "src": "art/sf3-bg.png",
+          "depth": 0.1
+        }
+      ],
+      "camera": "descend",
+      "focus": 0.1,
+      "shade": 0.45
+    }
+  }
+}

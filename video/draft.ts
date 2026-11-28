@@ -27,6 +27,10 @@ export interface EpisodeVisual {
   prompt?: string
   /** screen */
   capture?: string
+  /** scene: a name from the episode's `art` map, and the type on top */
+  art?: string
+  type?: import('./scene/type').TypeSpec
+  camera?: import('./scene/Scene').CameraMove
 }
 
 export interface EpisodeBeat {
@@ -44,6 +48,8 @@ export interface EpisodeFile {
   cast: string[]
   sources?: Source[]
   chapters: { title: string; beats: EpisodeBeat[] }[]
+  /** Layered scenes: each a set of Codex images (in media/art/) with depths, a camera and a focus. */
+  art?: Record<string, Omit<import('./scene/Scene').SceneSpec, 'type'>>
 }
 
 /** One stretch of sound: a narration take, or a character block voiced as one take. */
@@ -93,7 +99,8 @@ export function layoutTimeline(ep: EpisodeFile, units: LayoutUnit[], fps: number
       const seconds = b.seconds + (last && unit.tail !== false ? GAP.tail : 0) + (isEnd ? GAP.endHold : 0)
       const words: TimedWord[] = b.words.map((w) => ({ text: w.text, at: f(w.seconds) }))
       const props = beat.visual.props ?? {}
-      const sourceId = typeof props.source === 'string' ? props.source : undefined
+      const typeSource = (beat.visual.type as { source?: string } | undefined)?.source
+      const sourceId = typeof props.source === 'string' ? props.source : typeSource
       beats.push({
         index: b.index,
         chapter,
@@ -106,6 +113,7 @@ export function layoutTimeline(ep: EpisodeFile, units: LayoutUnit[], fps: number
         src: b.src ?? files.publicFor?.(b.index),
         trimBefore: b.trimSeconds !== undefined ? f(b.trimSeconds) : undefined,
         component: beat.visual.component,
+        scene: beat.visual.kind === 'scene' && beat.visual.art && ep.art?.[beat.visual.art] ? { ...ep.art[beat.visual.art], ...(beat.visual.camera ? { camera: beat.visual.camera } : {}), type: beat.visual.type } : undefined,
         props,
         source: sourceId ? sourceById.get(sourceId) : undefined,
       })

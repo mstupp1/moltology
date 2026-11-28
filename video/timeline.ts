@@ -5,7 +5,7 @@
  */
 import { createContext, useContext } from 'react'
 
-export type BeatKind = 'character' | 'motion' | 'still' | 'screen'
+export type BeatKind = 'character' | 'motion' | 'still' | 'screen' | 'scene'
 
 export interface TimedWord {
   text: string
@@ -36,6 +36,8 @@ export interface TimelineBeat {
   /** motion: the component name and its props. */
   component?: string
   props?: Record<string, unknown>
+  /** scene: the layered Codex art, camera and type (video/scene/Scene.tsx). */
+  scene?: import('./scene/Scene').SceneSpec
   /** A source shown as a small lower third while this beat plays. */
   source?: Source
 }

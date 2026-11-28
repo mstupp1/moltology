@@ -10,6 +10,7 @@ import { ShellSplit, ShellTurntable } from './motion/shell3d'
 import { BeatContext, type Timeline, type TimelineBeat } from './timeline'
 import { C } from './theme'
 import { DeepWater, SourceTag } from './ui/primitives'
+import { Scene } from './scene/Scene'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MOTION: Record<string, React.FC<any>> = {
@@ -80,6 +81,8 @@ export const BeatView: React.FC<{ beat: TimelineBeat }> = ({ beat }) => {
   if (beat.kind === 'motion') {
     const Component = beat.component ? MOTION[beat.component] : undefined
     body = Component ? <Component {...(beat.props ?? {})} /> : <Missing beat={beat} />
+  } else if (beat.kind === 'scene' && beat.scene) {
+    body = <Scene spec={beat.scene} />
   } else if (beat.kind === 'character' && beat.src) {
     body = <OffthreadVideo src={staticFile(beat.src)} trimBefore={beat.trimBefore ?? 0} muted />
   } else if (beat.kind === 'still' && beat.src) {
