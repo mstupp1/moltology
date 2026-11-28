@@ -168,7 +168,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
             <section className={cn(ACADEMY_CARD, 'p-4 space-y-2')} aria-labelledby="track-cert-heading">
               <p className="inline-flex items-center gap-1.5 text-2xs text-ink-muted font-semibold">
                 <Award className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
-                Path certification
+                Track certificate
               </p>
               <h2 id="track-cert-heading" className="font-grotesk font-semibold text-ink">{detail.certificate.title}</h2>
               <p className="text-xs text-ink-body leading-relaxed">{detail.certificate.description}</p>

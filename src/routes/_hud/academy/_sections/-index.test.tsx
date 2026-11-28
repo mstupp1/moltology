@@ -135,7 +135,7 @@ describe('Molt Academy home', () => {
     expect(screen.getByText('Introduction to Ecdysis')).toBeInTheDocument()
   })
 
-  it('lets a member explore tracks, filter courses, and open certifications', () => {
+  it('lets a member explore tracks, filter courses, and skip the certificates preview', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
       isPending: false,
@@ -159,7 +159,8 @@ describe('Molt Academy home', () => {
     })
     expect(screen.getByText('The Chitinous Mind')).toBeInTheDocument()
     expect(screen.queryByText('Biomechanical Armor')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Open certification record/i })).toHaveAttribute('href', '/academy/certificates')
+    // Certificates live on their own tab, not repeated at the bottom of the catalog.
+    expect(screen.queryByRole('heading', { name: 'Certificates' })).not.toBeInTheDocument()
   })
 
   it('shows one coming-soon panel instead of empty sections when nothing is published', () => {

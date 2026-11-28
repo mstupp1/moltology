@@ -252,14 +252,14 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
           <section className={cn(ACADEMY_CARD, 'p-4 space-y-2')} aria-labelledby="course-cert-heading">
             <p className="inline-flex items-center gap-1.5 text-2xs text-ink-muted font-semibold">
               <Award className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
-              Certification
+              Certificate
             </p>
             {detail.certificate ? (
               <>
                 <h2 id="course-cert-heading" className="font-grotesk font-semibold text-ink">{detail.certificate.title}</h2>
                 <p className="text-xs text-ink-body leading-relaxed">{detail.certificate.description}</p>
                 <p className={cn('text-xs', detail.certificate.earned ? 'text-emerald-500' : 'text-ink-muted')}>
-                  {detail.certificate.earned ? 'Earned. It is on your certification record.' : 'Issued when every lesson in this course is complete.'}
+                  {detail.certificate.earned ? 'Earned. It is on your Certificates page.' : 'Issued when every lesson in this course is complete.'}
                 </p>
                 {detail.certificate.earned && detail.certificate.credentialId ? (
                   <Link
@@ -273,7 +273,7 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                 ) : null}
               </>
             ) : (
-              <p id="course-cert-heading" className="text-xs text-ink-muted">This course does not issue a certification yet.</p>
+              <p id="course-cert-heading" className="text-xs text-ink-muted">This course does not issue a certificate yet.</p>
             )}
           </section>
         </aside>

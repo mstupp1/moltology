@@ -141,7 +141,7 @@ export function LevelMark({ level }: { level: AcademyLevel }) {
 /** One-line empty state for a section that has nothing in it yet. */
 export function AcademyEmpty({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-control border border-dashed border-line-subtle px-3 py-2.5 text-xs text-ink-muted leading-relaxed">
+    <p className="rounded-control border border-dashed border-line-subtle px-3 sm:px-4 py-2.5 text-xs text-ink-muted leading-relaxed">
       {children}
     </p>
   )
@@ -159,7 +159,8 @@ export function AcademySectionHeading({
   action?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+    // Phones and small tablets inset the heading by card padding so it lines up with the band title.
+    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 px-3 sm:px-4 md:px-0">
       <div className="space-y-0.5">
         <h2 id={id} className="font-grotesk text-sm font-semibold text-ink">
           {title}
@@ -217,9 +218,8 @@ export function AcademyCover({
         <div className="absolute inset-0 bg-gradient-to-t from-abyss/85 via-abyss/20 to-transparent" aria-hidden="true" />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-          <span className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_30%_20%,rgba(0,195,255,0.18),transparent_60%)]" />
           {label ? (
-            <span className="relative font-grotesk font-semibold text-2xl tracking-[0.12em] text-ink/15 select-none">{label}</span>
+            <span className="relative font-grotesk font-semibold text-2xl text-ink/15 select-none">{label}</span>
           ) : (
             <GraduationCap className="relative w-10 h-10 text-ink/15" />
           )}
