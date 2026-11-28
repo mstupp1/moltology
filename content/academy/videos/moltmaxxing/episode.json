@@ -548,6 +548,127 @@
       "camera": "descend",
       "focus": 0.1,
       "shade": 0.45
+    },
+    "melt-meter": {
+      "layers": [
+        {
+          "src": "art/melt-meter-bg.png",
+          "depth": 0.15
+        }
+      ],
+      "camera": "push",
+      "focus": 0.15,
+      "shade": 0.55
+    },
+    "scattered-desk": {
+      "layers": [
+        {
+          "src": "art/scattered-bg.png",
+          "depth": 0
+        },
+        {
+          "src": "art/phone-buzz-cut.png",
+          "depth": 0.75,
+          "x": 0.78,
+          "y": 0.66,
+          "width": 0.2,
+          "float": 10,
+          "turn": 14,
+          "glow": "rgba(0,195,255,0.5)"
+        }
+      ],
+      "camera": "drift-right",
+      "focus": 0.75,
+      "shade": 0.65
+    },
+    "four-moves": {
+      "layers": [
+        {
+          "src": "art/four-moves-bg.png",
+          "depth": 0.1
+        }
+      ],
+      "camera": "drift-left",
+      "focus": 0.1,
+      "shade": 0.6
+    },
+    "shed-phone": {
+      "layers": [
+        {
+          "src": "art/sf1-bg.png",
+          "depth": 0
+        },
+        {
+          "src": "art/phone-down-cut.png",
+          "depth": 0.66,
+          "x": 0.72,
+          "y": 0.66,
+          "width": 0.26,
+          "float": 4,
+          "turn": 10,
+          "glow": "rgba(255,180,120,0.5)"
+        }
+      ],
+      "camera": "push",
+      "focus": 0.66,
+      "shade": 0.65,
+      "light": "rgba(255,190,140,0.2)"
+    },
+    "notebook-phone": {
+      "layers": [
+        {
+          "src": "art/notebook.png",
+          "depth": 0.2
+        }
+      ],
+      "camera": "rise",
+      "focus": 0.2,
+      "shade": 0.55,
+      "light": "rgba(255,200,150,0.2)"
+    },
+    "harden": {
+      "layers": [
+        {
+          "src": "art/harden-bg.png",
+          "depth": 0
+        },
+        {
+          "src": "art/shell-shield-cut.png",
+          "depth": 0.68,
+          "x": 0.72,
+          "y": 0.58,
+          "width": 0.32,
+          "float": 6,
+          "turn": 12,
+          "glow": "rgba(255,160,100,0.45)"
+        }
+      ],
+      "camera": "rise",
+      "focus": 0.68,
+      "shade": 0.65
+    },
+    "residue": {
+      "layers": [
+        {
+          "src": "art/residue.png",
+          "depth": 0.2
+        }
+      ],
+      "camera": "drift-right",
+      "focus": 0.2,
+      "focusTo": 0.35,
+      "shade": 0.6
+    },
+    "melt-vs-molt": {
+      "layers": [
+        {
+          "src": "art/melt-vs-molt.png",
+          "depth": 0.2
+        }
+      ],
+      "camera": "push",
+      "focus": 0.2,
+      "shade": 0.35
     }
   }
 }

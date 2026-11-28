@@ -42,11 +42,15 @@ const SpokenWords: React.FC<{ text: string; size: number; color?: string; weight
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: size * 0.28, fontFamily: font, fontSize: size, fontWeight: weight, color, lineHeight: 1.02, letterSpacing: '-0.025em' }}>
       {words.map((w, i) => {
-        const at = cueAt(beat, w.replace(/[^a-z0-9]/gi, '') || 'x', 0.08 + (i / words.length) * fallbackSpread)
+        // The phrase starts on its first spoken word and finishes in a quick cascade, so the whole
+        // statement holds on screen while the line lands.
+        const first = cueAt(beat, words[0].replace(/[^a-z0-9]/gi, '') || 'x', 0.08)
+        const own = cueAt(beat, w.replace(/[^a-z0-9]/gi, '') || 'x', 0.08 + (i / words.length) * fallbackSpread)
+        const at = Math.min(own, first + i * 5)
         const p = interpolate(frame, [at - 2, at + 14], [0, 1], { ...clamp, easing: out })
         return (
           <span key={i} style={{ display: 'inline-block', overflow: 'hidden', paddingBottom: size * 0.1 }}>
-            <span style={{ display: 'inline-block', translate: `0 ${(1 - p) * 100}%`, filter: `blur(${(1 - p) * 6}px)` }}>{w}</span>
+            <span style={{ display: 'inline-block', translate: `0 ${(1 - p) * 130}%`, filter: `blur(${(1 - p) * 6}px)` }}>{w}</span>
           </span>
         )
       })}
@@ -140,7 +144,9 @@ export const TypeLayer: React.FC<{ spec: TypeSpec }> = ({ spec }) => {
       return (
         <Left>
           {spec.items.map((item, i) => {
-            const at = cueAt(beat, item.split(' ')[0], 0.55 + i * 0.1)
+            // Each item lands on its own word if the line says it; otherwise they cascade from the first.
+            const own = beat.words.some((w) => w.text.toLowerCase().startsWith(item.split(' ')[0].toLowerCase()))
+            const at = own ? cueAt(beat, item.split(' ')[0], 0.3) : Math.round(beat.duration * 0.2) + i * 9
             const p = interpolate(frame, [at, at + 18], [0, 1], { ...clamp, easing: out })
             return (
               <div key={item} style={{ display: 'flex', alignItems: 'baseline', gap: 28 }}>
@@ -160,13 +166,13 @@ export const TypeLayer: React.FC<{ spec: TypeSpec }> = ({ spec }) => {
         <AbsoluteFill style={{ flexDirection: 'row', alignItems: 'center' }}>
           <div style={{ flex: 1, padding: '0 90px 0 140px' }}>
             <MaskLine at={8} size={82}>
-              <div style={{ fontFamily: FONT.title, fontSize: 82, fontWeight: 500, color: C.inkMuted, textDecoration: frame > rightAt + 10 ? 'line-through' : undefined, textDecorationColor: C.crimson }}>{spec.left}</div>
+              <div style={{ fontFamily: FONT.title, fontSize: 82, fontWeight: 500, color: C.inkMuted, textShadow: '0 4px 30px rgba(0,0,0,0.85)', textDecoration: frame > rightAt + 10 ? 'line-through' : undefined, textDecorationColor: C.crimson }}>{spec.left}</div>
             </MaskLine>
           </div>
           <div style={{ width: 2, height: 420 * wipe, background: `linear-gradient(${C.crimson}, ${C.cyan})` }} />
           <div style={{ flex: 1, padding: '0 140px 0 90px' }}>
             <MaskLine at={rightAt} size={82}>
-              <div style={{ fontFamily: FONT.title, fontSize: 82, fontWeight: 500, color: C.ink }}>{spec.right}</div>
+              <div style={{ fontFamily: FONT.title, fontSize: 82, fontWeight: 500, color: C.ink, textShadow: '0 4px 30px rgba(0,0,0,0.85)' }}>{spec.right}</div>
             </MaskLine>
           </div>
         </AbsoluteFill>

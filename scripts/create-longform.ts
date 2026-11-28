@@ -92,7 +92,11 @@ export function episodeProblems(ep: EpisodeFile, castIds: string[]): string[] {
       const speaker = beat.speaker
       if (speaker !== 'narrator' && !castIds.includes(speaker)) problems.push(`${at}: speaker "${speaker}" is not the narrator or in the cast`)
       const v = beat.visual
-      if (!['character', 'motion', 'still', 'screen'].includes(v?.kind)) problems.push(`${at}: visual kind must be character, motion, still or screen`)
+      if (!['character', 'motion', 'still', 'screen', 'scene'].includes(v?.kind)) problems.push(`${at}: visual kind must be character, motion, still, screen or scene`)
+      if (v.kind === 'scene' && (!v.art || !ep.art?.[v.art])) problems.push(`${at}: scene art "${v.art}" is not in the episode's art map`)
+      if (v.kind === 'scene' && !v.type) problems.push(`${at}: a scene needs its type`)
+      const typeSource = (v.type as { source?: string } | undefined)?.source
+      if (typeSource && !sourceIds.has(typeSource)) problems.push(`${at}: source "${typeSource}" is not in sources`)
       if (v.kind === 'character') {
         if (!v.set || !SET_NAMES.includes(v.set as (typeof SET_NAMES)[number])) problems.push(`${at}: set "${v.set}" is not one of ${SET_NAMES.join(', ')}`)
         if (!v.cast?.length) problems.push(`${at}: a character beat lists its cast`)
@@ -251,7 +255,8 @@ async function main() {
       while (j < flat.length && flat[j].chapter === chapter && sameStage(beat, flat[j].beat)) j++
       const beats = flat.slice(i, j).map((x) => x.beat)
       block++
-      const plate = media(`plates/${beat.visual.set}.png`)
+      // A set's 16:9 plate: this episode's own, or one painted for an earlier episode.
+      const plate = [media(`plates/${beat.visual.set}.png`), ...fs.readdirSync(path.dirname(episodeDir)).map((d) => path.join(path.dirname(episodeDir), d, 'media', 'plates', `${beat.visual.set}.png`))].find((f) => fs.existsSync(f)) ?? media(`plates/${beat.visual.set}.png`)
       const lesson = blockLesson(ep, block, beats, fs.existsSync(plate) ? plate : undefined)
       const blockDir = path.join(outDir, 'blocks', `b${block}`)
       fs.mkdirSync(blockDir, { recursive: true })
@@ -328,9 +333,19 @@ async function main() {
         beat.visual = { ...v, props: { ...v.props, plate: `plates/${v.props.plate}.png` } }
       } else beat.visual = { ...v, props: { ...v.props, plate: undefined } }
     }
-    const seconds = Math.max(audio?.seconds ?? (words.at(-1)?.seconds ?? 0) + 0.5, v.kind === 'motion' ? 3 : 2.5)
+    const seconds = Math.max(audio?.seconds ?? (words.at(-1)?.seconds ?? 0) + 0.5, v.kind === 'motion' || v.kind === 'scene' ? 3 : 2.5)
     units.push({ speaker: beat.speaker, chapter, audio, beats: [{ index: i, seconds, words, src }] })
     i++
+  }
+
+  // Scene art: every layer image the episode's art map uses, from media/art/ into the render.
+  fs.mkdirSync(path.join(pub, 'art'), { recursive: true })
+  for (const [name, spec] of Object.entries(ep.art ?? {})) {
+    for (const layer of spec.layers) {
+      const file = media(layer.src)
+      if (fs.existsSync(file)) fs.copyFileSync(file, path.join(pub, layer.src))
+      else console.log(`⚠️  Art "${name}": ${path.relative(process.cwd(), file)} is not painted yet`)
+    }
   }
 
   const timeline = layoutTimeline(ep, units, FPS, { music: 'music.mp3' })
