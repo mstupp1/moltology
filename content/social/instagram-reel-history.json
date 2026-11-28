@@ -2755,6 +2755,54 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-11-28T03:42:32.742Z"
+    },
+    {
+      "id": "reel-1795875087820",
+      "topic": "The Law of Ecdysis (Codex SCR-010): drop the stale obligation you most recently defended out loud before adding anything new",
+      "hookHeadline": "I'm adding three routines and dropping zero.",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": null,
+      "characterArc": "moss, sol (animated 3D cast)",
+      "narrationScript": "I'm adding three routines and dropping zero. A crab does not renovate, Sol. Shells don't stretch. Even my side project from eleven months ago? Especially that one. Drop one old obligation before you add a new one. Fine. How do I even pick one? Pick the one you most recently defended out loud. Cancel it cleanly. Oh no. I defended that project yesterday. Read the Law of Ecdysis at moltology.org.",
+      "series": "Codex Lessons",
+      "episode": 4,
+      "format": "animated-lesson",
+      "cast": [
+        "moss",
+        "sol"
+      ],
+      "stopper": "Sol flexing proudly under a 7-word claim in the lamp-lit Codex study while elder Moss watches deadpan.",
+      "callback": "Continues Codex Lessons in codex-study after Ep. 3 (Isolation Protocols); shifts from ignoring pings to hoarding dead obligations.",
+      "loudness": 3,
+      "archivePath": "Social Archive/2026/11/reel-911083abbc9deeb9f9a6a05a",
+      "zernioMediaUrls": [
+        "https://media.zernio.com/temp/1795875089014_240f4fc906d87246_01.mp4"
+      ],
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 35.466667,
+      "status": "queued",
+      "scheduledFor": "2026-11-29T23:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6b0ae112a7d89c14e6b3cf72",
+      "zernioYouTubePostId": "6b0ae112a7d89c14e6b3cf72",
+      "zernioPostId": "6b0ae112a7d89c14e6b3cf72",
+      "zernioCommentId": null,
+      "isAiGenerated": true,
+      "firstComment": "The full passage: https://moltology.org/codex/scr-010",
+      "caption": "Adding three routines and dropping zero never works.\n\nA crab does not renovate. Before you pile on one more goal, pick the stale obligation or dead project you most recently defended out loud and cancel it cleanly.\n\nRead the Law of Ecdysis at moltology.org.",
+      "hashtags": [
+        "#habits",
+        "#focus",
+        "#productivity"
+      ],
+      "ctaGoal": "codex",
+      "commentTriggerKeyword": "CODEX",
+      "commentTriggerUrl": "https://moltology.org/codex",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-11-28T14:11:33.011Z"
     }
   ]
 }
