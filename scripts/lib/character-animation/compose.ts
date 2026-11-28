@@ -11,8 +11,14 @@ import { createCanvas, loadImage, type SKRSContext2D } from '@napi-rs/canvas'
 import type { WordBoundaryEvent } from '../tts-engine'
 
 const execFileAsync = promisify(execFile)
-export const OUT_W = 1080
-export const OUT_H = 1920
+export let OUT_W = 1080
+export let OUT_H = 1920
+
+/** Switch every clip, backdrop and card to another frame size (16:9 clips for long-form). */
+export function setFrameSize(width: number, height: number) {
+  OUT_W = width
+  OUT_H = height
+}
 const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 
 async function ffmpeg(args: string[]): Promise<void> {
@@ -261,7 +267,7 @@ export interface SceneClipOptions {
   overlays?: { png: string; from: number; to: number }[]
 }
 
-/** One scene: the character frames over the backdrop, plus any timed overlays, at 1080x1920. */
+/** One scene: the character frames over the backdrop, plus any timed overlays, at the frame size (1080x1920 unless set). */
 export async function renderSceneClip(o: SceneClipOptions): Promise<string> {
   const inputs = ['-loop', '1', '-framerate', String(o.fps), '-i', o.backdrop, '-framerate', String(o.fps), '-start_number', String(o.start), '-i', path.join(o.framesDir, '%05d.png')]
   const overlays = o.overlays ?? []

@@ -28,6 +28,7 @@ Read the shared prerequisites and matching skill before any content pipeline, in
 | Benthic comedy shorts (Crab Logic) | [benthic-comedy-shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md), `npm run anim:create`; cast in [characters/cast.json](characters/cast.json) |
 | Blog dispatches | [blog-creator](../.agents/skills/blog-creator/SKILL.md) |
 | Long-form YouTube topic validation | [youtube-research](../.agents/skills/youtube-research/SKILL.md) |
+| Long-form narrated Academy and YouTube videos | [long-form-video-creator](../.agents/skills/long-form-video-creator/SKILL.md), `npm run longform:create`; episodes in [academy/videos/](academy/videos/) |
 | Composite layouts from references | [composite-reference-library](../.agents/skills/composite-reference-library/SKILL.md), `npm run refs`; JSON specs in [composite-layouts/](composite-layouts/README.md) |
 
 Composites render through `scripts/lib/composite-renderer.ts` using `npm run composite:render`.

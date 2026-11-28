@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "tsBuildInfoFile": "../tmp/tsc/video.tsbuildinfo",
+    "paths": { "@/*": ["../src/*"] }
+  },
+  "include": ["./", "../remotion.config.ts"]
+}

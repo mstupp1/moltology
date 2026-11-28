@@ -21,7 +21,7 @@
     "share:cards": "tsx scripts/build-share-cards.ts",
     "email:preview": "tsx scripts/preview-transactional-email.ts",
     "pretypecheck": "node scripts/setup-dev-worktree.mjs --dependencies-only",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p video",
     "pretest": "node scripts/setup-dev-worktree.mjs --dependencies-only",
     "test": "vitest run --configLoader runner",
     "pretest:core": "node scripts/setup-dev-worktree.mjs --dependencies-only",
@@ -106,7 +106,10 @@
     "db:retention-chats": "tsx scripts/db-retention-chats.ts",
     "db:retention-verify": "tsx scripts/verify-db-retention.ts",
     "vercel:prune": "tsx scripts/prune-vercel-deployments.ts",
-    "gh:ruleset": "tsx scripts/setup-github-ruleset.ts"
+    "gh:ruleset": "tsx scripts/setup-github-ruleset.ts",
+    "longform:create": "tsx scripts/create-longform.ts",
+    "video:studio": "remotion studio video/index.ts",
+    "longform:publish": "tsx scripts/publish-longform.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",
@@ -154,6 +157,13 @@
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.0.8",
+    "@react-three/fiber": "9.8.2",
+    "@remotion/bundler": "4.0.547",
+    "@remotion/cli": "4.0.547",
+    "@remotion/fonts": "4.0.547",
+    "@remotion/media-utils": "4.0.547",
+    "@remotion/renderer": "4.0.547",
+    "@remotion/three": "4.0.547",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/router-plugin": "^1.168.35",
     "@testing-library/dom": "^10.4.1",
@@ -172,6 +182,7 @@
     "msedge-tts": "^2.0.7",
     "playwright-core": "^1.56.1",
     "qrcode-generator": "^2.0.4",
+    "remotion": "4.0.547",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.19.2",
     "typescript": "^7.0.2",

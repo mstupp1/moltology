@@ -143,4 +143,4 @@ A lesson that does well can also go on the Academy as a short video lesson: hand
 
 ## Not built yet
 
-Long-form episodes (16:9 chapters that cut into shorts, which would make Molt Pod a real show), characters walking between marks, hand props and a branded intro sting. Long form needs a 16:9 compositor; ask before building it.
+Characters walking between marks, hand props and a branded intro sting. Long-form 16:9 videos are built: see [long-form-video-creator](../long-form-video-creator/SKILL.md), which renders cast scenes through `anim:create` as `format: "clip"`, `aspect: "16:9"` (a full Molt Pod episode would use it too).

@@ -57,7 +57,7 @@ function artLoader(art: SetArt) {
   const pending: Promise<void>[] = []
   return {
     pending,
-    apply(slot: keyof SetArt, material: MeshStandardMaterial | MeshBasicMaterial, repeat = 1) {
+    apply(slot: keyof SetArt, material: MeshStandardMaterial | MeshBasicMaterial, repeat = 1, onLoad?: (texture: Texture) => void) {
       const url = art[slot]
       if (!url) return false
       pending.push(
@@ -71,6 +71,7 @@ function artLoader(art: SetArt) {
           material.map = texture
           material.color.set('#ffffff')
           material.needsUpdate = true
+          onLoad?.(texture)
         })
       )
       return true
@@ -110,9 +111,14 @@ function floor(color: string, paint: ReturnType<typeof artLoader>, radius = 3.2)
 /** The painted background as a card at the back of the scene, unlit so it keeps its own light. */
 function plateCard(paint: ReturnType<typeof artLoader>): Mesh | null {
   const material = new MeshBasicMaterial({ toneMapped: false, depthWrite: false })
-  if (!paint.apply('plate', material)) return null
   const height = PLATE.width * (16 / 9)
   const mesh = new Mesh(new PlaneGeometry(PLATE.width, height), material)
+  // A landscape painting (long-form 16:9 plates) keeps the card's height and widens to its shape.
+  const fit = (texture: Texture) => {
+    const image = texture.image as { width?: number; height?: number } | undefined
+    if (image?.width && image.height && image.width > image.height) mesh.scale.x = (height * (image.width / image.height)) / PLATE.width
+  }
+  if (!paint.apply('plate', material, 1, fit)) return null
   mesh.position.set(0, PLATE.centreY, PLATE.z)
   mesh.renderOrder = -4
   return mesh
