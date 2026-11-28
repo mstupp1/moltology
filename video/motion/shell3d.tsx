@@ -38,7 +38,7 @@ function lookOf(id: string) {
 }
 
 /** The crab and a glassy copy of its shell, built once per character. */
-function useMoltPair(castId: string) {
+export function useMoltPair(castId: string) {
   const [handle] = useState(() => delayRender(`Building ${castId}`))
   const look = useMemo(() => lookOf(castId), [castId])
   const pair = useMemo(() => {

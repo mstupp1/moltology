@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from 'react'
 import { Composition, continueRender, delayRender, staticFile } from 'remotion'
 import { Episode } from './Episode'
+import { Thumbnail, type ThumbnailProps } from './Thumbnail'
 import { loadBrandFonts } from './theme'
 import { draftTimeline, type EpisodeFile } from './draft'
 import type { Timeline } from './timeline'
@@ -26,6 +27,12 @@ const WithFonts: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const EpisodeComp: React.FC<{ timeline: Timeline }> = ({ timeline }) => (
   <WithFonts>
     <Episode timeline={timeline} />
+  </WithFonts>
+)
+
+const ThumbnailComp: React.FC<ThumbnailProps> = (props) => (
+  <WithFonts>
+    <Thumbnail {...props} />
   </WithFonts>
 )
 
@@ -50,6 +57,7 @@ export const Root: React.FC = () => (
         return { durationInFrames: timeline.durationInFrames, fps: timeline.fps, props: { timeline } }
       }}
     />
+    <Composition id="Thumbnail" component={ThumbnailComp} fps={FPS} width={1280} height={720} durationInFrames={1} defaultProps={{ text: 'Why crabs?' } as ThumbnailProps} />
     <Composition id="Draft" component={EpisodeComp} fps={FPS} width={1920} height={1080} durationInFrames={draft.durationInFrames} defaultProps={{ timeline: draft }} />
   </>
 )
