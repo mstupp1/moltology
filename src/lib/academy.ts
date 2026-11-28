@@ -21,15 +21,16 @@ export {
 } from './academy-types'
 
 export const ACADEMY_COPY = {
-  comingSoonTitle: 'The first lectures are still being recorded',
+  comingSoonTitle: 'The first courses are on the way',
   comingSoonBody:
-    'Molt Academy opens with its first courses soon. Each one is a short run of video lectures, readings, and a quiz, and you keep your place as you go.',
-  emptyCatalog: 'No courses are published yet. They will show up here as soon as they open.',
-  emptyTracks: 'No tracks yet. A track groups courses into a path you take in order.',
-  emptyCertificates: 'No certifications are published yet. Each course and track will list its own.',
-  emptyFilter: 'No courses match that search. Clear a filter and look again.',
-  emptyCertificatesGuest: 'Certifications open with the first courses. Sign up and you can start earning them then.',
-  emptyEarned: 'You have not earned a certification yet. Finish a course and it will be issued here.',
+    'Each course is a few short lectures and readings, then a quiz.',
+  emptyCatalog: 'No courses yet.',
+  emptyTracks: 'No tracks yet.',
+  emptyCertificates: 'No certificates yet.',
+  comingSoonCourse: 'This course is not open yet. It will appear in the catalog when its lessons are ready.',
+  emptyFilter: 'No courses match. Try clearing a filter.',
+  emptyCertificatesGuest: 'No certificates yet. Sign up to earn them as they open.',
+  emptyEarned: 'None yet. Finish a course to earn its certificate.',
   enrollSuccess: 'You are enrolled. Start with the first lesson whenever you are ready.',
   enrollError: 'Could not enroll you. Please try again.',
   progressError: 'Could not save your progress. Please try again.',
@@ -39,7 +40,7 @@ export const ACADEMY_COPY = {
   missingCourse: 'This course is not in the catalog.',
   missingLesson: 'This lesson is not in the catalog.',
   missingTrack: 'This track is not in the catalog.',
-  missingCertificate: 'This certification could not be found.',
+  missingCertificate: 'This certificate could not be found.',
   lessonLocked: 'Enroll in this course to open the lesson.',
   lessonLockedGuest: 'Accounts are free. Sign up to start this lesson, keep your place and earn the certificate.',
   guestStartLesson: 'Sign up to start',
@@ -48,7 +49,7 @@ export const ACADEMY_COPY = {
   guestSaveProgress: 'Sign up to save your progress',
   guestSubmitQuiz: 'Sign up to submit',
   guestEarnCertificate: 'Sign up to earn this',
-  guestEarnedCertificates: 'Sign up to earn certificates. Each one gets a credential page you can share.',
+  guestEarnedCertificates: 'Sign up to earn certificates you can share.',
   videoWaiting: 'The video for this lecture is not up yet. Read the summary, then mark it complete or come back later.',
   guestLock: 'Lessons and certificates need a free account. Sign up to enroll and keep your progress.',
   guestEnroll: 'Sign up to enroll',
@@ -84,6 +85,8 @@ export interface AcademyCourseRow {
   outcomes: string[]
   coverImageUrl: string | null
   sortOrder: number
+  /** Listed as coming soon: no lessons, no enrolling, no certificate yet. */
+  comingSoon?: boolean
 }
 
 export interface AcademyTrackLinkRow {
@@ -182,6 +185,7 @@ export interface AcademyCourseCard {
   completed: boolean
   resumeLessonSlug: string | null
   trackSlugs: string[]
+  comingSoon: boolean
 }
 
 export interface AcademyTrackCard {
@@ -192,6 +196,8 @@ export interface AcademyTrackCard {
   level: AcademyLevel
   estimatedHours: number
   courseCount: number
+  /** Courses on the track that are open now; the rest are coming soon. */
+  openCourseCount: number
   outcomes: string[]
   coverImageUrl: string | null
   progressPercent: number
@@ -276,6 +282,7 @@ export interface AcademyCourseDetail {
   modules: AcademySyllabusModule[]
   tracks: { slug: string; title: string }[]
   certificate: AcademyCertificateCard | null
+  comingSoon: boolean
 }
 
 export interface AcademyTrackCourseItem {
@@ -291,6 +298,7 @@ export interface AcademyTrackCourseItem {
   completed: boolean
   progressPercent: number
   sortOrder: number
+  comingSoon: boolean
 }
 
 export interface AcademyTrackDetail {
@@ -643,8 +651,9 @@ export function assembleAcademyHome(input: {
     trackSlugsByCourse.set(link.courseId, list)
   }
 
+  // Live courses first, then the coming-soon roadmap, each in its own order.
   const courses = [...input.courses]
-    .sort((a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title))
+    .sort((a, b) => Number(Boolean(a.comingSoon)) - Number(Boolean(b.comingSoon)) || a.sortOrder - b.sortOrder || a.title.localeCompare(b.title))
     .map((course): AcademyCourseCard => {
       const courseLessons = lessonsByCourse.get(course.id) ?? []
       const refs = lessonRefs(courseLessons, input.modules.filter((module) => module.courseId === course.id))
@@ -670,6 +679,7 @@ export function assembleAcademyHome(input: {
         completed,
         resumeLessonSlug: resumeLessonSlug(refs, done),
         trackSlugs: trackSlugsByCourse.get(course.id) ?? [],
+        comingSoon: Boolean(course.comingSoon),
       }
     })
 
@@ -697,6 +707,7 @@ export function assembleAcademyHome(input: {
         level: track.level,
         estimatedHours: track.estimatedHours,
         courseCount: linkedCourses.length,
+        openCourseCount: linkedCourses.filter((course) => !course.comingSoon).length,
         outcomes: track.outcomes,
         coverImageUrl: track.coverImageUrl,
         progressPercent,
@@ -704,7 +715,15 @@ export function assembleAcademyHome(input: {
       }
     })
 
-  const certificates = input.certificates.map((certificate) => {
+  // A certificate is only on offer once its course, or every course on its track, is live.
+  const trackHasSoonCourse = (trackId: string) =>
+    input.links.some((link) => link.trackId === trackId && courseById.get(link.courseId)?.comingSoon)
+  const offered = input.certificates.filter((certificate) => {
+    if (certificate.courseId) return !courseById.get(certificate.courseId)?.comingSoon
+    if (certificate.trackId) return !trackHasSoonCourse(certificate.trackId)
+    return true
+  })
+  const certificates = offered.map((certificate) => {
     const course = certificate.courseId ? courseById.get(certificate.courseId) : undefined
     const track = certificate.trackId ? trackById.get(certificate.trackId) : undefined
     const subject = course
@@ -789,12 +808,13 @@ export function assembleCourseDetail(input: {
     tracks: input.tracks
       .filter((track) => linkedTrackIds.has(track.id))
       .map((track) => ({ slug: track.slug, title: track.title })),
-    certificate: input.certificate
+    certificate: input.certificate && !input.course.comingSoon
       ? certificateCard(input.certificate, input.award ?? undefined, {
           title: input.course.title,
           slug: input.course.slug,
         })
       : null,
+    comingSoon: Boolean(input.course.comingSoon),
   }
 }
 
@@ -840,6 +860,7 @@ export function assembleTrackDetail(input: {
         completed,
         progressPercent: completed ? 100 : progressPercent,
         sortOrder: link.sortOrder,
+        comingSoon: Boolean(course.comingSoon),
       }]
     })
   const progressPercent = items.length === 0
@@ -856,7 +877,7 @@ export function assembleTrackDetail(input: {
     coverImageUrl: input.track.coverImageUrl,
     progressPercent,
     courses: items,
-    certificate: input.certificate
+    certificate: input.certificate && !items.some((item) => item.comingSoon)
       ? certificateCard(input.certificate, input.award ?? undefined, {
           title: input.track.title,
           slug: input.track.slug,

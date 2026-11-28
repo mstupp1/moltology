@@ -36,8 +36,11 @@ Every field is shown and commented there.
   file such as `./media/lecture.mp4`. Local files, covers, posters and images in lesson text are
   uploaded to the asset bucket under a content-hash key, so re-running the ingest never uploads the
   same file twice. Members load them through the cached `/media` path.
-- **Status** is `draft` (default) or `published`. A draft course is invisible to members. A track only
-  shows published courses, so publish the courses before the track.
+- **Status** is `draft` (default), `soon` or `published`. A draft course is invisible to members. A
+  `soon` course is a roadmap card: it shows in the catalog and on its tracks as coming soon, with its
+  outcomes and planned modules (modules may list no lessons), but nobody can enroll and its
+  certificate stays hidden. A track's certificate also stays hidden while any of its courses is
+  `soon`. To launch one, add its lessons and set `published`. Draft courses never show on a track.
 - **Removing a lesson** deletes member progress on it, so the ingest refuses unless you pass `--prune`.
   Editing a lesson's text, video, questions or position keeps everyone's progress.
 

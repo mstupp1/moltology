@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_hud/academy/_sections/')({
     meta: [
       ...seo({
         title: 'Academy: courses and certificates | Moltology',
-        description: 'Browse Molt Academy tracks and courses. Watch lectures, finish lessons, and earn certifications.',
+        description: 'Browse Molt Academy tracks and courses. Watch lectures, finish lessons, and earn certificates.',
         canonical: 'https://moltology.org/academy',
         siteName: 'Moltology',
         twitterSite: '@moltology',

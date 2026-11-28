@@ -19,6 +19,7 @@ import {
   ACADEMY_FOCUS,
   ACADEMY_TEXT_ACTION,
   AcademyCover,
+  ComingSoonChip,
   AcademyCrumbs,
   AcademyProgress,
   LevelMark,
@@ -78,14 +79,22 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
               <User className="w-3.5 h-3.5" aria-hidden="true" />
               {detail.instructorName}, {detail.instructorTitle}
             </li>
-            <li className="inline-flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5" aria-hidden="true" />
-              {lessons.length} {lessons.length === 1 ? 'lesson' : 'lessons'}
-            </li>
-            <li className="inline-flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-              {formatCourseLength(detail.estimatedMinutes)}
-            </li>
+            {detail.comingSoon ? (
+              <li>
+                <ComingSoonChip />
+              </li>
+            ) : (
+              <>
+                <li className="inline-flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5" aria-hidden="true" />
+                  {lessons.length} {lessons.length === 1 ? 'lesson' : 'lessons'}
+                </li>
+                <li className="inline-flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+                  {formatCourseLength(detail.estimatedMinutes)}
+                </li>
+              </>
+            )}
           </ul>
           {detail.tracks.length > 0 ? (
             <p className="text-xs text-ink-muted">
@@ -134,10 +143,11 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
             ) : null}
           </section>
 
+          {detail.modules.length > 0 ? (
           <section className={cn(ACADEMY_CARD, 'p-2 sm:p-3')} aria-labelledby="syllabus-heading">
             <div className="flex items-center justify-between gap-3 px-2 pt-2 pb-3">
               <h2 id="syllabus-heading" className="font-grotesk text-sm font-semibold text-ink">
-                Syllabus
+                {detail.comingSoon ? 'What it will cover' : 'Syllabus'}
               </h2>
               {detail.enrolled ? (
                 <span className="text-xs text-ink-muted tabular-nums">
@@ -209,11 +219,20 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
               ))}
             </div>
           </section>
+          ) : null}
         </div>
 
         <aside className="space-y-3 order-1 lg:order-2 lg:sticky lg:top-4">
-          <section className={cn(ACADEMY_CARD, 'p-4 space-y-3')} aria-label="Your progress">
-            {detail.enrolled ? (
+          <section className={cn(ACADEMY_CARD, 'p-4 space-y-3')} aria-label={detail.comingSoon ? 'Coming soon' : 'Your progress'}>
+            {detail.comingSoon ? (
+              <>
+                <ComingSoonChip />
+                <p className="text-xs text-ink-body leading-relaxed">{ACADEMY_COPY.comingSoonCourse}</p>
+                <Link to="/academy" className={cn(academyButtonLink('secondary'), 'w-full')}>
+                  Browse open courses
+                </Link>
+              </>
+            ) : detail.enrolled ? (
               <>
                 <AcademyProgress percent={detail.progressPercent} label={detail.completed ? 'Course complete' : 'Your progress'} />
                 {resume ? (
@@ -249,17 +268,18 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
             )}
           </section>
 
+          {detail.comingSoon ? null : (
           <section className={cn(ACADEMY_CARD, 'p-4 space-y-2')} aria-labelledby="course-cert-heading">
             <p className="inline-flex items-center gap-1.5 text-2xs text-ink-muted font-semibold">
               <Award className="w-3.5 h-3.5 text-cyan-glow" aria-hidden="true" />
-              Certification
+              Certificate
             </p>
             {detail.certificate ? (
               <>
                 <h2 id="course-cert-heading" className="font-grotesk font-semibold text-ink">{detail.certificate.title}</h2>
                 <p className="text-xs text-ink-body leading-relaxed">{detail.certificate.description}</p>
                 <p className={cn('text-xs', detail.certificate.earned ? 'text-emerald-500' : 'text-ink-muted')}>
-                  {detail.certificate.earned ? 'Earned. It is on your certification record.' : 'Issued when every lesson in this course is complete.'}
+                  {detail.certificate.earned ? 'Earned. It is on your Certificates page.' : 'Issued when every lesson in this course is complete.'}
                 </p>
                 {detail.certificate.earned && detail.certificate.credentialId ? (
                   <Link
@@ -273,9 +293,10 @@ export function AcademyCourseView({ course }: { course: AcademyCourseDetail }) {
                 ) : null}
               </>
             ) : (
-              <p id="course-cert-heading" className="text-xs text-ink-muted">This course does not issue a certification yet.</p>
+              <p id="course-cert-heading" className="text-xs text-ink-muted">This course does not issue a certificate yet.</p>
             )}
           </section>
+          )}
         </aside>
       </div>
       {guest.modal}

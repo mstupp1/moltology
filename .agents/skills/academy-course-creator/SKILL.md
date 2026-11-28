@@ -25,7 +25,7 @@ complete worked course and track in `content/academy/_examples/`. The parser is
 - `npm run academy:ingest` writes them to the database, which is what members see. It matches
   courses and tracks by slug and lessons by course + slug, so editing text, video, questions or
   order keeps every member's progress, notes and certificates.
-- Status lives in the file: `draft` (default, invisible to members) or `published`.
+- Status lives in the file: `draft` (default, invisible to members), `soon` (a coming-soon roadmap card: listed with its outcomes and planned modules, no lessons, no enrolling, certificate hidden) or `published`. To launch a `soon` course, write its lessons and set `published`.
 
 ## Before writing
 

@@ -24,7 +24,7 @@ export const Route = createFileRoute('/_hud/academy/certificates/$credentialId')
         title: loaderData?.credential
           ? `${loaderData.credential.title} | Academy | Moltology`
           : 'Credential | Academy | Moltology',
-        description: loaderData?.credential?.description ?? 'A Molt Academy certification.',
+        description: loaderData?.credential?.description ?? 'A Molt Academy certificate.',
         siteName: 'Moltology',
         twitterSite: '@moltology',
       }),

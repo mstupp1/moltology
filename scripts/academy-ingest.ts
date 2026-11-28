@@ -106,7 +106,10 @@ async function main() {
   }
 
   const published = reports.filter((report) => report.status === 'published').length
-  console.log(`\nDone: ${reports.length} ok, ${failed} failed. ${published} published, ${reports.length - published} draft.`)
+  const soon = reports.filter((report) => report.status === 'soon').length
+  console.log(
+    `\nDone: ${reports.length} ok, ${failed} failed. ${published} published, ${soon} coming soon, ${reports.length - published - soon} draft.`,
+  )
   if (failed > 0) process.exit(1)
 }
 
