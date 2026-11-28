@@ -7,7 +7,7 @@ level: beginner
 instructor:
   name: The Synaptic Oracle
   title: Narrator of the Molt Academy
-status: draft # published once the video is live on YouTube
+status: published
 order: 0
 outcomes:
   - Explain why molting is a method for growth, not just a metaphor
