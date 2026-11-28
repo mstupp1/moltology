@@ -230,8 +230,8 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   key.position.set(2.2, 3.4, 4.4)
   key.castShadow = true
   key.shadow.mapSize.set(low ? 512 : 1024, low ? 512 : 1024)
-  key.shadow.camera.left = key.shadow.camera.bottom = -1.7
-  key.shadow.camera.right = key.shadow.camera.top = 1.7
+  key.shadow.camera.left = key.shadow.camera.bottom = -3.0
+  key.shadow.camera.right = key.shadow.camera.top = 3.0
   key.shadow.camera.near = 1
   key.shadow.camera.far = 12
   key.shadow.bias = -0.0004
@@ -241,7 +241,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
   key.target.position.set(0, 1, 0)
   scene.add(key, key.target)
 
-  const ground = new Mesh(new PlaneGeometry(8, 8), new ShadowMaterial({ opacity: 0.26 }))
+  const ground = new Mesh(new PlaneGeometry(8, 8), new ShadowMaterial({ opacity: 0.34 }))
   ground.rotation.x = -Math.PI / 2
   ground.receiveShadow = true
   const blobTexture = contactShadowTexture()
@@ -331,9 +331,10 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
       // Zooming in closes on the head and shoulders rather than the middle of the body.
       const near = clamp((zoom - 1) / (ZOOM_MAX - 1), 0, 1)
       wantLook.copy(home.look)
-      // Close shots aim at the head of whoever the shot is on (a cast member may be shorter).
+      // Close shots aim at the head of whoever the shot is on (a cast member may be shorter or seated).
       const on = subject > 0 ? (extras[subject - 1]?.character ?? character) : character
-      wantLook.y += ((on?.height ?? 1.8) * 0.8 - home.look.y) * near
+      const seatY = (on?.root.userData.seatY as number | undefined) ?? 0
+      wantLook.y += ((on?.height ?? 1.8) * 0.8 + seatY - home.look.y) * near
       dist = (home.position.z - home.look.z) / zoom
       rise = (home.position.y - home.look.y) / zoom
     } else {
@@ -428,13 +429,13 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions = {
     }
     if (character) {
       character.root.rotation.y = yaw
-      character.root.position.set(primaryX, 0, primaryZ)
+      character.root.position.set(primaryX, (character.root.userData.seatY as number | undefined) ?? 0, primaryZ)
       character.update(dt, time, !options.reducedMotion)
     }
     blob.position.set(primaryX, 0.002, primaryZ)
     for (const e of extras) {
       e.character.root.rotation.y = e.yaw
-      e.character.root.position.set(e.x, 0, e.z)
+      e.character.root.position.set(e.x, (e.character.root.userData.seatY as number | undefined) ?? 0, e.z)
       e.character.update(dt, time, !options.reducedMotion)
     }
     // With a cast, everyone has moved now: settle claws that swung into a neighbour (scripted only).

@@ -34,6 +34,7 @@ describe('zernio-client', () => {
     expect(QUEUE_IDS.REELS_AND_SHORTS).toBe('6a84b7702421e968ac81f5bd')
     expect(QUEUE_IDS.LEAD_MAGNETS_DAILY).toBe('6a8d93576f0e96efe2960c91')
     expect(QUEUE_IDS.COMEDY_SHORTS).toBe('6b00c2052c18af30956c81c9')
+    expect(QUEUE_IDS.MOLT_POD_REACTS).toBe('6b0a417a494a7f556edd91b9')
   })
 
   it('retrieves API key from environment', () => {

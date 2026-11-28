@@ -50,7 +50,7 @@ function rehearsalStage(): TimelineStage & { members: Member[] } {
       if (members[0]) members[0].yaw += spin * dt
       for (const m of members) {
         m.character.root.rotation.y = m.yaw
-        m.character.root.position.set(m.x, 0, m.z)
+        m.character.root.position.set(m.x, (m.character.root.userData.seatY as number | undefined) ?? 0, m.z)
         m.character.update(dt, clock, true)
       }
       // As stage.ts does: once everyone has moved, claws settle out of each other.

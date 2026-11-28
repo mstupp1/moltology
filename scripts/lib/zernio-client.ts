@@ -20,6 +20,7 @@ export const QUEUE_IDS = {
   REELS_AND_SHORTS: '6a84b7702421e968ac81f5bd', // Moltology Reels & Shorts (Daily at 18:30 EST)
   LEAD_MAGNETS_DAILY: '6a8d93576f0e96efe2960c91', // Moltology Lead Magnets — Daily (Daily at 13:00 EST)
   COMEDY_SHORTS: '6b00c2052c18af30956c81c9', // Moltology Comedy Shorts (Sat at 12:00 EST)
+  MOLT_POD_REACTS: '6b0a417a494a7f556edd91b9', // Molt Pod Reacts (Tue at 18:30 EST)
 } as const
 
 export interface ZernioMediaItem {

@@ -191,4 +191,172 @@ describe('animated lessons', () => {
       { x: 0, z: -0.85 },
     ])
   })
+
+  it('validates Molt Pod reaction episodes, enforces clip guardrails, and preserves exact clip windows', () => {
+    const reaction: Lesson = {
+      id: 'molt-pod-test-reaction',
+      title: 'Test Reaction',
+      topic: 'Reaction test',
+      series: 'Molt Pod Reacts',
+      episode: 1,
+      format: 'reaction',
+      loudness: 4,
+      set: 'podcast-studio',
+      queueId: '6b0a417a494a7f556edd91b9',
+      host: 'juno',
+      cast: [
+        { id: 'juno', at: 'left' },
+        { id: 'vera', at: 'right' },
+      ],
+      hookHeadline: 'He heats his eyelids to keep scrolling.',
+      scenes: [
+        {
+          speaker: 'juno',
+          line: 'He heats his eyelids to keep scrolling.',
+          shot: 'two',
+          pose: 'ready',
+          look: 'camera',
+          description: 'Hook over the desk.',
+        },
+        {
+          line: '',
+          shot: 'two',
+          description: 'First YouTube clip in the studio monitor.',
+          sourceClip: {
+            path: 'tmp/molt-pod-ep01/clip-1.mp4',
+            start: 0,
+            duration: 6.5,
+            attribution: 'Bryan Johnson · Your Phone Screen Is Making You Blind',
+            url: 'https://www.youtube.com/watch?v=coU8aHzTvpk',
+            publishedAt: '2026-11-17',
+          },
+        },
+        {
+          speaker: 'vera',
+          line: 'One hundred and thirteen degrees. That is basically slow-poaching your face.',
+          shot: 'close',
+          move: 'cut',
+          pose: 'ready',
+          look: 'left',
+          description: 'Vera deadpans.',
+        },
+        {
+          speaker: 'juno',
+          line: 'To be fair, he says screens are ruining everyone tear film. Surely he quits phones next.',
+          shot: 'close',
+          move: 'cut',
+          pose: 'shrug',
+          look: 'right',
+          description: 'Juno checks.',
+        },
+        {
+          line: '',
+          shot: 'two',
+          description: 'Second clip in monitor.',
+          sourceClip: {
+            path: 'tmp/molt-pod-ep01/clip-2.mp4',
+            start: 0,
+            duration: 3.5,
+            attribution: 'Bryan Johnson · Your Phone Screen Is Making You Blind',
+          },
+        },
+        {
+          speaker: 'vera',
+          line: 'I have eyestalks and no eyelids. Even I leave my phone in another room tonight instead of buying a heated eye mask.',
+          shot: 'close',
+          move: 'push-in',
+          pose: 'rest',
+          look: 'camera',
+          description: 'Vera closes the bit.',
+        },
+      ],
+      caption: 'Heated eye masks to avoid putting the phone down.',
+      hashtags: ['#MoltPod', '#Moltology'],
+      firstComment: 'More crustacean logic: https://moltology.org',
+      youtubeTitle: 'Billionaire heated eye mask routine #shorts',
+      youtubeDescription: 'Juno and Vera react to Bryan Johnson.',
+    }
+
+    expect(lessonProblems(reaction)).toEqual([])
+    expect(narrationOf(reaction)).not.toContain('  ')
+
+    // Reject oversized single clip, oversized total clip, missing attribution, scene 1 clip, non-empty clip line, and public/ path.
+    const tooLongClip: Lesson = {
+      ...reaction,
+      scenes: reaction.scenes.map((s, i) => (i === 1 ? { ...s, sourceClip: { ...s.sourceClip!, duration: 10.5 } } : s)),
+    }
+    expect(lessonProblems(tooLongClip).some((p) => p.includes('between 1.5s and 9.5s'))).toBe(true)
+
+    const tooMuchTotal: Lesson = {
+      ...reaction,
+      scenes: reaction.scenes.map((s) => (s.sourceClip ? { ...s, sourceClip: { ...s.sourceClip, duration: 9.0 } } : s)),
+    }
+    expect(lessonProblems(tooMuchTotal).some((p) => p.includes('total sourceClip duration'))).toBe(true)
+
+    const publicPath: Lesson = {
+      ...reaction,
+      scenes: reaction.scenes.map((s, i) => (i === 1 ? { ...s, sourceClip: { ...s.sourceClip!, path: 'public/clip.mp4' } } : s)),
+    }
+    expect(lessonProblems(publicPath).some((p) => p.includes('outside public/ and src/'))).toBe(true)
+
+    const badLineOnClip: Lesson = {
+      ...reaction,
+      scenes: reaction.scenes.map((s, i) => (i === 1 ? { ...s, line: 'Should be empty' } : s)),
+    }
+    expect(lessonProblems(badLineOnClip).some((p) => p.includes('line must be empty'))).toBe(true)
+
+    const clipFirst: Lesson = {
+      ...reaction,
+      scenes: [{ ...reaction.scenes[1], line: '' }, ...reaction.scenes.slice(1)],
+    }
+    expect(lessonProblems(clipFirst)).toContain('scene 1 cannot be a sourceClip (put the spoken hookHeadline first)')
+
+    // Segment splitting around speakers and clips (even if same speaker flanks a clip)
+    const segments = segmentsOf(reaction, 'BOOK RECORD REGULAR')
+    expect(segments.map((s) => s.kind)).toEqual(['speech', 'clip', 'speech', 'speech', 'clip', 'speech'])
+    const sameFlank: Lesson = {
+      ...reaction,
+      scenes: reaction.scenes.map((s, i) => (i === 2 ? { ...s, speaker: 'juno' } : s)),
+    }
+    expect(segmentsOf(sameFlank, 'BOOK RECORD REGULAR').map((s) => s.kind)).toEqual([
+      'speech',
+      'clip',
+      'speech',
+      'clip',
+      'speech',
+    ])
+
+    // Exact clipWindows without LEAD drift + monitor framing & look up
+    const words = estimateWords(narrationOf(reaction))
+    const clipWindows = {
+      1: { start: words[6].endMs / 1000 + 0.2, end: words[6].endMs / 1000 + 6.7 },
+      4: { start: words[31].endMs / 1000 + 0.2, end: words[31].endMs / 1000 + 3.7 },
+    }
+    const looks = Object.fromEntries(castOf(reaction).map((c) => [c.id, castLook(c.id)]))
+    const { timeline, windows } = buildTimeline(reaction, looks, words, [[], []], {
+      width: 540,
+      height: 960,
+      fps: 30,
+      tail: 0.35,
+      hookLift: 0.9,
+      clipWindows,
+    })
+    expect(windows[1].start).toBe(clipWindows[1].start)
+    expect(windows[1].end).toBe(clipWindows[1].end)
+    expect(windows[2].start).toBe(clipWindows[1].end)
+
+    const clipCamera = timeline.cues.find((c) => c.t === windows[1].start && c.camera)!.camera!
+    expect(clipCamera.cut).toBe(true)
+    expect(clipCamera.lift).toBeGreaterThan(0.8)
+    const afterClipCamera = timeline.cues.find((c) => c.t === windows[2].start && c.camera)!.camera!
+    expect(afterClipCamera.cut).toBe(true)
+    const clipLook = timeline.cues.find((c) => c.t === windows[1].start && c.who === 0 && c.look)!.look!
+    expect(clipLook.y).toBeGreaterThan(1)
+    expect(timeline.cues.some((c) => c.gesture && c.t >= windows[1].start && c.t <= windows[1].end)).toBe(false)
+
+    const draft = reelDraftFrom(reaction)
+    expect(draft.format).toBe('molt-pod-reaction')
+    expect(draft.queueId).toBe('6b0a417a494a7f556edd91b9')
+    expect(draft.sourceClips).toHaveLength(2)
+  })
 })
