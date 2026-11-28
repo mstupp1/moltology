@@ -52,7 +52,7 @@ export function archivePath(root: string, relativePath: string): string {
 }
 
 export async function archiveSocialMedia(input: {
-  kind: 'post' | 'carousel' | 'reel' | 'series'
+  kind: 'post' | 'carousel' | 'reel' | 'series' | 'video'
   files: string[]
   metadata: Record<string, unknown>
   root?: string

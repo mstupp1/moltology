@@ -3,7 +3,7 @@ title: What is Moltology
 summary: Why evolution keeps making crabs, what molting teaches about growth, and what you would do on day one.
 kind: video
 duration: "4:43"
-# video: https://www.youtube.com/watch?v=VIDEO_ID   # the public YouTube link, added once it is live
+video: https://www.youtube.com/watch?v=0xXlID2iXSY
 preview: true # open to everyone, signed in or not
 ---
 

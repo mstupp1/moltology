@@ -108,7 +108,8 @@
     "vercel:prune": "tsx scripts/prune-vercel-deployments.ts",
     "gh:ruleset": "tsx scripts/setup-github-ruleset.ts",
     "longform:create": "tsx scripts/create-longform.ts",
-    "video:studio": "remotion studio video/index.ts"
+    "video:studio": "remotion studio video/index.ts",
+    "longform:publish": "tsx scripts/publish-longform.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",
