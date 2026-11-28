@@ -46,12 +46,36 @@ A beat is one or two sentences and one picture. `speaker` is `narrator` (the Ora
 
 | Kind | Fields | Made by | Use for |
 | --- | --- | --- | --- |
+| `scene` | `art` (a name in the episode's `art` map), `type`, optional `camera` | Codex paintings in layers, moved through by a 3D camera (`video/scene/`) | **The default for narration.** Every idea, list, number, quote and title. Most of the video |
 | `character` | `set`, `cast`, `shot`, `move`, `focus`, `pose`, `look`, `acting`, `react`, `note` | `anim:create` at 1920x1080, lip-synced | The cold open, dialogue, reactions, the ending. The highest-value beats: about a quarter to a half of the video |
-| `motion` | `component`, `props` | Remotion components in `video/motion/` | Titles, numbers, comparisons, diagrams, 3D. Each piece lands on the word that names it |
+| `motion` | `component`, `props` | Remotion components in `video/motion/` | Only what a painting can't do: the 3D molt with the real cast, a live chart from data, the end card |
 | `still` | `image` (under `media/`), `prompt` | Codex, Luna at low effort | Moods and places: a desk at night, a gathering. A whole slide can be a still when it's only text and art |
 | `screen` | `capture` (file in `media/screens/`) | The real app, from `mockup-capture` or a recording | Showing a feature the line names |
 
 Character beats in a row on the same set with the same cast render as one clip, so the cut between speakers is seamless and the voices keep their turn gaps. Narrator lines inside such a run are voiced by the Oracle over the cast.
+
+### Scenes: Codex art first
+
+The look is a motion designer's 2.5D work, not code drawings. Each scene is a Codex painting cut into layers, set at depths in 3D space; the camera pushes, drifts, rises or descends through them with depth of field, kinetic type lands on the spoken words, and a finishing pass adds light leaks, shafts, a vignette and film grain. Scenes cut in with a push-through or a whip (`Entrance` in `video/Episode.tsx`).
+
+The episode's `art` map names each scene once, so beats can reuse it with different type:
+
+```json
+"art": {
+  "shed": { "layers": [
+      { "src": "art/sea-floor.png", "depth": 0 },
+      { "src": "art/molt-cut.png", "depth": 0.62, "x": 0.73, "y": 0.62, "width": 0.34, "float": 6, "turn": 8, "glow": "rgba(255,170,110,0.55)" }
+    ], "camera": "push", "focus": 0.62, "shade": 0.7 }
+}
+```
+
+- **Layers:** a 16:9 background (depth 0 to 0.2) and usually one hero cutout (depth 0.6 to 0.75) painted on solid magenta and keyed with `python3 scripts/chroma_key.py in.png out-cut.png -c magenta --trim`. Keep a hero's `width` at 0.3 to 0.35: nearer layers grow as the camera pushes. `float`, `turn` and `glow` bring the hero to life.
+- **Camera:** `push`, `pull`, `drift-left`, `drift-right`, `rise`, `descend`, `orbit` or `hold`. Vary it scene to scene; match the move to the idea (descend for "go deep", rise for "harden").
+- **Focus:** the depth in focus; `focusTo` racks focus across the beat.
+- **`shade`:** darkens the left of the frame under the type. Paint every background with a calm, darker left third so type has a home.
+- **Type styles** (`video/scene/type.tsx`): `title`, `kicker` (with an optional `source`), `statement` (words land as spoken), `chapter-move` (giant outline numeral), `list`, `split` (one side struck through), `quote`, `meter`, `timer`, `depth-readings`. Type is Space Grotesk 500 for words that matter, Inter for labels, sentence case, cyan as the only signal colour, revealed through masks, never a plain fade.
+
+**Style frames first.** Before painting a whole episode, make three style frames (`npx remotion still SceneStill out.png --frame=<n> --public-dir=<folder with art/ and fonts/> --props=<spec, line, seconds json>`) and a short motion test (`npx remotion render SceneStill …`). Get the person's OK on the look, then paint the rest in one Codex brief.
 
 ### Motion components
 
@@ -82,7 +106,8 @@ codex exec --skip-git-repo-check -s workspace-write -m gpt-6-luna -c model_reaso
 
 Each prompt starts from the set art style in `content/animation/sets/art.json`. Files go in `content/academy/videos/<slug>/media/` (git-ignored; the Academy ingest uploads finished media):
 
-- `plates/<set>.png`: a 16:9 painted plate for each set a character beat uses (the 9:16 kits crop badly). The set's `plate` prompt, rewritten as wide, with an empty floor in the lower third and nothing in front.
+- `plates/<set>.png`: a 16:9 painted plate for each set a character beat uses (the 9:16 kits crop badly). A plate painted for an earlier episode is reused automatically. The set's `plate` prompt, rewritten as wide, with an empty floor in the lower third and nothing in front.
+- `art/<name>.png`: scene layers. Backgrounds are 16:9 with a calm, darker left third; hero objects are square on solid magenta (#FF00FF) with no magenta on the subject, then keyed to `art/<name>-cut.png`. Ten to fifteen images cover a 5-minute video; scenes are reused with new type.
 - `stills/<name>.png`: the still beats, from their `prompt`.
 - `screens/<capture>.png`: app captures. The marketing previews (`/images/marketing/<id>_desktop_preview.webp`) are a fine first pass; record the real feature when the line is about a specific moment.
 

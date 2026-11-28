@@ -3,13 +3,15 @@
  * chapter cards and source credits. Built from the timeline create-longform writes.
  */
 import React from 'react'
-import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion'
+import { AbsoluteFill, Audio, Easing, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion'
 import { TitleCard, ChapterCard, WordReveal, EndCard } from './motion/cards'
 import { FamilyTree, FourMoves, MeltDay, MeltVsMolt, MoltCycle, PingWaves, StageLadder, ThreePanels } from './motion/diagrams'
 import { ShellSplit, ShellTurntable } from './motion/shell3d'
 import { BeatContext, type Timeline, type TimelineBeat } from './timeline'
 import { C } from './theme'
 import { DeepWater, SourceTag } from './ui/primitives'
+import { Scene } from './scene/Scene'
+import { Finish } from './scene/Finish'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MOTION: Record<string, React.FC<any>> = {
@@ -49,7 +51,22 @@ const ScreenBeat: React.FC<{ src: string; duration: number }> = ({ src, duration
   return (
     <AbsoluteFill>
       <DeepWater snow={false} />
-      <div style={{ position: 'absolute', left: 200, top: 90, width: 1520, height: 900, borderRadius: 24, overflow: 'hidden', border: `1px solid ${C.line}`, background: C.surface1, boxShadow: '0 40px 120px rgba(0,0,0,0.55)' }}>
+      <div
+        style={{
+          position: 'absolute',
+          left: 200,
+          top: 90,
+          width: 1520,
+          height: 900,
+          borderRadius: 24,
+          overflow: 'hidden',
+          border: `1px solid ${C.line}`,
+          background: C.surface1,
+          boxShadow: '0 40px 120px rgba(0,0,0,0.55)',
+          // A slow 3D swing toward the viewer, like a product shot.
+          transform: `perspective(1800px) rotateY(${interpolate(frame, [0, duration], [-9, -2], { extrapolateRight: 'clamp' })}deg) rotateX(${interpolate(frame, [0, duration], [4, 1], { extrapolateRight: 'clamp' })}deg) scale(${interpolate(frame, [0, duration], [0.94, 1], { extrapolateRight: 'clamp' })})`,
+        }}
+      >
         <div style={{ height: 44, background: C.surface2, display: 'flex', alignItems: 'center', gap: 10, paddingLeft: 20 }}>
           {[0, 1, 2].map((i) => (
             <span key={i} style={{ width: 12, height: 12, borderRadius: 6, background: C.surface3 }} />
@@ -61,6 +78,29 @@ const ScreenBeat: React.FC<{ src: string; duration: number }> = ({ src, duration
           <Img src={staticFile(src)} style={{ width: '100%', translate: `0 ${scroll}%` }} />
         )}
       </div>
+      <Finish />
+    </AbsoluteFill>
+  )
+}
+
+/**
+ * How a scene cuts in: a fast push through the lens with motion blur and a light flash, or a whip
+ * from the side. Alternates by beat so the cuts don't repeat; 9 frames, like an editor's transition.
+ */
+const Entrance: React.FC<{ index: number; children: React.ReactNode }> = ({ index, children }) => {
+  const frame = useCurrentFrame()
+  const p = interpolate(frame, [0, 9], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.2, 0.8, 0.2, 1) })
+  const whip = index % 3 === 1
+  const dir = index % 2 ? 1 : -1
+  return (
+    <AbsoluteFill
+      style={{
+        scale: whip ? '1' : String(1.14 - 0.14 * p),
+        translate: whip ? `${dir * (1 - p) * 260}px 0` : undefined,
+        filter: p < 1 ? `blur(${(1 - p) * (whip ? 22 : 14)}px) brightness(${1 + (1 - p) * 0.6})` : undefined,
+      }}
+    >
+      {children}
     </AbsoluteFill>
   )
 }
@@ -80,6 +120,12 @@ export const BeatView: React.FC<{ beat: TimelineBeat }> = ({ beat }) => {
   if (beat.kind === 'motion') {
     const Component = beat.component ? MOTION[beat.component] : undefined
     body = Component ? <Component {...(beat.props ?? {})} /> : <Missing beat={beat} />
+  } else if (beat.kind === 'scene' && beat.scene) {
+    body = (
+      <Entrance index={beat.index}>
+        <Scene spec={beat.scene} />
+      </Entrance>
+    )
   } else if (beat.kind === 'character' && beat.src) {
     body = <OffthreadVideo src={staticFile(beat.src)} trimBefore={beat.trimBefore ?? 0} muted />
   } else if (beat.kind === 'still' && beat.src) {

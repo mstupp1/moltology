@@ -9,6 +9,9 @@ import React, { useEffect, useState } from 'react'
 import { Composition, continueRender, delayRender, staticFile } from 'remotion'
 import { Episode } from './Episode'
 import { Thumbnail, type ThumbnailProps } from './Thumbnail'
+import { Scene, type SceneSpec } from './scene/Scene'
+import { BeatContext } from './timeline'
+import { estimateWords } from './draft'
 import { loadBrandFonts } from './theme'
 import { draftTimeline, type EpisodeFile } from './draft'
 import type { Timeline } from './timeline'
@@ -36,6 +39,16 @@ const ThumbnailComp: React.FC<ThumbnailProps> = (props) => (
   </WithFonts>
 )
 
+/** One scene on its own, for style frames: the line's words are estimated, so type lands roughly on cue. */
+type SceneStillProps = { spec: SceneSpec; line: string; seconds: number } & Record<string, unknown>
+const SceneStill: React.FC<SceneStillProps> = ({ spec, line, seconds }) => (
+  <WithFonts>
+    <BeatContext.Provider value={{ duration: Math.round(seconds * FPS), line, words: estimateWords(line).map((w) => ({ text: w.text, at: Math.round((w.seconds + 0.3) * FPS) })) }}>
+      <Scene spec={spec} />
+    </BeatContext.Provider>
+  </WithFonts>
+)
+
 const draft = draftTimeline(whatIsMoltology as EpisodeFile, FPS)
 
 export const Root: React.FC = () => (
@@ -58,6 +71,16 @@ export const Root: React.FC = () => (
       }}
     />
     <Composition id="Thumbnail" component={ThumbnailComp} fps={FPS} width={1280} height={720} durationInFrames={1} defaultProps={{ text: 'Why crabs?' } as ThumbnailProps} />
+    <Composition
+      id="SceneStill"
+      component={SceneStill}
+      fps={FPS}
+      width={1920}
+      height={1080}
+      durationInFrames={240}
+      defaultProps={{ spec: { layers: [] }, line: '', seconds: 8 } as SceneStillProps}
+      calculateMetadata={({ props }) => ({ durationInFrames: Math.round(props.seconds * FPS) })}
+    />
     <Composition id="Draft" component={EpisodeComp} fps={FPS} width={1920} height={1080} durationInFrames={draft.durationInFrames} defaultProps={{ timeline: draft }} />
   </>
 )
