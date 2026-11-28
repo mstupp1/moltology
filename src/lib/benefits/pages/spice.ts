@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'How to spice up your life when every day is a rerun: pick a hard question, open the sketchbook and do something beyond your usual scroll with Moltology.',
   keywords: 'how to spice up your life, bored with routine, stuck in a rut, new interests, daily learning',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/spice/share.jpg?v=2',
     alt: 'A bright red crab with a sketchbook on a hot orange snack advertising set',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The Prime Directive in the Codex',
+    label: 'The Prime Directive',
     href: '/codex/scr-001#verse-5',
-    text: 'The Prime Directive says, “Nothing grows inside the shell that grew it”. The fifth verse is honest about the awkward part: to get larger, you first have to be briefly uncovered. Read it, then name a routine you keep because you already know how it goes.',
+    text: 'Make room to grow by leaving one familiar routine behind.',
   },
   reveal: {
-    headline: 'Your next subject is allowed to surprise you.',
-    body: 'Use Learn something hard for the subject you keep putting off.',
+    headline: 'Put a little heat on the calendar.',
+    body: 'Give the daily learning task a subject you’ve never tried.',
     screenshot: 'dashboard',
   },
   related: ['zest', 'intelligence', 'adaptive'],
@@ -65,8 +65,8 @@ const page: BenefitPage = {
     hero: {
       sticker: 'Now with extra curiosity',
       headline: 'Spice up your life. Retire the reruns.',
-      sub: 'Same feed. Same saved videos. That sketchbook still in its wrapper. Pick something difficult and have a go. Open the book, ask the beginner question and put a little unfamiliar on the menu.',
-      cta: 'Add some heat, free',
+      sub: 'Open the sketchbook. Ask the beginner question. Order something unfamiliar.',
+      cta: 'Get started free',
       image: {
         src: '/images/benefits/spice/hero.jpg?v=2',
         alt: 'A glossy red crab showing an open sketchbook against vivid yellow in a bold snack advertisement',
@@ -76,7 +76,7 @@ const page: BenefitPage = {
     },
     marquee: ['Extra bite', 'Bring your questions', 'Beginner status welcome', 'No special kit needed', 'Curiosity on the menu'],
     flavors: {
-      title: 'Go off your usual order',
+      title: 'The extra-bite range',
       items: [
         { name: 'First Bite Lime', note: 'Read the chapter you skipped because you did not understand the opening.', tone: 'lime' },
         { name: 'Wild Question Berry', note: 'Ask someone how their hobby works. Follow up on the bit you do not get.', tone: 'berry' },
@@ -85,30 +85,18 @@ const page: BenefitPage = {
       ],
     },
     label: {
-      title: 'What is in the mix',
+      title: 'In the mix',
       serving: 'Best opened with a question',
       rows: [
         { label: 'Main ingredient', value: 'A new attempt' },
         { label: 'Learning task', value: 'Learn something hard' },
-        { label: 'Topic selection', value: 'Your call' },
         { label: 'Prior experience', value: 'Start at the beginning' },
-        { label: 'Equipment upgrade', value: 'Use what you own' },
         { label: 'First draft', value: 'Rough is fine' },
       ],
-      footnote: 'Pick one thing to attempt before collecting supplies. A pencil and the back of an envelope count as drawing equipment.',
-    },
-    crash: {
-      title: 'Change what is on repeat',
-      without: ['The same clips in a new order', 'Another tutorial saved for later', 'A hobby shopping basket', 'Waiting until you know enough'],
-      with: ['Choose a subject off the feed', 'Follow the lesson with an attempt', 'Try the supplies in the drawer', 'Ask the first question now'],
+      footnote: 'A pencil and the back of an envelope will do.',
     },
     story: {
-      title: 'Beginner is a perfectly good flavor',
-      body: [
-        'The sketchbook has been waiting politely. Break the seal and draw the nearest thing. A lopsided mug is a fine place to start. Keep the page, turn it over and try another angle.',
-        'Bring that approach to Learn something hard. Pick a topic with a question attached: how bread rises, how a camera works, why the moon changes shape. Read past the easy opening. Write down what you still cannot explain.',
-        'The Prime Directive asks you to leave a familiar fit when it is time to grow. For an ordinary evening, try the ordinary version: stop replaying the tutorial you know by heart. Open the lesson where you need to pause and ask for help.',
-      ],
+      caption: 'Beginner is a perfectly good flavor.',
       image: {
         src: '/images/benefits/spice/story.jpg?v=2',
         alt: 'A lobster drawing at a sunny yellow table with saturated red snack campaign colors',

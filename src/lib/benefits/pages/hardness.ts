@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Wondering how to toughen up? Start with a boundary, a short reading and a daily checklist. Practice saying what you mean before typing another apology.',
   keywords: 'how to toughen up, thick skin, emotional toughness, setting boundaries, handling criticism',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer:
     'Moltology is a free practice and community, not mental health care. If distress is getting in the way of daily life, talk to a professional.',
   shareImage: {
@@ -21,13 +21,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Shell Hardness, from The Sacred Metrics',
+    label: 'Shell Hardness',
     href: '/codex/scr-040#verse-2',
-    text: 'Shell Hardness is the Codex reading about boundaries and composure. Its point is simple: a strong shell still feels everything, it just keeps its shape. Read it with one recent conversation in mind, then write the answer you mean to give.',
+    text: 'Hold your shape when the conversation puts pressure on you.',
   },
   reveal: {
-    headline: 'Kindness can come with office hours.',
-    body: 'Put a boundary into words, then return to your daily checklist.',
+    headline: 'Kindness can have office hours.',
+    body: 'Practice one clear boundary today.',
     screenshot: 'dashboard',
   },
   related: ['resilience', 'emotional', 'communication'],
@@ -65,11 +65,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      eyebrow: 'Personal assessment · no appointment',
-      headline: 'Toughen up. Keep the kind part.',
-      sub: 'One blunt message does not need your whole afternoon. Pause, say what you can offer and get back to what you were doing. Your plan starts with a short reading and eight daily tasks.',
-      checks: ['Free, no card', 'Start with one boundary', 'Read at your pace'],
-      cta: 'Start your boundary plan',
+      eyebrow: 'Boundary check-in',
+      headline: 'Toughen up. Stay kind.',
+      sub: 'Take the useful part of a blunt message. Give the rest of your afternoon back to yourself.',
+      cta: 'Start free',
       image: {
         src: '/images/benefits/hardness/hero.jpg?v=2',
         alt: 'A crab holding a notebook in a pale consultation room, with soft portrait lighting and clean clinic styling',
@@ -77,20 +76,8 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    trust: ['No appointment needed', 'Readings included', 'Daily check-ins', 'Your own pace'],
-    signs: {
-      title: 'Still thinking about that comment?',
-      intro: 'Start with the moment you keep replaying. Pick a situation small enough to practice with today.',
-      items: [
-        'You type “sorry” before checking what the request is',
-        'A short reply gets a very long explanation',
-        'You say yes while your calendar says otherwise',
-        'An old conversation comes back during dinner',
-        'You ask three friends whether your answer was all right',
-      ],
-    },
     steps: {
-      title: 'Your next reply, in three steps',
+      title: 'The reply protocol',
       items: [
         { title: 'Read before replying', body: 'Open the boundary reading. Think of the last message that got under your skin and write down what it asked for.' },
         { title: 'Choose your limit', body: 'Decide what you have time to offer. A clear answer might be one sentence, a later date or a polite refusal.' },
@@ -98,23 +85,12 @@ const page: BenefitPage = {
       ],
     },
     plans: {
-      title: 'Start where you keep saying yes',
-      intro: 'These readings belong to the same practice. Choose the one that fits the conversation in front of you.',
+      title: 'Ways to draw a line',
+      intro: 'Pick the reading that fits the conversation.',
       items: [
         { name: 'The sharp remark', tag: 'For criticism', body: 'Read about Shell Hardness. Separate the correction you can use from the tone you do not need to copy.', href: '/codex/scr-040#verse-2' },
         { name: 'The extra favor', tag: 'For a full calendar', body: 'Name what matters today in Pick your one thing. Check it before you accept somebody else’s deadline.', href: '/codex/scr-030#verse-3' },
         { name: 'The reply never sent', tag: 'For evening replays', body: 'Use Let one thing go to name a conversation you are done rehearsing. Stop editing the imaginary follow-up.', href: '/codex/scr-032' },
-      ],
-    },
-    compare: {
-      title: 'Before you press send',
-      us: 'A clear boundary',
-      them: 'An automatic yes',
-      rows: [
-        { label: 'The request', us: 'Check what is being asked', them: 'Assume you must handle it' },
-        { label: 'Your calendar', us: 'Look before committing', them: 'Find room somehow' },
-        { label: 'Your answer', us: 'Say what you can offer', them: 'Apologize for having limits' },
-        { label: 'The next step', us: 'Go back to your work', them: 'Watch for their reaction' },
       ],
     },
   },

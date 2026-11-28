@@ -255,6 +255,61 @@ export function renderOutroText(lines: string[], outPath: string): string {
   return outPath
 }
 
+/**
+ * Molt Pod studio monitor chassis (1080x1920 transparent PNG): dark slate frame with amber border
+ * at x=44..1036, y=288..920, leaving a 960x540 16:9 viewport at (60, 304) and a crisp attribution
+ * footer bar below it.
+ */
+export function renderMonitorCard(attribution: string, outPath: string): string {
+  const canvas = createCanvas(OUT_W, OUT_H)
+  const ctx = canvas.getContext('2d')
+  const mx = 44
+  const my = 288
+  const mw = 992
+  const mh = 632
+
+  ctx.save()
+  ctx.shadowColor = 'rgba(0,0,0,0.72)'
+  ctx.shadowBlur = 28
+  ctx.shadowOffsetY = 12
+  ctx.fillStyle = 'rgba(10,14,22,0.96)'
+  ctx.beginPath()
+  ctx.roundRect(mx, my, mw, mh, 24)
+  ctx.fill()
+  ctx.restore()
+
+  ctx.strokeStyle = 'rgba(245,158,11,0.68)'
+  ctx.lineWidth = 2.5
+  ctx.beginPath()
+  ctx.roundRect(mx, my, mw, mh, 24)
+  ctx.stroke()
+
+  // Crisp inner screen recess for the 960x540 16:9 clip at (60, 304).
+  ctx.strokeStyle = 'rgba(255,255,255,0.14)'
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(59, 303, 962, 542)
+
+  // Attribution bar in the lower lip (y 852..912).
+  const label = `Source: ${attribution.trim()}`
+  let fontSize = 26
+  for (; fontSize >= 20; fontSize -= 2) {
+    ctx.font = `600 ${fontSize}px ${FONT}`
+    if (ctx.measureText(label).width <= 888) break
+  }
+  ctx.fillStyle = '#f59e0b'
+  ctx.beginPath()
+  ctx.arc(80, 882, 6, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = 'rgba(241,245,249,0.94)'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(label, 98, 883, 898)
+
+  fs.mkdirSync(path.dirname(outPath), { recursive: true })
+  fs.writeFileSync(outPath, canvas.toBuffer('image/png'))
+  return outPath
+}
+
 export interface SceneClipOptions {
   framesDir: string
   fps: number
@@ -276,6 +331,66 @@ export async function renderSceneClip(o: SceneClipOptions): Promise<string> {
   const chain = [`[0:v]${fit},setsar=1[bg]`, `[1:v]scale=${OUT_W}:${OUT_H}:flags=lanczos,format=rgba[ch]`, `[bg][ch]overlay=0:0:format=auto[v0]`]
   overlays.forEach((ov, i) => {
     chain.push(`[v${i}][${i + 2}:v]overlay=0:0:enable='between(t,${ov.from.toFixed(3)},${ov.to.toFixed(3)})'[v${i + 1}]`)
+  })
+  await ffmpeg([
+    '-y',
+    ...inputs,
+    '-filter_complex',
+    chain.join(';'),
+    '-map',
+    `[v${overlays.length}]`,
+    '-frames:v',
+    String(o.count),
+    '-r',
+    String(o.fps),
+    '-c:v',
+    'libx264',
+    '-preset',
+    'medium',
+    '-crf',
+    '18',
+    '-pix_fmt',
+    'yuv420p',
+    o.outPath,
+  ])
+  return o.outPath
+}
+
+export interface SourceClipSceneOptions extends SceneClipOptions {
+  sourceVideo: string
+  clipStart: number
+  clipDuration: number
+  monitorCard: string
+  insetOnly?: boolean
+}
+
+/**
+ * A Molt Pod studio reaction scene: backdrop + cast watching from below (unless `insetOnly`),
+ * overlaid with the studio monitor frame and the third-party clip scaled to 960x540 at (60, 304).
+ */
+export async function renderSourceClipScene(o: SourceClipSceneOptions): Promise<string> {
+  const inputs = [
+    '-loop', '1', '-framerate', String(o.fps), '-i', o.backdrop,
+    '-framerate', String(o.fps), '-start_number', String(o.start), '-i', path.join(o.framesDir, '%05d.png'),
+    '-loop', '1', '-framerate', String(o.fps), '-i', o.monitorCard,
+    '-ss', o.clipStart.toFixed(3), '-t', Math.max(o.clipDuration, o.count / o.fps + 0.5).toFixed(3), '-i', o.sourceVideo,
+  ]
+  const overlays = o.overlays ?? []
+  for (const ov of overlays) inputs.push('-loop', '1', '-framerate', String(o.fps), '-i', ov.png)
+  const fit = `scale=${OUT_W}:${OUT_H}:force_original_aspect_ratio=increase,crop=${OUT_W}:${OUT_H}`
+  const sceneDur = o.count / o.fps
+  const fadeOutStart = Math.max(0, sceneDur - 0.18)
+  const chain: string[] = o.insetOnly
+    ? [`[0:v]${fit},setsar=1[stage]`]
+    : [`[0:v]${fit},setsar=1[bg]`, `[1:v]scale=${OUT_W}:${OUT_H}:flags=lanczos,format=rgba[ch]`, `[bg][ch]overlay=0:0:format=auto[stage]`]
+  chain.push(
+    `[2:v]scale=${OUT_W}:${OUT_H}:flags=lanczos,format=rgba[mon]`,
+    `[3:v]setpts=PTS-STARTPTS,fps=${o.fps},scale=960:540:force_original_aspect_ratio=increase,crop=960:540,setsar=1,tpad=stop_mode=clone:stop_duration=2,format=rgba[clip]`,
+    `[mon][clip]overlay=60:304:format=auto:eof_action=repeat,fade=t=in:st=0:d=0.14:alpha=1,fade=t=out:st=${fadeOutStart.toFixed(3)}:d=0.18:alpha=1[monlayer]`,
+    `[stage][monlayer]overlay=0:0:format=auto[v0]`,
+  )
+  overlays.forEach((ov, i) => {
+    chain.push(`[v${i}][${i + 4}:v]overlay=0:0:enable='between(t,${ov.from.toFixed(3)},${ov.to.toFixed(3)})'[v${i + 1}]`)
   })
   await ffmpeg([
     '-y',

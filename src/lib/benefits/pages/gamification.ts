@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Meet the gamified habit app with eight daily tasks and XP for checking them off. Open the Moltology task board, do the work, then claim the completion.',
   keywords: 'gamified habit app, daily task board, habit quests, task XP, daily practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/gamification/share.jpg?v=2',
     alt: 'A blue crab at an arcade mission terminal, rendered as neon-lit game launch key art',
@@ -21,11 +21,11 @@ const page: BenefitPage = {
   hook: {
     label: 'The daily task board',
     href: '/dashboard',
-    text: 'Open the dashboard for the eight daily tasks. Do a task away from the board, then check it off for XP. Reading the objective is the briefing; doing it is the mission.',
+    text: 'Open today’s board and claim XP by completing a task.',
   },
   reveal: {
-    headline: 'That unfinished task has a quest slot.',
-    body: 'Pick one action from the daily board and put it on your calendar.',
+    headline: 'The quest is on the board.',
+    body: 'Pick one task you can finish today.',
     screenshot: 'dashboard',
   },
   related: ['gaming', 'technique', 'automation'],
@@ -64,9 +64,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Daily missions · Free to join',
-      headline: 'A gamified habit app for your unfinished business.',
-      sub: 'Bring the chapter you keep skipping and the draft called final-final. Moltology puts eight daily tasks on the board. Do one, check it off, collect XP. Menu time does not count as mission time.',
-      cta: 'Start your daily board',
+      headline: 'A gamified habit app for unfinished business.',
+      sub: 'Pick a daily quest. Do it away from the screen. Come back for the XP.',
+      cta: 'Play free',
       image: {
         src: '/images/benefits/gamification/hero.jpg?v=2',
         alt: 'A blue crab facing a mission terminal on the right of a dark neon arcade, cinematic game launch lighting',
@@ -74,20 +74,9 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: {
-      title: 'Inspect the loadout',
-      intro: 'A sample build. Your own five stats live on your character; the daily board is where you log tasks.',
-      items: [
-        { code: 'SHL', label: 'Shell', body: 'Practice a boundary: leave the group chat until your chosen break.', value: 72 },
-        { code: 'TRQ', label: 'Torque', body: 'Pick a finish line for the draft before opening the document.', value: 64 },
-        { code: 'SYN', label: 'Synapse', body: 'Read the instruction, then take the first step on the page.', value: 81 },
-        { code: 'ECD', label: 'Ecdysis', body: 'Drop one routine you keep doing out of habit.', value: 55 },
-        { code: 'DEP', label: 'Depth', body: 'Stay with the chosen work when another tab looks tempting.', value: 68 },
-      ],
-    },
     quests: {
-      title: 'Your daily mission list',
-      intro: 'Eight daily tasks, fixed for everyone. Bring your own book, work and unanswered question.',
+      title: 'Today’s quest board',
+      intro: 'Clear a task in real life, then log it for XP.',
       items: [
         { title: 'Sit in silence', body: 'Leave the inbox closed and sit quietly before the first feed.', reward: 'Task XP' },
         { title: 'Pick your one thing', body: 'Write down the one job that deserves your first attempt.', reward: 'Task XP' },
@@ -113,17 +102,6 @@ const page: BenefitPage = {
         width: 1280,
         height: 960,
       },
-    },
-    patch: {
-      title: 'Read before entering',
-      version: 'Daily board · Rules of play',
-      items: [
-        'Task selection: the same daily set for every member.',
-        'Completion check: do the action before marking the box.',
-        'Custom objective: bring your own work to the daily task.',
-        'Co-op objective: help someone on the forum.',
-        'Session exit: close the board and do the next thing.',
-      ],
     },
   },
 }

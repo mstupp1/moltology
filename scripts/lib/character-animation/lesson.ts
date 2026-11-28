@@ -15,6 +15,31 @@ import { tokenizeScriptText, type WordBoundaryEvent } from '../tts-engine'
 
 /** How far a podcast-desk speaker shot aims below the default, in world units (see buildTimeline). */
 const DESK_SHOT_DROP = 0.16
+/** Keeps non-hook, non-monitor podcast-studio two-shots anchored in the lower frame instead of floating mid-screen. */
+const PODCAST_TWO_LIFT = 0.65
+
+export const MIN_CLIP_SECONDS = 1.5
+export const MAX_CLIP_SECONDS = 9.5
+export const MAX_TOTAL_CLIP_SECONDS = 16.0
+export const MAX_CLIP_RATIO = 0.35
+
+export interface SourceClip {
+  /** Path to the trimmed ephemeral clip inside tmp/ (relative to lesson file or repo root). */
+  path: string
+  /** Offset in seconds inside `path` (usually 0 after `anim:clip fetch`). */
+  start: number
+  /** Duration in seconds (1.5s–9.5s). */
+  duration: number
+  /** Shown on the studio monitor attribution bar ("Channel · Video Title"). */
+  attribution: string
+  url?: string
+  publishedAt?: string
+  volume?: number
+  layout?: 'monitor' | 'inset-only'
+  transcript?: string
+}
+
+export type ClipWindowMap = Record<number, { start: number; end: number }>
 
 export const REACTIONS: readonly Reaction[] = ['poke', 'snap', 'equip', 'celebrate']
 export const LOOKS = ['camera', 'wander', 'left', 'right', 'down', 'up'] as const
@@ -100,6 +125,8 @@ export interface LessonScene {
   description: string
   /** A full-frame 1080x1920 transparent PNG laid over this scene (a title card, a greeting), relative to the lesson file. */
   overlay?: string
+  /** Third-party YouTube clip shown inside the Molt Pod studio monitor while the cast watches. */
+  sourceClip?: SourceClip
 }
 
 export interface Lesson {
@@ -109,7 +136,7 @@ export interface Lesson {
   series: string
   episode: number
   /** `clip`: a block of scenes for a long-form video (create-longform), no hook, outro or captions. */
-  format: 'short' | 'sketch' | 'clip'
+  format: 'short' | 'sketch' | 'reaction' | 'clip'
   /** Frame shape; long-form clips are 16:9. */
   aspect?: '9:16' | '16:9'
   /** Cast id from content/characters/cast.json: the main character. */
@@ -222,9 +249,12 @@ export function speakerOf(lesson: Pick<Lesson, 'host'>, scene: Pick<LessonScene,
 /** Words as the voice step counts them (hyphenated words split, spoken domains joined). */
 const wordsOf = (text: string) => tokenizeScriptText(text.trim())
 
-/** The full narration: every scene's line, in order. */
+/** The full narration: every spoken scene's line, in order. */
 export function narrationOf(lesson: Pick<Lesson, 'scenes'>): string {
-  return lesson.scenes.map((s) => s.line.trim()).join(' ')
+  return lesson.scenes
+    .map((s) => s.line.trim())
+    .filter(Boolean)
+    .join(' ')
 }
 
 /**
@@ -254,13 +284,21 @@ export function lessonProblems(lesson: Lesson): string[] {
   for (const key of ['id', 'title', 'topic', 'series', 'host', 'hookHeadline', 'caption', 'firstComment', 'youtubeTitle', 'youtubeDescription'] as const) {
     if (typeof lesson[key] !== 'string' || !lesson[key].trim()) problems.push(`needs ${key}`)
   }
-  if (lesson.format !== 'short' && lesson.format !== 'sketch') {
-    problems.push('format must be "short", "sketch" or "clip"')
+  if (lesson.format !== 'short' && lesson.format !== 'sketch' && lesson.format !== 'reaction') {
+    problems.push('format must be "short", "sketch", "reaction" or "clip"')
   }
   const isSketch = lesson.format === 'sketch'
-  const minScenes = isSketch ? 4 : 6
-  if (!Array.isArray(lesson.scenes) || lesson.scenes.length < minScenes || lesson.scenes.length > 10) {
-    problems.push(isSketch ? 'a sketch has four to ten scenes' : 'a short has six to ten scenes')
+  const isReaction = lesson.format === 'reaction'
+  const minScenes = isSketch ? 4 : isReaction ? 5 : 6
+  const maxScenes = isReaction ? 12 : 10
+  if (!Array.isArray(lesson.scenes) || lesson.scenes.length < minScenes || lesson.scenes.length > maxScenes) {
+    problems.push(
+      isSketch
+        ? 'a sketch has four to ten scenes'
+        : isReaction
+          ? 'a reaction has five to twelve scenes'
+          : 'a short has six to ten scenes',
+    )
   }
   const cast = castOf(lesson)
   const ids = cast.map((c) => c.id)
@@ -272,9 +310,41 @@ export function lessonProblems(lesson: Lesson): string[] {
   if (lesson.set && !SET_NAMES.includes(lesson.set)) problems.push(`set "${lesson.set}" is not one of ${SET_NAMES.join(', ')}`)
   if (!Array.isArray(lesson.hashtags) || lesson.hashtags.length > 3) problems.push('at most three hashtags')
   const scenes = Array.isArray(lesson.scenes) ? lesson.scenes : []
+  let clipCount = 0
+  let totalClipDuration = 0
   scenes.forEach((scene, i) => {
     const at = `scene ${i + 1}`
-    if (!scene.line?.trim()) problems.push(`${at} has no line`)
+    if (scene.sourceClip) {
+      clipCount++
+      if (!isReaction) problems.push(`${at}: sourceClip is only supported on "reaction" episodes`)
+      if (i === 0) problems.push('scene 1 cannot be a sourceClip (put the spoken hookHeadline first)')
+      if (scene.line?.trim()) problems.push(`${at} has a sourceClip so line must be empty`)
+      const sc = scene.sourceClip
+      if (typeof sc.path !== 'string' || !sc.path.trim()) {
+        problems.push(`${at} sourceClip needs a path`)
+      } else {
+        const norm = sc.path.replace(/\\/g, '/').replace(/^\.\//, '')
+        if (norm.startsWith('public/') || norm.startsWith('src/') || norm === 'public' || norm === 'src') {
+          problems.push(`${at} sourceClip path must stay outside public/ and src/`)
+        }
+      }
+      if (typeof sc.start !== 'number' || !Number.isFinite(sc.start) || sc.start < 0) {
+        problems.push(`${at} sourceClip start must be >= 0`)
+      }
+      if (typeof sc.duration !== 'number' || !Number.isFinite(sc.duration) || sc.duration < MIN_CLIP_SECONDS || sc.duration > MAX_CLIP_SECONDS) {
+        problems.push(`${at} sourceClip duration must be between ${MIN_CLIP_SECONDS}s and ${MAX_CLIP_SECONDS}s`)
+      } else {
+        totalClipDuration += sc.duration
+      }
+      if (typeof sc.attribution !== 'string' || !sc.attribution.trim() || sc.attribution.trim().length > 90) {
+        problems.push(`${at} sourceClip needs attribution of at most 90 characters`)
+      }
+      if (sc.layout !== undefined && sc.layout !== 'monitor' && sc.layout !== 'inset-only') {
+        problems.push(`${at} sourceClip layout must be "monitor" or "inset-only"`)
+      }
+    } else if (!scene.line?.trim()) {
+      problems.push(`${at} has no line`)
+    }
     if (!scene.description?.trim()) problems.push(`${at} has no description`)
     if (!(scene.shot in SHOTS)) problems.push(`${at} shot "${scene.shot}" is not one of ${Object.keys(SHOTS).join(', ')}`)
     if (scene.move && !MOVES.includes(scene.move)) problems.push(`${at} move "${scene.move}" is not one of ${MOVES.join(', ')}`)
@@ -289,30 +359,42 @@ export function lessonProblems(lesson: Lesson): string[] {
       if (d.pose && !AVATAR_POSES.includes(d.pose)) problems.push(`${at} pose "${d.pose}" is not one of ${AVATAR_POSES.join(', ')}`)
       // The think pose holds a claw at the chin, right over the mouth: fine for a listener, but it
       // hides the lip sync on a character who is talking.
-      const talking = who === 'scene' ? speakerOf(lesson, scene) !== NARRATOR : who === speakerOf(lesson, scene)
+      const talking = !scene.sourceClip && (who === 'scene' ? speakerOf(lesson, scene) !== NARRATOR : who === speakerOf(lesson, scene))
       if (talking && d.pose === 'think') problems.push(`${at}: the speaker can't use the think pose (its claw covers the mouth); give it to a listener`)
       if (d.acting && !ACTING.includes(d.acting)) problems.push(`${at} acting "${d.acting}" is not one of ${ACTING.join(', ')}`)
       for (const g of d.gesture ?? []) {
         if (!GESTURES.includes(g.kind)) problems.push(`${at} gesture "${g.kind}" is not one of ${GESTURES.join(', ')}`)
-        if (g.word !== undefined && (g.word < 0 || g.word >= count)) problems.push(`${at} gesture word ${g.word} is outside its ${count}-word line`)
+        if (scene.sourceClip || (g.word !== undefined && (g.word < 0 || g.word >= count))) {
+          problems.push(`${at} gesture word ${g.word ?? '(none)'} is outside its ${count}-word line`)
+        }
       }
       for (const r of d.react ?? []) {
         if (!REACTIONS.includes(r.kind)) problems.push(`${at} reaction "${r.kind}" is not one of ${REACTIONS.join(', ')}`)
-        if (r.word !== undefined && (r.word < 0 || r.word >= count)) problems.push(`${at} reaction word ${r.word} is outside its ${count}-word line`)
+        if (scene.sourceClip || (r.word !== undefined && (r.word < 0 || r.word >= count))) {
+          problems.push(`${at} reaction word ${r.word ?? '(none)'} is outside its ${count}-word line`)
+        }
       }
     }
   })
+  if (isReaction && (clipCount < 1 || clipCount > 3)) {
+    problems.push('a reaction needs 1 to 3 sourceClip scenes')
+  }
+  if (totalClipDuration > MAX_TOTAL_CLIP_SECONDS) {
+    problems.push(`total sourceClip duration is ${totalClipDuration.toFixed(1)}s; keep under ${MAX_TOTAL_CLIP_SECONDS}s`)
+  }
   const first = scenes[0]?.line?.trim() ?? ''
   // Scene 1 is the hook alone: its framing leaves room for the headline, and body subtitles would
   // land on the cast in that framing.
   if (lesson.hookHeadline && first.trim() !== lesson.hookHeadline.trim()) problems.push('scene 1 must be exactly the hookHeadline (put the rest of the line in scene 2)')
   if (lesson.hookHeadline && wordsOf(lesson.hookHeadline).length >= 14) problems.push('hookHeadline must be under 14 words')
   const words = wordsOf(narrationOf({ scenes })).length
-  if (isSketch ? words < 18 || words > 65 : words < 40 || words > 80) {
+  if (isSketch ? words < 18 || words > 65 : isReaction ? words < 45 || words > 115 : words < 40 || words > 80) {
     problems.push(
       isSketch
         ? `narration is ${words} words; aim for 25 to 55 for a comedy sketch`
-        : `narration is ${words} words; aim for 50 to 65 (up to 75 for a dialogue)`,
+        : isReaction
+          ? `narration is ${words} words; aim for 45 to 115 for a reaction`
+          : `narration is ${words} words; aim for 50 to 65 (up to 75 for a dialogue)`,
     )
   }
   return problems
@@ -353,8 +435,13 @@ export function talkFromWords(words: WordBoundaryEvent[], fps: number, frames: n
   return talk
 }
 
-/** When each scene starts and ends, in seconds, from where its first word is spoken. */
-export function sceneWindows(lesson: Pick<Lesson, 'scenes'>, words: WordBoundaryEvent[], total: number): { start: number; end: number; firstWord: number }[] {
+/** When each scene starts and ends, in seconds, from where its first word is spoken or clip plays. */
+export function sceneWindows(
+  lesson: Pick<Lesson, 'scenes'>,
+  words: WordBoundaryEvent[],
+  total: number,
+  clipWindows?: ClipWindowMap,
+): { start: number; end: number; firstWord: number }[] {
   let index = 0
   const firsts = lesson.scenes.map((scene) => {
     const first = index
@@ -364,10 +451,43 @@ export function sceneWindows(lesson: Pick<Lesson, 'scenes'>, words: WordBoundary
   if (index !== words.length) {
     throw new Error(`Voice has ${words.length} words but the scenes have ${index}; re-run the voice step after editing lines`)
   }
-  // A scene cuts in a little before its first word, as an editor would.
   const LEAD = 0.12
-  const starts = firsts.map((w, i) => (i === 0 ? 0 : Math.max(0, words[w].startMs / 1000 - LEAD)))
-  return starts.map((start, i) => ({ start, end: i + 1 < starts.length ? starts[i + 1] : total, firstWord: firsts[i] }))
+  if (!clipWindows) {
+    // A scene cuts in a little before its first word, as an editor would.
+    const starts = firsts.map((w, i) => (i === 0 ? 0 : Math.max(0, words[w].startMs / 1000 - LEAD)))
+    return starts.map((start, i) => ({ start, end: i + 1 < starts.length ? starts[i + 1] : total, firstWord: firsts[i] }))
+  }
+  const windows: { start: number; end: number; firstWord: number }[] = []
+  for (let i = 0; i < lesson.scenes.length; i++) {
+    const prevFloor = i === 0 ? 0 : clipWindows[i - 1] ? clipWindows[i - 1].end : windows[i - 1].start
+    const clip = clipWindows[i]
+    let start: number
+    if (i === 0) {
+      start = 0
+    } else if (clip) {
+      start = clip.start
+    } else if (clipWindows[i - 1]) {
+      // Snap cleanly back to the studio right as the preceding source clip ends.
+      start = clipWindows[i - 1].end
+    } else {
+      const w = words[firsts[i]]
+      start = w ? Math.max(prevFloor, w.startMs / 1000 - LEAD) : prevFloor
+    }
+    if (i > 0 && start < prevFloor) start = prevFloor
+    windows.push({ start, end: total, firstWord: firsts[i] })
+  }
+  for (let i = 0; i < windows.length; i++) {
+    const clip = clipWindows[i]
+    if (clip) {
+      windows[i].end = clip.end
+      if (i + 1 < windows.length && windows[i + 1].start < clip.end) {
+        windows[i + 1].start = clip.end
+      }
+    } else if (i + 1 < windows.length) {
+      windows[i].end = windows[i + 1].start
+    }
+  }
+  return windows
 }
 
 const PAN = { center: 0, left: 0.22, right: -0.22 } as const
@@ -401,17 +521,24 @@ export function buildTimeline(
   looks: Record<string, Avatar3DLook>,
   words: WordBoundaryEvent[],
   talkBy: number[][],
-  options: TimelineOptions & { set?: SetName; mouthBy?: string[]; emphasisBy?: number[][]; accentBy?: number[][] },
+  options: TimelineOptions & {
+    set?: SetName
+    mouthBy?: string[]
+    emphasisBy?: number[][]
+    accentBy?: number[][]
+    clipWindows?: ClipWindowMap
+  },
 ): { timeline: AnimationTimeline; windows: ReturnType<typeof sceneWindows>; hookEnd: number } {
   const fps = options.fps
   const cast = castOf(lesson)
   const index = new Map(cast.map((c, i) => [c.id, i]))
   const xOf = (id: string) => markPosition(cast[index.get(id)!].at, cast.length).x
   const lastWord = words.length ? words[words.length - 1].endMs / 1000 : 0
+  const lastClipEnd = options.clipWindows ? Math.max(0, ...Object.values(options.clipWindows).map((w) => w.end)) : 0
   const longest = Math.max(0, ...talkBy.map((t) => t.length))
-  const duration = Math.max(lastWord + (options.tail ?? 0.8), longest / fps)
+  const duration = Math.max(Math.max(lastWord, lastClipEnd) + (options.tail ?? 0.8), longest / fps)
   const frames = Math.ceil(duration * fps)
-  const windows = sceneWindows(lesson, words, duration)
+  const windows = sceneWindows(lesson, words, duration, options.clipWindows)
   const hookWords = lesson.hookHeadline ? wordsOf(lesson.hookHeadline).length : 0
   const hookEnd = hookWords && words[hookWords - 1] ? words[hookWords - 1].endMs / 1000 : 0
   const cues: TimelineCue[] = []
@@ -431,7 +558,10 @@ export function buildTimeline(
 
   lesson.scenes.forEach((scene, i) => {
     const { start: t0, end: t1, firstWord } = windows[i]
-    const speaker = speakerOf(lesson, scene)
+    const isClipScene = Boolean(scene.sourceClip)
+    const afterClipScene = i > 0 && Boolean(lesson.scenes[i - 1]?.sourceClip)
+    const monitorLayout = isClipScene && scene.sourceClip?.layout !== 'inset-only'
+    const speaker = isClipScene ? NARRATOR : speakerOf(lesson, scene)
     const subject = speaker === NARRATOR ? lesson.host : speaker
     // A two-shot takes in everyone; other shots go to whoever is talking.
     const focus = scene.focus ?? (scene.shot === 'two' && !solo ? 'all' : speaker !== NARRATOR ? speaker : solo ? lesson.host : 'all')
@@ -442,17 +572,25 @@ export function buildTimeline(
     // The opening shot looks a little higher, so the characters stand lower in the frame and the
     // hook headline has room above them. It holds for the whole first scene and goes on the cut to
     // the second (a glide there becomes a cut), so the frame never visibly slides.
-    const move = i === 0 || (i === 1 && options.hookLift && (scene.move ?? 'glide') === 'glide') ? 'cut' : (scene.move ?? 'glide')
+    // Source-clip monitor scenes also cut cleanly in and out so the camera never slides past the monitor.
+    const move =
+      i === 0 || isClipScene || afterClipScene || (i === 1 && options.hookLift && (scene.move ?? 'glide') === 'glide')
+        ? 'cut'
+        : (scene.move ?? 'glide')
     // A two-shot is framed wider, so it needs less lift to clear the headline; more would strand the
     // pair high above an empty floor.
     const hook = i === 0 && options.hookLift ? options.hookLift * (scene.shot === 'two' ? 0.8 : 1) : 0
+    // While the studio monitor plays above (y 288..920), aim higher so the cast & desk sit below it.
+    const monitorLift = monitorLayout ? (scene.shot === 'two' ? 1.02 : 1.05) : 0
+    const isPodcastTwo = (options.set ?? lesson.set) === 'podcast-studio' && i > 0 && !monitorLayout && scene.shot === 'two'
+    const podcastTwoLift = isPodcastTwo ? PODCAST_TWO_LIFT : 0
     // At the podcast desk a single-speaker shot aims lower, so the mouth sits above the subtitle band
     // (centred at 61% of the height) instead of under it; the desk fills the bottom of the frame.
-    const deskDrop = (options.set ?? lesson.set) === 'podcast-studio' && i > 0 && scene.shot !== 'two' && focus !== 'all' ? DESK_SHOT_DROP : 0
-    const lift = hook - deskDrop
+    const deskDrop = (options.set ?? lesson.set) === 'podcast-studio' && i > 0 && !monitorLayout && scene.shot !== 'two' && focus !== 'all' ? DESK_SHOT_DROP : 0
+    const lift = hook + monitorLift + podcastTwoLift - deskDrop
     // The hook's two-shot comes in a step closer so the pair reads big under the headline. It holds
     // a resting pose there; later two-shots keep the wider frame so pointing and cheering claws stay in.
-    const zoom = i === 0 && options.hookLift && scene.shot === 'two' ? 0.56 : shot.zoom
+    const zoom = (i === 0 && options.hookLift && scene.shot === 'two') || (monitorLayout && scene.shot === 'two') || isPodcastTwo ? 0.56 : shot.zoom
     const camera = { zoom, tilt: shot.tilt, pan, lift, subject: focus === 'all' ? 0 : index.get(focus)! }
     if (move === 'push-in') {
       cues.push({ t: t0, camera: { ...camera, zoom: zoom * 0.82, cut: true } })
@@ -471,8 +609,16 @@ export function buildTimeline(
       const who = index.get(member.id)!
       const own: CharacterDirection = member.id === subject ? scene : (scene.act?.[member.id] ?? {})
       const partner = member.id === subject ? (others(subject)[0]?.id ?? null) : speaker !== NARRATOR ? speaker : subject
-      // A speaker in a dialogue talks to the other character; alone, or to the narrator, they face us.
-      const defaultLook: CharacterDirection['look'] = solo ? 'camera' : member.id === speaker ? 'other' : speaker !== NARRATOR ? 'other' : 'camera'
+      // While watching a source clip, cast members default to looking up at the studio monitor.
+      const defaultLook: CharacterDirection['look'] = isClipScene
+        ? 'up'
+        : solo
+          ? 'camera'
+          : member.id === speaker
+            ? 'other'
+            : speaker !== NARRATOR
+              ? 'other'
+              : 'camera'
       const look = own.look ?? defaultLook
       // Listeners (and anyone told to look at the other) turn a little toward who they look at.
       const facing = look === 'other' && partner ? Math.sign(xOf(partner) - xOf(member.id)) * 18 : 0
@@ -481,14 +627,16 @@ export function buildTimeline(
       if (own.pose && i > 0) cues.push({ t: t0, who, pose: own.pose, ...(move === 'cut' ? { snap: true } : {}) })
       cues.push({ t: t0, who, look: lookFor(member.id, look, partner) })
       cues.push({ t: t0, who, yaw: deg(own.turn ?? facing) })
-      for (const r of own.react ?? []) {
-        const at = r.word === undefined ? t0 : words[firstWord + r.word].startMs / 1000
-        cues.push({ t: Math.min(at, t1), who, react: { kind: r.kind, side: r.side } })
-      }
-      for (const g of own.gesture ?? []) {
-        // A gesture starts a moment before its word so the hit lands on it.
-        const at = g.word === undefined ? t0 : words[firstWord + g.word].startMs / 1000 - GESTURE_LEAD
-        cues.push({ t: Math.max(t0, Math.min(at, t1)), who, gesture: { kind: g.kind, side: g.side ?? 1 } })
+      if (!isClipScene) {
+        for (const r of own.react ?? []) {
+          const at = r.word === undefined ? t0 : words[firstWord + r.word].startMs / 1000
+          cues.push({ t: Math.min(at, t1), who, react: { kind: r.kind, side: r.side } })
+        }
+        for (const g of own.gesture ?? []) {
+          // A gesture starts a moment before its word so the hit lands on it.
+          const at = g.word === undefined ? t0 : words[firstWord + g.word].startMs / 1000 - GESTURE_LEAD
+          cues.push({ t: Math.max(t0, Math.min(at, t1)), who, gesture: { kind: g.kind, side: g.side ?? 1 } })
+        }
       }
     }
     cues.push({ t: t0, spin: deg(scene.spin ?? 0) })
@@ -557,6 +705,7 @@ export function actingCues(
     lastKind.set(`${who}`, kind)
   }
   lesson.scenes.forEach((scene, i) => {
+    if (scene.sourceClip) return
     const { start: t0, end: t1, firstWord } = windows[i]
     const count = wordsOf(scene.line).length
     const speaker = speakerOf(lesson, scene)
@@ -650,15 +799,31 @@ export function softenClippingGestures(timeline: AnimationTimeline, clips: { fra
 
 /** The reel draft `npm run reel:create -- --custom-video` needs to archive and queue the finished file. */
 export function reelDraftFrom(lesson: Lesson): Record<string, unknown> {
+  const sourceClips = lesson.scenes
+    .filter((s) => s.sourceClip)
+    .map((s) => ({
+      ...(s.sourceClip!.url ? { url: s.sourceClip!.url } : {}),
+      attribution: s.sourceClip!.attribution,
+      ...(s.sourceClip!.publishedAt ? { publishedAt: s.sourceClip!.publishedAt } : {}),
+      start: s.sourceClip!.start,
+      duration: s.sourceClip!.duration,
+      ...(s.sourceClip!.transcript ? { transcript: s.sourceClip!.transcript } : {}),
+    }))
   return {
     title: lesson.title,
     topic: lesson.topic,
     series: lesson.series,
     episode: lesson.episode,
-    format: lesson.format === 'sketch' ? 'animated-sketch' : 'animated-lesson',
+    format:
+      lesson.format === 'sketch'
+        ? 'animated-sketch'
+        : lesson.format === 'reaction'
+          ? 'molt-pod-reaction'
+          : 'animated-lesson',
     cast: castOf(lesson).map((c) => c.id),
     ...(lesson.loudness !== undefined ? { loudness: lesson.loudness } : {}),
     ...(lesson.queueId ? { queueId: lesson.queueId } : {}),
+    ...(sourceClips.length ? { sourceClips } : {}),
     hookHeadline: lesson.hookHeadline,
     narrationScript: narrationOf(lesson),
     // reel:create stores exactly six scene prompts; longer dialogues fold neighbouring scenes together.

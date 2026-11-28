@@ -34,6 +34,7 @@ describe('zernio-client', () => {
     expect(QUEUE_IDS.REELS_AND_SHORTS).toBe('6a84b7702421e968ac81f5bd')
     expect(QUEUE_IDS.LEAD_MAGNETS_DAILY).toBe('6a8d93576f0e96efe2960c91')
     expect(QUEUE_IDS.COMEDY_SHORTS).toBe('6b00c2052c18af30956c81c9')
+    expect(QUEUE_IDS.MOLT_POD_REACTS).toBe('6b0a417a494a7f556edd91b9')
   })
 
   it('retrieves API key from environment', () => {
@@ -321,6 +322,37 @@ describe('zernio-client', () => {
     expect(postPayload.platforms).toHaveLength(1)
     expect(postPayload.platforms[0].platform).toBe('youtube')
     expect(postPayload.platforms[0].platformSpecificData.title).toBe('YouTube Short Title #Shorts')
+  })
+
+  it('publishes immediately without queue fields or redundant inbox comment calls', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      text: async () => JSON.stringify({ post: { _id: 'live_dual_1', status: 'publishing' } }),
+    } as any)
+
+    const result = await queueDualReelAndShort({
+      videoUrl: 'https://media.zernio.com/reel.mp4',
+      instagramCaption: 'IG live caption',
+      youtubeTitle: 'YT live Short #Shorts',
+      youtubeDescription: 'Full YT live description',
+      firstComment: 'More crustacean logic: https://moltology.org',
+      queueId: QUEUE_IDS.MOLT_POD_REACTS,
+      publishNow: true,
+    })
+
+    expect(result.postId).toBe('live_dual_1')
+    expect(result.status).toBe('publishing')
+    expect(result.commentId).toBeNull()
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+
+    const postPayload = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)
+    expect(postPayload.publishNow).toBe(true)
+    expect(postPayload).not.toHaveProperty('queueId')
+    expect(postPayload).not.toHaveProperty('queuedFromProfile')
+    expect(postPayload).not.toHaveProperty('scheduledFor')
+    expect(postPayload.platforms).toHaveLength(2)
+    expect(postPayload.platforms[0].platformSpecificData.firstComment).toBe('More crustacean logic: https://moltology.org')
+    expect(postPayload.platforms[1].platformSpecificData.firstComment).toBe('More crustacean logic: https://moltology.org')
   })
 })
 

@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Learn how to focus better with a simple work routine: pick one task, mute routine messages and set a stopping time. Read the plan and begin where you are.',
   keywords: 'how to focus better, deep work, distractions at work, single tasking, focus routine',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer:
     'Moltology does not diagnose or treat ADHD; see a qualified professional if focus problems are severe or disrupt your daily life.',
   shareImage: {
@@ -21,13 +21,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The Isolation Protocols, for Do deep work',
+    label: 'The Isolation Protocols',
     href: '/codex/scr-031',
-    text: 'The Isolation Protocols ask you to arrange the work before starting it. Choose one objective, decide whose urgent calls can reach you and set a timer for the end. Do deep work is the daily task that puts those instructions into practice.',
+    text: 'Set up your space and silence interruptions before the focus block starts.',
   },
   reveal: {
-    headline: 'Give the draft its turn.',
-    body: 'Open Do deep work with one job already chosen.',
+    headline: 'Give one draft the whole desk.',
+    body: 'Try Do deep work with a single task in front of you.',
     screenshot: 'dashboard',
   },
   related: ['clarity', 'intelligence', 'technique'],
@@ -65,11 +65,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      eyebrow: 'Focus routine · available online',
-      headline: 'Focus better, one task at a time.',
-      sub: 'The same email, six readings later. Start smaller: choose the reply you need to write, put your phone aside and stay with that job. Moltology has a daily task and a written plan for the setup.',
-      checks: ['A clear place to start', 'Use the tools you have', 'Emergency calls stay open'],
-      cta: 'Set up your focus routine',
+      eyebrow: 'Focus studio',
+      headline: 'Better focus. One window open.',
+      sub: 'Pick the job, put your phone aside, and give it one uninterrupted block.',
+      cta: 'Start free',
       image: {
         src: '/images/benefits/focus/hero.jpg?v=2',
         alt: 'A lobster working at a simple desk in warm daylight, styled as a calm online care campaign portrait',
@@ -77,20 +76,8 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    trust: ['Free membership', 'No equipment to order', 'Written work protocol', 'Set your own schedule'],
-    signs: {
-      title: 'A busy screen. An untouched draft.',
-      intro: 'Look at what keeps taking the next turn. Choose one interruption to handle before your next work session.',
-      items: [
-        'You check chat while the file is still opening',
-        'A quick search ends on a different subject',
-        'You switch projects whenever a paragraph gets difficult',
-        'Every notification arrives with the same importance',
-        'You reach lunchtime with the first sentence still waiting',
-      ],
-    },
     steps: {
-      title: 'How to begin a work session',
+      title: 'Set up the work block',
       items: [
         { title: 'Name the job', body: 'Write what this session is for. Choose a piece of work you can point to, such as drafting a reply or checking a table.' },
         { title: 'Set the conditions', body: 'Keep the references you need. Mute everyday messages, leave urgent contacts reachable and choose when to stop.' },
@@ -98,23 +85,12 @@ const page: BenefitPage = {
       ],
     },
     plans: {
-      title: 'Pick the part that needs attention',
-      intro: 'Read a short instruction for the sticking point. You can use the same readings again when the next project starts.',
+      title: 'Find your sticking point',
+      intro: 'Choose a reading for the part of the session you keep losing.',
       items: [
         { name: 'Too much on the list', tag: 'Choose first', body: 'Start with Pick your one thing. Name today’s priority before arranging tabs, notebooks or a very convincing new folder system.', href: '/codex/scr-030#verse-3' },
         { name: 'Too much coming in', tag: 'Prepare the desk', body: 'Follow the Isolation Protocols before Do deep work. Decide what gets through while you work and what waits until the end.', href: '/codex/scr-031' },
         { name: 'A loose end at lunch', tag: 'Pause and restart', body: 'At noon, clear one distraction: answer the nagging message or close the spare tab. Then pick the next useful move.', href: '/codex/scr-030#verse-5' },
-      ],
-    },
-    compare: {
-      title: 'Give your next session a plan',
-      us: 'One task chosen',
-      them: 'Everything open',
-      rows: [
-        { label: 'First move', us: 'Write the next action', them: 'Check what arrived' },
-        { label: 'Phone', us: 'Urgent contacts allowed', them: 'All alerts welcome' },
-        { label: 'Browser', us: 'Keep the working references', them: 'Keep every possible detour' },
-        { label: 'Stop time', us: 'Set before starting', them: 'Whenever something pings' },
       ],
     },
   },

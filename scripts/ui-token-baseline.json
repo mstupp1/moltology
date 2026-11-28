@@ -12,9 +12,6 @@
     "glow": 11,
     "off-scale-radius": 10
   },
-  "src/components/academy/AcademyChrome.tsx": {
-    "tracking": 1
-  },
   "src/components/blog/BlogTopSlider.tsx": {
     "uppercase": 1
   },

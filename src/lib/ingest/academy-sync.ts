@@ -325,7 +325,7 @@ export async function syncAcademyCourse(db: Db, course: AcademyContentCourse, op
   }
 
   await upsertCertificate(db, 'course', courseId, course.certificate)
-  notes.push(`${lessons.length} lessons in ${course.modules.length} modules`)
+  notes.push(course.status === 'soon' ? `coming soon, ${course.modules.length} planned modules` : `${lessons.length} lessons in ${course.modules.length} modules`)
   return { kind: 'course', slug: course.slug, action: existing ? 'updated' : 'inserted', status: course.status, notes }
 }
 
@@ -341,7 +341,7 @@ export async function syncAcademyTrack(db: Db, track: AcademyContentTrack, optio
     .where(inArray(schema.academyCourses.slug, slugs))
   const missing = slugs.filter((slug) => !courseRows.some((row) => row.slug === slug))
   if (missing.length > 0) throw new Error(`${track.slug}: no course with slug ${missing.join(', ')}. Ingest the course first.`)
-  const drafts = courseRows.filter((row) => row.status !== 'published').map((row) => row.slug)
+  const drafts = courseRows.filter((row) => row.status === 'draft').map((row) => row.slug)
   if (track.status === 'published' && drafts.length > 0) {
     notes.push(`still draft: ${drafts.join(', ')} (members will not see them on the track yet)`)
   }

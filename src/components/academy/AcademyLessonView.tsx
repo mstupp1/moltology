@@ -93,7 +93,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLessonDetail }) {
       })
       setDetail(saved.lesson)
       if (action === 'complete') reportAlignmentAction('skill-development')
-      if (action === 'complete') toast?.success(saved.awardedCredentialIds.length ? 'Lesson complete. A certification was issued.' : 'Lesson complete.')
+      if (action === 'complete') toast?.success(saved.awardedCredentialIds.length ? 'Lesson complete. A certificate was issued.' : 'Lesson complete.')
       if (saved.awardedCredentialIds[0]) {
         toast?.info('Open Certificates to see the credential.', { id: 'academy-cert' })
       }

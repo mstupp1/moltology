@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+import '@/components/benefits/benefits.css'
 import { INDEXED_BENEFIT_PAGES } from '@/lib/benefits/registry'
 import { BENEFITS_HUB_DESCRIPTION, BENEFITS_HUB_TITLE } from '@/lib/benefits/seo'
 import { NOINDEX_ROBOTS, SITE_ORIGIN, seo, xRobotsNoindexHeaders } from '@/lib/seo'

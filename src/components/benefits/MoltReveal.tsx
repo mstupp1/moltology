@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, ListChecks } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
-import { BENEFIT_KITS, findBenefitSummary } from '@/lib/benefits/registry'
+import { findBenefitSummary } from '@/lib/benefits/registry'
 import type { BenefitPage } from '@/lib/benefits/types'
 import { BENEFIT_LINKS } from './kit-props'
 import { WearTheLook } from './WearTheLook'
@@ -43,7 +43,7 @@ interface MoltRevealProps {
  */
 /** The same plain line on every page, so page files only add what is specific to them. */
 const REVEAL_INTRO =
-  'Moltology is a free daily practice: eight small tasks, readings from the Codex, an AI guide called the Oracle and a forum of people doing the same.'
+  'Moltology is a free daily practice with eight small tasks.'
 
 export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltRevealProps) {
   const shot = SCREENSHOTS[page.reveal.screenshot]
@@ -83,7 +83,7 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
               className="mt-6 inline-flex items-center gap-2 rounded-control text-sm text-ink-muted hover:text-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-glow"
             >
               <ListChecks className="w-4 h-4 text-cyan-glow" aria-hidden="true" />
-              Not ready yet? Take the free three minute quiz.
+              Take the habit quiz
             </Link>
           </div>
           <figure className="rounded-panel border border-line-subtle bg-surface-1 overflow-hidden">
@@ -102,14 +102,11 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
           </figure>
         </div>
 
-        <WearTheLook kit={page.kit} />
-
-        <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <div className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-6">
-            <p className="eyebrow">Where this comes from</p>
+        <div className="mt-10 grid gap-6 border-t border-line-subtle pt-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div>
             <a
               href={page.hook.href}
-              className="mt-3 inline-flex items-center gap-2 text-md font-medium text-ink hover:text-cyan-glow transition-colors"
+              className="inline-flex items-center gap-2 text-md font-medium text-ink hover:text-cyan-glow transition-colors"
             >
               {page.hook.href.startsWith('/codex') ? (
                 <BookOpen className="w-4 h-4 text-crimson-aggro" aria-hidden="true" />
@@ -120,28 +117,23 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
             </a>
             <p className="mt-2 text-sm leading-relaxed text-ink-body">{page.hook.text}</p>
           </div>
-          <nav aria-label="More benefits" className="rounded-card border border-line-subtle bg-surface-1 p-5 sm:p-6">
-            <p className="eyebrow">More benefits</p>
-            <ul className="mt-3 divide-y divide-line-subtle">
+          <nav aria-label="More benefits">
+            <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {related.map((item) => (
                 <li key={item.slug}>
                   <Link
                     to="/benefits/$slug"
                     params={{ slug: item.slug }}
-                    className="group flex items-center justify-between gap-3 py-2.5 text-sm text-ink hover:text-cyan-glow transition-colors"
+                    className="inline-flex min-h-8 items-center text-sm text-ink hover:text-cyan-glow transition-colors"
                   >
-                    <span>
-                      {item.topic}
-                      <span className="ml-2 text-xs text-ink-muted">{BENEFIT_KITS[item.kit].industry}</span>
-                    </span>
-                    <ArrowRight className="w-4 h-4 shrink-0 text-ink-muted group-hover:text-cyan-glow" aria-hidden="true" />
+                    {item.topic}
                   </Link>
                 </li>
               ))}
               <li>
                 <Link
                   to={BENEFIT_LINKS.hub}
-                  className="group flex items-center justify-between gap-3 py-2.5 text-sm text-ink-muted hover:text-cyan-glow transition-colors"
+                  className="group inline-flex min-h-8 items-center gap-2 text-sm text-ink-muted hover:text-cyan-glow transition-colors"
                 >
                   All benefits
                   <ArrowRight className="w-4 h-4 shrink-0" aria-hidden="true" />
@@ -151,7 +143,11 @@ export function MoltReveal({ page, authReady, onOpenAuth, onNavigate }: MoltReve
           </nav>
         </div>
 
-        {page.disclaimer ? <p className="mt-8 text-xs leading-relaxed text-ink-muted max-w-3xl">{page.disclaimer}</p> : null}
+        {page.disclaimer && page.kit !== 'clinic' && page.kit !== 'ledger' && (
+          <p className="mt-6 max-w-3xl text-xs leading-relaxed text-ink-muted">{page.disclaimer}</p>
+        )}
+
+        <WearTheLook kit={page.kit} />
       </div>
     </section>
   )

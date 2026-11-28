@@ -362,18 +362,6 @@
   color: var(--nw-body);
 }
 
-[data-kit='network'] .nw-post-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 6px;
-  color: var(--nw-muted);
-}
-
-[data-kit='network'] .nw-post-actions svg {
-  width: 15px;
-  height: 15px;
-}
-
 @media (min-width: 900px) {
   [data-kit='network'] .nw-hero {
     padding: 72px 0 112px;
@@ -393,39 +381,6 @@
 
 [data-kit='network'] .nw-tint {
   background: var(--nw-lav);
-}
-
-[data-kit='network'] .nw-cards {
-  margin-top: 48px;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
-[data-kit='network'] .nw-card {
-  padding: 28px 24px;
-  border-radius: 28px;
-  transition: transform 0.2s;
-}
-
-[data-kit='network'] .nw-card:hover {
-  transform: translateY(-4px) rotate(-0.5deg);
-}
-
-[data-kit='network'] .nw-card.is-0 {
-  background: #efe8ff;
-}
-
-[data-kit='network'] .nw-card.is-1 {
-  background: #ffe9f3;
-}
-
-[data-kit='network'] .nw-card.is-2 {
-  background: #fff0e0;
-}
-
-[data-kit='network'] .nw-card.is-3 {
-  background: #e3f7ef;
 }
 
 [data-kit='network'] .nw-split {
@@ -657,25 +612,6 @@
   color: #a83c1c;
 }
 
-@media (min-width: 720px) {
-  [data-kit='network'][data-variant='coastal-club'] .nw-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-[data-kit='network'][data-variant='coastal-club'] .nw-card {
-  border-radius: 16px;
-  border: 1px solid var(--nw-line);
-  border-top: 3px solid var(--nw-violet);
-}
-
-[data-kit='network'][data-variant='coastal-club'] .nw-card.is-0,
-[data-kit='network'][data-variant='coastal-club'] .nw-card.is-1,
-[data-kit='network'][data-variant='coastal-club'] .nw-card.is-2,
-[data-kit='network'][data-variant='coastal-club'] .nw-card.is-3 {
-  background: #ffffff;
-}
-
 /* Variant: editorial-salon (culture) ------------------------------------ */
 
 [data-kit='network'][data-variant='editorial-salon'] {
@@ -749,24 +685,6 @@
 [data-kit='network'][data-variant='editorial-salon'] .nw-btn {
   background: var(--nw-ink);
   box-shadow: none;
-}
-
-[data-kit='network'][data-variant='editorial-salon'] .nw-card {
-  border-radius: 0;
-  border: 0;
-  border-top: 2px solid var(--nw-ink);
-  padding: 24px 0 8px;
-}
-
-[data-kit='network'][data-variant='editorial-salon'] .nw-card:hover {
-  transform: none;
-}
-
-[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-0,
-[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-1,
-[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-2,
-[data-kit='network'][data-variant='editorial-salon'] .nw-card.is-3 {
-  background: transparent;
 }
 
 [data-kit='network'][data-variant='editorial-salon'] .nw-tint {

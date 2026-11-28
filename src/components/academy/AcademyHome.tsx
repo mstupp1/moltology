@@ -8,13 +8,13 @@ import {
   filterCourseCards,
   formatCourseLength,
   levelLabel,
-  type AcademyCertificateCard,
   type AcademyCourseCard,
   type AcademyHomePayload,
   type AcademyTrackCard,
 } from '@/lib/academy'
 import type { AcademyLevel } from '@/lib/academy-types'
 import { cn } from '@/lib/utils'
+import { pillTabClass } from '@/components/ui/pillTab'
 import {
   ACADEMY_CARD,
   ACADEMY_CARD_LINK,
@@ -24,6 +24,7 @@ import {
   AcademyEmpty,
   AcademyProgress,
   AcademySectionHeading,
+  ComingSoonChip,
   LevelMark,
 } from './AcademyChrome'
 
@@ -41,42 +42,53 @@ function courseHref(course: AcademyCourseCard) {
 }
 
 function courseAction(course: AcademyCourseCard) {
+  if (course.comingSoon) return 'Preview'
   return course.completed ? 'Review' : course.enrolled ? 'Continue' : 'View course'
 }
 
 function CourseCard({ course }: { course: AcademyCourseCard }) {
   const href = courseHref(course)
   return (
-    <Link to={href.to} params={href.params} className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col h-full')}>
-      <AcademyCover url={course.coverImageUrl} className="aspect-[16/7] border-b border-line-subtle">
-        <div className="flex h-full items-start justify-between gap-2 p-3">
-          <span className="rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">{course.code}</span>
-          {course.completed ? (
-            <span className="inline-flex items-center gap-1 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-emerald-500">
-              <Check className="w-3 h-3" aria-hidden="true" /> Done
-            </span>
-          ) : null}
-        </div>
-      </AcademyCover>
+    <Link
+      to={href.to}
+      params={href.params}
+      className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col h-full', course.comingSoon && 'opacity-70 hover:opacity-100')}
+    >
+      {course.coverImageUrl ? (
+        <AcademyCover url={course.coverImageUrl} className="aspect-[16/7] border-b border-line-subtle">
+          <div className="flex h-full items-start justify-between gap-2 p-3">
+            <span className="rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">{course.code}</span>
+            {course.completed ? <DoneChip /> : null}
+          </div>
+        </AcademyCover>
+      ) : null}
       <div className="p-3 sm:p-4 flex flex-col gap-2.5 flex-1">
+        {course.coverImageUrl ? null : (
+          // No artwork: the code sits on the card itself instead of over an empty cover.
+          <div className="flex items-center justify-between gap-2">
+            <span className="rounded-chip bg-surface-2 px-1.5 py-0.5 text-2xs font-semibold text-ink-muted">{course.code}</span>
+            {course.completed ? <DoneChip /> : course.comingSoon ? <ComingSoonChip /> : null}
+          </div>
+        )}
         <div className="space-y-1">
           <h3 className="font-grotesk font-semibold text-base text-ink leading-snug">{course.title}</h3>
           <p className="text-xs text-ink-body leading-relaxed">{course.subtitle}</p>
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs text-ink-muted">
           <LevelMark level={course.level} />
-          <span className="inline-flex items-center gap-1">
-            <Layers className="w-3.5 h-3.5" aria-hidden="true" />
-            {course.lessonCount} {course.lessonCount === 1 ? 'lesson' : 'lessons'}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-            {formatCourseLength(course.estimatedMinutes)}
-          </span>
+          {course.comingSoon ? null : (
+            <>
+              <span className="inline-flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5" aria-hidden="true" />
+                {course.lessonCount} {course.lessonCount === 1 ? 'lesson' : 'lessons'}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+                {formatCourseLength(course.estimatedMinutes)}
+              </span>
+            </>
+          )}
         </div>
-        <p className="text-2xs text-ink-muted">
-          {course.instructorName} · {course.category}
-        </p>
         <div className="mt-auto pt-1 space-y-2.5">
           {course.enrolled ? <AcademyProgress percent={course.progressPercent} /> : null}
           <span className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow">
@@ -86,6 +98,14 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
         </div>
       </div>
     </Link>
+  )
+}
+
+function DoneChip() {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-emerald-500">
+      <Check className="w-3 h-3" aria-hidden="true" /> Done
+    </span>
   )
 }
 
@@ -118,7 +138,14 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
       params={{ slug: track.slug }}
       className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col sm:flex-row')}
     >
-      <AcademyCover url={track.coverImageUrl} className="h-24 sm:h-auto sm:w-40 shrink-0 border-b sm:border-b-0 sm:border-r border-line-subtle">
+      <AcademyCover
+        url={track.coverImageUrl}
+        className={cn(
+          'sm:h-auto sm:w-40 shrink-0 border-b sm:border-b-0 sm:border-r border-line-subtle',
+          // No artwork: skip the empty cover on phones, where it would stack above the text.
+          track.coverImageUrl ? 'h-24' : 'hidden sm:block',
+        )}
+      >
         <div className="flex h-full items-end p-3">
           <span className="inline-flex items-center gap-1.5 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">
             <RouteIcon className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
@@ -130,7 +157,12 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <LevelMark level={track.level} />
           <span className="text-2xs text-ink-muted">
-            {track.courseCount} {track.courseCount === 1 ? 'course' : 'courses'} · about {track.estimatedHours} hr
+            {track.courseCount} {track.courseCount === 1 ? 'course' : 'courses'}
+            {track.openCourseCount < track.courseCount
+              ? track.openCourseCount === 0
+                ? ' · coming soon'
+                : ` · ${track.openCourseCount} open now`
+              : ` · about ${track.estimatedHours} hr`}
           </span>
         </div>
         <h3 className="font-grotesk font-semibold text-lg text-ink leading-snug">{track.title}</h3>
@@ -151,17 +183,17 @@ const COMING_SOON_STEPS = [
   {
     icon: RouteIcon,
     title: 'Tracks',
-    body: 'A path of courses taken in order, from your first shed to the deep material.',
+    body: 'Courses taken in order.',
   },
   {
     icon: BookOpen,
     title: 'Courses',
-    body: 'Short video lectures and readings, closed out by a quiz. Your place is saved as you go.',
+    body: 'Short lectures and readings, then a quiz.',
   },
   {
     icon: Award,
     title: 'Certificates',
-    body: 'Finish a course or a whole track and a credential is issued in your name.',
+    body: 'Issued when you finish a course or track.',
   },
 ]
 
@@ -173,20 +205,12 @@ function AcademyComingSoon() {
       className={cn(ACADEMY_CARD, 'hud-band-hero hud-band-hero-joined overflow-hidden')}
       aria-labelledby="academy-coming-soon"
     >
-      <div className="relative p-5 sm:p-8 space-y-3 border-b border-line-subtle">
-        <span
-          className="absolute inset-0 opacity-60 bg-[radial-gradient(ellipse_at_top_right,rgba(0,195,255,0.12),transparent_55%)]"
-          aria-hidden="true"
-        />
-        <div className="relative flex items-start gap-4">
+      <div className="p-4 sm:p-5 lg:p-6 border-b border-line-subtle">
+        <div className="flex items-start gap-4">
           <span className="hidden sm:flex w-12 h-12 shrink-0 items-center justify-center rounded-card border border-line-subtle bg-surface-2 text-cyan-glow">
             <GraduationCap className="w-6 h-6" aria-hidden="true" />
           </span>
           <div className="space-y-2 max-w-2xl">
-            <p className="inline-flex items-center gap-2 text-2xs font-semibold text-cyan-glow">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow animate-pulse" aria-hidden="true" />
-              In preparation
-            </p>
             <h2 id="academy-coming-soon" className="font-grotesk font-semibold text-xl sm:text-2xl text-ink leading-tight">
               {ACADEMY_COPY.comingSoonTitle}
             </h2>
@@ -215,7 +239,7 @@ function AcademyComingSoon() {
         ))}
       </ol>
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-subtle bg-abyss/30 px-4 sm:px-5 py-3">
-        <p className="text-xs text-ink-muted">Until then, the Codex has the full doctrine.</p>
+        <p className="text-xs text-ink-muted">Until then, read the Codex.</p>
         <Link to="/codex" className={ACADEMY_TEXT_ACTION}>
           Read the Codex
           <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -223,44 +247,6 @@ function AcademyComingSoon() {
       </div>
     </section>
   )
-}
-
-function CertificateRow({ certificate }: { certificate: AcademyCertificateCard }) {
-  const body = (
-    <>
-      <span
-        className={cn(
-          'flex w-8 h-8 shrink-0 items-center justify-center rounded-control',
-          certificate.earned ? 'bg-cyan-soft text-cyan-glow' : 'bg-surface-2 text-ink-muted',
-        )}
-      >
-        <Award className="w-4 h-4" aria-hidden="true" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="eyebrow block">
-          {certificate.scope === 'track' ? 'Track certification' : 'Course certification'}
-        </span>
-        <span className="block font-grotesk font-semibold text-sm text-ink truncate">{certificate.title}</span>
-      </span>
-      {certificate.earned ? (
-        <span className="eyebrow text-emerald-500 shrink-0">Earned</span>
-      ) : (
-        <span className="text-2xs text-ink-muted shrink-0">Not yet</span>
-      )}
-    </>
-  )
-  if (certificate.earned && certificate.credentialId) {
-    return (
-      <Link
-        to="/academy/certificates/$credentialId"
-        params={{ credentialId: certificate.credentialId }}
-        className={cn('flex items-center gap-3 rounded-control px-2 py-2 hover:bg-surface-2', ACADEMY_FOCUS)}
-      >
-        {body}
-      </Link>
-    )
-  }
-  return <div className="flex items-center gap-3 px-2 py-2">{body}</div>
 }
 
 export function AcademyHome({ data }: { data: AcademyHomePayload }) {
@@ -274,11 +260,9 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
   const nothingPublished = data.courses.length === 0 && data.tracks.length === 0
   const showFilters = data.courses.length >= FILTER_MIN_COURSES
   const filtering = query.trim() !== '' || level !== 'all' || category !== 'all'
-  const earnedCount = data.certificates.filter((certificate) => certificate.earned).length
-  const certificatePreview = [...data.certificates].sort((a, b) => Number(b.earned) - Number(a.earned)).slice(0, 4)
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5">
       {/* The Academy band (title, tabs) is drawn by the academy/_sections layout route. */}
       {nothingPublished ? (
         <AcademyComingSoon />
@@ -286,8 +270,8 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
         <>
           {data.continueLearning.length > 0 ? (
             <section className="space-y-3" aria-labelledby="continue-heading">
-              <AcademySectionHeading id="continue-heading" title="Continue learning" subtitle="Pick up where you left off." />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <AcademySectionHeading id="continue-heading" title="Continue learning" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 lg:gap-5">
                 {data.continueLearning.map((course) => (
                   <ContinueRow key={course.slug} course={course} />
                 ))}
@@ -295,28 +279,21 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
             </section>
           ) : null}
 
-          <section className="space-y-3" id="tracks" aria-labelledby="tracks-heading">
-            <AcademySectionHeading
-              id="tracks-heading"
-              title="Tracks"
-              subtitle="A track is a path. Take the courses in order, then earn the path certification."
-            />
-            {data.tracks.length === 0 ? (
-              <AcademyEmpty>{ACADEMY_COPY.emptyTracks}</AcademyEmpty>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {data.tracks.length > 0 ? (
+            <section className="space-y-3" id="tracks" aria-labelledby="tracks-heading">
+              <AcademySectionHeading id="tracks-heading" title="Tracks" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 lg:gap-5">
                 {data.tracks.map((track) => (
                   <TrackCard key={track.slug} track={track} />
                 ))}
               </div>
-            )}
-          </section>
+            </section>
+          ) : null}
 
           <section className="space-y-3" id="courses" aria-labelledby="courses-heading">
             <AcademySectionHeading
               id="courses-heading"
               title="Courses"
-              subtitle="Every published course. Enroll when you are ready to keep progress."
               action={
                 filtering ? (
                   <span className="text-xs text-ink-muted">
@@ -372,36 +349,9 @@ export function AcademyHome({ data }: { data: AcademyHomePayload }) {
             ) : filtered.length === 0 ? (
               <AcademyEmpty>{ACADEMY_COPY.emptyFilter}</AcademyEmpty>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-2 sm:gap-4 lg:gap-5">
                 {filtered.map((course) => (
                   <CourseCard key={course.slug} course={course} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="space-y-3" id="certifications" aria-labelledby="certs-heading">
-            <AcademySectionHeading
-              id="certs-heading"
-              title="Certificates"
-              subtitle={
-                data.certificates.length > 0
-                  ? `${earnedCount} of ${data.certificates.length} earned. Finish a course for its certificate, or a whole track for the path certificate.`
-                  : undefined
-              }
-              action={
-                <Link to="/academy/certificates" className={ACADEMY_TEXT_ACTION}>
-                  Open certification record
-                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                </Link>
-              }
-            />
-            {data.certificates.length === 0 ? (
-              <AcademyEmpty>{ACADEMY_COPY.emptyCertificates}</AcademyEmpty>
-            ) : (
-              <div className={cn(ACADEMY_CARD, 'p-2 grid grid-cols-1 md:grid-cols-2 gap-x-2')}>
-                {certificatePreview.map((certificate) => (
-                  <CertificateRow key={certificate.slug} certificate={certificate} />
                 ))}
               </div>
             )}
@@ -422,16 +372,7 @@ function FilterChip({
   children: React.ReactNode
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        'shrink-0 min-h-8 px-3 rounded-control text-2xs font-semibold whitespace-nowrap cursor-pointer transition-[background-color,color,box-shadow] duration-200',
-        active ? 'bg-surface-3 shadow-nav-current text-ink' : 'text-ink-muted hover:text-ink hover:bg-surface-2',
-        ACADEMY_FOCUS,
-      )}
-    >
+    <button type="button" onClick={onClick} aria-pressed={active} className={pillTabClass(active, 'shrink-0 whitespace-nowrap cursor-pointer')}>
       {children}
     </button>
   )

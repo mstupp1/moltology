@@ -249,19 +249,9 @@
 }
 
 [data-kit='arcade'] .ar-btn:focus-visible,
-[data-kit='arcade'] .ar-btn-alt:focus-visible,
-[data-kit='arcade'] .ar-quiz:focus-visible {
+[data-kit='arcade'] .ar-btn-alt:focus-visible {
   outline: 2px solid var(--ar-gold);
   outline-offset: 3px;
-}
-
-[data-kit='arcade'] .ar-quiz {
-  display: inline-block;
-  margin-top: 20px;
-  font-size: 0.9375rem;
-  color: var(--ar-cyan);
-  text-decoration: underline;
-  text-underline-offset: 4px;
 }
 
 /* Hero ------------------------------------------------------------------ */
@@ -346,13 +336,6 @@
   align-items: center;
 }
 
-[data-kit='arcade'] .ar-panel {
-  padding: 24px;
-  clip-path: var(--ar-cut);
-  background: var(--ar-panel);
-  box-shadow: inset 0 0 0 2px var(--ar-line);
-}
-
 @media (min-width: 900px) {
   [data-kit='arcade'] .ar-section {
     padding: 120px 0;
@@ -365,53 +348,6 @@
 }
 
 /* Stats ----------------------------------------------------------------- */
-
-[data-kit='arcade'] .ar-stats {
-  display: grid;
-  gap: 20px;
-}
-
-[data-kit='arcade'] .ar-stat-head {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-
-[data-kit='arcade'] .ar-stat-code {
-  color: var(--ar-cyan);
-}
-
-[data-kit='arcade'] .ar-stat-name {
-  flex: 1;
-  font-family: var(--ar-display);
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--ar-white);
-}
-
-[data-kit='arcade'] .ar-stat-value {
-  color: var(--ar-gold);
-}
-
-[data-kit='arcade'] .ar-bar {
-  display: block;
-  height: 10px;
-  margin-top: 8px;
-  background: var(--ar-deep);
-  box-shadow: inset 0 0 0 1px var(--ar-line);
-}
-
-[data-kit='arcade'] .ar-bar span {
-  display: block;
-  height: 100%;
-  background: repeating-linear-gradient(90deg, var(--ar-cyan) 0 8px, transparent 8px 10px);
-}
-
-[data-kit='arcade'] .ar-stat-body {
-  margin-top: 8px;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
 
 /* Quests ---------------------------------------------------------------- */
 
@@ -491,23 +427,6 @@
 }
 
 /* Patch notes ----------------------------------------------------------- */
-
-[data-kit='arcade'] .ar-version {
-  margin-top: 16px;
-}
-
-[data-kit='arcade'] .ar-patch {
-  display: grid;
-  gap: 12px;
-  font-family: var(--ar-display);
-  font-weight: 600;
-  color: var(--ar-white);
-}
-
-[data-kit='arcade'] .ar-patch li::before {
-  content: '+ ';
-  color: var(--ar-cyan);
-}
 
 /* FAQ ------------------------------------------------------------------- */
 
@@ -705,7 +624,6 @@
     var(--ar-deep);
 }
 
-[data-kit='arcade'][data-variant='gold-cabinet'] .ar-panel,
 [data-kit='arcade'][data-variant='gold-cabinet'] .ar-quest,
 [data-kit='arcade'][data-variant='gold-cabinet'] .ar-modes-img {
   clip-path: none;
@@ -863,10 +781,6 @@
   color: #ffffff;
 }
 
-[data-kit='arcade'][data-variant='esports-light'] .ar-quiz {
-  color: var(--ar-magenta);
-}
-
 [data-kit='arcade'][data-variant='esports-light'] .ar-dark {
   background:
     linear-gradient(rgba(91, 33, 182, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
@@ -874,15 +788,10 @@
     var(--ar-deep);
 }
 
-[data-kit='arcade'][data-variant='esports-light'] .ar-panel,
 [data-kit='arcade'][data-variant='esports-light'] .ar-quest,
 [data-kit='arcade'][data-variant='esports-light'] .ar-modes-img {
   clip-path: none;
   border-radius: 10px;
-}
-
-[data-kit='arcade'][data-variant='esports-light'] .ar-bar {
-  background: var(--ar-deep);
 }
 
 [data-kit='arcade'][data-variant='esports-light'] .bf-q {

@@ -90,6 +90,18 @@ describe('parseAcademyLesson', () => {
 })
 
 describe('parseAcademyCourse', () => {
+  it('lets a coming-soon course list planned modules with no lessons or certificate', () => {
+    const { certificate: _certificate, ...rest } = courseData
+    const result = parseAcademyCourse(
+      file('course.md', { ...rest, status: 'soon', modules: [{ title: 'Planned', summary: 'Later.' }] }, 'A course on the way.'),
+      'soon-course',
+      new Map(),
+    )
+    expect(result.issues.filter((issue) => issue.severity === 'error')).toEqual([])
+    expect(result.value?.status).toBe('soon')
+    expect(result.value?.modules).toEqual([{ title: 'Planned', summary: 'Later.', lessons: [] }])
+  })
+
   it('orders lessons by module and sums the course length', () => {
     const result = parseAcademyCourse(file('course.md', courseData, 'A short first course.'), 'introduction-to-ecdysis', lessons())
     expect(result.issues.filter((issue) => issue.severity === 'error')).toEqual([])

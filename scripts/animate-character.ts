@@ -17,7 +17,7 @@ import { buildTimeline, castLook, castOf, lessonProblems, reelDraftFrom, softenC
 import { rehearse, type FrameClip } from '../src/lib/avatar3d/rehearse'
 import { voiceLesson } from './lib/character-animation/voices'
 import { renderFrames } from './lib/character-animation/render'
-import { defaultBackdrop, headlineOverlays, normaliseBackdrop, OUT_H, OUT_W, renderHeadlineCards, renderOutroText, renderSceneClip, renderTagCard, setFrameSize } from './lib/character-animation/compose'
+import { defaultBackdrop, headlineOverlays, normaliseBackdrop, OUT_H, OUT_W, renderHeadlineCards, renderMonitorCard, renderOutroText, renderSceneClip, renderSourceClipScene, renderTagCard, setFrameSize } from './lib/character-animation/compose'
 import { tokenizeScriptText } from './lib/tts-engine'
 import { setArtFiles, textureUrls } from './lib/character-animation/set-art'
 import { SHOTS } from '../src/lib/avatar3d/scripted'
@@ -140,10 +140,10 @@ async function mouthCheck(
   voice: Awaited<ReturnType<typeof voiceLesson>>,
   o: { width: number; height: number; outDir: string; maxSeconds?: number; art: boolean },
 ) {
-  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy } = voice
+  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy, clipWindows } = voice
   const dir = path.join(o.outDir, 'mouth-check')
   fs.mkdirSync(dir, { recursive: true })
-  const { timeline } = buildTimeline(mouthCheckLesson(lesson), looks, words, talkBy, { width: o.width, height: o.height, fps: FPS, tail: 0.8, hookLift: 0, mouthBy, emphasisBy, accentBy })
+  const { timeline } = buildTimeline(mouthCheckLesson(lesson), looks, words, talkBy, { width: o.width, height: o.height, fps: FPS, tail: 0.8, hookLift: 0, mouthBy, emphasisBy, accentBy, clipWindows })
   if (o.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(o.maxSeconds * FPS))
   const art = o.art ? await setArtFiles(lesson.set) : {}
   timeline.setArt = textureUrls(art)
@@ -180,26 +180,53 @@ async function main() {
   const rel = (p: string) => path.resolve(path.dirname(lessonPath), p)
 
   const isSketch = lesson.format === 'sketch'
+  const isReaction = lesson.format === 'reaction'
   const isClip = lesson.format === 'clip'
   const wide = lesson.aspect === '16:9'
   if (wide) setFrameSize(1920, 1080)
-  const turnGap = lesson.turnGap ?? (isSketch ? 0.14 : 0.35)
-  const tail = lesson.tail ?? (isSketch ? 0.3 : isClip ? 0.4 : 0.8)
-  const noOutro = isClip || lesson.outro === 'none' || (isSketch && !lesson.outro)
+  const turnGap = lesson.turnGap ?? (isSketch ? 0.14 : isReaction ? 0.22 : 0.35)
+  const tail = lesson.tail ?? (isSketch ? 0.3 : isReaction ? 0.35 : isClip ? 0.4 : 0.8)
+  const noOutro = isClip || lesson.outro === 'none' || ((isSketch || isReaction) && !lesson.outro)
   const ctaDurationSeconds = noOutro ? 0 : OUTRO_SECONDS
-  const bgVolume = lesson.bgVolume ?? (isSketch ? 0 : undefined)
+  const bgVolume = lesson.bgVolume ?? (isSketch || isReaction ? 0 : undefined)
 
   const looks = Object.fromEntries(castOf(lesson).map((c) => [c.id, castLook(c.id, undefined, c.equipment)]))
   const look = looks[lesson.host]
   const narratorVoice = args.voice || (process.env.FISH_VOICE_REFERENCE_ID ? '' : NARRATOR)
-  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy } = await voiceLesson(lesson, outDir, { silent: args.silent, fps: FPS, narratorVoice, turnGap, rate: args.rate })
+  const { audio, words, talkBy, mouthBy, emphasisBy, accentBy, clipWindows } = await voiceLesson(lesson, outDir, {
+    silent: args.silent,
+    fps: FPS,
+    narratorVoice,
+    turnGap,
+    rate: args.rate,
+    lessonDir: path.dirname(lessonPath),
+  })
+  if (clipWindows) {
+    const totalClipSec = Object.values(clipWindows).reduce((sum, w) => sum + (w.end - w.start), 0)
+    const totalDur = Math.max(0.001, (words.at(-1)?.endMs ?? 0) / 1000, ...Object.values(clipWindows).map((w) => w.end)) + tail
+    const ratio = totalClipSec / totalDur
+    console.log(`⚖️  Fair-use check: ${totalClipSec.toFixed(1)}s clipped / ${totalDur.toFixed(1)}s total (${Math.round(ratio * 100)}%)`)
+    if (ratio > 0.38 && !args.force) {
+      throw new Error(`Source clips take ${Math.round(ratio * 100)}% of runtime (max 38%). Trim clips or expand commentary, or pass --force for a test.`)
+    }
+  }
   const width = even((wide ? 1920 : 1080) * args.scale)
   const height = even((wide ? 1080 : 1920) * args.scale)
   if (args.mouthCheck) {
-    await mouthCheck(lesson, looks, { audio, words, talkBy, mouthBy, emphasisBy, accentBy }, { width, height, outDir, maxSeconds: args.maxSeconds, art: args.art })
+    await mouthCheck(lesson, looks, { audio, words, talkBy, mouthBy, emphasisBy, accentBy, clipWindows }, { width, height, outDir, maxSeconds: args.maxSeconds, art: args.art })
     return
   }
-  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, { width, height, fps: FPS, tail, hookLift: isClip ? 0 : 0.9, mouthBy, emphasisBy, accentBy })
+  const { timeline, windows, hookEnd } = buildTimeline(lesson, looks, words, talkBy, {
+    width,
+    height,
+    fps: FPS,
+    tail,
+    hookLift: isClip ? 0 : 0.9,
+    mouthBy,
+    emphasisBy,
+    accentBy,
+    clipWindows,
+  })
   if (args.maxSeconds) timeline.frames = Math.min(timeline.frames, Math.ceil(args.maxSeconds * FPS))
   const gestures = timeline.cues.filter((c) => c.gesture)
   console.log(`🎭 Acting: ${gestures.length} gestures (${gestures.filter((c) => c.auto).length} automatic)`)
@@ -286,21 +313,60 @@ async function main() {
     if (last <= first) break
     const scene = lesson.scenes[i]
     const backdrop = scene.backdrop ? await normaliseBackdrop(rel(scene.backdrop), path.join(outDir, `backdrop-${i + 1}.png`)) : defaultSet
-    clips.push(
-      await renderSceneClip({
-        framesDir,
-        fps: FPS,
-        start: first,
-        count: last - first,
-        backdrop,
-        outPath: path.join(outDir, `scene-${i + 1}.mp4`),
-        overlays: [
-          ...(tag ? [{ png: tag, from: 0, to: (last - first) / FPS + 1 }] : []),
-          ...(i === 0 && cards.length ? headlineOverlays(cards, words.slice(0, hookCount), hookEnd) : []),
-          ...(scene.overlay ? [{ png: rel(scene.overlay), from: 0, to: (last - first) / FPS + 1 }] : []),
-        ],
-      })
-    )
+    const baseOverlays = [
+      ...(tag ? [{ png: tag, from: 0, to: (last - first) / FPS + 1 }] : []),
+      ...(i === 0 && cards.length ? headlineOverlays(cards, words.slice(0, hookCount), hookEnd) : []),
+      ...(scene.overlay ? [{ png: rel(scene.overlay), from: 0, to: (last - first) / FPS + 1 }] : []),
+    ]
+    if (scene.sourceClip) {
+      const monPng = renderMonitorCard(scene.sourceClip.attribution, path.join(outDir, `monitor-${i + 1}.png`))
+      const clipFile = path.resolve(process.cwd(), scene.sourceClip.path)
+      const resolvedClip = fs.existsSync(clipFile) ? clipFile : rel(scene.sourceClip.path)
+      if (fs.existsSync(resolvedClip)) {
+        clips.push(
+          await renderSourceClipScene({
+            framesDir,
+            fps: FPS,
+            start: first,
+            count: last - first,
+            backdrop,
+            outPath: path.join(outDir, `scene-${i + 1}.mp4`),
+            sourceVideo: resolvedClip,
+            clipStart: scene.sourceClip.start,
+            clipDuration: scene.sourceClip.duration,
+            monitorCard: monPng,
+            insetOnly: scene.sourceClip.layout === 'inset-only',
+            overlays: baseOverlays,
+          })
+        )
+      } else if (args.silent) {
+        clips.push(
+          await renderSceneClip({
+            framesDir,
+            fps: FPS,
+            start: first,
+            count: last - first,
+            backdrop,
+            outPath: path.join(outDir, `scene-${i + 1}.mp4`),
+            overlays: [{ png: monPng, from: 0, to: (last - first) / FPS + 1 }, ...baseOverlays],
+          })
+        )
+      } else {
+        throw new Error(`Source clip not found: ${resolvedClip}`)
+      }
+    } else {
+      clips.push(
+        await renderSceneClip({
+          framesDir,
+          fps: FPS,
+          start: first,
+          count: last - first,
+          backdrop,
+          outPath: path.join(outDir, `scene-${i + 1}.mp4`),
+          overlays: baseOverlays,
+        })
+      )
+    }
     durations.push((last - first) / FPS)
   }
 
@@ -335,11 +401,19 @@ async function main() {
     tempDir: path.join(outDir, 'composite'),
   })
   const firstBody = words[hookCount]?.startMs ?? 0
+  const clipMoments: Record<string, number> = {}
+  let clipIndex = 0
+  lesson.scenes.forEach((scene, i) => {
+    if (!scene.sourceClip || !windows[i]) return
+    clipIndex++
+    clipMoments[`clip-${clipIndex}`] = (windows[i].start + windows[i].end) / 2
+  })
   previewStills(final, path.join(outDir, 'checks'), {
     'frame-zero': 0,
     'mid-hook': hookEnd / 2,
     'last-hook-word': Math.max(0, hookEnd - 0.1),
     'first-body-phrase': firstBody / 1000 + 0.2,
+    ...clipMoments,
     later: result.durationSeconds * 0.6,
     outro: noOutro ? Math.max(0, result.durationSeconds - 0.12) : result.durationSeconds - 1,
   })

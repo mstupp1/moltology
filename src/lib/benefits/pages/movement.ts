@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'How to keep moving forward when a day stalls: pick the next action, open the file and start. Eight daily tasks, from first light to close, with no workouts.',
   keywords: 'keep moving forward, how to get unstuck, getting started, procrastination, next action',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/movement/share.jpg?v=2',
     alt: 'A lobster reaching for a notebook beside black gym lockers in a crisp sports editorial shot',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Hesitation is where the day leaks, from the Codex',
+    label: 'The Art of the Grip',
     href: '/codex/scr-012#verse-5',
-    text: 'The passage looks at the gap between knowing what needs doing and starting. Read it, pick a task you have already decided on, and take the first step. As the verse says, a frantic person and a decisive one look nothing alike.',
+    text: 'Use the next minute to begin the work you’ve already picked.',
   },
   reveal: {
-    headline: 'The starting line is the open file.',
-    body: 'Begin the work you have already picked.',
+    headline: 'The open file is the starting line.',
+    body: 'Pick one action small enough to do before the next tab opens.',
     screenshot: 'dashboard',
   },
   related: ['grip', 'focus', 'technique'],
@@ -65,8 +65,8 @@ const page: BenefitPage = {
     hero: {
       tag: 'Less setup. More starts.',
       headline: 'Keep moving forward.',
-      sub: 'The reply is drafted. The send button is right there. Take the next step before opening another tab about getting started. Eight daily tasks take you from a quiet start to clocking off.',
-      cta: 'Start the daily routine',
+      sub: 'The file is already open. Take the next step before one more tab.',
+      cta: 'Start training free',
       image: {
         src: '/images/benefits/movement/hero.jpg?v=2',
         alt: 'A crab crossing a dark locker room toward an open notebook in a wide black and volt sports campaign photograph',
@@ -74,23 +74,13 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: [
-      { value: '8', label: 'Actions each day' },
-      { value: '1', label: 'Next step to choose' },
-      { value: '0', label: 'Training gear needed' },
-      { value: '$0', label: 'To get started' },
-    ],
     program: {
-      title: 'Off pause. Into the session.',
-      intro: 'Take the eight daily tasks in order. Choose the work, start the work, and make a clean stop. Resist adding a preparation routine for your preparation routine.',
+      title: 'The starting sequence',
+      intro: 'Work the first move before planning the next three.',
       items: [
-        { set: 'First move', title: 'Sit in silence', body: 'Start the morning seated, with the feed still closed. Look back at yesterday before reaching for the phone.' },
         { set: 'Pick', title: 'Pick your one thing', body: 'Choose what matters today and start on it. Open the actual draft instead of moving its reminder to a nicer list.' },
         { set: 'Try', title: 'Learn something hard', body: 'Go to the lesson you keep saving for later. Read the first difficult section and try working through its example.' },
-        { set: 'Resume', title: 'Reset your focus', body: 'Close the tab that pulled you away. Find your place in the work and choose the next action.' },
         { set: 'Go', title: 'Do deep work', body: 'Set aside interruptions for one task. Write the paragraph, check the figures, or work through the problem you chose.' },
-        { set: 'Reply', title: 'Help a member', body: 'Send a useful answer on the forum. A clear welcome also counts as showing up for someone new.' },
-        { set: 'Set down', title: 'Let one thing go', body: 'Name one thing from the day to leave behind. Stop reopening a settled decision just to see if it still bothers you.' },
         { set: 'Finish', title: 'Close the day', body: 'Mark completed tasks and end the session. Leave a note for unfinished work instead of starting another round tonight.' },
       ],
     },
@@ -105,7 +95,6 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    creed: 'Start before the next tab opens.',
   },
 }
 

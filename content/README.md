@@ -24,6 +24,7 @@ Read the shared prerequisites and matching skill before any content pipeline, in
 | Reels and Shorts | [reels-and-shorts-creator](../.agents/skills/reels-and-shorts-creator/SKILL.md) |
 | Cast stills, poses and reference sheets | [character-creator](../.agents/skills/character-creator/SKILL.md), `npm run cast:render`; cast in [characters/cast.json](characters/cast.json) |
 | Molt Pod podcast highlight clips | [animated-lessons](../.agents/skills/animated-lessons/SKILL.md) (Molt Pod format, `podcast-studio` set) |
+| Molt Pod Reacts (YouTube commentary) | [molt-pod-reacts](../.agents/skills/molt-pod-reacts/SKILL.md), `npm run anim:clip` + `npm run anim:create`; dedicated `Molt Pod Reacts` Zernio queue |
 | Animated lessons with the 3D characters | [animated-lessons](../.agents/skills/animated-lessons/SKILL.md), `npm run anim:create`; cast in [characters/cast.json](characters/cast.json) |
 | Benthic comedy shorts (Crab Logic) | [benthic-comedy-shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md), `npm run anim:create`; cast in [characters/cast.json](characters/cast.json) |
 | Blog dispatches | [blog-creator](../.agents/skills/blog-creator/SKILL.md) |

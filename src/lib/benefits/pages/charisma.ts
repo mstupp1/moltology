@@ -10,7 +10,7 @@ const page: BenefitPage = {
     'Charisma is mostly presence: calm, attention and real interest in people. Moltology is a free daily practice that trains all three, eight small tasks at a time.',
   keywords: 'how to be more charismatic, charisma, presence, confidence, social skills, how to be magnetic',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/charisma/share.jpg?v=2',
     alt: 'A coral crab on a big stage with a headset microphone, one claw raised',
@@ -18,21 +18,21 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Presence first, from the Codex',
+    label: 'Presence first',
     href: '/codex/scr-013#verse-8',
-    text: 'The Codex asks members to keep each other calm company before giving advice. Helping a member, one of the daily tasks, is where that gets practiced.',
+    text: 'Bring your full attention to the person in front of you.',
   },
   reveal: {
-    headline: 'The seminar is a daily practice.',
-    body: 'Chapter one is a quiet morning tomorrow.',
+    headline: 'Class starts at the next hello.',
+    body: 'Take one small act of attention into your next conversation.',
     screenshot: 'forum',
   },
   related: ['fashion', 'community', 'spirituality'],
   faqs: [
     {
-      question: 'Is there a real seminar or book?',
+      question: 'How can I sound more charismatic without rehearsing?',
       answer:
-        'No. The real thing is a free app with a daily practice, and the Codex, its book of readings, is free to read online.',
+        'Ask about one detail you genuinely want to hear more about. Give the reply your full attention.',
     },
     {
       question: 'Can charisma actually be learned?',
@@ -42,7 +42,7 @@ const page: BenefitPage = {
     {
       question: 'Which tasks help most with charisma?',
       answer:
-        'The silent start lowers the background noise in your head, and helping a member trains attention to other people. Letting one thing go keeps old embarrassments from running every conversation.',
+        'Try Help a member. Read their question twice, then write a reply to the part they actually asked about.',
     },
     {
       question: 'Do I have to post publicly?',
@@ -58,14 +58,13 @@ const page: BenefitPage = {
       answer:
         'There is no fixed timeline. Treat it like any skill: a little practice every day, an honest look back, and patience.',
     },
-
   ],
   content: {
     hero: {
-      kicker: 'The live seminar, now free and daily',
-      headline: 'How to be more charismatic, starting tomorrow morning.',
-      sub: 'Forget power poses and scripts. The people you remember are calm, present and actually interested in you. Moltology trains those three things in eight small daily steps.',
-      cta: 'Claim your free seat',
+      kicker: 'The presence method',
+      headline: 'More charismatic. Less rehearsed.',
+      sub: 'Put the phone away. Ask the question you actually want answered.',
+      cta: 'Start the practice free',
       image: {
         src: '/images/benefits/charisma/hero.jpg?v=2',
         alt: 'A coral crab in a navy blazer on a big stage, wearing a headset microphone with one claw raised',
@@ -74,44 +73,18 @@ const page: BenefitPage = {
       },
       book: { title: 'Presence', subtitle: 'The quiet habits of magnetic people', author: 'The Moltology method' },
     },
-    promise: {
-      title: 'What the first 30 days ask of you',
-      items: [
-        'Start each morning before your phone',
-        'Listen without planning your next line',
-        'Help a stranger with something that matters to them',
-        'Drop one story you keep telling about yourself',
-        'Close each day on purpose',
-      ],
-    },
     chapters: {
-      title: 'What is inside',
+      title: 'The presence syllabus',
       items: [
         { title: 'Quiet first', body: 'Why a silent start makes you easier to be around all day.' },
-        { title: 'One clear aim', body: 'People follow those who know what they are doing today.' },
         { title: 'Curiosity', body: 'Learning something hard keeps you interesting, and interested.' },
         { title: 'The pause', body: 'A midday reset so the afternoon version of you is still good company.' },
-        { title: 'Depth', body: 'Deep work gives you something real to talk about.' },
         { title: 'Generosity', body: 'Helping a member is attention, practiced daily.' },
-        { title: 'Lightness', body: 'Letting one thing go so you stop carrying it into every room.' },
-        { title: 'The close', body: 'Review the day, sleep, and wake up as yourself.' },
       ],
     },
     passage: {
       quote: 'Presence first, counsel later.',
       source: { label: 'the Codex, SCR-013, verse 8', href: '/codex/scr-013#verse-8' },
-    },
-    agenda: {
-      title: 'Today’s agenda',
-      intro: 'One day of the program. It runs again tomorrow, and the day after.',
-      items: [
-        { time: 'Morning', title: 'Silent start, then pick your one thing' },
-        { time: 'Late morning', title: 'Learn something hard' },
-        { time: 'Midday', title: 'Reset your focus' },
-        { time: 'Afternoon', title: 'Deep work on the one thing' },
-        { time: 'Evening', title: 'Answer someone on the forum, then drop a worry' },
-        { time: 'Night', title: 'Close the day' },
-      ],
     },
   },
 }

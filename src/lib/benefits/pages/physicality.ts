@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Put mind body connection on the training card. Pause before the inbox, notice your surroundings, and talk daily habits on the Moltology forum.',
   keywords: 'mind body connection, physical awareness, screen habits, daily check-in',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   disclaimer: 'Moltology offers daily habits and community discussion, not medical care or an exercise plan.',
   shareImage: {
     src: '/images/benefits/physicality/share.jpg?v=2',
@@ -20,13 +20,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'The Moltmaxxing & Biometrics board',
+    label: 'Moltmaxxing & Biometrics',
     href: '/forum/moltmaxxing-biometrics',
-    text: 'Bring your training notes to the Moltmaxxing & Biometrics forum board. Say what your day looked like, what you tried, and what you want to ask. Start with the lunch beside the laptop, not a theory about everyone else.',
+    text: 'Bring a specific question or a few training notes to the forum.',
   },
   reveal: {
     headline: 'Clock in with your whole self.',
-    body: 'Take a quiet seat before taking on the inbox.',
+    body: 'Fit a quiet check-in between two blocks of work.',
     screenshot: 'dashboard',
   },
   related: ['movement', 'fitness', 'focus'],
@@ -65,9 +65,9 @@ const page: BenefitPage = {
   content: {
     hero: {
       tag: 'Daily check-in · zero equipment',
-      headline: 'Mind body connection. Train both.',
-      sub: 'Lunch beside the laptop. Phone in your hand. Your day has a physical side. Before the next set of emails, pause and notice it. Then work through the eight daily tasks.',
-      cta: 'Join the daily practice',
+      headline: 'Mind-body connection. Check in before you clock in.',
+      sub: 'Take lunch away from the keyboard. Notice how you’re sitting before the next session.',
+      cta: 'Start training free',
       image: {
         src: '/images/benefits/physicality/hero.jpg?v=2',
         alt: 'A lobster pausing by a training bench under hard side lighting in a black and volt sportswear shoot',
@@ -75,23 +75,13 @@ const page: BenefitPage = {
         height: 1000,
       },
     },
-    stats: [
-      { value: '8', label: 'Daily tasks' },
-      { value: '15', label: 'Moltmax questions' },
-      { value: '0', label: 'Equipment needed' },
-      { value: '$0', label: 'To join' },
-    ],
     program: {
-      title: 'Check in. Work through.',
-      intro: 'Take the full training card into an ordinary day. Start away from the feed, choose your work, and leave time to stop. Keep your actual surroundings in the picture.',
+      title: 'Training starts at the desk',
+      intro: 'Four check-ins and work blocks from the daily practice.',
       items: [
         { set: 'Arrival', title: 'Sit in silence', body: 'Leave the phone face down. Sit quietly and look back at yesterday before adding fresh messages to the morning.' },
-        { set: 'Selection', title: 'Pick your one thing', body: 'Choose the work that matters today. Get the notebook or document ready and start on that piece.' },
-        { set: 'Practice', title: 'Learn something hard', body: 'Take on a difficult idea. Read the paragraph you skipped, then try explaining it before reaching for another article.' },
         { set: 'Break', title: 'Reset your focus', body: 'Check the space around the work. Clear a distraction and decide what to do when you return to it.' },
         { set: 'Work block', title: 'Do deep work', body: 'Put the chosen task in front of you. Silence the interruptions you can control and keep the extra windows closed.' },
-        { set: 'Teamwork', title: 'Help a member', body: 'Reply to someone on the forum with a useful detail from your own day. Read their question all the way through first.' },
-        { set: 'Unload', title: 'Let one thing go', body: 'Name something from today you are done carrying. The awkward email does not need another rehearsal over dinner.' },
         { set: 'Clock out', title: 'Close the day', body: 'Tick off what you did and finish the check-in. Put the device down when you close the day.' },
       ],
     },
@@ -106,7 +96,6 @@ const page: BenefitPage = {
         height: 1280,
       },
     },
-    creed: 'Put the phone down before the first rep.',
   },
 }
 

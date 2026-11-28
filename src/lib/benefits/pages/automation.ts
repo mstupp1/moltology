@@ -5,12 +5,12 @@ const page: BenefitPage = {
   topic: 'Automation',
   kit: 'platform',
   query: 'automate your daily routine',
-  title: 'Automate your daily routine, and your decisions | Moltology',
+  title: 'Automate your daily routine setup | Moltology',
   description:
-    'Stop deciding how to run every day. Moltology automates your daily routine into eight small tasks, with an AI guide on call when the plan breaks. Free.',
+    'Set up your daily routine with a ready-made checklist and the Oracle AI guide. Pick your own work, log what you do, and come back tomorrow.',
   keywords: 'automate your daily routine, routine automation, decision fatigue, AI productivity, daily planner, habit system',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/automation/share.jpg?v=2',
     alt: 'A teal lobster floating among glowing glass panels linked like a workflow',
@@ -20,11 +20,11 @@ const page: BenefitPage = {
   hook: {
     label: 'Oracle skills',
     href: '/oracle',
-    text: 'The Oracle, our AI guide, has skills you can switch on, and it can read the forum, the news and the page you are on to give answers that fit.',
+    text: 'Choose a skill when you want a guided plan, a focus round, or a check-in.',
   },
   reveal: {
-    headline: 'The Oracle is ready when the plan breaks.',
-    body: 'Ask it to plan tomorrow around one thing.',
+    headline: 'Give tomorrow a default.',
+    body: 'Ask the Oracle to plan around one thing you want done.',
     screenshot: 'oracle',
   },
   related: ['investing', 'energy-drinks', 'gaming'],
@@ -59,15 +59,13 @@ const page: BenefitPage = {
       answer:
         'The first hour. Decide the night before what you will do before opening any app, then do it the same way each morning. A silent start and picking your one thing cover exactly that.',
     },
-
   ],
   content: {
     hero: {
-      badge: 'New · Oracle skills',
-      headline: 'Automate your daily routine. Keep your attention.',
-      sub: 'Moltology turns the day into a pipeline you never have to design again: eight small tasks, an AI guide when something breaks, and a log of every run. Free to start.',
-      cta: 'Start building free',
-      prompt: 'Plan tomorrow around one thing: shipping the draft.',
+      badge: 'Daily checklist · Oracle guidance',
+      headline: 'Put your daily routine on rails.',
+      sub: 'Eight tasks in order. An AI guide for the days that go off script.',
+      cta: 'Create a free account',
       image: {
         src: '/images/benefits/automation/hero.jpg?v=2',
         alt: 'A teal lobster floating calmly among glowing translucent panels joined by thin lines of light',
@@ -76,46 +74,21 @@ const page: BenefitPage = {
       },
     },
     features: {
-      title: 'Everything a routine needs, already wired',
-      intro: 'You bring the goals. The structure, reminders of what comes next and the help are built in.',
+      title: 'Already set up',
+      intro: 'The checklist is ready. Bring your own work.',
       items: [
-        { title: 'Fixed schedule', body: 'Eight tasks in a set order, from a quiet start to closing the day. Nothing to configure.' },
+        { title: 'Ready-made checklist', body: 'Eight tasks in order, with practice days you choose.' },
         { title: 'AI on call', body: 'The Oracle plans, explains and unblocks. Four skills are free, and more can be added from the shop.' },
         { title: 'Run history', body: 'A streak, weekly XP and an activity log show what ran and what did not.' },
-        { title: 'Members who help', body: 'A forum of people doing the same practice, for the problems AI cannot fix.' },
-        { title: 'Source docs', body: 'Every task links to its passage in the Codex, so you know why it is there.' },
-        { title: 'Works anywhere', body: 'Phone or desktop, in the browser. No install.' },
       ],
     },
     workflow: {
-      title: 'Your day, as a workflow',
-      intro: 'Triggers you already have, actions you already know. Moltology just keeps them in order.',
+      title: 'A day on rails',
+      intro: 'Three cues you already have.',
       steps: [
         { when: 'You wake up', then: 'Sit in silence before opening anything' },
-        { when: 'First coffee', then: 'Pick your one thing and write it down' },
-        { when: 'Calendar opens up', then: 'Run a deep work block on that one thing' },
         { when: 'Lunch', then: 'Reset your focus with a real break' },
-        { when: 'Evening', then: 'Help a member, let one thing go' },
         { when: 'Before bed', then: 'Close the day and log it' },
-      ],
-    },
-    config: {
-      title: 'Zero config, but here is the config',
-      body: 'If your day were a file, it would look like this. You never have to write it.',
-      filename: 'practice.yml',
-      lines: [
-        'schedule: daily',
-        'tasks:',
-        '  - silent-start',
-        '  - pick-one-thing',
-        '  - learn-something-hard',
-        '  - reset-focus',
-        '  - deep-work',
-        '  - help-a-member',
-        '  - let-one-thing-go',
-        '  - close-the-day',
-        'on_failure: ask_oracle',
-        'cost: free',
       ],
     },
     plans: {

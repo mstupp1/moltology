@@ -34,6 +34,7 @@ const course: AcademyCourseDetail = {
   completed: false,
   progressPercent: 0,
   resumeLessonSlug: null,
+  comingSoon: false,
   modules: [
     {
       id: 'mod',

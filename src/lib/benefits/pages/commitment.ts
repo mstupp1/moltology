@@ -11,7 +11,7 @@ const page: BenefitPage = {
     'Working out how to stick to goals? Choose one objective, name the next action, and protect a place for it in your day with Moltology’s daily practice.',
   keywords: 'how to stick to goals, commitment, one objective, daily goal practice',
   indexed: true,
-  updated: '2026-11-22',
+  updated: '2026-11-27',
   shareImage: {
     src: '/images/benefits/commitment/share.jpg?v=2',
     alt: 'A dark blue crab at a seminar lectern beside a single closed folder, dramatic book-tour photography',
@@ -19,13 +19,13 @@ const page: BenefitPage = {
     height: 630,
   },
   hook: {
-    label: 'Hold one objective, from the Isolation Protocols',
+    label: 'Hold one objective',
     href: '/codex/scr-031#verse-5',
-    text: 'One clear objective per work session, and only one. Write the task before you begin, put the competing work aside, and keep that session for the objective you chose.',
+    text: 'Choose one result for the session and write it where you can see it.',
   },
   reveal: {
-    headline: 'Bring the task you keep moving to tomorrow.',
-    body: 'Pick your one thing: name it, then start.',
+    headline: 'Open to the page you left off.',
+    body: 'Name one thing worth finishing today.',
     screenshot: 'forum',
   },
   related: ['focus', 'self-help-books', 'truth'],
@@ -63,10 +63,10 @@ const page: BenefitPage = {
   ],
   content: {
     hero: {
-      kicker: 'Your next session starts with a decision',
-      headline: 'How to stick to goals when the new-notebook feeling wears off.',
-      sub: 'The notebook is lovely. Put one task in it. Choose what matters today, shut out the avoidable interruptions, and do the work you named before adding another objective.',
-      cta: 'Start your daily practice',
+      kicker: 'Notes on follow-through',
+      headline: 'Stick to goals past page one.',
+      sub: 'Pick what done looks like. Give it a slot before the day fills up.',
+      cta: 'Start the practice free',
       image: {
         src: '/images/benefits/commitment/hero-alt.jpg',
         alt: 'Cora Pearl, a pearl-white lobster wearing a gold crown, standing beside a cobalt-paneled architectural podium in a daylight seminar studio',
@@ -75,44 +75,18 @@ const page: BenefitPage = {
       },
       book: { title: 'Stay with it', subtitle: 'One objective for the session in front of you', author: 'Moltology · the daily practice' },
     },
-    promise: {
-      title: 'What to bring to the work',
-      items: [
-        'A goal you still choose for yourself',
-        'One action written before the session begins',
-        'The document or tools that action needs',
-        'A plan for interruptions that can wait',
-        'Permission to stop at the end you set',
-      ],
-    },
     chapters: {
-      title: 'The part after setting the goal',
+      title: 'From intention to appointment',
       items: [
         { title: 'Choose it again', body: 'Read the goal you wrote down. Say why it still matters before giving it a place in today’s work.' },
         { title: 'Make the action small enough', body: 'Replace work on the proposal with draft the opening paragraph. Pick something you can begin with the tools already available.' },
-        { title: 'Prepare the start', body: 'Open the file and find the place to continue. Leave the redesign of your entire workspace for its own appointment.' },
-        { title: 'Put the other goals aside', body: 'Keep a separate list for ideas that arrive during the session. Write them there and return to the task you selected.' },
         { title: 'Protect the session', body: 'Turn off interruptions that can wait. Keep a way for people who genuinely need you to reach you.' },
-        { title: 'Do the named work', body: 'Stay with the action in front of you. Reading about someone else’s routine belongs outside this work session.' },
         { title: 'Record the attempt', body: 'Mark what you completed honestly. If the task was too large, write a smaller next action before you close the file.' },
-        { title: 'Set the work down', body: 'Finish at the stopping point you chose. A commitment to a project leaves room for the rest of your life.' },
       ],
     },
     passage: {
       quote: 'Juggling two tasks behind a closed door is just surface work in a quieter room.',
       source: { label: 'The Isolation Protocols, verse 5', href: '/codex/scr-031#verse-5' },
-    },
-    agenda: {
-      title: 'One appointment with your objective',
-      intro: 'Give the session a beginning and an end. Keep this plan beside the work, where you can read it without opening another app.',
-      items: [
-        { time: 'The choice', title: 'Name what you intend to work on' },
-        { time: 'The setup', title: 'Gather what this action actually requires' },
-        { time: 'The boundary', title: 'Decide which interruptions must get through' },
-        { time: 'The session', title: 'Do deep work on the objective you named' },
-        { time: 'The review', title: 'Write the stopping point and next action' },
-        { time: 'The finish', title: 'Close the day with an honest task record' },
-      ],
     },
   },
 }

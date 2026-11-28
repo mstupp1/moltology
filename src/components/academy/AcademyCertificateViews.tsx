@@ -27,22 +27,19 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
   const available = data.certificates.filter((certificate) => !certificate.earned)
   // The list is public; signed-out visitors get sign-up prompts where earning would start.
   const guest = useAcademyGuestEnroll()
+  if (data.certificates.length === 0) {
+    return (
+      // The Academy band (title, tabs) is drawn by the academy/_sections layout route.
+      <AcademyEmpty>{guest.isGuest ? ACADEMY_COPY.emptyCertificatesGuest : ACADEMY_COPY.emptyCertificates}</AcademyEmpty>
+    )
+  }
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-2 sm:space-y-4 lg:space-y-5">
       {/* The Academy band (title, tabs) is drawn by the academy/_sections layout route. */}
-      <p className="max-w-2xl text-xs text-ink-muted leading-relaxed">
-        Finish every lesson for a course certificate, or every required course on a track for its certificate.
-      </p>
       <section className="space-y-3" aria-labelledby="earned-heading">
-        <AcademySectionHeading
-          id="earned-heading"
-          title="Earned"
-          subtitle={earned.length > 0 ? `${earned.length} issued in your name.` : undefined}
-        />
-        {guest.isGuest && data.certificates.length === 0 ? (
-          <AcademyEmpty>{ACADEMY_COPY.emptyCertificatesGuest}</AcademyEmpty>
-        ) : guest.isGuest ? (
-          <div className={cn(ACADEMY_CARD, 'p-4 flex flex-col sm:flex-row sm:items-center gap-3')}>
+        <AcademySectionHeading id="earned-heading" title="Earned" />
+        {guest.isGuest ? (
+          <div className={cn(ACADEMY_CARD, 'p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3')}>
             <p className="text-sm text-ink-body flex-1">{ACADEMY_COPY.guestEarnedCertificates}</p>
             <HudButton type="button" variant="primary" size="sm" onClick={guest.promptSignUp}>
               {ACADEMY_COPY.guestSignUp}
@@ -51,18 +48,16 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
         ) : earned.length === 0 ? (
           <AcademyEmpty>{ACADEMY_COPY.emptyEarned}</AcademyEmpty>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 lg:gap-5">
             {earned.map((certificate) => (
               <EarnedCard key={certificate.slug} certificate={certificate} />
             ))}
           </div>
         )}
       </section>
-      <section className="space-y-3" aria-labelledby="available-heading">
-        <AcademySectionHeading id="available-heading" title="Available" subtitle={available.length > 0 ? 'Finish the work below to earn these.' : undefined} />
-        {available.length === 0 ? (
-          <AcademyEmpty>{data.certificates.length === 0 ? ACADEMY_COPY.emptyCertificates : 'You have earned every certification on offer.'}</AcademyEmpty>
-        ) : (
+      {available.length > 0 ? (
+        <section className="space-y-3" aria-labelledby="available-heading">
+          <AcademySectionHeading id="available-heading" title="Available" />
           <ul className={cn(ACADEMY_CARD, 'divide-y divide-line-subtle')}>
             {available.map((certificate) => (
               <AvailableRow
@@ -72,15 +67,15 @@ export function AcademyCertificateIndex({ data }: { data: AcademyHomePayload }) 
               />
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : null}
       {guest.modal}
     </div>
   )
 }
 
 function scopeLabel(certificate: { scope: AcademyCertificateCard['scope'] }) {
-  return certificate.scope === 'track' ? 'Track certification' : 'Course certification'
+  return certificate.scope === 'track' ? 'Track certificate' : 'Course certificate'
 }
 
 function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
@@ -95,9 +90,8 @@ function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
         ) : null}
       </div>
       <div className="space-y-1">
-        <p className="eyebrow">{scopeLabel(certificate)}</p>
         <h3 className="font-grotesk font-semibold text-lg text-ink leading-snug">{certificate.title}</h3>
-        {certificate.subjectTitle ? <p className="text-xs text-ink-body">For {certificate.subjectTitle}</p> : null}
+        {certificate.subjectTitle ? <p className="text-xs text-ink-muted">For {certificate.subjectTitle}</p> : null}
       </div>
       {certificate.credentialId ? (
         <p className="mt-auto flex items-center justify-between gap-3 pt-2 border-t border-line-subtle">
@@ -111,13 +105,13 @@ function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
     </>
   )
   if (!certificate.credentialId) {
-    return <article className={cn(ACADEMY_CARD, 'p-4 flex flex-col gap-3')}>{content}</article>
+    return <article className={cn(ACADEMY_CARD, 'p-3 sm:p-4 flex flex-col gap-3')}>{content}</article>
   }
   return (
     <Link
       to="/academy/certificates/$credentialId"
       params={{ credentialId: certificate.credentialId }}
-      className={cn(ACADEMY_CARD_LINK, 'group p-4 flex flex-col gap-3')}
+      className={cn(ACADEMY_CARD_LINK, 'group p-3 sm:p-4 flex flex-col gap-3')}
     >
       {content}
     </Link>
@@ -127,12 +121,11 @@ function EarnedCard({ certificate }: { certificate: AcademyCertificateCard }) {
 function AvailableRow({ certificate, onSignUp }: { certificate: AcademyCertificateCard; onSignUp?: () => void }) {
   if (onSignUp) {
     return (
-      <li className="flex items-start gap-3 p-4">
+      <li className="flex items-start gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
         <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-control bg-surface-2 text-ink-muted">
           <Award className="w-4 h-4" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1 space-y-1">
-          <p className="eyebrow">{scopeLabel(certificate)}</p>
           <h3 className="font-grotesk font-semibold text-ink">{certificate.title}</h3>
           <p className="text-xs text-ink-body leading-relaxed">{certificate.description}</p>
         </div>
@@ -143,12 +136,11 @@ function AvailableRow({ certificate, onSignUp }: { certificate: AcademyCertifica
     )
   }
   return (
-    <li className="flex items-start gap-3 p-4">
+    <li className="flex items-start gap-3 px-3 py-2 sm:px-4 sm:py-2.5">
       <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-control bg-surface-2 text-ink-muted">
         <Lock className="w-4 h-4" aria-hidden="true" />
       </span>
       <div className="min-w-0 flex-1 space-y-1">
-        <p className="eyebrow">{scopeLabel(certificate)}</p>
         <h3 className="font-grotesk font-semibold text-ink">{certificate.title}</h3>
         <p className="text-xs text-ink-body leading-relaxed">{certificate.description}</p>
       </div>
@@ -194,10 +186,6 @@ export function AcademyCredential({ credential }: { credential: AcademyCredentia
         ]}
       />
       <article className="relative mx-auto max-w-3xl overflow-hidden rounded-panel border border-line-subtle bg-surface-1 hud-sheen">
-        <span
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,195,255,0.10),transparent_60%)]"
-          aria-hidden="true"
-        />
         <div className="relative m-2 sm:m-3 rounded-card border border-line-subtle px-5 py-8 sm:px-12 sm:py-12 text-center space-y-5">
           <GlowEmblem size={64} className="mt-2" />
           <div className="space-y-1">

@@ -126,6 +126,30 @@ describe('academy catalog rules', () => {
     expect(home.categories).toEqual(['Armor', 'Attention', 'Foundations', 'Systems'])
   })
 
+  it('lists coming-soon courses last and holds back their certificates and their tracks\' certificates', () => {
+    const fixture = catalogFixture()
+    const soon = fixture.courses[0]!
+    const courses = fixture.courses.map((course) => (course.id === soon.id ? { ...course, comingSoon: true } : course))
+    const home = assembleAcademyHome({
+      ...fixture,
+      courses,
+      lessons: fixture.lessons.filter((lesson) => lesson.courseId !== soon.id),
+      enrollments: [],
+      progress: [],
+      awards: [],
+    })
+    expect(home.courses.at(-1)?.slug).toBe(soon.slug)
+    expect(home.courses.at(-1)?.comingSoon).toBe(true)
+    const soonTracks = fixture.links.filter((link) => link.courseId === soon.id).map((link) => link.trackId)
+    const certificateIds = new Set(
+      fixture.certificates.filter((cert) => cert.courseId === soon.id || (cert.trackId && soonTracks.includes(cert.trackId))).map((cert) => cert.slug),
+    )
+    expect(certificateIds.size).toBeGreaterThan(1)
+    expect(home.certificates.some((cert) => certificateIds.has(cert.slug))).toBe(false)
+    const track = home.tracks.find((item) => soonTracks.includes(fixture.tracks.find((row) => row.slug === item.slug)!.id))!
+    expect(track.openCourseCount).toBe(track.courseCount - 1)
+  })
+
   it('puts an in-progress enrollment on continue learning and resumes the next lesson', () => {
     const fixture = catalogFixture()
     const course = fixture.courses[0]!

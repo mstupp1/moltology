@@ -1,0 +1,174 @@
+{
+  "id": "molt-pod-ep01-heated-eyelid-protocol",
+  "title": "Heated Eyelids vs Putting the Phone Down",
+  "topic": "Molt Pod Reacts Ep. 1: Juno and Vera react to Bryan Johnson's 110-degree heated eyelid protocol for screen use",
+  "series": "Molt Pod Reacts",
+  "episode": 1,
+  "format": "reaction",
+  "loudness": 4,
+  "set": "podcast-studio",
+  "outro": "none",
+  "turnGap": 0.22,
+  "tail": 0.35,
+  "bgVolume": 0,
+  "queueId": "6b0a417a494a7f556edd91b9",
+  "host": "juno",
+  "cast": [
+    {
+      "id": "juno",
+      "at": "left"
+    },
+    {
+      "id": "vera",
+      "at": "right"
+    }
+  ],
+  "hookHeadline": "This billionaire heats his eyelids to 110 degrees to keep scrolling.",
+  "scenes": [
+    {
+      "speaker": "juno",
+      "line": "This billionaire heats his eyelids to 110 degrees to keep scrolling.",
+      "shot": "two",
+      "pose": "ready",
+      "look": "camera",
+      "act": {
+        "vera": {
+          "pose": "rest",
+          "look": "camera"
+        }
+      },
+      "description": "Two-shot at the podcast desk: Juno introduces Bryan Johnson's heated eyelid routine straight to camera while Vera watches deadpan."
+    },
+    {
+      "line": "",
+      "shot": "two",
+      "description": "Studio monitor plays Bryan Johnson explaining his 108 to 113 degree heated eye mask while Juno and Vera look up from the desk.",
+      "act": {
+        "juno": {
+          "pose": "rest",
+          "acting": "calm"
+        },
+        "vera": {
+          "pose": "rest",
+          "acting": "none"
+        }
+      },
+      "sourceClip": {
+        "path": "tmp/molt-pod-ep01/clip-1.mp4",
+        "start": 0,
+        "duration": 9.35,
+        "attribution": "Bryan Johnson · Your Phone Screen Is Making You Blind",
+        "url": "https://www.youtube.com/watch?v=coU8aHzTvpk",
+        "publishedAt": "2026-11-17",
+        "transcript": "I then will apply a heated eye mask. Target between 108 and 110 Fahrenheit, but not to exceed 113 Fahrenheit for ten minutes."
+      }
+    },
+    {
+      "speaker": "vera",
+      "line": "One hundred and thirteen degrees. That is basically slow-poaching your face.",
+      "shot": "close",
+      "move": "cut",
+      "pose": "ready",
+      "look": "left",
+      "description": "Close-up on Vera staring sideways at Juno after hearing the temperature cap."
+    },
+    {
+      "speaker": "juno",
+      "line": "To be fair, Vera, he says screens are ruining everyone's tear film.",
+      "shot": "close",
+      "move": "cut",
+      "pose": "shrug",
+      "look": "right",
+      "description": "Close-up on Juno shrugging back toward Vera at the desk."
+    },
+    {
+      "speaker": "vera",
+      "line": "So his big protocol is putting the phone down?",
+      "shot": "close",
+      "move": "cut",
+      "pose": "point",
+      "look": "left",
+      "react": [
+        {
+          "kind": "snap",
+          "word": 8,
+          "side": -1
+        }
+      ],
+      "description": "Close-up on Vera pointing and snapping on the obvious question."
+    },
+    {
+      "line": "",
+      "shot": "two",
+      "description": "Studio monitor plays Bryan Johnson saying he does not expect anyone to quit screens because he certainly will not, while Juno and Vera look up.",
+      "act": {
+        "juno": {
+          "pose": "rest",
+          "acting": "calm"
+        },
+        "vera": {
+          "pose": "rest",
+          "acting": "none"
+        }
+      },
+      "sourceClip": {
+        "path": "tmp/molt-pod-ep01/clip-2.mp4",
+        "start": 0,
+        "duration": 5.75,
+        "attribution": "Bryan Johnson · Your Phone Screen Is Making You Blind",
+        "url": "https://www.youtube.com/watch?v=coU8aHzTvpk",
+        "publishedAt": "2026-11-17",
+        "transcript": "I don't expect anyone to quit screens because I certainly won't. But I change the behavior around them."
+      }
+    },
+    {
+      "speaker": "vera",
+      "line": "I have eyestalks, no eyelids, and negligible aging. Even I leave my phone in another room.",
+      "shot": "close",
+      "move": "push-in",
+      "pose": "rest",
+      "look": "camera",
+      "acting": "calm",
+      "description": "Slow push-in on Vera deadpanning straight to camera about lobster biology versus phone habits."
+    },
+    {
+      "speaker": "juno",
+      "line": "Skip the 110-degree eye mask. Charge your phone in the kitchen tonight.",
+      "shot": "two",
+      "move": "cut",
+      "pose": "point",
+      "look": "camera",
+      "react": [
+        {
+          "kind": "snap",
+          "word": 6,
+          "side": 1
+        }
+      ],
+      "act": {
+        "vera": {
+          "pose": "rest",
+          "look": "camera"
+        }
+      },
+      "description": "Two-shot at the desk: Juno points to camera with the plain takeaway before the cut."
+    }
+  ],
+  "caption": "Slow-poaching your eyelids at 113 degrees instead of putting the phone in another room.\n\nJuno and Vera break down Bryan Johnson's recent screen-habit protocol.\n\n#MoltPod #ScreenTime #Moltology",
+  "hashtags": [
+    "#MoltPod",
+    "#ScreenTime",
+    "#Moltology"
+  ],
+  "firstComment": "More crustacean logic: https://moltology.org",
+  "youtubeTitle": "Heated eye masks vs putting the phone down #shorts",
+  "youtubeDescription": "Juno and Vera react to Bryan Johnson's 'Your Phone Screen Is Making You Blind' protocol (published Nov 17, 2026).\n\nSource: Bryan Johnson — https://www.youtube.com/watch?v=coU8aHzTvpk\n\nMore crustacean logic: https://moltology.org",
+  "youtubeTags": [
+    "molt pod",
+    "reaction",
+    "screen time",
+    "bryan johnson",
+    "moltology"
+  ],
+  "ctaGoal": "homepage"
+}

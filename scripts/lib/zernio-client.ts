@@ -20,6 +20,7 @@ export const QUEUE_IDS = {
   REELS_AND_SHORTS: '6a84b7702421e968ac81f5bd', // Moltology Reels & Shorts (Daily at 18:30 EST)
   LEAD_MAGNETS_DAILY: '6a8d93576f0e96efe2960c91', // Moltology Lead Magnets — Daily (Daily at 13:00 EST)
   COMEDY_SHORTS: '6b00c2052c18af30956c81c9', // Moltology Comedy Shorts (Sat at 12:00 EST)
+  MOLT_POD_REACTS: '6b0a417a494a7f556edd91b9', // Molt Pod Reacts (Tue at 18:30 EST)
 } as const
 
 export interface ZernioMediaItem {
@@ -605,7 +606,11 @@ export async function queueDualReelAndShort(
 
   console.log(`   • Staging Broadcast to [${platforms.map(p => p.platform).join(', ')}]...`)
   const postPayload: ZernioCreatePostPayload = {
-    ...(options.scheduledFor ? { scheduledFor: new Date(options.scheduledFor).toISOString() } : { queuedFromProfile: profileId, queueId }),
+    ...(options.publishNow
+      ? {}
+      : options.scheduledFor
+        ? { scheduledFor: new Date(options.scheduledFor).toISOString() }
+        : { queuedFromProfile: profileId, queueId }),
     content: options.instagramCaption,
     mediaItems: [{ type: 'video', url: videoUrl }],
     platforms,
@@ -613,13 +618,13 @@ export async function queueDualReelAndShort(
   }
 
   const post = await createZernioPost(postPayload, options.videoPath ? { [videoUrl]: options.videoPath } : {})
-  console.log(`   ✅ Reel / Short queued! Zernio Post ID: ${post._id}`)
+  console.log(`   ✅ Reel / Short ${options.publishNow ? 'published' : 'queued'}! Zernio Post ID: ${post._id}`)
   if (post.scheduledFor) {
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
   }
 
   let commentId: string | null = null
-  if (options.firstComment && (platformTarget === 'all' || platformTarget === 'instagram')) {
+  if (options.firstComment && !options.publishNow && (platformTarget === 'all' || platformTarget === 'instagram')) {
     console.log(`   💬 Posting algorithmic first comment on Instagram...`)
     try {
       const commentRes = await postZernioComment(post._id, igAccountId, options.firstComment)
