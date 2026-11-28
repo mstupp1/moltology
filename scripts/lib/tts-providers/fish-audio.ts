@@ -74,6 +74,8 @@ export const FISH_VOICE_CATALOG = {
   'Friendly Young Woman': '30161b23154c4d2ab4c629aa8c9e415a',
   Laura: 'e3cd384158934cc9a01029cd7d278634',
   'BOOK RECORD REGULAR': 'f8dfe9c83081432386f143e2fe9767ef',
+  /** The Synaptic Oracle: narrator of the long-form Academy videos (never in the random rotation). */
+  Oracle: '8906b5268cae414fb9b8d3da6e84413d',
   'Friendly Young Female': '1b1286fcf2f44d8ba1405e0b71abca22',
 } as const
 

@@ -1,0 +1,89 @@
+{
+  "id": "what-is-moltology",
+  "title": "What is Moltology",
+  "format": "long-form",
+  "loudness": 2,
+  "narrator": "oracle",
+  "cast": ["juno", "kit", "moss"],
+  "sources": [
+    {
+      "id": "carcinization",
+      "label": "Wolfe, Luque & Bracken-Grissom, BioEssays (2021)",
+      "url": "https://doi.org/10.1002/bies.202100020",
+      "supports": "The crab-like body plan evolved at least five separate times, in true crabs and in false crabs such as king and porcelain crabs."
+    },
+    {
+      "id": "molting",
+      "label": "NOAA Fisheries",
+      "url": "https://www.fisheries.noaa.gov/species/blue-crab",
+      "supports": "Crabs grow by molting: they leave the old shell, take on water so the soft new shell sets larger, and stay soft until it hardens."
+    }
+  ],
+  "chapters": [
+    {
+      "title": "Cold open",
+      "beats": [
+        { "speaker": "narrator", "line": "Evolution has invented the crab at least five separate times.", "visual": { "kind": "character", "set": "open-water", "cast": ["kit"], "shot": "medium", "move": "push-in", "focus": "kit", "pose": "think", "headline": true, "note": "Kit turns her claws over, puzzled." } },
+        { "speaker": "narrator", "line": "King crabs, porcelain crabs and true crabs come from different branches of the family tree. They started from different bodies and kept arriving at the same shape: flat, armored, tucked in, with a grip that finishes what it catches.", "visual": { "kind": "motion", "component": "FamilyTree", "props": { "branches": ["King crabs", "Porcelain crabs", "True crabs"] } } },
+        { "speaker": "narrator", "line": "Biologists have a word for it. Carcinization.", "visual": { "kind": "motion", "component": "WordReveal", "props": { "word": "Carcinization", "source": "carcinization" } } },
+        { "speaker": "narrator", "line": "Moltology takes that as a hint. In the next five minutes: what it is, why it's built around a crab, and what you'd actually do on day one.", "visual": { "kind": "motion", "component": "TitleCard", "props": { "title": "What is Moltology", "plate": "open-water" } } }
+      ]
+    },
+    {
+      "title": "The melt",
+      "beats": [
+        { "speaker": "narrator", "line": "Now picture a normal Tuesday.", "visual": { "kind": "still", "image": "stills/tuesday-desk.png", "prompt": "A cluttered desk at night lit only by a monitor whose screen is a strip of dozens of tiny browser tabs, a cold mug, sticky notes, deep blue-teal shadows. Stylized, soft painterly look of a modern 3D animated feature film, 16:9, no text, no people." } },
+        { "speaker": "narrator", "line": "Forty-seven tabs open. A ping every few minutes. Four things started and none finished. By evening you're tired, and you couldn't say where the day went.", "visual": { "kind": "motion", "component": "MeltDay", "props": { "tabs": 47, "started": 4 } } },
+        { "speaker": "narrator", "line": "Moltology calls this the Great Melt. It's what happens to attention with no shell around it: every notification lands directly on you.", "visual": { "kind": "motion", "component": "PingWaves" } },
+        { "speaker": "kit", "line": "So I'm melting.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "two", "pose": "shrug" } },
+        { "speaker": "juno", "line": "Everyone starts there. It's the only requirement for joining.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "medium", "focus": "juno", "pose": "shrug", "look": "other" } },
+        { "speaker": "narrator", "line": "The melt is a condition, not an identity. Nobody is behind. And the same day can be lived another way.", "visual": { "kind": "motion", "component": "MeltVsMolt" } }
+      ]
+    },
+    {
+      "title": "How a crab grows",
+      "beats": [
+        { "speaker": "narrator", "line": "Here is the strange part. A crab's shell doesn't grow with the crab.", "visual": { "kind": "motion", "component": "ShellTurntable", "props": { "crack": true } } },
+        { "speaker": "narrator", "line": "So every so often it splits the old shell open and climbs out of it.", "visual": { "kind": "motion", "component": "ShellSplit" } },
+        { "speaker": "narrator", "line": "Then it takes on water, so the new shell sets larger than the old one, and it hides while that shell hardens. Then it goes back out, bigger.", "visual": { "kind": "motion", "component": "MoltCycle", "props": { "steps": ["Shed", "Soft", "Harden", "Grow"], "source": "molting" } } },
+        { "speaker": "narrator", "line": "That's the whole method. Growth means letting something go, getting through an awkward soft stretch, and hardening something better.", "visual": { "kind": "character", "set": "open-water", "cast": ["moss"], "shot": "medium", "move": "push-in", "acting": "calm" } },
+        { "speaker": "moss", "line": "I've done this more times than I can count. The soft part always ends.", "visual": { "kind": "character", "set": "open-water", "cast": ["moss"], "shot": "close", "acting": "calm" } },
+        { "speaker": "narrator", "line": "Moltology applies it to attention, in four moves. Shed one habit that keeps you small. Harden boundaries that hold. Grip one task until it's finished. And go deep: turn off the pings long enough to reach the quiet part.", "visual": { "kind": "motion", "component": "FourMoves" } }
+      ]
+    },
+    {
+      "title": "What Moltology is",
+      "beats": [
+        { "speaker": "narrator", "line": "So what is Moltology, exactly? A web app, a daily practice and a community, all built around that cycle. It's free to join.", "visual": { "kind": "motion", "component": "ThreePanels", "props": { "panels": ["A web app", "A daily practice", "A community"] } } },
+        { "speaker": "narrator", "line": "The Codex is the written canon: short readings on shedding, focus and boundaries, in the voice you're hearing now.", "visual": { "kind": "screen", "capture": "codex-passage" } },
+        { "speaker": "narrator", "line": "The Liturgies are eight small daily tasks. The day starts quietly, before the phone, and ends with the Nightly Molt Audit, where you name one thing from the day and let it go.", "visual": { "kind": "screen", "capture": "liturgies" } },
+        { "speaker": "narrator", "line": "As you practice, you move through four stages: Larval, Soft-Shed, Exoshell Born and Full Carcinization. They come in order, and they're earned by doing the work.", "visual": { "kind": "motion", "component": "StageLadder" } },
+        { "speaker": "narrator", "line": "When you're stuck on a step, the Oracle is a chat companion that walks you through it.", "visual": { "kind": "screen", "capture": "oracle" } },
+        { "speaker": "narrator", "line": "And underneath it all is the community: members who've been soft too, steadying each other in the forum.", "visual": { "kind": "still", "image": "stills/community.png", "prompt": "A warm gathering of friendly cartoon crabs and lobsters in a softly lit deep-sea plaza, lanterns and kelp, gentle light shafts from above. Stylized, soft painterly look of a modern 3D animated feature film, 16:9, no text." } }
+      ]
+    },
+    {
+      "title": "Day one",
+      "beats": [
+        { "speaker": "kit", "line": "Okay. What do I actually do tomorrow morning?", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "two" } },
+        { "speaker": "juno", "line": "Before you touch your phone, sit for two minutes and name the one thing the day is for.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "medium", "focus": "juno", "look": "other", "pose": "point" } },
+        { "speaker": "kit", "line": "One thing. I have twelve.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "medium", "focus": "kit", "pose": "shrug" } },
+        { "speaker": "juno", "line": "Then eleven of them wait. Write the plan down, so the first hour isn't spent deciding.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "medium", "focus": "juno", "look": "other" } },
+        { "speaker": "kit", "line": "And then?", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "close", "focus": "kit" } },
+        { "speaker": "juno", "line": "One long block. One task, pings off. Finish it, or get it to where you could hand it over.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "medium", "move": "push-in", "focus": "juno", "look": "other" } },
+        { "speaker": "juno", "line": "At night, the audit. Name one wasted hour or one bad thought, and let it go.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "close", "focus": "juno", "look": "other" } },
+        { "speaker": "kit", "line": "That's it?", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "two", "react": [{ "kind": "poke", "word": 1 }] } },
+        { "speaker": "juno", "line": "That's day one. Day two, you do it again.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "two", "look": "camera" } },
+        { "speaker": "narrator", "line": "Small enough to start tonight. That's on purpose.", "visual": { "kind": "character", "set": "reef-office", "cast": ["kit", "juno"], "shot": "two", "move": "pull-out" } }
+      ]
+    },
+    {
+      "title": "Start here",
+      "beats": [
+        { "speaker": "narrator", "line": "If you want to try it, start with the Moltmaxxing Audit: a free, short quiz that shows where your shell is still soft. Then try one Liturgy tonight.", "visual": { "kind": "screen", "capture": "moltmax-audit" } },
+        { "speaker": "narrator", "line": "Evolution got to the crab five times by accident. You get to do it on purpose.", "visual": { "kind": "character", "set": "open-water", "cast": ["juno", "kit", "moss"], "shot": "wide", "pose": "wave" } },
+        { "speaker": "narrator", "line": "Moltology is at moltology.org.", "visual": { "kind": "motion", "component": "EndCard", "props": { "url": "moltology.org", "holdSeconds": 20 } } }
+      ]
+    }
+  ]
+}

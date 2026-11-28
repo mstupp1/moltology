@@ -25,6 +25,8 @@ export const QUEUE_IDS = {
 export interface ZernioMediaItem {
   type: 'image' | 'video'
   url: string
+  /** YouTube custom thumbnail: a Zernio-hosted image URL. */
+  thumbnail?: string
 }
 
 export interface ZernioPlatformConfig {
