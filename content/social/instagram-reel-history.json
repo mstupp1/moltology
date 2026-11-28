@@ -2711,7 +2711,7 @@
       "createdAt": "2026-11-27T14:12:35.015Z"
     },
     {
-      "id": "reel-1795836316774",
+      "id": "reel-1795837347941",
       "topic": "Molt Pod Reacts Ep. 1: Juno and Vera react to Bryan Johnson's 110-degree heated eyelid protocol for screen use",
       "hookHeadline": "This billionaire heats his eyelids to 110 degrees to keep scrolling.",
       "holidayOrEvent": null,
@@ -2726,19 +2726,19 @@
         "vera"
       ],
       "loudness": 4,
-      "archivePath": "Social Archive/2026/11/reel-8c48c86ebc8f908fa4809660",
+      "archivePath": "Social Archive/2026/11/reel-62401c0533077a3076f0a630",
       "zernioMediaUrls": [
-        "https://media.zernio.com/temp/1795836318107_afa39c13aa778d15_01.mp4"
+        "https://media.zernio.com/temp/1795837348283_8860d85bfa62a9f6_01.mp4"
       ],
       "thumbnailUrl": null,
       "s3ThumbKey": null,
       "durationSeconds": 45.533333,
-      "status": "queued",
-      "scheduledFor": "2026-12-01T23:30:00.000Z",
+      "status": "published",
+      "scheduledFor": "2026-11-28T03:42:29.882Z",
       "queueId": "6b0a417a494a7f556edd91b9",
-      "zernioInstagramPostId": "6b0a499fe4d5ce9eeb03c37a",
-      "zernioYouTubePostId": "6b0a499fe4d5ce9eeb03c37a",
-      "zernioPostId": "6b0a499fe4d5ce9eeb03c37a",
+      "zernioInstagramPostId": "6b0a4da57d14a57f9a6aaec3",
+      "zernioYouTubePostId": "6b0a4da57d14a57f9a6aaec3",
+      "zernioPostId": "6b0a4da57d14a57f9a6aaec3",
       "zernioCommentId": null,
       "isAiGenerated": true,
       "firstComment": "More crustacean logic: https://moltology.org",
@@ -2754,7 +2754,7 @@
       "trialParams": {
         "graduationStrategy": "SS_PERFORMANCE"
       },
-      "createdAt": "2026-11-28T03:25:21.438Z"
+      "createdAt": "2026-11-28T03:42:32.742Z"
     }
   ]
 }

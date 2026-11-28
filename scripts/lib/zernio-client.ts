@@ -606,7 +606,11 @@ export async function queueDualReelAndShort(
 
   console.log(`   • Staging Broadcast to [${platforms.map(p => p.platform).join(', ')}]...`)
   const postPayload: ZernioCreatePostPayload = {
-    ...(options.scheduledFor ? { scheduledFor: new Date(options.scheduledFor).toISOString() } : { queuedFromProfile: profileId, queueId }),
+    ...(options.publishNow
+      ? {}
+      : options.scheduledFor
+        ? { scheduledFor: new Date(options.scheduledFor).toISOString() }
+        : { queuedFromProfile: profileId, queueId }),
     content: options.instagramCaption,
     mediaItems: [{ type: 'video', url: videoUrl }],
     platforms,
@@ -614,13 +618,13 @@ export async function queueDualReelAndShort(
   }
 
   const post = await createZernioPost(postPayload, options.videoPath ? { [videoUrl]: options.videoPath } : {})
-  console.log(`   ✅ Reel / Short queued! Zernio Post ID: ${post._id}`)
+  console.log(`   ✅ Reel / Short ${options.publishNow ? 'published' : 'queued'}! Zernio Post ID: ${post._id}`)
   if (post.scheduledFor) {
     console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
   }
 
   let commentId: string | null = null
-  if (options.firstComment && (platformTarget === 'all' || platformTarget === 'instagram')) {
+  if (options.firstComment && !options.publishNow && (platformTarget === 'all' || platformTarget === 'instagram')) {
     console.log(`   💬 Posting algorithmic first comment on Instagram...`)
     try {
       const commentRes = await postZernioComment(post._id, igAccountId, options.firstComment)
