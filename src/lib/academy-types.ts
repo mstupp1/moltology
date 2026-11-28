@@ -1,6 +1,7 @@
 export type AcademyLevel = 'beginner' | 'intermediate' | 'advanced'
 
-export type AcademyPublishStatus = 'draft' | 'published'
+/** `soon` lists a course or track as coming soon: shown on the catalog, no lessons, no enrolling. */
+export type AcademyPublishStatus = 'draft' | 'soon' | 'published'
 
 export type AcademyLessonKind = 'video' | 'reading' | 'quiz'
 

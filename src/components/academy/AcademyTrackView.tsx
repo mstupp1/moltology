@@ -15,6 +15,7 @@ import {
   AcademyCrumbs,
   AcademyEmpty,
   AcademyProgress,
+  ComingSoonChip,
   LevelMark,
   useAcademyGuestEnroll,
 } from './AcademyChrome'
@@ -24,10 +25,11 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
   const [detail, setDetail] = useState(track)
   const [busy, setBusy] = useState(false)
   const guest = useAcademyGuestEnroll()
-  const enrolledCount = detail.courses.filter((course) => course.enrolled).length
+  const liveCourses = detail.courses.filter((course) => !course.comingSoon)
+  const enrolledCount = liveCourses.filter((course) => course.enrolled).length
   const completedCount = detail.courses.filter((course) => course.completed).length
-  const allEnrolled = detail.courses.length > 0 && enrolledCount === detail.courses.length
-  const nextCourse = enrolledCount > 0 ? detail.courses.find((course) => !course.completed) ?? null : null
+  const allEnrolled = liveCourses.length > 0 && enrolledCount === liveCourses.length
+  const nextCourse = enrolledCount > 0 ? liveCourses.find((course) => !course.completed) ?? null : null
 
   async function enroll() {
     if (guest.isGuest) return guest.promptSignUp()
@@ -68,7 +70,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
           </ul>
           <div className="flex flex-wrap items-center gap-3 pt-1">
             {allEnrolled ? null : (
-              <HudButton type="button" variant="primary" size="md" disabled={busy || detail.courses.length === 0} onClick={() => void enroll()}>
+              <HudButton type="button" variant="primary" size="md" disabled={busy || liveCourses.length === 0} onClick={() => void enroll()}>
                 {busy ? 'Enrolling…' : guest.isGuest ? ACADEMY_COPY.guestEnroll : 'Enroll in track'}
               </HudButton>
             )}
@@ -109,8 +111,9 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
                       params={{ slug: course.slug }}
                       className={cn(
                         ACADEMY_CARD_LINK,
-                        'group p-4 flex items-start gap-4',
+                        'group p-3 sm:p-4 flex items-start gap-4',
                         lit && 'bg-surface-3 shadow-nav-current border-transparent',
+                        course.comingSoon && 'opacity-70',
                       )}
                     >
                       <span
@@ -122,10 +125,15 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
                         {course.completed ? <CheckCircle2 className="w-4 h-4" aria-label="Complete" /> : index + 1}
                       </span>
                       <div className="flex-1 min-w-0 space-y-1">
-                        <p className="eyebrow">
+                        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xs text-ink-muted">
                           <span className="font-semibold text-ink">{course.code}</span>
-                          {course.required ? ' · Required' : ' · Optional'} · {formatCourseLength(course.estimatedMinutes)}
-                          {lit ? <span className="font-semibold text-cyan-glow"> · Up next</span> : null}
+                          {course.comingSoon ? (
+                            <ComingSoonChip />
+                          ) : (
+                            <span>{formatCourseLength(course.estimatedMinutes)}</span>
+                          )}
+                          {course.required ? null : <span>Optional</span>}
+                          {lit ? <span className="font-semibold text-cyan-glow">Up next</span> : null}
                         </p>
                         <h3 className="font-grotesk font-semibold text-ink">{course.title}</h3>
                         <p className="text-xs text-ink-body leading-relaxed">{course.subtitle}</p>
@@ -136,7 +144,7 @@ export function AcademyTrackView({ track }: { track: AcademyTrackDetail }) {
                         ) : null}
                       </div>
                       <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-cyan-glow shrink-0 self-center">
-                        {course.completed ? 'Review' : course.enrolled ? 'Continue' : 'View course'}
+                        {course.comingSoon ? 'Preview' : course.completed ? 'Review' : course.enrolled ? 'Continue' : 'View course'}
                         <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                       </span>
                     </Link>

@@ -24,6 +24,7 @@ import {
   AcademyEmpty,
   AcademyProgress,
   AcademySectionHeading,
+  ComingSoonChip,
   LevelMark,
 } from './AcademyChrome'
 
@@ -41,13 +42,18 @@ function courseHref(course: AcademyCourseCard) {
 }
 
 function courseAction(course: AcademyCourseCard) {
+  if (course.comingSoon) return 'Preview'
   return course.completed ? 'Review' : course.enrolled ? 'Continue' : 'View course'
 }
 
 function CourseCard({ course }: { course: AcademyCourseCard }) {
   const href = courseHref(course)
   return (
-    <Link to={href.to} params={href.params} className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col h-full')}>
+    <Link
+      to={href.to}
+      params={href.params}
+      className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col h-full', course.comingSoon && 'opacity-70 hover:opacity-100')}
+    >
       {course.coverImageUrl ? (
         <AcademyCover url={course.coverImageUrl} className="aspect-[16/7] border-b border-line-subtle">
           <div className="flex h-full items-start justify-between gap-2 p-3">
@@ -61,7 +67,7 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
           // No artwork: the code sits on the card itself instead of over an empty cover.
           <div className="flex items-center justify-between gap-2">
             <span className="rounded-chip bg-surface-2 px-1.5 py-0.5 text-2xs font-semibold text-ink-muted">{course.code}</span>
-            {course.completed ? <DoneChip /> : null}
+            {course.completed ? <DoneChip /> : course.comingSoon ? <ComingSoonChip /> : null}
           </div>
         )}
         <div className="space-y-1">
@@ -70,14 +76,18 @@ function CourseCard({ course }: { course: AcademyCourseCard }) {
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs text-ink-muted">
           <LevelMark level={course.level} />
-          <span className="inline-flex items-center gap-1">
-            <Layers className="w-3.5 h-3.5" aria-hidden="true" />
-            {course.lessonCount} {course.lessonCount === 1 ? 'lesson' : 'lessons'}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-            {formatCourseLength(course.estimatedMinutes)}
-          </span>
+          {course.comingSoon ? null : (
+            <>
+              <span className="inline-flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5" aria-hidden="true" />
+                {course.lessonCount} {course.lessonCount === 1 ? 'lesson' : 'lessons'}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+                {formatCourseLength(course.estimatedMinutes)}
+              </span>
+            </>
+          )}
         </div>
         <div className="mt-auto pt-1 space-y-2.5">
           {course.enrolled ? <AcademyProgress percent={course.progressPercent} /> : null}
@@ -128,7 +138,14 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
       params={{ slug: track.slug }}
       className={cn(ACADEMY_CARD_LINK, 'group overflow-hidden flex flex-col sm:flex-row')}
     >
-      <AcademyCover url={track.coverImageUrl} className="h-24 sm:h-auto sm:w-40 shrink-0 border-b sm:border-b-0 sm:border-r border-line-subtle">
+      <AcademyCover
+        url={track.coverImageUrl}
+        className={cn(
+          'sm:h-auto sm:w-40 shrink-0 border-b sm:border-b-0 sm:border-r border-line-subtle',
+          // No artwork: skip the empty cover on phones, where it would stack above the text.
+          track.coverImageUrl ? 'h-24' : 'hidden sm:block',
+        )}
+      >
         <div className="flex h-full items-end p-3">
           <span className="inline-flex items-center gap-1.5 rounded-chip bg-abyss/70 px-1.5 py-0.5 text-2xs font-semibold text-ink">
             <RouteIcon className="w-3 h-3 text-cyan-glow" aria-hidden="true" />
@@ -140,7 +157,12 @@ function TrackCard({ track }: { track: AcademyTrackCard }) {
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <LevelMark level={track.level} />
           <span className="text-2xs text-ink-muted">
-            {track.courseCount} {track.courseCount === 1 ? 'course' : 'courses'} · about {track.estimatedHours} hr
+            {track.courseCount} {track.courseCount === 1 ? 'course' : 'courses'}
+            {track.openCourseCount < track.courseCount
+              ? track.openCourseCount === 0
+                ? ' · coming soon'
+                : ` · ${track.openCourseCount} open now`
+              : ` · about ${track.estimatedHours} hr`}
           </span>
         </div>
         <h3 className="font-grotesk font-semibold text-lg text-ink leading-snug">{track.title}</h3>

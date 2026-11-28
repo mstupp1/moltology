@@ -16,7 +16,7 @@ import {
   type AcademyVideoProvider,
 } from './academy-types'
 
-export const ACADEMY_CONTENT_STATUSES: AcademyPublishStatus[] = ['draft', 'published']
+export const ACADEMY_CONTENT_STATUSES: AcademyPublishStatus[] = ['draft', 'soon', 'published']
 const LESSON_KINDS: AcademyLessonKind[] = ['video', 'reading', 'quiz']
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CODE_PATTERN = /^[A-Z][A-Z0-9]*-\d{3}$/
@@ -366,8 +366,10 @@ export function parseAcademyCourse(
     parsedLessons.set(result.value.slug, result.value)
   }
 
+  // A coming-soon course is a roadmap card: its modules are the planned outline and need no lessons yet.
+  const comingSoon = data.status === 'soon'
   const rawModules = Array.isArray(data.modules) ? data.modules : []
-  if (rawModules.length === 0) issues.error(path, 'List at least one module with its lessons under "modules".')
+  if (rawModules.length === 0 && !comingSoon) issues.error(path, 'List at least one module with its lessons under "modules".')
   const used = new Set<string>()
   const modules: AcademyContentModule[] = []
   rawModules.forEach((raw, index) => {
@@ -375,7 +377,7 @@ export function parseAcademyCourse(
     const moduleTitle = text(module.title)
     if (!moduleTitle) issues.error(path, `Module ${index + 1} is missing "title".`)
     const slugs = stringList(module.lessons)
-    if (slugs.length === 0) issues.error(path, `Module "${moduleTitle || index + 1}" lists no lessons.`)
+    if (slugs.length === 0 && !comingSoon) issues.error(path, `Module "${moduleTitle || index + 1}" lists no lessons.`)
     const lessons: AcademyContentLesson[] = []
     for (const lessonSlug of slugs) {
       if (used.has(lessonSlug)) {
@@ -402,7 +404,7 @@ export function parseAcademyCourse(
   if (outcomes.length === 0) issues.warn(path, 'No "outcomes" listed. The course page will skip "What you will practice".')
   const parsedStatus = status(data.status, path, issues)
   const parsedCertificate = certificate(data.certificate, slug, path, issues)
-  if (!parsedCertificate) issues.warn(path, 'No "certificate". Finishing this course will not issue one.')
+  if (!parsedCertificate && !comingSoon) issues.warn(path, 'No "certificate". Finishing this course will not issue one.')
   const parsedLevel = level(data.level, path, issues)
 
   if (issues.hasErrors) return { value: null, issues: issues.items }

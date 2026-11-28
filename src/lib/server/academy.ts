@@ -45,11 +45,15 @@ import type {
   AcademyLessonKind,
   AcademyLevel,
   AcademyProgressStatus,
+  AcademyPublishStatus,
   AcademyVideoProvider,
 } from '../academy-types'
 import { ensureUserProfile } from '../user-sync'
 import { tryCheckGemMilestones } from './gems'
 import { resolveWriteAuth, type WriteAuthContext, type WriteAuthData } from './write-auth'
+
+/** Course statuses that show on the catalog. Drafts stay hidden; `soon` courses list without lessons. */
+const LISTED_STATUSES: AcademyPublishStatus[] = ['published', 'soon']
 
 type ReadContext = {
   user?: { sub?: string; id?: string; name?: string } | null
@@ -107,6 +111,7 @@ function mapCourse(row: typeof academyCourses.$inferSelect): AcademyCourseRow {
     outcomes: row.outcomes ?? [],
     coverImageUrl: row.coverImageUrl,
     sortOrder: row.sortOrder,
+    comingSoon: row.status === 'soon',
   }
 }
 
@@ -198,19 +203,21 @@ function mapAward(row: typeof academyCertificateAwards.$inferSelect, holderName?
 async function publishedCatalog(db: ReturnType<typeof getDb>) {
   const [tracks, courses, links, modules, lessons, certificates] = await Promise.all([
     db.select().from(academyTracks).where(eq(academyTracks.status, 'published')).orderBy(asc(academyTracks.sortOrder)),
-    db.select().from(academyCourses).where(eq(academyCourses.status, 'published')).orderBy(asc(academyCourses.sortOrder)),
+    db.select().from(academyCourses).where(inArray(academyCourses.status, LISTED_STATUSES)).orderBy(asc(academyCourses.sortOrder)),
     db.select().from(academyTrackCourses).orderBy(asc(academyTrackCourses.sortOrder)),
     db.select().from(academyModules).orderBy(asc(academyModules.sortOrder)),
     db.select().from(academyLessons).orderBy(asc(academyLessons.sortOrder)),
     db.select().from(academyCertificates),
   ])
-  const publishedCourseIds = new Set(courses.map((course) => course.id))
+  // Coming-soon courses are listed (and sit on tracks) but carry no lessons or certificate.
+  const listedCourseIds = new Set(courses.map((course) => course.id))
+  const publishedCourseIds = new Set(courses.filter((course) => course.status === 'published').map((course) => course.id))
   const publishedTrackIds = new Set(tracks.map((track) => track.id))
   return {
     tracks: tracks.map(mapTrack),
     courses: courses.map(mapCourse),
     links: links
-      .filter((link) => publishedTrackIds.has(link.trackId) && publishedCourseIds.has(link.courseId))
+      .filter((link) => publishedTrackIds.has(link.trackId) && listedCourseIds.has(link.courseId))
       .map((link): AcademyTrackLinkRow => ({
         trackId: link.trackId,
         courseId: link.courseId,
@@ -252,6 +259,7 @@ export async function getAcademyHomeHandler(args: { context?: ReadContext }): Pr
   return assembleAcademyHome({ ...catalog, ...learner })
 }
 
+/** Live courses only: lessons, enrolling and progress all go through this. */
 async function courseBySlug(db: ReturnType<typeof getDb>, slug: string) {
   const [course] = await db
     .select()
@@ -261,12 +269,22 @@ async function courseBySlug(db: ReturnType<typeof getDb>, slug: string) {
   return course ?? null
 }
 
+/** Live or coming-soon: the course page shows a coming-soon course's planned outline. */
+async function listedCourseBySlug(db: ReturnType<typeof getDb>, slug: string) {
+  const [course] = await db
+    .select()
+    .from(academyCourses)
+    .where(and(eq(academyCourses.slug, slug), inArray(academyCourses.status, LISTED_STATUSES)))
+    .limit(1)
+  return course ?? null
+}
+
 export async function getAcademyCourseHandler(args: {
   data: { slug: string }
   context?: ReadContext
 }): Promise<AcademyCourseDetail | null> {
   const db = getDb()
-  const course = await courseBySlug(db, args.data.slug)
+  const course = await listedCourseBySlug(db, args.data.slug)
   if (!course) return null
   const userId = readerId(args.context)
   const [modules, lessons, links, certificates, enrollmentRows, progressRows, awardRows] = await Promise.all([
@@ -324,7 +342,7 @@ export async function getAcademyTrackHandler(args: {
   const courseIds = links.map((link) => link.courseId)
   const [courses, lessons, certificates] = await Promise.all([
     courseIds.length
-      ? db.select().from(academyCourses).where(and(inArray(academyCourses.id, courseIds), eq(academyCourses.status, 'published')))
+      ? db.select().from(academyCourses).where(and(inArray(academyCourses.id, courseIds), inArray(academyCourses.status, LISTED_STATUSES)))
       : Promise.resolve([]),
     courseIds.length
       ? db.select().from(academyLessons).where(inArray(academyLessons.courseId, courseIds))
@@ -556,8 +574,15 @@ export async function enrollAcademyTrackHandler(args: {
     .limit(1)
   if (!track) throw new Error(ACADEMY_COPY.missingTrack)
   const links = await auth.dbClient.select().from(academyTrackCourses).where(eq(academyTrackCourses.trackId, track.id))
-  for (const link of links) {
-    await enrollUser(auth.dbClient, auth.userId, link.courseId)
+  // Only live courses take enrollments; coming-soon and draft courses on the track are skipped.
+  const liveCourses = links.length
+    ? await auth.dbClient
+        .select({ id: academyCourses.id })
+        .from(academyCourses)
+        .where(and(inArray(academyCourses.id, links.map((link) => link.courseId)), eq(academyCourses.status, 'published')))
+    : []
+  for (const course of liveCourses) {
+    await enrollUser(auth.dbClient, auth.userId, course.id)
   }
   const detail = await getAcademyTrackHandler({
     data: { slug: args.data.slug },

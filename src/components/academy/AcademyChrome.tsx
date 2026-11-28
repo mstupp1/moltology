@@ -138,6 +138,15 @@ export function LevelMark({ level }: { level: AcademyLevel }) {
   )
 }
 
+/** Marks a course on the roadmap that has no lessons yet. */
+export function ComingSoonChip({ className }: { className?: string }) {
+  return (
+    <span className={cn('inline-flex items-center rounded-chip bg-surface-2 px-1.5 py-0.5 text-2xs font-semibold text-ink-muted', className)}>
+      Coming soon
+    </span>
+  )
+}
+
 /** One-line empty state for a section that has nothing in it yet. */
 export function AcademyEmpty({ children }: { children: React.ReactNode }) {
   return (
