@@ -128,6 +128,7 @@ Add a line here when a phrase starts repeating across pieces.
 | Skill | Formats | Typical loudness | Ending |
 | --- | --- | --- | --- |
 | [Reels and shorts](../.agents/skills/reels-and-shorts-creator/SKILL.md) | [Reel formats](../.agents/skills/reels-and-shorts-creator/references/reel-formats.md) | 3–4 | One website invitation; no save or share ask |
+| [Molt Pod Reacts](../.agents/skills/molt-pod-reacts/SKILL.md) | 3D podcast commentary on fresh pop-culture YouTube clips | 3–4 | Hard cut or one plain takeaway; no commercial promo |
 | [Benthic comedy shorts](../.agents/skills/benthic-comedy-shorts/SKILL.md) | Crab Logic 3D sketches (Surface Confusion, Crab Logic, Breakroom) | 4–5 | Hard cut on the punchline; no commercial outro |
 | [Benthic Swipe Lab](../.agents/skills/benthic-swipe-lab/SKILL.md) | [Format library](../.agents/skills/benthic-swipe-lab/references/format-library.md) | 3–4 | One save, share or comment-question ask |
 | [Carousels](../.agents/skills/instagram-carousel-creator/SKILL.md) and [posts](../.agents/skills/instagram-post-creator/SKILL.md) | Swipe Lab library where it fits | 2–3 | Per STYLE_GUIDE §4.3 |

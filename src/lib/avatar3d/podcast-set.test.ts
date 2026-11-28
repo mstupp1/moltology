@@ -20,7 +20,9 @@ describe('podcast studio', () => {
     const members = [member('lobster_vera_drift', -1.05), member('crab_bo_pebble', 1.05)]
     const props = dressPodcast(members)
     const mics = props.children.filter((c) => c.name === 'podcast:mic')
+    const chairs = props.children.filter((c) => c.name === 'podcast:chair')
     expect(mics).toHaveLength(2)
+    expect(chairs).toHaveLength(2)
     for (const m of members) {
       expect(m.character.rig.sockets.get('ears')!.node.getObjectByName('podcast:headphones')).toBeTruthy()
     }

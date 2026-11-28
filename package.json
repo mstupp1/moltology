@@ -66,6 +66,7 @@
     "reel:create": "tsx scripts/create-reel.ts",
     "anim:create": "tsx scripts/animate-character.ts",
     "anim:art": "tsx scripts/anim-art.ts",
+    "anim:clip": "tsx scripts/fetch-reaction-clip.ts",
     "cast:render": "tsx scripts/render-cast.ts",
     "gear:board": "tsx scripts/gear-board.ts",
     "gear:sync": "tsx scripts/gear-sync.ts",
